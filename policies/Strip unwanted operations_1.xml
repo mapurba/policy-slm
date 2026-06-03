@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip unwanted operations</description>
+									<comment xml:space="preserve">Strip all delete commands (because Identity tracking Identity records and Account records are never deleted in Sentinel).
+
+Also strip any operation that has an operation property that specifies that the operation should be stripped. This is primarily in support of the Account matching rule, which allows an add to proceed so as to avoid an alarming yellow warning message that the engine displays if the matching rule strips the add operation.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">delete</if-operation>
+											<if-op-property mode="nocase" name="strip-this" op="equal">true</if-op-property>
+										</or>
+									</conditions>
+									<actions>
+										<do-veto />
+									</actions>
+								</rule>
+							

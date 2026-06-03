@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat New Name for Users</description>
+									<comment xml:space="preserve">Removes domain name part from New Name element in case of rename events on class user.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="nu-name" scope="policy">
+											<arg-string>
+												<token-split delimiter="@">
+													<token-xpath expression="new-name" />
+												</token-split>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="new-name/text()" />
+										<do-append-xml-text expression="new-name">
+											<arg-string>
+												<token-local-variable name="nu-name" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

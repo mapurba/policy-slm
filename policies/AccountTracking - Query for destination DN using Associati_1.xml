@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Query for destination DN using Association</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">modify|delete|move|rename</if-operation>
+											<if-op-property name="AccountTracking-Operation" op="not-available" />
+											<if-association op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-op-attr name="~drv.acctTrk.statusAttr~" op="available" />
+													<if-operation mode="case" op="not-equal">modify</if-operation>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-operation mode="case" op="equal">rename</if-operation>
+															<if-xpath op="true">string-length($oldAssociationValue)&gt;0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="ObjectDN" scope="policy">
+															<arg-node-set>
+																<token-query scope="entry">
+																	<arg-association>
+																		<token-local-variable name="oldAssociationValue" />
+																	</arg-association>
+																</token-query>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-set-local-variable name="oldAssociationValue" scope="driver">
+															<arg-string />
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="ObjectDN" scope="policy">
+															<arg-node-set>
+																<token-query scope="entry">
+																	<arg-association>
+																		<token-association />
+																	</arg-association>
+																</token-query>
+															</arg-node-set>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length($ObjectDN) &gt; 0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-ObjectDN">
+															<arg-string>
+																<token-xpath expression="$ObjectDN/@src-dn" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

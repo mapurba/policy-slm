@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Populate DirXML-MDADContext on initial user add</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="association" scope="policy">
+											<arg-string>
+												<token-xpath expression="./text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="query-result" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src" scope="entry">
+													<arg-association>
+														<token-local-variable name="association" />
+													</arg-association>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-add-dest-attr-value direct="true" name="Object Class">
+											<arg-dn>
+												<token-xpath expression="@dest-dn" />
+											</arg-dn>
+											<arg-value type="string">
+												<token-text xml:space="preserve">DirXML-ApplicationAttrs</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-for-each>
+											<arg-node-set>
+												<token-dest-attr name="DirXML-MDADContext" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-dest-attr-value direct="true" name="DirXML-MDADContext">
+															<arg-dn>
+																<token-xpath expression="@dest-dn" />
+															</arg-dn>
+															<arg-value type="structured">
+																<arg-component name="nameSpace">
+																	<token-xpath expression="$current-node/component[@name=&quot;nameSpace&quot;]" />
+																</arg-component>
+																<arg-component name="volume">
+																	<token-xpath expression="$current-node/component[@name=&quot;volume&quot;]" />
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</arg-component>
+															</arg-value>
+														</do-remove-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-add-dest-attr-value direct="true" name="DirXML-MDADContext">
+											<arg-dn>
+												<token-xpath expression="@dest-dn" />
+											</arg-dn>
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-xpath expression="$query-result/@src-dn" />
+												</arg-component>
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

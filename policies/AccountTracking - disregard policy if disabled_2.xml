@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - disregard policy if disabled</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.acctTrk.enable" op="equal">true</if-global-variable>
+											<if-xpath op="true">status[1]/@level='success'</if-xpath>
+											<if-xpath op="true">status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='operation-data']/*[local-name()='return-to-me']/@command='add'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">adding account tracking information for sap portal add event</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-op-property name="AccountTracking-Operation">
+											<arg-string>
+												<token-text xml:space="preserve">add</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-AccountStatusChanged">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-AppAccountStatus">
+											<arg-string>
+												<token-text xml:space="preserve">-</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-IdvAccountStatus">
+											<arg-string>
+												<token-text xml:space="preserve">A</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-ObjectDN">
+											<arg-string>
+												<token-xpath expression="status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='operation-data']/*[local-name()='return-to-me']/@src-dn" />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+								

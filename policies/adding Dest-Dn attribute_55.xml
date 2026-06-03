@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>adding Dest-Dn attribute</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">check-object-password</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="destDN">
+											<arg-node-set>
+												<token-query class-name="User" scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+													<arg-string>
+														<token-global-variable name="column.username" />
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="username">
+											<arg-string>
+												<token-global-variable name="column.username" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-dest-dn>
+											<arg-dn>
+												<token-xpath expression="$destDN/attr[@attr-name=$username]/value/text()" />
+											</arg-dn>
+										</do-set-op-dest-dn>
+									</actions>
+								</rule>
+							

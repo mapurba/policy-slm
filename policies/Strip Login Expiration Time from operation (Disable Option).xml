@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip Login Expiration Time from operation (Disable Option)</description>
+									<comment xml:space="preserve">If entitlements control whether the account in the application is enabled or disabled (as in the Disable Option), we'll disregard changes to Login Disabled.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="Login Expiration Time" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="Login Expiration Time" />
+									</actions>
+								</rule>
+								

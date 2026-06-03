@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Populating urn:ietf:params:scim:schemas:core:2.0:User:name.familyName attribute</description>
+									<comment xml:space="preserve">The policy populates the urn:ietf:params:scim:schemas:core:2.0:User:name.familyName field,If it is not available.
+</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-src-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value class-name="User" name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName">
+											<arg-value type="string">
+												<token-split delimiter="@">
+													<token-src-attr class-name="User" name="urn:ietf:params:scim:schemas:core:2.0:User:userName" />
+												</token-split>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

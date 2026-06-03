@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Generate Audit Event</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-local-variable name="auditEventID" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="version" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">1</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="target" scope="policy">
+											<arg-string>
+												<token-op-property name="association" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="targetType" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">4</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="subTarget" scope="policy">
+											<arg-string>
+												<token-op-property name="accountAction" />
+												<token-text xml:space="preserve">_</token-text>
+												<token-local-variable name="auditEventID" />
+												<token-text xml:space="preserve">_</token-text>
+												<token-xpath expression="@level" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="status" scope="policy">
+											<arg-string>
+												<token-replace-all regex="success" replace-with="0">
+													<token-replace-all regex="retry" replace-with="1">
+														<token-replace-all regex="warning" replace-with="2">
+															<token-replace-all regex="error" replace-with="3">
+																<token-replace-all regex="fatal" replace-with="4">
+																	<token-xpath expression="@level" />
+																</token-replace-all>
+															</token-replace-all>
+														</token-replace-all>
+													</token-replace-all>
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="idmEventID" scope="policy">
+											<arg-string>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="identity" scope="policy">
+											<arg-string>
+												<token-op-property name="guid" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-generate-event id="$auditEventID$" level="log-info">
+											<arg-string name="value3">
+												<token-local-variable name="version" />
+											</arg-string>
+											<arg-string name="target">
+												<token-local-variable name="target" />
+											</arg-string>
+											<arg-string name="target-type">
+												<token-local-variable name="targetType" />
+											</arg-string>
+											<arg-string name="subTarget">
+												<token-local-variable name="subTarget" />
+											</arg-string>
+											<arg-string name="value">
+												<token-local-variable name="status" />
+											</arg-string>
+											<arg-string name="text3">
+												<token-local-variable name="idmEventID" />
+											</arg-string>
+											<arg-string name="text1">
+												<token-local-variable name="identity" />
+											</arg-string>
+											<arg-string name="data">
+												<token-text xml:space="preserve">IDM eventID: </token-text>
+												<token-local-variable name="idmEventID" />
+												<token-text xml:space="preserve">level: </token-text>
+												<token-xpath expression="@level" />
+											</arg-string>
+											<arg-string name="text2">
+												<token-text xml:space="preserve">Object Class: </token-text>
+												<token-op-property name="objectClass" />
+											</arg-string>
+										</do-generate-event>
+									</actions>
+								</rule>
+							

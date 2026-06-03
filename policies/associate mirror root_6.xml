@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>associate mirror root</description>
+									<comment xml:space="preserve">In a mirrored configuration, it is important to have the two mirror roots (the one in the IDV and the one in AD) associated with one another. If the roots are not associated, objects cannot be moved into the mirror root on the publisher channel.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">move</if-operation>
+											<if-xpath op="true">translate(./parent/@src-dn,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')=translate('\~dirxml.auto.treename~\~idv.dit.data.users~','ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')</if-xpath>
+											<if-global-variable mode="nocase" name="drv.subPlacementType" op="equal">mirrored</if-global-variable>
+											<if-local-variable name="mirrorRootAssociated" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="mirrorRootInstance" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src" scope="entry">
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="parentAsso">
+											<arg-string>
+												<token-xpath expression="$mirrorRootInstance/association/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-local-variable name="parentAsso" />
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="parentAsso" op="not-equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="adRootInstance" scope="policy">
+													<arg-node-set>
+														<token-query scope="entry">
+															<arg-dn>
+																<token-global-variable name="drv.user.container" />
+															</arg-dn>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-add-association direct="true">
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+													</arg-dn>
+													<arg-association>
+														<token-xpath expression="$adRootInstance/association/text()" />
+													</arg-association>
+												</do-add-association>
+												<do-append-xml-element expression="parent" name="association" />
+												<do-append-xml-text expression="parent/association">
+													<arg-string>
+														<token-xpath expression="$adRootInstance/association/text()" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="mirrorRootAssociated" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform changes to loginExpirationTime</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-op-attr name="Login Expiration Time" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="removeValNode" scope="policy">
+											<arg-node-set>
+												<token-text xml:space="preserve">modify-attr[@attr-name="Login Expiration Time"]/remove-value</token-text>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-xpath expression="modify-attr[@attr-name=&quot;Login Expiration Time&quot;]/remove-value" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="removeValNode" op="available" />
+													<if-local-variable mode="nocase" name="removeValNode" op="not-equal" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element before="add-value" expression="modify-attr[@attr-name=&quot;Login Expiration Time&quot;]" name="remove-all-values" />
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">"No Remove values"</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

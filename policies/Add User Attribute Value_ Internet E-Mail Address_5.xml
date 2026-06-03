@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add User Attribute Value: Internet E-Mail Address</description>
+									<conditions>
+										<and>
+											<if-op-attr name="Internet EMail Address" op="not-available" />
+											<if-global-variable mode="nocase" name="account.email" op="equal">true</if-global-variable>
+											<if-global-variable name="account.email.InternetDomainName" op="not-equal" />
+										</and>
+										<and>
+											<if-op-attr name="Internet EMail Address" op="not-available" />
+											<if-global-variable mode="nocase" name="account.email" op="not-equal">false</if-global-variable>
+											<if-global-variable mode="nocase" name="account.cert" op="not-equal">false</if-global-variable>
+											<if-global-variable name="account.email.InternetDomainName" op="not-equal" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="local.InternetAddress">
+											<arg-string>
+												<token-attr name="Given Name" />
+												<token-attr name="Surname" />
+												<token-text>@</token-text>
+												<token-global-variable name="account.email.InternetDomainName" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-add-dest-attr-value name="Internet EMail Address">
+											<arg-value>
+												<token-local-variable name="local.InternetAddress" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-src-attr-value name="Internet EMail Address">
+											<arg-value>
+												<token-local-variable name="local.InternetAddress" />
+											</arg-value>
+										</do-add-src-attr-value>
+									</actions>
+								</rule>
+								

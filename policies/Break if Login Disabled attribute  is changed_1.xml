@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Break if Login Disabled attribute  is changed</description>
+									<comment xml:space="preserve">This rule executes when
+[1] Login Disabled attribute of entitled user is modified.  'Account entitlement revoked' global variable is either disable or expire or disable and expire.
+[2] CN value of user is modified.
+The rule bypasses modify events not intended for grant and revoke of entitlements.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="regex" name="driver.gw.ent.account.remove" op="equal">disable|expire|dispire</if-global-variable>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-xpath op="true">count(operation-data/child::*)=0</if-xpath>
+											<if-entitlement name="gwAccount" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-break />
+									</actions>
+								</rule>
+								

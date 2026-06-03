@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - update DirXMLAccounts attribute on mapped operations</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">operation-data/account-tracking-operation</if-xpath>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-xpath op="true">./@level='success' or ./@level='warning'</if-xpath>
+										</and>
+										<and>
+											<if-xpath op="true">operation-data/account-tracking-operation</if-xpath>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./operation-data/account-tracking-operation" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="atoNode" scope="policy">
+													<arg-node-set>
+														<token-local-variable name="current-node" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="operation" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@AccountTracking-Operation" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="realm" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@AccountTracking-Realm" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="className" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@AccountTracking-ClassName" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="idvAccountStatus" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@AccountTracking-IdvAccountStatus" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="appAccountStatus" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@AccountTracking-AppAccountStatus" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Account Tracking - Mapped $operation$ operation</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/@AccountTracking-association</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="association" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/@AccountTracking-association" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-operation mode="case" op="equal">add-association</if-operation>
+																	<if-xpath op="true">$current-node/@AccountTracking-RealmKey</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="realm-key" scope="policy">
+																	<arg-string>
+																		<token-replace-first regex="~drv.acctTrk.realmKeyExtractor~" replace-with="$1">
+																			<token-xpath expression="text()" />
+																		</token-replace-first>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="new-realm-key" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$current-node/@AccountTracking-RealmKey" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="association" scope="policy">
+																	<arg-string>
+																		<token-replace-first regex="$realm-key$" replace-with="$new-realm-key$">
+																			<token-xpath expression="text()" />
+																		</token-replace-first>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-break />
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+												<do-set-local-variable name="dn" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@AccountTracking-ObjectDN" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="AccountIdentifiers" scope="policy">
+													<arg-node-set>
+														<token-dest-attr name="DirXML-Accounts">
+															<arg-dn>
+																<token-local-variable name="dn" />
+															</arg-dn>
+														</token-dest-attr>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">$AccountIdentifiers</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-add-dest-attr-value direct="true" name="Object Class">
+															<arg-dn>
+																<token-local-variable name="dn" />
+															</arg-dn>
+															<arg-value>
+																<token-text xml:space="preserve">DirXML-Identity</token-text>
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="operation" op="equal">add|enable|disable|delete</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="$AccountIdentifiers[starts-with(.,$dirxml.auto.driverguid) and contains(concat(.,'#'),concat('#',$realm,'#'))]" />
+															</arg-node-set>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Account Tracking - Removing entry $current-node$</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-remove-dest-attr-value direct="true" name="DirXML-Accounts">
+																	<arg-dn>
+																		<token-local-variable name="dn" />
+																	</arg-dn>
+																	<arg-value>
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="operation" op="equal">add|enable|disable</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-for-each>
+															<arg-node-set>
+																<token-global-variable name="drv.acctTrk.identifiers" />
+															</arg-node-set>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="current-node" op="equal">LDAPDN</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="sleep" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="thread:sleep(number(~drv.acctTrk.fanout.som.repWaitTime~)*1000)" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="instance" scope="policy">
+																			<arg-node-set>
+																				<token-query datastore="src">
+																					<arg-association>
+																						<token-local-variable name="association" />
+																					</arg-association>
+																				</token-query>
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="value" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="$instance/@src-dn" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="current-node" op="equal">DESTNAME</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="sleep" scope="policy">
+																					<arg-string>
+																						<token-xpath expression="thread:sleep(number(~drv.acctTrk.fanout.som.repWaitTime~)*1000)" />
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-set-local-variable name="instance" scope="policy">
+																					<arg-node-set>
+																						<token-query datastore="src">
+																							<arg-association>
+																								<token-local-variable name="association" />
+																							</arg-association>
+																						</token-query>
+																					</arg-node-set>
+																				</do-set-local-variable>
+																				<do-set-local-variable name="value" scope="policy">
+																					<arg-string>
+																						<token-parse-dn dest-dn-format="src-dn" length="1" src-dn-format="src-dn" start="-1">
+																							<token-xpath expression="$instance/@src-dn" />
+																						</token-parse-dn>
+																					</arg-string>
+																				</do-set-local-variable>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-if>
+																					<arg-conditions>
+																						<and>
+																							<if-local-variable mode="nocase" name="current-node" op="equal">association</if-local-variable>
+																						</and>
+																					</arg-conditions>
+																					<arg-actions>
+																						<do-set-local-variable name="value" scope="policy">
+																							<arg-string>
+																								<token-local-variable name="association" />
+																							</arg-string>
+																						</do-set-local-variable>
+																					</arg-actions>
+																					<arg-actions>
+																						<do-set-local-variable name="sleep" scope="policy">
+																							<arg-string>
+																								<token-xpath expression="thread:sleep(number(~drv.acctTrk.fanout.som.repWaitTime~)*1000)" />
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-set-local-variable name="value" scope="policy">
+																							<arg-string>
+																								<token-src-attr name="$current-node$">
+																									<arg-association>
+																										<token-local-variable name="association" />
+																									</arg-association>
+																								</token-src-attr>
+																							</arg-string>
+																						</do-set-local-variable>
+																					</arg-actions>
+																				</do-if>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																</do-if>
+																<do-set-local-variable name="tmp" scope="policy">
+																	<arg-string>
+																		<token-join delimiter="#">
+																			<token-global-variable name="dirxml.auto.driverguid" />
+																			<token-local-variable name="current-node" />
+																			<token-local-variable name="value" />
+																			<token-local-variable name="idvAccountStatus" />
+																			<token-local-variable name="appAccountStatus" />
+																			<token-local-variable name="realm" />
+																		</token-join>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Account Tracking - Adding entry $tmp$</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-add-dest-attr-value direct="true" name="DirXML-Accounts">
+																	<arg-dn>
+																		<token-local-variable name="dn" />
+																	</arg-dn>
+																	<arg-value>
+																		<token-local-variable name="tmp" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

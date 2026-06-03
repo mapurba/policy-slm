@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking-Set 'realm' for the operations and get pre-existing relevant Acc values</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="objectDN" scope="policy">
+											<arg-string>
+												<token-xpath expression="operation-data/@AccountTracking-ObjectDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="driverGUID" scope="policy">
+											<arg-string>
+												<token-global-variable name="dirxml.auto.driverguid" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="realm" scope="policy">
+											<arg-string>
+												<token-join delimiter=".">
+													<token-xpath expression="@connection-dn" />
+													<token-global-variable name="jfoactrk.Realm" />
+												</token-join>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="allAccounts" scope="policy">
+											<arg-node-set>
+												<token-dest-attr name="DirXML-Accounts">
+													<arg-dn>
+														<token-local-variable name="objectDN" />
+													</arg-dn>
+												</token-dest-attr>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">$allAccounts</if-xpath>
+													<if-op-property mode="regex" name="AccountTracking-Operation" op="not-equal">delete</if-op-property>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value direct="true" name="Object Class">
+													<arg-dn>
+														<token-local-variable name="objectDN" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-text xml:space="preserve">DirXML-Identity</token-text>
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="relevantAccounts" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$allAccounts[starts-with(.,$driverGUID) and contains(.,$realm)]" />
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

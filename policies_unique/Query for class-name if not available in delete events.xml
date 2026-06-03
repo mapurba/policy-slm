@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Query for class-name if not available in delete events</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+											<if-class-name op="not-available" />
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group.onboard" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable name="drv.entitlement.Group" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="permValue" scope="policy">
+													<arg-string>
+														<token-map dest="entValue" src="nativeName" table="..\Group_Values">
+															<token-association />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable name="permValue" op="not-equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="classname">
+															<arg-string>
+																<token-text xml:space="preserve">Group</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="targetObj" scope="policy">
+													<arg-node-set>
+														<token-query class-name="Group" scope="entry">
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="classname">
+													<arg-string>
+														<token-xpath expression="$targetObj/@class-name" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

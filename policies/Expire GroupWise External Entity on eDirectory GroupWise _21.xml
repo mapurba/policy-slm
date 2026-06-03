@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Expire GroupWise External Entity on eDirectory GroupWise External Entity Disable/Expire</description>
+									<conditions>
+										<and>
+											<if-global-variable name="driver.gw.GWExternalEntityDisable" op="equal">expire</if-global-variable>
+											<if-global-variable mode="nocase" name="driver.gw.GWExternalEntityExpire" op="equal">expire</if-global-variable>
+											<if-class-name op="equal">GroupWise External Entity</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-xpath op="true">./modify-attr[@attr-name='Login Expiration Time']</if-xpath>
+													<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']</if-xpath>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="Login Expiration Time" op="changing" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-xpath op="not-true">./modify-attr[@attr-name='Login Expiration Time']/remove-value/value</if-xpath>
+																	<if-xpath op="not-true">./modify-attr[@attr-name='Login Expiration Time']/add-value/value</if-xpath>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="*[@attr-name='Login Disabled']" />
+																<do-rename-op-attr dest-name="NGW: Mailbox Expiration Time" src-name="Login Expiration Time" />
+																<do-break />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<or>
+															<if-op-attr name="Login Disabled" op="changing" />
+														</or>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']/add-value/*[text() = 'false']</if-xpath>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-clear-dest-attr-value name="NGW: Mailbox Expiration Time" />
+																<do-strip-xpath expression="*[@attr-name='Login Disabled']" />
+																<do-break />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']/add-value/*[text() = 'true']</if-xpath>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-dest-attr-value name="NGW: Mailbox Expiration Time">
+																	<arg-value type="string">
+																		
+																		<token-xpath expression="int:new(date:getTime(date:new()))" />
+																	</arg-value>
+																</do-set-dest-attr-value>
+																<do-strip-xpath expression="*[@attr-name='Login Expiration Time']" />
+																<do-break />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="combinationdone" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								
+								

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove empty modify events</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">modify-attr[@attr-name='DirXML-EntitlementRef']</if-xpath>
+											<if-op-attr name="DirXML-EntitlementRef" op="not-available" />
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="modify-attr[@attr-name='DirXML-EntitlementRef']" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">count(modify-attr)=0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-strip-xpath expression="." />
+												<do-break />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Employee entitlement: do not match existing accounts</description>
+									<comment xml:space="preserve">When using the Employee entitlement with the Identity Manager user application or Role Based Entitlements, employees are created and disabled by granting or revoking the entitlement. Default policy does not match an existing account in Oracle E-Business Suite if the user is not entitled to an account in Oracle E-Business Suite. Modify or remove this rule if you want entitlement policy to apply to matching accounts in Oracle E-Business Suite. Notice that this may result in the Oracle E-Business Suite account being deleted or disabled.</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.Employee" op="equal">true</if-global-variable>
+											<if-entitlement name="UserAccount" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

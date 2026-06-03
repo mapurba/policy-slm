@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Sync User with Account Entitlements On</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-operation mode="nocase" op="equal">sync</if-operation>
+											<if-xpath op="not-true">//modify/@processed</if-xpath>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="entitlementsQuery" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" datastore="src" scope="entry">
+													<arg-dn>
+														<token-src-dn />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-EntitlementRef</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="entitlementsGranted" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;Entitlements-Granted&gt;&lt;/Entitlements-Granted&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$entitlementsQuery/attr[@attr-name='DirXML-EntitlementRef']/node()[component[@name='nameSpace']/text()='1']" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="$entitlementsGranted/Entitlements-Granted" name="add-value" />
+												<do-clone-xpath dest-expression="$entitlementsGranted/Entitlements-Granted/add-value[last()]" src-expression="$current-node" />
+											</arg-actions>
+										</do-for-each>
+										<do-clone-xpath before="node()" dest-expression="." src-expression="$entitlementsGranted/node()" />
+									</actions>
+								</rule>
+								

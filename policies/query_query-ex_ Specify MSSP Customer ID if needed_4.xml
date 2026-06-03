@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>query/query-ex: Specify MSSP Customer ID if needed</description>
+									<comment xml:space="preserve">If a query or query-ex for identity objects add the MSSP Customer ID value to the search attributes if the customer ID is set.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">query</if-operation>
+											<if-operation mode="case" op="equal">query-ex</if-operation>
+										</or>
+										<or>
+											<if-local-variable name="drv.customer.key" op="available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="." name="search-attr" />
+										<do-set-xml-attr expression="./search-attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">cid</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="./search-attr[last()]" name="value" />
+										<do-append-xml-text expression="./search-attr[last()]/value">
+											<arg-string>
+												<token-local-variable name="drv.customer.key" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

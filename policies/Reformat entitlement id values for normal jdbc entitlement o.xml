@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat entitlement id values for normal jdbc entitlement operations</description>
+									<comment xml:space="preserve">This is for the support for the normal JDBC driver's policies execution</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group" op="equal">true</if-global-variable>
+											<if-xpath op="true">node()[@attr-name='DirXML-EntitlementRef']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="groupEntitlement" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="child::node()[@attr-name='DirXML-EntitlementRef']//param/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="groupEntitlement" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="valueReformatted" scope="policy">
+													<arg-string>
+														<token-xpath expression="concat(substring($current-node,1,7),substring-after($current-node,&quot;-&quot;))" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression=".//param[text()=$current-node]/text()" />
+												<do-append-xml-text expression=".//param[normalize-space(text())='']">
+													<arg-string>
+														<token-local-variable name="valueReformatted" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

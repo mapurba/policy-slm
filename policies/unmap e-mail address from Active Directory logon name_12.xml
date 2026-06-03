@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>unmap e-mail address from Active Directory logon name</description>
+									<comment>Active Directory logon name (userPrincipalName) policy</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="UpnMap" op="equal">edir-mail-auth</if-global-variable>
+											<if-op-attr mode="regex" name="Internet EMail Address" op="changing-from">.+</if-op-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-remove-dest-attr-value name="DirXML-ADAliasName">
+											<arg-value>
+												<token-removed-attr name="Internet EMail Address" />
+											</arg-value>
+										</do-remove-dest-attr-value>
+										<do-remove-src-attr-value name="DirXML-ADAliasName">
+											<arg-value>
+												<token-removed-attr name="Internet EMail Address" />
+											</arg-value>
+										</do-remove-src-attr-value>
+									</actions>
+								</rule>
+								

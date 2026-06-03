@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>set dest-dn for migrate</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-xpath op="true">@scope='subtree'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" notrace="true" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">
+					</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if notrace="true">
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Query Multiplexer ... [</token-text>
+												<token-xpath expression="search-class/@class-name" />
+												<token-text xml:space="preserve"> - </token-text>
+												<token-xpath expression="@dest-dn" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-xpath expression="search-attr/@attr-name" />
+												<token-text xml:space="preserve">=</token-text>
+												<token-xpath expression="search-attr/value" />
+												<token-text xml:space="preserve">]</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Query Multiplexer ... [</token-text>
+												<token-xpath expression="search-class/@class-name" />
+												<token-text xml:space="preserve"> - </token-text>
+												<token-xpath expression="@dest-dn" />
+												<token-text xml:space="preserve">[</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="search-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-local-variable name="lvTmp" />
+														<token-xpath expression="$current-node/@attr-name" />
+														<token-text xml:space="preserve">=</token-text>
+														<token-xpath expression="$current-node/value" />
+														<token-text xml:space="preserve">&amp;</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-substring length="-2">
+													<token-local-variable name="lvTmp" />
+												</token-substring>
+												<token-text xml:space="preserve">]</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if notrace="true">
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length(@dest-dn) &gt; 1</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv.mig.client" scope="policy">
+													<arg-string>
+														<token-substring start="1">
+															<token-xpath expression="@dest-dn" />
+														</token-substring>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="lv.mig.client" scope="policy">
+													<arg-string>
+														<token-xpath expression="@dest-dn" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="lv.mig.client.list" scope="policy">
+											<arg-node-set>
+												<token-global-variable name="drv.operation.control.migrate" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="lv.mig.client.list" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="current-node" />
+														<token-text xml:space="preserve">-ctype</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="cls" scope="policy">
+													<arg-string>
+														<token-local-variable name="current-node" />
+														<token-text xml:space="preserve">-clsname</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length($lv.mig.client) &gt; 0</if-xpath>
+															<if-xpath op="true">string($lv.mig.client) = string($current-node)</if-xpath>
+														</and>
+														<and>
+															<if-xpath op="true">string-length($lv.mig.client) = 0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-local-variable mode="nocase" name="$dvn$" op="equal">cua-central</if-local-variable>
+																	<if-local-variable mode="nocase" name="$dvn$" op="equal">non-cua</if-local-variable>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-clone-xpath dest-expression=".." src-expression="." />
+																<do-set-xml-attr expression="../query[last()]" name="dest-dn">
+																	<arg-string>
+																		<token-text xml:space="preserve">\</token-text>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-append-xml-element expression="../query[last()]" name="operation-data" />
+																<do-set-xml-attr expression="../query[last()]/operation-data[last()]" name="ctype">
+																	<arg-string>
+																		<token-local-variable name="$dvn$" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">\</token-text>
+																		<token-local-variable name="current-node" />
+																		<token-text xml:space="preserve"> [</token-text>
+																		<token-local-variable name="$dvn$" />
+																		<token-text xml:space="preserve">]</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="lvFile" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if disabled="true">
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="$dvn$" op="equal">cua-child</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-clone-xpath dest-expression=".." src-expression="." />
+																<do-set-xml-attr expression="../query[last()]" name="dest-dn">
+																	<arg-string>
+																		<token-text xml:space="preserve">\</token-text>
+																		<token-local-variable name="$cls$" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-set-xml-attr disabled="true" expression="../query[last()]" name="dest-dn">
+																	<arg-string>
+																		<token-text xml:space="preserve">\</token-text>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-append-xml-element expression="../query[last()]" name="operation-data" />
+																<do-set-xml-attr expression="../query[last()]/operation-data[last()]" name="ctype">
+																	<arg-string>
+																		<token-local-variable name="$dvn$" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-set-xml-attr expression="../query[last()]/operation-data[last()]" name="clsname">
+																	<arg-string>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">\</token-text>
+																		<token-local-variable name="current-node" />
+																		<token-text xml:space="preserve"> [</token-text>
+																		<token-local-variable name="$dvn$" />
+																		<token-text xml:space="preserve">]</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="lvFile" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">number(count($lv.mig.client.list)) &gt; 0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-strip-xpath expression="../query[1]" />
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">strip primary query</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">keep primary query</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

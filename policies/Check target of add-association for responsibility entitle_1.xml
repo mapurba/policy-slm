@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check target of add-association for responsibility entitlements</description>
+									<comment xml:space="preserve">Responsibility entitlements assigned to users being created in Oracle EBS cannot be processed until the user is successfully created. The add-association signals that an object has been created by the driver in Oracle EBS. If the object is also tagged for responsibility entitlement processing, do the work now.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Responsibility" op="equal">true</if-global-variable>
+											<if-operation op="equal">add-association</if-operation>
+											<if-op-property mode="nocase" name="check-responsibility-entitlements" op="equal">true</if-op-property>
+											<if-entitlement name="Responsibility" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="Responsibility" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="responsibility-assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-src-attr-value class-name="inetOrgPerson" name="ebsResponsibilities">
+													<arg-association>
+														<token-xpath expression="./text()" />
+													</arg-association>
+													<arg-value type="string">
+														<token-local-variable name="responsibility-assoc" />
+													</arg-value>
+												</do-add-src-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

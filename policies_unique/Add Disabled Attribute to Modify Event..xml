@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add Disabled Attribute to Modify Event.</description>
+									<comment xml:space="preserve">The Disabled attribute is required in Account Tracking Policy. The policy will add the disabled attribute.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">user</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-global-variable mode="nocase" name="drv.acctTrk.enable" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="Login Disabled" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-dest-attr-value name="Login Disabled">
+													<arg-value type="state">
+														<token-global-variable name="drv.acctTrk.activeStatus" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

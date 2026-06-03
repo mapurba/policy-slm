@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check for Entitlement Query Result</description>
+									<comment xml:space="preserve">Check if this is an entitlement query result set, if so, set a start flag and set up a values xml document nodeset to hold all of the data from the &lt;instance&gt; elements in the results</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-xpath op="true">$current-op/@event-id='ENTITLEMENT:Group'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="values-xml" scope="driver">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;mapping-table&gt;&lt;col-def name="nativeName"/&gt;&lt;col-def name="entValue"/&gt;&lt;/mapping-table&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-op-property name="getInstances">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

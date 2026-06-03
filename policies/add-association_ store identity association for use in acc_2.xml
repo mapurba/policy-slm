@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>add-association: store identity association for use in account operations</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+											<if-xpath op="true">starts-with(.,'identity/')</if-xpath>
+											<if-xml-attr name="dest-entry-id" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="identity-guid" scope="policy">
+											<arg-string>
+												<token-xpath expression="substring-after(.,'identity/')" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="identity-src-entry-id" scope="policy">
+											<arg-string>
+												<token-xpath expression="@dest-entry-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="throwaway" scope="policy">
+											<arg-string>
+												<token-xpath expression="jmap:put($drv.identity.map, jstring:new($identity-src-entry-id),jstring:new($identity-guid))" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

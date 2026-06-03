@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create Entitlement Configuration Object if not present</description>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="entiConfigurationRes" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Resource" datastore="src" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+													<arg-match-attr name="DirXML-ContentType">
+														<arg-value type="string">
+															<token-text xml:space="preserve">text/vnd.novell.idm.entitlementConfiguration+xml</token-text>
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($entiConfigurationRes/@src-dn)&lt;=0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="xml" scope="policy">
+													<arg-node-set>
+														<token-xml-parse>
+															<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;entitlement-configuration&gt;&lt;entitlements/&gt;&lt;/entitlement-configuration&gt;</token-text>
+														</token-xml-parse>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Creating new Entitlement Configuration resource object</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-add-src-object class-name="DirXML-Resource" direct="true">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+												</do-add-src-object>
+												<do-add-src-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-ContentType">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+													<arg-value>
+														<token-text xml:space="preserve">text/vnd.novell.idm.entitlementConfiguration+xml</token-text>
+													</arg-value>
+												</do-add-src-attr-value>
+												<do-add-src-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-Data">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+													<arg-value type="octet">
+														<token-base64-encode>
+															<token-xml-serialize>
+																<token-local-variable name="xml" />
+															</token-xml-serialize>
+														</token-base64-encode>
+													</arg-value>
+												</do-add-src-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Entitlement Configuration resource object is already present... Proceed with update...</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

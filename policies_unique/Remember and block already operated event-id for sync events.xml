@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remember and block already operated event-id for sync events</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">sync</if-operation>
+											<if-class-name mode="case" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="this.event-id" scope="policy">
+											<arg-string>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lv.event-id" scope="policy">
+											<arg-string>
+												<token-xpath expression="concat(substring-before($this.event-id,':'),':',substring-before(substring-after($this.event-id,':'),'#'))" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-xpath op="not-true">string-length($lv.event-id.ns/event-ids/event-id/@name) &gt; 0</if-xpath>
+													<if-xpath op="true">$lv.event-id.ns/event-ids/event-id[not(contains(@name,$lv.event-id))]</if-xpath>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv.event-id.ns" scope="driver">
+													<arg-node-set>
+														<token-xml-parse>
+															<token-text xml:space="preserve">&lt;event-ids/&gt;</token-text>
+														</token-xml-parse>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($lv.event-id.ns/event-ids/event-id/@name) = 0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element expression="$lv.event-id.ns/event-ids" name="event-id" />
+												<do-set-xml-attr expression="$lv.event-id.ns/event-ids/event-id[last()]" name="name">
+													<arg-string>
+														<token-local-variable name="this.event-id" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="lv.event-id.found" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$lv.event-id.ns/event-ids/event-id" />
+													</arg-node-set>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">contains($current-node/@name,$this.event-id)</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lv.event-id.found" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="case" name="lv.event-id.found" op="equal">false</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-element expression="$lv.event-id.ns/event-ids" name="event-id" />
+														<do-set-xml-attr expression="$lv.event-id.ns/event-ids/event-id[last()]" name="name">
+															<arg-string>
+																<token-local-variable name="this.event-id" />
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">Already processed sync event is blocked from further processing</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-veto />
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-trace-message>
+											<arg-string>
+												<token-xpath expression="es:NodeSetToString($lv.event-id.ns)" />
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

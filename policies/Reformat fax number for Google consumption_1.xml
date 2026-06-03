@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat fax number for Google consumption</description>
+									<comment xml:space="preserve">Fax numbers are structured within eDirectory. This policy strips the structure, preserving the actual number. Each added value is then sent to Google and each removed value (for non-merged remove-value nodes on modify events) is removed from Google.</comment>
+									<comment name="author" xml:space="preserve">Mike Weaver</comment>
+									<comment name="version" xml:space="preserve">4</comment>
+									<comment name="lastchanged" xml:space="preserve">5-22-13</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="WorkFaxPhoneNumber" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="case" op="equal">add</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-values" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="add-attr[@attr-name='WorkFaxPhoneNumber']/value/component[@name=&quot;faxNumber&quot;]" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-strip-op-attr name="WorkFaxPhoneNumber" />
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="lv-values" />
+													</arg-node-set>
+													<arg-actions>
+														<do-add-dest-attr-value name="WorkFaxPhoneNumber">
+															<arg-value type="string">
+																<token-local-variable name="current-node" />
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="case" op="equal">modify</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-values" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="modify-attr[@attr-name='WorkFaxPhoneNumber']/add-value/value/component[@name=&quot;faxNumber&quot;]" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-removedValues" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="modify-attr[@attr-name='WorkFaxPhoneNumber']/remove-value/value/component[@name=&quot;faxNumber&quot;]" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-strip-op-attr name="WorkFaxPhoneNumber" />
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xml-attr mode="nocase" name="from-merge" op="equal">true</if-xml-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-clear-dest-attr-value name="WorkFaxPhoneNumber" />
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="lv-values" />
+															</arg-node-set>
+															<arg-actions>
+																<do-add-dest-attr-value name="WorkFaxPhoneNumber">
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+													<arg-actions>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="lv-values" />
+															</arg-node-set>
+															<arg-actions>
+																<do-add-dest-attr-value name="WorkFaxPhoneNumber">
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+														</do-for-each>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="lv-removedValues" />
+															</arg-node-set>
+															<arg-actions>
+																<do-remove-dest-attr-value name="WorkFaxPhoneNumber">
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

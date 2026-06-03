@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle AlternateEmailAddresses</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">modify</if-operation>
+											<if-op-attr name="AlternateEmailAddresses" op="available" />
+											<if-xpath op="true">./modify-attr[@attr-name="AlternateEmailAddresses"]/add-value</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="query-back" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;input&gt;&lt;query class-name="User"</token-text>
+													<token-text xml:space="preserve">  dest-dn="</token-text>
+													<token-src-dn />
+													<token-text xml:space="preserve">" scope="entry"&gt;&lt;read-attr attr-name="Internet EMail Address"/&gt;&lt;/query&gt;&lt;/input&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="query-results" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="query:query($srcQueryProcessor,$query-back)" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-xpath expression="./modify-attr[@attr-name=&quot;AlternateEmailAddresses&quot;]" />
+										<do-add-dest-attr-value name="AlternateEmailAddresses">
+											<arg-value type="string">
+												<token-xpath expression="$query-results//attr[@attr-name=&quot;Internet EMail Address&quot;]/value[last()]/text()" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-append-xml-element expression="./modify-attr[@attr-name=&quot;AlternateEmailAddresses&quot;]" name="remove-all-values" />
+									</actions>
+								</rule>
+							

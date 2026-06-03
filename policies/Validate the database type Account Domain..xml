@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Validate the database type Account Domain.</description>
+									<comment xml:space="preserve">The profile value is mandatory to distinguish the type of database in PAM and accordingly other attribute values are to be set. For Oracle DB, the server details are configured in the form of a ConnectString.</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">DirXML-PUMAccountDomain</if-class-name>
+										</or>
+										<or>
+											<if-attr mode="nocase" name="DirXML-pumAccDomType" op="equal">db</if-attr>
+										</or>
+										<or>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="dbProfile" scope="policy">
+											<arg-string>
+												<token-attr name="DirXML-pumAccDomProfile" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-local-variable mode="nocase" name="dbProfile" op="equal" />
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Missing mandatory attribute, profile type for the DB Account Domain. For Oracle DB the profile type value is 1001.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-veto />
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<or>
+															<if-local-variable mode="nocase" name="dbProfile" op="not-equal">1001</if-local-variable>
+														</or>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Invalid profile type $dbProfile$ for the DB Account Domain</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-veto />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

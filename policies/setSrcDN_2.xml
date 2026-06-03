@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>setSrcDN</description>
+									<comment xml:space="preserve">set the src DN to rename event</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="newSrcDN" scope="policy">
+											<arg-string>
+												<token-src-dn length="-2" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-xpath expression="./new-name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-src-dn>
+											<arg-dn>
+												<token-local-variable name="newSrcDN" />
+											</arg-dn>
+										</do-set-op-src-dn>
+									</actions>
+								</rule>
+							

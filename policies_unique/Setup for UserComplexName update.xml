@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Setup for UserComplexName update</description>
+									<comment xml:space="preserve">Set the variables needed for updating the UserComplexName in Epic</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lv-updateName" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lo-PersonName" scope="policy">
+											<arg-object>
+												<token-xpath expression="es:PersonName()" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-set-local-variable name="lv-idv-user-epic-class-name" scope="policy">
+											<arg-string>
+												<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/class-name[app-name/text()=&quot;EMP&quot;]/nds-name/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="ln-user-attributes" scope="policy">
+											<arg-node-set>
+												<token-query class-name="EMP" datastore="src" scope="entry">
+													<arg-dn>
+														<token-src-dn />
+													</arg-dn>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;AcademicTitle&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;FatherName&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;FirstName&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;GivenNameInitials&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;GrandfatherName&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;LastName&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;LastNamePrefix&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;MiddleName&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;PrimaryTitle&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;SpouseLastName&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;SpouseLastNameFirst&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;SpousePrefix&quot;]/nds-name/text()" />
+													</arg-string>
+													<arg-string>
+														<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;Suffix&quot;]/nds-name/text()" />
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$ln-user-attributes//attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lv-current-idv-attr-name" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="$lv-current-idv-attr-name$" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lv-updateName" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

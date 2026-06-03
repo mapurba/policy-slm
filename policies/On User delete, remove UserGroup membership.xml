@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>On User delete, remove UserGroup membership</description>
+									<comment xml:space="preserve">On deletion of a user object, update the UserGroup membership which the user would have got through Entitlement request.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable disabled="true" name="userName" scope="policy">
+											<arg-string>
+												<token-src-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="groupList" scope="policy">
+											<arg-node-set>
+												<token-query class-name="Group">
+													<arg-match-attr name="Member">
+														<arg-value type="string">
+															<token-src-name />
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="groupList" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="groupAssoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/association" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-remove-dest-attr-value class-name="Group" direct="true" name="Member">
+													<arg-association>
+														<token-local-variable name="groupAssoc" />
+													</arg-association>
+													<arg-value type="string">
+														<token-local-variable name="userName" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-operation mode="nocase" op="equal">rename</if-operation>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-add-dest-attr-value class-name="Group" direct="true" name="Member">
+															<arg-association>
+																<token-xpath expression="$current-node" />
+															</arg-association>
+															<arg-value type="string">
+																<token-src-attr name="CN" />
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-veto />
+										<do-for-each disabled="true">
+											<arg-node-set>
+												<token-query class-name="Group" scope="subordinates">
+													<arg-match-attr name="Member">
+														<arg-value type="string">
+															<token-attr name="CN" />
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+											<arg-actions>
+												<do-remove-dest-attr-value class-name="Group" name="Member">
+													<arg-association>
+														<token-local-variable name="assoc" />
+													</arg-association>
+													<arg-value type="string">
+														<token-src-attr name="CN" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

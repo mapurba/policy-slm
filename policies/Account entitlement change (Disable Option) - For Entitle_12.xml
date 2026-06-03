@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account entitlement change (Disable Option) - For Entitlement Revoke</description>
+									<comment xml:space="preserve">Disable account on connected application for removed entitlement.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name mode="regex" op="equal">user</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="Account" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled">
+													<arg-value type="state">
+														<token-text>true</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+												<do-remove-association when="after">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</do-remove-association>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

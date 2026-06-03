@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check target of add-association for Exchange mailbox entitlements</description>
+									<comment xml:space="preserve">Exchange mailbox entitlements assigned to users being created in Active Directory cannot be processed until the user is successfully created. The add-association signals that an object has been created by the driver in Active Directory. If the object is also tagged for mailbox entitlement processing, do the work now.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.exchMailboxMethod" op="equal">entitlement</if-global-variable>
+											<if-operation op="equal">add-association</if-operation>
+											<if-op-property mode="nocase" name="check-exch-mailbox-entitlements" op="equal">true</if-op-property>
+											<if-entitlement name="ExchangeMailbox" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="ExchangeMailbox" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="homeMDB" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-src-attr-value name="homeMDB">
+													<arg-association>
+														<token-xpath expression="./text()" />
+													</arg-association>
+													<arg-value type="string">
+														<token-local-variable name="homeMDB" />
+													</arg-value>
+												</do-set-src-attr-value>
+												<do-set-src-attr-value name="mailNickname">
+													<arg-association>
+														<token-xpath expression="./text()" />
+													</arg-association>
+													<arg-value type="string">
+														<token-substring length="20">
+															<token-replace-all regex="[^a-zA-Z0-9\x21\x23-\x29\x2d\x2e\x40\x5e-\x60\x7b\x7d\x7e\xc0-\xf6\xf8-\xff\x410-\x44f]" replace-with="">
+																<token-src-name />
+															</token-replace-all>
+														</token-substring>
+													</arg-value>
+												</do-set-src-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

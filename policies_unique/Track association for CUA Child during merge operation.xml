@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Track association for CUA Child during merge operation</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-xml-attr mode="case" name="from-merge" op="equal">true</if-xml-attr>
+											<if-entitlement name="UserAccount" op="not-changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="added-lsname" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="added-lsname" />
+														<token-text xml:space="preserve">-clsname</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="added-clsname" scope="policy">
+													<arg-string>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="added-lsname" />
+														<token-text xml:space="preserve">-ctype</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="added-ctype" scope="policy">
+													<arg-string>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="added-lsname" />
+														<token-text xml:space="preserve">-llo</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="added-llo" scope="policy">
+													<arg-string>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="added-ctype" op="equal">cua-child</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Granting UserAccount entitlement for object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> and logical system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Adding object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> to CUA child system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-add-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+															<arg-value type="string">
+																<token-local-variable name="added-lsname" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-association op="available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lsname" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-after(substring-before(association/text(), '\USd'),'\')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="assoc" scope="policy">
+																	<arg-string>
+																		<token-replace-first regex="$lsname$" replace-with="$added-lsname$">
+																			<token-association />
+																		</token-replace-first>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="assoc" scope="policy">
+																	<arg-string>
+																		<token-replace-first regex="$lsname$\\" replace-with="$added-lsname$\\USd">
+																			<token-dest-dn />
+																		</token-replace-first>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="added-llo" op="equal">1</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Scheduling granular unlocking of </token-text>
+																		<token-src-name />
+																		<token-text xml:space="preserve"> in CUA child system </token-text>
+																		<token-local-variable name="added-lsname" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-op-property name="fanout-unlock-granular">
+																	<arg-string>
+																		<token-text xml:space="preserve">assoc=</token-text>
+																		<token-local-variable name="assoc" />
+																	</arg-string>
+																</do-set-op-property>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Scheduling adding association $assoc$ for object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> in CUA child system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-set-op-property disabled="true" name="fanout-add-association">
+															<arg-string>
+																<token-text xml:space="preserve">assoc=</token-text>
+																<token-local-variable name="assoc" />
+																<token-text xml:space="preserve">|dn=</token-text>
+																<token-src-dn />
+															</arg-string>
+														</do-set-op-property>
+														<do-append-xml-element expression="./operation-data" name="fanout-add-association" />
+														<do-set-xml-attr expression="./operation-data/fanout-add-association[last()]" name="assoc">
+															<arg-string>
+																<token-local-variable name="assoc" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="./operation-data/fanout-add-association[last()]" name="dn">
+															<arg-string>
+																<token-src-dn />
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Replace search-attr value with appropriate filter.</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">urn:ietf:params:scim:schemas:core:2.0:User</if-class-name>
+											<if-operation op="equal">query</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="search-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="searchAttr">
+													<arg-node-set>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable name="searchAttr" op="equal">emails:work:value</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="emailValue">
+															<arg-string>
+																<token-xpath expression="$current-node/value" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-strip-xpath expression="$current-node/value" />
+														<do-append-xml-element expression="$current-node" name="value" />
+														<do-append-xml-text expression="$current-node/value">
+															<arg-string>
+																<token-text xml:space="preserve">emails eq </token-text>
+																<token-text xml:space="preserve">"</token-text>
+																<token-local-variable name="emailValue" />
+																<token-text xml:space="preserve">"</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

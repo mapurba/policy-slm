@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Acquire the Notes Deny Access Group UNID</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="regex" name="DenyAccessGrpUNID" op="not-equal">.+</if-local-variable>
+											<if-operation op="equal">modify</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-attr mode="nocase" name="Login Disabled" op="changing" />
+											<if-global-variable name="DenyAccessGrpName" op="available" />
+											<if-global-variable name="DenyAccessGrpName" op="not-equal" />
+										</and>
+										<and>
+											<if-local-variable mode="regex" name="DenyAccessGrpUNID" op="not-equal">.+</if-local-variable>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="account.remove" op="equal">disable</if-global-variable>
+											<if-global-variable name="DenyAccessGrpName" op="available" />
+											<if-global-variable name="DenyAccessGrpName" op="not-equal" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ReturnDenyAccessGrpDoc">
+											<arg-node-set>
+												<token-query class-name="Group" datastore="dest" scope="entry">
+													<arg-dn>
+														<token-global-variable name="DenyAccessGrpName" />
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="DenyAccessGrpUNID" scope="driver">
+											<arg-string>
+												<token-xpath expression="$ReturnDenyAccessGrpDoc/association/text()" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

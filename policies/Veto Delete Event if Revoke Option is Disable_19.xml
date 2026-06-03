@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto Delete Event if Revoke Option is Disable</description>
+									<comment xml:space="preserve">The rule will disable the user on the connected database if delete event is fired and entitlement revoke options is set to disable.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value class-name="User" name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled" when="before">
+											<arg-association>
+												<token-association />
+											</arg-association>
+											<arg-value type="state">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+								

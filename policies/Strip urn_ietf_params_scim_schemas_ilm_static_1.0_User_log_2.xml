@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled from operation (UserAccount Entitlement but NO Onboarding)</description>
+									<comment xml:space="preserve">If entitlements control whether the account in the application is enabled or disabled (as in the Disable Option), we'll disregard changes to Login Disabled.
+If UserAccount onboarding is allowed we will strip the attribute in the pub-ctp-PermissionAttributesCaching policy</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.sync.disabled" op="equal">false</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled" />
+									</actions>
+								</rule>
+							

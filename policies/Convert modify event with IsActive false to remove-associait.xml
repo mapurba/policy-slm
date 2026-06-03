@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert modify event with IsActive false to remove-associaition</description>
+									<comment xml:space="preserve">A delete in Salesforce does not delete the controlling object in the vault. A future change to the object in the Identity Vault or a merge operation may re-create the account in Salesforce.</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-xpath op="true">modify-attr[@attr-name='IsActive']/add-value/value[text()='false']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="association" scope="driver">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/association/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="AccountTracking-ObjectDN" scope="driver">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/operation-data/@AccountTracking-ObjectDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="delete-event" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-remove-association when="after">
+											<arg-association>
+												<token-association />
+											</arg-association>
+										</do-remove-association>
+										<do-veto />
+									</actions>
+								</rule>
+							

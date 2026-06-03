@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Work Order To Do Placement</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXMLWorkToDo</if-class-name>
+											<if-src-dn op="in-subtree">\$drv.driver.name$\</if-src-dn>
+											<if-src-dn op="not-equal">\$drv.driver.name$\</if-src-dn>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="src-name" scope="policy">
+											<arg-string>
+												<token-src-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="name" scope="policy">
+											<arg-string>
+												<token-replace-all regex="\D{4}\d\d/\d\d/\d{4}\s\d{1,2}:\d{2}\s\D{2}" replace-with="">
+													<token-src-name />
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="timestamp" scope="policy">
+											<arg-string>
+												<token-convert-time dest-format="yyyyMMddhhmm" src-format="MM/dd/yyyy hh:mm a">
+													<token-xpath expression="substring-after(substring-after($src-name, $name), 'ToDo')" />
+												</token-convert-time>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="object-name" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">DO</token-text>
+												<token-text xml:space="preserve">-</token-text>
+												<token-local-variable name="name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-dest-dn>
+											<arg-dn>
+												<token-global-variable name="idv.workorder.container" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-local-variable name="object-name" />
+											</arg-dn>
+										</do-set-op-dest-dn>
+										<do-break />
+									</actions>
+								</rule>
+							

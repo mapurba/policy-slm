@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - on add operation add Dirxml-Accounts</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value name="Object Class">
+											<arg-dn>
+												<token-dest-dn />
+											</arg-dn>
+											<arg-value>
+												<token-text xml:space="preserve">DirXML-Identity</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-property mode="nocase" name="AccountTracking-AppAccountStatus" op="equal">-</if-op-property>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-property name="AccountTracking-AppAccountStatus">
+													<arg-string>
+														<token-text xml:space="preserve">A</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-property name="AccountTracking-$current-node$" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="tmp" scope="policy">
+															<arg-string>
+																<token-op-property name="AccountTracking-$current-node$" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length($tmp) &gt; 0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-add-dest-attr-value name="DirXML-Accounts">
+																	<arg-dn>
+																		<token-dest-dn />
+																	</arg-dn>
+																	<arg-value>
+																		<token-join delimiter="#">
+																			<token-global-variable name="dirxml.auto.driverguid" />
+																			<token-local-variable name="current-node" />
+																			<token-op-property name="AccountTracking-$current-node$" />
+																			<token-op-property name="AccountTracking-IdvAccountStatus" />
+																			<token-op-property name="AccountTracking-AppAccountStatus" />
+																			<token-global-variable name="drv.acctTrk.realm" />
+																		</token-join>
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-clear-op-property name="AccountTracking-$current-node$" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-clear-op-property name="AccountTracking-IdvAccountStatus" />
+										<do-clear-op-property name="AccountTracking-AppAccountStatus" />
+									</actions>
+								</rule>
+							

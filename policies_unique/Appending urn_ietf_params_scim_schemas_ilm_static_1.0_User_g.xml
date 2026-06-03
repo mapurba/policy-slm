@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Appending urn:ietf:params:scim:schemas:ilm:static:1.0:User:guid for membership in Groups</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">urn:ietf:params:scim:schemas:core:2.0:Group</if-class-name>
+											<if-xpath op="true">./attr[@attr-name='members:value']</if-xpath>
+											<if-op-property name="publisher-type" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ValueNode" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="./attr[@attr-name='members:value']/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="ValueNode" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="current-node" op="not-equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="queryResponse">
+															<arg-node-set>
+																<token-query datastore="src" scope="entry">
+																	<arg-dn>
+																		<token-xpath expression="$current-node/text()" />
+																	</arg-dn>
+																	<arg-string>
+																		<token-text xml:space="preserve">urn:ietf:params:scim:schemas:core:2.0:User:id</token-text>
+																	</arg-string>
+																</token-query>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-set-local-variable name="groupId">
+															<arg-string>
+																<token-xpath expression="$queryResponse/attr[ @attr-name = 'urn:ietf:params:scim:schemas:core:2.0:User:id']/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-strip-xpath expression="$current-node/text()" />
+														<do-append-xml-text expression="$current-node">
+															<arg-string>
+																<token-local-variable name="groupId" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>logon name mapping: map NT logon name to ILM Vault object name</description>
+									<comment xml:space="preserve">Logon name policy: Keep destination object name in sync when logon name (sAMAccountName) changes.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="LogonNameMap" op="equal">true</if-global-variable>
+											<if-operation op="equal">modify</if-operation>
+											<if-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:userName" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-rename-dest-object when="after">
+											<arg-string>
+												<token-text>urn:ietf:params:scim:schemas:core:2.0:User:userName=</token-text>
+												<token-escape-for-dest-dn>
+													<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:userName" />
+												</token-escape-for-dest-dn>
+											</arg-string>
+										</do-rename-dest-object>
+									</actions>
+								</rule>
+								

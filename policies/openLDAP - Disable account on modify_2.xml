@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>openLDAP - Disable account on modify</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.acctTrk.statusAttr" op="equal">pwdAccountLockedTime</if-global-variable>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-op-attr mode="nocase" name="pwdAccountLockedTime" op="changing-to">TRUE</if-op-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="pwdAccountLockedTime" />
+										<do-clear-dest-attr-value name="pwdAccountLockedTime" />
+										<do-add-dest-attr-value name="pwdAccountLockedTime">
+											<arg-value type="string">
+												<token-text xml:space="preserve">197001010001Z</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+								

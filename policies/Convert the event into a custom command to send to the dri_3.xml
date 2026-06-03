@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert the event into a custom command to send to the driver</description>
+									<comment xml:space="preserve">Generate a custom command to the driver shim based on the class of the source object.</comment>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="command" scope="policy">
+											<arg-string>
+												<token-map dest="command" src="class-name" table="NOVLRSERVB-sub-CommandMappingTable">
+													<token-class-name />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-element expression=".." name="$command$" />
+										<do-set-xml-attr expression="../nrf:*" name="event-id">
+											<arg-string>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../nrf:*" name="dn">
+											<arg-string>
+												<token-xpath expression="@qualified-src-dn" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-operation mode="nocase" op="equal">rename</if-operation>
+													<if-operation mode="nocase" op="equal">sync</if-operation>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../nrf:*" name="old-dn">
+													<arg-string>
+														<token-xpath expression="@qualified-old-src-dn" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="nrfChildRoles" op="changing" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../nrf:role" name="hierarchical">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="nrfAssignedResources" op="changing" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../nrf:identity" name="changingAttribute">
+													<arg-string>
+														<token-text xml:space="preserve">nrfAssignedResources</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-property mode="regex" name="disjoint-set" op="equal">.+</if-op-property>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../nrf:*" name="Disjoint-Set">
+													<arg-string>
+														<token-op-property name="disjoint-set" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-op-attr name="Group Membership" op="changing" />
+													<if-op-attr name="nrfDynamicGroupMembership" op="changing" />
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../nrf:*" name="changingAttribute">
+													<arg-string>
+														<token-text xml:space="preserve">Group Membership</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="../nrf:*" name="driver-operational-data" />
+												<do-clone-xpath dest-expression="../nrf:*/driver-operational-data" src-expression="../modify/modify-attr" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="case" op="equal">sync</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../nrf:*" name="operation">
+													<arg-string>
+														<token-text xml:space="preserve">sync</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

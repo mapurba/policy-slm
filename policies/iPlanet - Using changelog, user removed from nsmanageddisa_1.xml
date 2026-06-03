@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>iPlanet - Using changelog, user removed from nsmanageddisabledrole role</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">inetOrgPerson</if-class-name>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-op-attr name="nsRoleDN" op="changing" />
+											<if-xpath op="true">starts-with(modify-attr[@attr-name='nsRoleDN']/remove-value/value/text(),'cn=nsmanageddisabledrole')</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">user appears to be removed from disabled role</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-dest-attr-value name="nsaccountlock">
+											<arg-value>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-strip-op-attr name="nsRoleDN" />
+									</actions>
+								</rule>
+								

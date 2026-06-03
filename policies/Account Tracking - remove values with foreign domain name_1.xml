@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Tracking - remove values with foreign domain name</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">move</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="entryObject" scope="policy">
+											<arg-node-set>
+												<token-query scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.domains" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="oldDomain" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="slash" length="-2" src-dn-format="slash" start="1">
+															<token-parse-dn dest-dn-format="slash" length="-2" src-dn-format="slash">
+																<token-xpath expression="$entryObject/@src-dn" />
+															</token-parse-dn>
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="domain_container" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.container.name&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="domain_user_container" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="oldDomain" op="equal">$domain_container$</if-local-variable>
+															<if-src-dn op="not-in-subtree">$domain_user_container$</if-src-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="oldDomain" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-global-variable name="drv.acctTrk.identifiers" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="search-key" scope="policy">
+																	<arg-string>
+																		<token-join delimiter="#">
+																			<token-global-variable name="dirxml.auto.driverguid" />
+																			<token-local-variable name="current-node" />
+																		</token-join>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$AccountIdentifiers[starts-with(.,$search-key) and contains(concat(.,'#'),concat('#',$oldDomain,'#'))]" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Account Tracking - Removing entry "$current-node$"</token-text>
+																			</arg-string>
+																		</do-trace-message>
+																		<do-remove-dest-attr-value direct="true" name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts">
+																			<arg-value type="string">
+																				<token-local-variable name="current-node" />
+																			</arg-value>
+																		</do-remove-dest-attr-value>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

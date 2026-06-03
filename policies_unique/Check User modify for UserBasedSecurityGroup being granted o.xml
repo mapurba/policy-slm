@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check User modify for UserBasedSecurityGroup being granted or revoked</description>
+									<conditions>
+										<or>
+											<if-global-variable name="drv.entitlement.UserBasedSecurityGroup" op="equal">true</if-global-variable>
+										</or>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-operation op="equal">modify</if-operation>
+										</or>
+										<or>
+											<if-entitlement name="UserBasedSecurityGroup" op="changing" />
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserBasedSecurityGroup" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">@from-merge='true'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="wd-USBID">
+															<arg-string>
+																<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-remove-dest-attr-value name="WD-EntitlementRef">
+															<arg-value type="string">
+																<token-local-variable name="wd-USBID" />
+															</arg-value>
+														</do-remove-dest-attr-value>
+														<do-append-xml-element expression="driver-operation-data" name="WD-EntitlementType" />
+														<do-append-xml-text expression="driver-operation-data/WD-EntitlementType">
+															<arg-string>
+																<token-text xml:space="preserve">UserBasedSecurityGroup</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserBasedSecurityGroup" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">@from-merge='true'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="wd-USBID">
+															<arg-string>
+																<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="WD-EntitlementRef">
+															<arg-value type="string">
+																<token-local-variable name="wd-USBID" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-append-xml-element expression="driver-operation-data" name="WD-EntitlementType" />
+														<do-append-xml-text expression="driver-operation-data/WD-EntitlementType">
+															<arg-string>
+																<token-text xml:space="preserve">UserBasedSecurityGroup</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

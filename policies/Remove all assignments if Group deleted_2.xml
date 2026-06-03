@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove all assignments if Group deleted</description>
+									<comment xml:space="preserve">Policy intercepts group delete events and generates entitlement-assignments payload.
+The payload captures all the required information of deleted group based on the GCV and mapping table configuration.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="case" op="equal">Group</if-class-name>
+											<if-operation mode="case" op="equal">delete</if-operation>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group.onboard" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="staticResourcePresent" scope="policy">
+											<arg-string>
+												<token-map dest="staticResourceDN" src="entitlementValue" table="..\StaticValueEntitlementMap">
+													<token-src-dn />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="case" name="staticResourcePresent" op="not-equal" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-append-xml-element expression=".." name="operation-data" />
+										<do-append-xml-element expression="../operation-data" name="entitlement-assignments" />
+										<do-set-local-variable name="entitlementObj" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Entitlement" datastore="src" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\Group</token-text>
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="entitlementQualifiedDn" scope="policy">
+											<arg-string>
+												<token-xpath expression="$entitlementObj/@qualified-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="entitlement">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-local-variable name="entitlementQualifiedDn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="fieldId">
+											<arg-string>
+												<token-text xml:space="preserve">ID</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="qualified-src-dn">
+											<arg-string>
+												<token-xpath expression="./@qualified-src-dn" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="value">
+											<arg-string>
+												<token-text xml:space="preserve">{"ID":"</token-text>
+												<token-replace-all regex="\\" replace-with="\\\\">
+													<token-src-dn />
+												</token-replace-all>
+												<token-text xml:space="preserve">"}</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-local-variable name="staticMappedResource" scope="policy">
+											<arg-string>
+												<token-map dest="staticResourceDN" src="entitlementValue" table="..\StaticValueEntitlementMap">
+													<token-src-dn />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="staticMappedResource" op="not-equal" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="resource">
+													<arg-string>
+														<token-local-variable name="staticMappedResource" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="dynamic">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions>
+												<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="resource">
+													<arg-string>
+														<token-map dest="resourceDN" src="entitlementName" table="..\PermissionEntMapping">
+															<token-text xml:space="preserve">Group</token-text>
+														</token-map>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr expression="../operation-data/entitlement-assignments[last()]" name="dynamic">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="grpDeleteOp" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="$current-op" />
+									</actions>
+								</rule>
+								

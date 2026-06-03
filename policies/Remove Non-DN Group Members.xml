@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule disabled="true">
+									<description>Remove Non-DN Group Members</description>
+									<conditions>
+										<or>
+											<if-class-name op="equal">Group</if-class-name>
+										</or>
+										<or>
+											<if-operation op="equal">modify</if-operation>
+											<if-operation op="equal">add</if-operation>
+										</or>
+										<or>
+											<if-op-attr name="Member" op="available" />
+										</or>
+										<or>
+											<if-xpath op="true">*[@attr-name='Member']//value[not(@type='dn')]</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="*[@attr-name='Member']//value[not(@type='dn')]" />
+									</actions>
+								</rule>
+							

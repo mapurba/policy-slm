@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle users entitlement to Google changes</description>
+									<conditions>
+										<and>
+											<if-entitlement name="NOVLGGLEUSER-Account" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="NOVLGGLEUSER-Account" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-dest-attr-value name="Login Disabled">
+													<arg-value type="string">
+														<token-text xml:space="preserve">false</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="NOVLGGLEUSER-Account" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Revoking </token-text>
+														<token-src-name />
+														<token-text xml:space="preserve"> entitlement to Google</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="gcv.NOVLGGLEUSER.AccountEntitlementLossHandler" op="equal">DISABLE</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="Login Disabled">
+															<arg-value type="string">
+																<token-text xml:space="preserve">true</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+														<do-remove-association direct="true">
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</do-remove-association>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="gcv.NOVLGGLEUSER.AccountEntitlementLossHandler" op="equal">DELETE</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-delete-dest-object />
+														<do-remove-association direct="true">
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</do-remove-association>
+														<do-veto />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

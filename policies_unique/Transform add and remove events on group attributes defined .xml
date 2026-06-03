@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform add and remove events on group attributes defined in the Group Attribute Map GCV</description>
+									<comment xml:space="preserve">Transforms changes on Group attributes listed in the “attribute_role_map” GCV to DirXML-BB-Enrollment object events. </comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="attribute_role_nodeset">
+											<arg-node-set>
+												<token-global-variable name="attribute_role_map" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$attribute_role_nodeset" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="attrName">
+													<arg-string>
+														<token-xpath expression="substring-before($current-node,':')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="roleName">
+													<arg-string>
+														<token-xpath expression="substring-after($current-node,':')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<or>
+															<if-local-variable mode="nocase" name="attrName" op="equal" />
+															<if-local-variable mode="nocase" name="roleName" op="equal" />
+														</or>
+													</arg-conditions>
+													<arg-actions>
+														<do-status level="fatal">
+															<arg-string>
+																<token-text xml:space="preserve">Invalid group attribute to role mapping:  "</token-text>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">".  Check the Group Attribute Map GCV.  Values must be in the format attrName:roleName.</token-text>
+															</arg-string>
+														</do-status>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="$attrName$" op="changing" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message level="5">
+															<arg-string>
+																<token-text xml:space="preserve">Transform removed attribute: </token-text>
+																<token-xpath expression="$attrName" />
+															</arg-string>
+														</do-trace-message>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="$current-op//modify-attr[@attr-name=$attrName]//remove-value/value/text()" />
+															</arg-node-set>
+															<arg-actions>
+																<do-trace-message level="5">
+																	<arg-string>
+																		<token-xpath expression="$current-node" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="linkedUser" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="User" datastore="src">
+																			<arg-dn>
+																				<token-xpath expression="$current-node" />
+																			</arg-dn>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-trace-message level="5">
+																	<arg-string>
+																		<token-text xml:space="preserve">Make sure the user exists and veto the event if the user does not exist.  This can happen when a user is deleted and an event is generated on the group object due to the user remove.</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-xpath op="true">count($linkedUser//association/text()) = 0</if-xpath>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-veto />
+																	</arg-actions>
+																</do-if>
+																<do-trace-message level="5">
+																	<arg-string>
+																		<token-text xml:space="preserve">Check the other attributes to make sure the user isn't in more than one.</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="doRemove">
+																	<arg-string>
+																		<token-text>true</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$attribute_role_nodeset" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-local-variable name="attrNameForTest">
+																			<arg-string>
+																				<token-xpath expression="$current-node//definition[@display-name='Group Attribute Name']/value/text()" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="userDN">
+																			<arg-string>
+																				<token-xpath expression="$linkedUser/@src-dn" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-attr name="$attrNameForTest$" op="equal">$userDN$</if-attr>
+																					<if-local-variable name="attrName" op="not-equal">$attrNameForTest$</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="doRemove">
+																					<arg-string>
+																						<token-text>false</token-text>
+																					</arg-string>
+																				</do-set-local-variable>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																</do-for-each>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable name="doRemove" op="equal">true</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-global-variable mode="nocase" name="delete_or_disable_enrollments" op="equal">Delete</if-global-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-delete-dest-object class-name="DirXML-BB-Enrollment" when="before">
+																					<arg-association>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-xpath expression="$linkedUser//association/text()" />
+																						</token-replace-first>
+																						<token-text xml:space="preserve">|enrolled_in|</token-text>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-association />
+																						</token-replace-first>
+																					</arg-association>
+																				</do-delete-dest-object>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-set-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-available-ind" when="before">
+																					<arg-association>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-xpath expression="$linkedUser//association/text()" />
+																						</token-replace-first>
+																						<token-text xml:space="preserve">|enrolled_in|</token-text>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-association />
+																						</token-replace-first>
+																					</arg-association>
+																					<arg-value type="string">
+																						<token-text>Disabled</token-text>
+																					</arg-value>
+																				</do-set-dest-attr-value>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+														<do-trace-message level="5">
+															<arg-string>
+																<token-text xml:space="preserve">Transform added attribute: </token-text>
+																<token-xpath expression="$attrName" />
+															</arg-string>
+														</do-trace-message>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="$current-op//modify-attr[@attr-name=$attrName]//add-value/value/text()" />
+															</arg-node-set>
+															<arg-actions>
+																<do-trace-message level="5">
+																	<arg-string>
+																		<token-xpath expression="$current-node" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="linkedUser" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="User" datastore="src">
+																			<arg-dn>
+																				<token-xpath expression="$current-node" />
+																			</arg-dn>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="linkedUser" op="not-equal" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-trace-message level="5">
+																			<arg-string>
+																				<token-text xml:space="preserve">Query Blackboard to see if the enrollment already exists.  If so the operation will be a modify event.</token-text>
+																			</arg-string>
+																		</do-trace-message>
+																		<do-set-local-variable name="enrollmentObject" scope="policy">
+																			<arg-node-set>
+																				<token-query class-name="DirXML-BB-Enrollment">
+																					<arg-match-attr name="DirXML-BB-enr-c-ext-key">
+																						<arg-value type="string">
+																							<token-replace-first regex="[^-]*-" replace-with="">
+																								<token-association />
+																							</token-replace-first>
+																						</arg-value>
+																					</arg-match-attr>
+																					<arg-match-attr name="DirXML-BB-enr-p-ext-key">
+																						<arg-value type="string">
+																							<token-replace-first regex="[^-]*-" replace-with="">
+																								<token-xpath expression="$linkedUser//association/text()" />
+																							</token-replace-first>
+																						</arg-value>
+																					</arg-match-attr>
+																				</token-query>
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="enrollmentObject" op="equal" />
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-add-dest-object class-name="DirXML-BB-Enrollment" when="before">
+																					<arg-dn>
+																						<token-src-dn />
+																					</arg-dn>
+																				</do-add-dest-object>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-c-ext-key" when="before">
+																					<arg-dn>
+																						<token-src-dn />
+																					</arg-dn>
+																					<arg-value>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-association />
+																						</token-replace-first>
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-p-ext-key" when="before">
+																					<arg-dn>
+																						<token-src-dn />
+																					</arg-dn>
+																					<arg-value>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-xpath expression="$linkedUser//association/text()" />
+																						</token-replace-first>
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-role" when="before">
+																					<arg-dn>
+																						<token-src-dn />
+																					</arg-dn>
+																					<arg-value>
+																						<token-xpath expression="$roleName" />
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-available-ind" when="before">
+																					<arg-dn>
+																						<token-src-dn />
+																					</arg-dn>
+																					<arg-value>
+																						<token-text>Yes</token-text>
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-set-local-variable name="enrollmentAssociation">
+																					<arg-string>
+																						<token-xpath expression="$enrollmentObject//association/text()" />
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-c-ext-key" when="before">
+																					<arg-association>
+																						<token-local-variable name="enrollmentAssociation" />
+																					</arg-association>
+																					<arg-value>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-association />
+																						</token-replace-first>
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-p-ext-key" when="before">
+																					<arg-association>
+																						<token-local-variable name="enrollmentAssociation" />
+																					</arg-association>
+																					<arg-value>
+																						<token-replace-first regex="[^-]*-" replace-with="">
+																							<token-xpath expression="$linkedUser//association/text()" />
+																						</token-replace-first>
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-role" when="before">
+																					<arg-association>
+																						<token-local-variable name="enrollmentAssociation" />
+																					</arg-association>
+																					<arg-value>
+																						<token-xpath expression="$roleName" />
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																				<do-add-dest-attr-value class-name="DirXML-BB-Enrollment" name="DirXML-BB-enr-available-ind" when="before">
+																					<arg-association>
+																						<token-local-variable name="enrollmentAssociation" />
+																					</arg-association>
+																					<arg-value>
+																						<token-text>Yes</token-text>
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+														<do-strip-op-attr name="$attrName$" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

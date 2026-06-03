@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check for worker type conversion from employee to contingent worker</description>
+									<comment xml:space="preserve">Check for worker type conversion from Employee to Contingent worker </comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="gvWorkersMergeIDV" op="equal">True</if-global-variable>
+											<if-op-attr mode="nocase" name="wd-WorkerIDType" op="changing-from">Employee_ID</if-op-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr mode="nocase" name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:wd-C-Active" op="equal">1</if-op-attr>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Update all values as contingnt worker record is active</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="LV-strip-employement-data" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">True</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

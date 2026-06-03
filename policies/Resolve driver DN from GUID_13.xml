@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Resolve driver DN from GUID</description>
+									<conditions />
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">MSGW Drv Reg: Dispatching registration query...</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="query-id" scope="policy">
+											<arg-string>
+												<token-class-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-property name="query-id">
+											<arg-string>
+												<token-local-variable name="query-id" />
+											</arg-string>
+										</do-set-op-property>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">MSGW Drv Reg: Retrieved result from registration cache: </token-text>
+												<token-xpath expression="boolean($REGN__CACHE/cache/instance[@class-name=$query-id])" />
+											</arg-string>
+										</do-trace-message>
+										<do-clone-xpath dest-expression="operation-data" src-expression="$REGN__CACHE/cache/instance[@class-name=$query-id]" />
+										<do-set-local-variable name="registered" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

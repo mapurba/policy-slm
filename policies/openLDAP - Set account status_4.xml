@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>openLDAP - Set account status</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.acctTrk.statusAttr" op="equal">pwdAccountLockedTime</if-global-variable>
+											<if-op-attr name="~drv.acctTrk.statusAttr~" op="available" />
+											<if-op-attr name="~drv.acctTrk.statusAttr~" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="secondsString" scope="policy">
+											<arg-string>
+												<token-convert-time dest-format="!CTIME" dest-tz="UTC" src-format="yyyyMMddHHmm" src-tz="Zulu">
+													<token-attr name="~drv.acctTrk.statusAttr~" />
+												</token-convert-time>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="nowString" scope="policy">
+											<arg-string>
+												<token-convert-time dest-format="!CTIME" dest-tz="UTC" src-format="yyyyMMddHHmm" src-tz="Zulu">
+													<token-time format="yyyyMMddHHmm" tz="Zulu" />
+												</token-convert-time>
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">fromApp: </token-text>
+												<token-local-variable name="secondsString" />
+											</arg-string>
+										</do-trace-message>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">CurrentTime: </token-text>
+												<token-local-variable name="nowString" />
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="nowString" op="gt">$secondsString$</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-dest-attr-value name="~drv.acctTrk.statusAttr~">
+													<arg-value>
+														<token-text xml:space="preserve">TRUE</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-set-dest-attr-value name="~drv.acctTrk.statusAttr~">
+													<arg-value>
+														<token-text xml:space="preserve">FALSE</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

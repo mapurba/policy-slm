@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Initialize scope rules (Primary)</description>
+									<conditions>
+										<or>
+											<if-global-variable mode="nocase" name="NOVLDCSSCPNG.drv.scoping.driverRole" op="equal">primary</if-global-variable>
+										</or>
+										<or>
+											<if-local-variable name="NOVLDCSSCPNG__EXCLUDE__SUB" op="not-available" />
+											<if-class-name mode="nocase" op="equal">DirXML-DriverSet</if-class-name>
+										</or>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Scoping: </token-text>
+												<token-text xml:space="preserve">(Re-)Initializing rules for driver role '</token-text>
+												<token-global-variable name="NOVLDCSSCPNG.drv.scoping.driverRole" />
+												<token-text xml:space="preserve">'...</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="NOVLDCSSCPNG__EXCLUDE__SUB" scope="driver">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;roots/&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="driverSetDN" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="src-dn" length="-2">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-query class-name="DirXML-DriverSet" datastore="src" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/@src-dn!=$driverSetDN</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Scoping: </token-text>
+																<token-text xml:space="preserve">Excluding '</token-text>
+																<token-xpath expression="$current-node/@src-dn" />
+																<token-text xml:space="preserve">' and subtree (remote driver set).</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-set-local-variable name="root" scope="policy">
+															<arg-node-set>
+																<token-xml-parse>
+																	<token-text xml:space="preserve">&lt;root&gt;</token-text>
+																	<token-xpath expression="$current-node/@src-dn" />
+																	<token-text xml:space="preserve">&lt;/root&gt;</token-text>
+																</token-xml-parse>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-clone-xpath dest-expression="$NOVLDCSSCPNG__EXCLUDE__SUB/roots" src-expression="$root" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Scoping: </token-text>
+												<token-text xml:space="preserve">Done (re-)initializing rules.</token-text>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

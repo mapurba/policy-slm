@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?><package base-package="false" category="Cloud" category-folder="Azure AD" checksum="3897456935" directive-checksum="3559868965" id="ENL6AMM3_201604261102380032" name="Azure AD Audit Entitlements" symbolic-name="com.novellinc.mfazuraudent" type="2" version="1.0.0.20160824162019">
+	<description>Audit user account entitlement activity for Azure AD</description>
+	<category-description></category-description>
+	<category-folder-description></category-folder-description>
+	<idm-shortname>MFAZURAUDENT</idm-shortname>
+	<idm-buildtime>20160824162019</idm-buildtime>
+	<idm-buildhost>sles-vm</idm-buildhost>
+	<idm-builduser>root</idm-builduser>
+	<idm-released>true</idm-released>
+	<idm-protected>false</idm-protected>
+	<idm-newversion>false</idm-newversion>
+	<idm-creationtime>201604261102380032</idm-creationtime>
+	<idm-vendorname>Novell, Inc.</idm-vendorname>
+	<idm-vendoraddress></idm-vendoraddress>
+	<idm-vendorurl></idm-vendorurl>
+	<idm-vendoremail></idm-vendoremail>
+	<idm-contactname></idm-contactname>
+	<idm-contactemail></idm-contactemail>
+	<idm-internalversion>4</idm-internalversion>
+	<idm-minidmversion>4.0.0</idm-minidmversion>
+	<idm-maxidmversion></idm-maxidmversion>
+	<idm-minappversion></idm-minappversion>
+	<idm-maxappversion></idm-maxappversion>
+	<license>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4=</license>
+	<readme>QWJvdXQNCi0tLS0tLS0tLQ0KDQpBdWRpdCB1c2VyIGFjY291bnQgZW50aXRsZW1lbnQgYWN0aXZpdHkuIFRoaXMgcGFja2FnZSBycXVpcmVzIHRoZSAnQXVkaXQgRW50aXRsZW1lbnRzIENvbW1vbicgKE5PVkxBVURURU5UQykgcGFja2FnZS4NCg0KDQpXaGF0J3MgTmV3DQotLS0tLS0tLS0tLS0tLS0tLQ0KDQoxLjAuMA0KLSBJbml0aWFsICByZWxlYXNl</readme>
+	<idm-installationdirective>
+		<installation-directive>
+			<ds-attributes/>
+			<dependencies>
+				<dependency name="Audit Entitlements Common" package-id="DETECXTK_201004161538110582" type="2"/>
+			</dependencies>
+			<supported-drivers>
+				<definition display-name="Driver for AZURE" driver-id="AZURE-Driver" id="AZURE"/>
+			</supported-drivers>
+		</installation-directive>
+	</idm-installationdirective>
+	<package-folder id="5" name="Provisioning">
+		<description></description>
+		<children/>
+	</package-folder>
+	<package-folder id="9" name="Global Configurations">
+		<description></description>
+		<children/>
+	</package-folder>
+	<package-folder id="2" name="Resources">
+		<description></description>
+		<children/>
+	</package-folder>
+	<package-folder id="1" name="Policies">
+		<description></description>
+		<children>
+			<ds-object ds-object-class="DirXML-Rule" ds-object-name="NOVLADAUDENT-sub-ctp-Audit-TagEvent">
+				<ds-attributes>
+					<ds-attribute ds-attr-name="XmlData">
+						<ds-value>
+							<policy>
+								<rule>
+									<description>User UserAccount Entitlement change (Delete Option)</description>
+									<comment>The User UserAccount Entitlement grants the user an enabled account in the connected system. Revoking the entitlement will disable or delete the user account depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the delete option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">delete</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-entitlement name="UserAccount" op="changing"/>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserAccount"/>
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="accountAction">
+													<arg-string>
+														<token-text xml:space="preserve">accountDeleteByEntitlementRevoke</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="sourceDN">
+													<arg-string>
+														<token-src-dn/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="association">
+													<arg-string>
+														<token-association/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="guid">
+													<arg-string>
+														<token-src-attr name="GUID"/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="objectClass">
+													<arg-string>
+														<token-text xml:space="preserve">User</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-break/>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount"/>
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="accountAction">
+													<arg-string>
+														<token-text xml:space="preserve">accountCreateByEntitlementGrant</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="sourceDN">
+													<arg-string>
+														<token-src-dn/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="association">
+													<arg-string>
+														<token-association/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="guid">
+													<arg-string>
+														<token-src-attr name="GUID"/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="objectClass">
+													<arg-string>
+														<token-text xml:space="preserve">User</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								<rule>
+									<description>User UserAccount Entitlement change (Disable Option)</description>
+									<comment>The User UserAccount Entitlement grants the user an enabled account in the connected system. Revoking the entitlement will disable or delete the user account depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the disable option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-entitlement name="UserAccount" op="changing"/>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserAccount"/>
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="accountAction">
+													<arg-string>
+														<token-text xml:space="preserve">accountDisableByEntitlementRevoke</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="sourceDN">
+													<arg-string>
+														<token-src-dn/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="association">
+													<arg-string>
+														<token-association/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="guid">
+													<arg-string>
+														<token-src-attr name="GUID"/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="objectClass">
+													<arg-string>
+														<token-text xml:space="preserve">User</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount"/>
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="accountAction">
+													<arg-string>
+														<token-text xml:space="preserve">accountEnableByEntitlementGrant</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="sourceDN">
+													<arg-string>
+														<token-src-dn/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="association">
+													<arg-string>
+														<token-association/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="guid">
+													<arg-string>
+														<token-src-attr name="GUID"/>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="objectClass">
+													<arg-string>
+														<token-text xml:space="preserve">User</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								<rule>
+									<description>User UserAccount Entitlement remove (Delete Option)</description>
+									<comment xml:space="preserve">The User UserAccount Entitlement grants the user an enabled account in the connected system. Revoking the entitlement will disable or delete the user account depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the delete option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">delete</if-global-variable>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">delete</if-operation>
+											<if-xpath op="true">operation-data/entitlement-impl/@name="UserAccount"</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="accountAction">
+											<arg-string>
+												<token-text xml:space="preserve">accountDeleteByEntitlementRevoke</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="sourceDN">
+											<arg-string>
+												<token-src-dn/>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="association">
+											<arg-string>
+												<token-association/>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="guid">
+											<arg-string>
+												<token-src-attr name="GUID"/>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="objectClass">
+											<arg-string>
+												<token-text xml:space="preserve">User</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-break/>
+									</actions>
+								</rule>
+							</policy>
+						</ds-value>
+					</ds-attribute>
+					<ds-attribute ds-attr-name="idm-installationdirective">
+						<ds-value>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48aW5zdGFsbGF0aW9uLWRpcmVjdGl2ZT4KCTxwbGFjZW1lbnQgbG9jYXRpb249InN1YnNjcmliZXIiLz4KCTxkcy1hdHRyaWJ1dGVzLz4KCTxwb2xpY3ktbGlua2FnZT4KCQk8cG9saWN5LXNldCBjaGFubmVsPSJzdWJzY3JpYmVyIiBuYW1lPSJjb21tYW5kIiBvcmRlcj0id2VpZ2h0IiB2YWx1ZT0iMjEwIi8+Cgk8L3BvbGljeS1saW5rYWdlPgo8L2luc3RhbGxhdGlvbi1kaXJlY3RpdmU+</ds-value>
+					</ds-attribute>
+					<ds-attribute ds-attr-name="idm-directivechecksum">
+						<ds-value>3292636808</ds-value>
+					</ds-attribute>
+					<ds-attribute ds-attr-name="idm-packageassocguid">
+						<ds-value>WVFBX7MK_201604261102380035</ds-value>
+					</ds-attribute>
+					<ds-attribute ds-attr-name="idm-packageguid">
+						<ds-value>ENL6AMM3_201604261102380032</ds-value>
+					</ds-attribute>
+					<ds-attribute ds-attr-name="idm-contentchecksum">
+						<ds-value>1576358028</ds-value>
+					</ds-attribute>
+				</ds-attributes>
+			</ds-object>
+		</children>
+	</package-folder>
+	<package-folder id="3" name="Jobs">
+		<description></description>
+		<children/>
+	</package-folder>
+	<package-folder id="4" name="Entitlements">
+		<description></description>
+		<children/>
+	</package-folder>
+	<package-folder id="6" name="Files">
+		<description></description>
+		<children/>
+	</package-folder>
+	<package-folder id="7" name="Notification Templates">
+		<description></description>
+		<children/>
+	</package-folder>
+	<package-folder id="8" name="ID Policies">
+		<description></description>
+		<children/>
+	</package-folder>
+</package>

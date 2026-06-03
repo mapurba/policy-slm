@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Tracking - ignore DirXML-Accounts attribute update for non-user objects</description>
+									<conditions>
+										<or>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-operation mode="nocase" op="equal">modify-association</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="AssociationValue" scope="policy">
+											<arg-object>
+												<token-xpath expression="./association[position()=1]/text()" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-xpath op="true">string-length($AssociationValue)&gt;0</if-xpath>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="VarUsrObject" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="dest" scope="entry">
+															<arg-association>
+																<token-text xml:space="preserve">$AssociationValue$</token-text>
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">DirXML-Accounts</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="VarUsrObject2" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$VarUsrObj/*[@attr-name=&quot;DirXML-Accounts&quot;]/value/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">string-length($VarUsrObject2)&gt;0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-break />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

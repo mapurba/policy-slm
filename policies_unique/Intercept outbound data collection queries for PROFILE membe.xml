@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept outbound data collection queries for PROFILE members</description>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">PROFILE</if-class-name>
+										</or>
+										<or>
+											<if-operation op="equal">query</if-operation>
+										</or>
+										<or>
+											<if-op-property name="data-collection-query" op="equal">true</if-op-property>
+											<if-op-property name="ig-collection-query" op="equal">true</if-op-property>
+										</or>
+										<or>
+											<if-xpath op="true">./read-attr[@attr-name='PROF:MEMBERS']</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">ILMSAPUFENT: Data collection query for profile member assignment intercepted. Looping over to ITP.</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="ILMSAPUFENT.ProfileEntitlementMemberAssignmentQuery" scope="driver">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;nds dtdversion="2.0"&gt;
+	&lt;input/&gt;
+&lt;/nds&gt; </token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="$ILMSAPUFENT.ProfileEntitlementMemberAssignmentQuery/nds/input" src-expression="." />
+										<do-strip-xpath expression="../query[last()]/@class-name" />
+										<do-set-xml-attr expression="../query[last()]" name="event-id">
+											<arg-string>
+												<token-text xml:space="preserve">query-driver-ident</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../query[last()]" name="scope">
+											<arg-string>
+												<token-text xml:space="preserve">entry</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-strip-xpath expression="../query[last()]/search-class" />
+										<do-append-xml-element expression="../query[last()]" name="search-class" />
+										<do-set-xml-attr expression="../query[last()]/search-class[last()]" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">__driver_identification_class__</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-strip-xpath expression="../query[last()]/read-attr" />
+										<do-append-xml-element expression="../query[last()]" name="read-attr" />
+										<do-set-op-property name="ProfileEntitlementMemberAssignmentQuery">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+								

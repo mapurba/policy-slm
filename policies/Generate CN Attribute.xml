@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Generate CN Attribute</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-class-name mode="nocase" op="equal">UDCIdentity</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="gcv.NOVLBNNRUSER.pubCNFormat" op="equal">UDCIdentifier</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv_cnToUse" scope="policy">
+													<arg-string>
+														<token-op-attr name="$gcv.NOVLBNNRUSER.pubCNFormat$" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="lv_firstNameCharacters" scope="policy">
+													<arg-string>
+														<token-replace-all regex="\*" replace-with="128">
+															<token-xpath expression="substring(substring-after($gcv.NOVLBNNRUSER.pubCNFormat,&quot;f&quot;),1,1)" />
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_middleNameCharacters" scope="policy">
+													<arg-string>
+														<token-replace-all regex="\*" replace-with="128">
+															<token-xpath expression="substring(substring-after($gcv.NOVLBNNRUSER.pubCNFormat,&quot;m&quot;),1,1)" />
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_lastNameCharacters" scope="policy">
+													<arg-string>
+														<token-replace-all regex="\*" replace-with="128">
+															<token-xpath expression="substring(substring-after($gcv.NOVLBNNRUSER.pubCNFormat,&quot;l&quot;),1,1)" />
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_firstName" scope="policy">
+													<arg-string>
+														<token-op-attr name="GivenName" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_middleName" scope="policy">
+													<arg-string>
+														<token-op-attr name="MiddleName" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_lastName" scope="policy">
+													<arg-string>
+														<token-op-attr name="FamilyName" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_firstNamePiece" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring($lv_firstName,1,$lv_firstNameCharacters)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_middleNamePiece" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring($lv_middleName,1,$lv_middleNameCharacters)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_lastNamePiece" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring($lv_lastName,1,$lv_lastNameCharacters)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv_cnToUse" scope="policy">
+													<arg-string>
+														<token-replace-first regex="f[*\d]+" replace-with="$lv_firstNamePiece$">
+															<token-replace-first regex="m[*\d]+" replace-with="$lv_middleNamePiece$">
+																<token-replace-first regex="l[*\d]+" replace-with="$lv_lastNamePiece$">
+																	<token-global-variable name="gcv.NOVLBNNRUSER.pubCNFormat" />
+																</token-replace-first>
+															</token-replace-first>
+														</token-replace-first>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-add-dest-attr-value class-name="User" name="CN">
+											<arg-value type="string">
+												<token-local-variable name="lv_cnToUse" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="gcv.NOVLBNNRUSER.pubUniqueIDSyncedWithCN" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value class-name="User" name="uniqueID">
+													<arg-value type="string">
+														<token-local-variable name="lv_cnToUse" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

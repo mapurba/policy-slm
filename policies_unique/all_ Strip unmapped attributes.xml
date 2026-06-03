@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>all: Strip unmapped attributes</description>
+									<comment xml:space="preserve">Strip unmapped attributes (attributes we use for operational purposes).</comment>
+									<conditions />
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="*[@attr-name]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="current-attr-name" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="mapped-attr-name" scope="policy">
+													<arg-string>
+														<token-map default-value="*" dest="edir" src="sentinel" table="NIQSENIDTRK-AccountAttrMap">
+															<token-local-variable name="current-attr-name" />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="mapped-attr-name" op="equal">*</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-op-attr name="$current-attr-name$" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

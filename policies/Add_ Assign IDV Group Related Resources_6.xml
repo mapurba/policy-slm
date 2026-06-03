@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add: Assign IDV Group Related Resources</description>
+									<comment xml:space="preserve">For all operations on Group objects that contain operation-data/entitlement-assignment data, Provision IDM Resources based on those values</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+											<if-xpath op="true">operation-data/entitlement-assignments</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										
+										
+										<do-set-local-variable name="assoc" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">"</token-text>
+												<token-xpath expression="$current-op/text()" />
+												<token-text xml:space="preserve">"</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="operation-data/entitlement-assignments" name="value">
+											<arg-string>
+												<token-replace-first regex="&quot;&quot;" replace-with="$assoc$">
+													<token-replace-first regex="&quot;&quot;" replace-with="$assoc$">
+														<token-xpath expression="operation-data/entitlement-assignments/@value" />
+													</token-replace-first>
+												</token-replace-first>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+													<token-global-variable name="UAProvAdmin" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="ua-admin-pwd" notrace="true" scope="policy">
+											<arg-string>
+												<token-dest-attr name="nspmDistributionPassword">
+													<arg-dn>
+														<token-parse-dn dest-dn-format="slash" src-dn-format="qualified-dot">
+															<token-global-variable name="UAProvAdmin" />
+														</token-parse-dn>
+													</arg-dn>
+												</token-dest-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="payload" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$current-op/operation-data/entitlement-assignments" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="prov-payload" scope="policy">
+											<arg-string>
+												<token-base64-encode charset="UTF-8">
+													<token-xml-serialize>
+														<token-local-variable name="payload" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="rpStatus" scope="policy">
+											<arg-string>
+												<token-xpath expression="ps:ReconcileGroupMemberPermissions($UAProvURL, $adminQualifiedLDAPDn, $ua-admin-pwd, $groupFQDN, 1000, $prov-payload, true)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">ReconcilePermissions status: </token-text>
+												<token-local-variable name="rpStatus" />
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="groupEntitlementLDAPDn" scope="policy">
+											<arg-string>
+												<token-xpath expression="operation-data/entitlement-assignments/@entitlement" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="rpStatus" scope="policy">
+											<arg-string>
+												<token-xpath expression="ps:RefreshCodeMapforGroupEntitlement($UAProvURL, $adminQualifiedLDAPDn, $ua-admin-pwd, $groupEntitlementLDAPDn, 1000,null, true)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">CodeRefresh Status: </token-text>
+												<token-local-variable name="rpStatus" />
+											</arg-string>
+										</do-trace-message>
+										<do-break />
+									</actions>
+								</rule>
+								

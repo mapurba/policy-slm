@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Configure Onboard Job</description>
+									<comment xml:space="preserve">Configure the PermissionOnboarding job with parameters it needs to run. This is the last onboarding setup rule in the chain. The IDM engine will commit all of the changes up to here so the objects can be utilized by subsequent policies and the job.</comment>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="onboardJob" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Job" datastore="src">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\PermissionOnboarding</token-text>
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="jobXmlData">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-base64-decode charset="UTF-8">
+														<token-src-attr class-name="DirXML-Job" name="XmlData">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\PermissionOnboarding</token-text>
+															</arg-dn>
+														</token-src-attr>
+													</token-base64-decode>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-trace-message level="5">
+											<arg-string>
+												<token-xml-serialize>
+													<token-local-variable name="jobXmlData" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+										<do-strip-xpath expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='onboarding-gcv']/value/text()" />
+										<do-append-xml-text expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='onboarding-gcv']/value">
+											<arg-string>
+												<token-global-variable name="drv.entitlement.onboarding" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='mapping-obj']/value/text()" />
+										<do-append-xml-text expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='mapping-obj']/value">
+											<arg-string>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\PermissionEntMapping</token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='ua-user']/value/text()" />
+										<do-append-xml-text expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='ua-user']/value">
+											<arg-string>
+												<token-global-variable name="UAProvAdmin" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='ua-url']/value/text()" />
+										<do-append-xml-text expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='ua-url']/value">
+											<arg-string>
+												<token-global-variable name="UAProvURL" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-set-src-attr-value class-name="DirXML-Job" name="XmlData">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\PermissionOnboarding</token-text>
+											</arg-dn>
+											<arg-value type="string">
+												<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</token-text>
+												<token-xml-serialize>
+													<token-local-variable name="jobXmlData" />
+												</token-xml-serialize>
+											</arg-value>
+										</do-set-src-attr-value>
+									</actions>
+								</rule>
+							

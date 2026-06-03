@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Onboard Entitlement Handling</description>
+									<comment xml:space="preserve">This policy determines the Entitlement-Ref values to be applied to the current User by finding them in  PermissionEntMapping table and transform them into standard native output instance format.</comment>
+									<conditions>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-operation mode="case" op="equal">instance</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="permEntMap" scope="policy">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\PermissionEntMapping</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="ent-names" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$permEntMap/mapping-table/row/col[1]/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="ent-names" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="entName" scope="policy">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-added-entitlement name="$entName$" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="entValue" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="assignAttr" scope="policy">
+															<arg-string>
+																<token-map dest="assignmentAttribute" src="entitlementName" table="..\PermissionEntMapping">
+																	<token-local-variable name="entName" />
+																</token-map>
+															</arg-string>
+														</do-set-local-variable>
+														<do-append-xml-element expression="$current-op" name="attr" />
+														<do-set-xml-attr expression="$current-op/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-local-variable name="assignAttr" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$current-op/attr[last()]" name="value" />
+														<do-append-xml-text expression="$current-op/attr[last()]/value">
+															<arg-string>
+																<token-local-variable name="entValue" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

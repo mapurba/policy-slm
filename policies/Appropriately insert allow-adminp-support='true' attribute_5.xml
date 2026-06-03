@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Appropriately insert allow-adminp-support='true' attribute for delete commands</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable name="account.deleteImmediate" op="equal">true</if-global-variable>
+										</and>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+											<if-global-variable name="account.deleteImmediate" op="equal">true</if-global-variable>
+										</and>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable name="account.mailfileDeleteAction" op="not-equal">MAILFILE_DELETE_NONE</if-global-variable>
+										</and>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="account.addToDenyAccessGrp" op="equal">true</if-global-variable>
+										</and>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable name="account.DelAdminPCmd" op="not-equal">default</if-global-variable>
+										</and>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+											<if-global-variable name="account.DelAdminPCmd" op="not-equal">default</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-xml-attr expression="../delete" name="allow-adminp-support">
+											<arg-string>
+												<token-text>true</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+								

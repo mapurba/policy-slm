@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto events with fanout association</description>
+									<comment xml:space="preserve">The fanout associations are only used for proper fanout policy processing, it does not represent a real object in the application.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-association mode="regex" op="equal">fanout1-.+|fanout2-.+</if-association>
+											<if-association disabled="true" mode="regex" op="equal">fanout1-.+</if-association>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression=".[starts-with(association/text(), 'fanout1')]" />
+										<do-strip-xpath expression=".[starts-with(association/text(), 'fanout2')]" />
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Filter events which only have 'fanout' associations</token-text>
+												<token-text xml:space="preserve"> ...</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

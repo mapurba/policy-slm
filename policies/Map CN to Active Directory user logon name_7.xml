@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Map CN to Active Directory user logon name</description>
+									<comment xml:space="preserve">Windows logon name mapping: When userPrincipalName is configured to follow the eDirectory user name, set userPrincipalName to the eDirectory object name plus the name of the Active Directory domain. A reference to the userPrincipalName is stored in eDirectory in the urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName attribute.</comment>
+									<conditions>
+										<and>
+											<if-global-variable name="UpnMap" op="equal">edir-name-auth</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirxmlMDADAliasName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-local-variable name="object-name" />
+													<token-text xml:space="preserve">@</token-text>
+													<token-op-property name="drv.domain.dns.name" />
+												</arg-component>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-for-each>
+											<arg-node-set>
+												<token-src-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirxmlMDADAliasName" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirxmlMDADAliasName">
+															<arg-value type="structured">
+																<arg-component name="nameSpace">
+																	<token-xpath expression="$current-node/component[@name=&quot;nameSpace&quot;]" />
+																</arg-component>
+																<arg-component name="volume">
+																	<token-xpath expression="$current-node/component[@name=&quot;volume&quot;]" />
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</arg-component>
+															</arg-value>
+														</do-remove-src-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-add-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirxmlMDADAliasName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-local-variable name="object-name" />
+													<token-text xml:space="preserve">@</token-text>
+													<token-op-property name="drv.domain.dns.name" />
+												</arg-component>
+											</arg-value>
+										</do-add-src-attr-value>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>associate mirror root</description>
+									<comment xml:space="preserve">In a mirrored configuration, it is important to have the two mirror roots (the one in the IDV and the one in AD) associated with one another. If the roots are not associated, objects cannot be moved into the mirror root on the publisher channel.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">move</if-operation>
+											<if-xpath op="true">translate(./parent/@src-dn,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')=translate(./operation-data/@drv.user.container,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')</if-xpath>
+											<if-local-variable mode="nocase" name="drv.pubPlacementType" op="equal">mirrored</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="mirrorRootInstance" scope="policy">
+											<arg-node-set>
+												<token-query scope="entry">
+													<arg-dn>
+														<token-local-variable name="drv.domain.container.name" />
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">$mirrorRootInstance/association/text()</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-association direct="true">
+													<arg-dn>
+														<token-local-variable name="drv.domain.container.name" />
+													</arg-dn>
+													<arg-association>
+														<token-xpath expression="./parent/association" />
+													</arg-association>
+												</do-add-association>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable disabled="true" name="mirrorRootAssociated" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

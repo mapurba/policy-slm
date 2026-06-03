@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set SER ID</description>
+									<comment xml:space="preserve">Set SER ID based on if a custom attribute is used in Epic for the SER ID</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<comment name="lastchanged" xml:space="preserve">5/3/2023</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="not-equal">query</if-operation>
+											<if-op-attr name="1" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvSerIDVal" scope="policy">
+											<arg-string>
+												<token-op-attr name="1" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="1">
+											<arg-value type="string">
+												<token-text xml:space="preserve">{{MPI}}</token-text>
+												<token-upper-case>
+													<token-local-variable name="lvSerIDVal" />
+												</token-upper-case>
+												<token-text xml:space="preserve">,-1,</token-text>
+												<token-global-variable name="pdsepicsdcfg.serid.attribute.type" />
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+								

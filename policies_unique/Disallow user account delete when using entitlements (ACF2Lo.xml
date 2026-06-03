@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Disallow user account delete when using entitlements (ACF2Logonid but NO Onboarding)</description>
+									<comment xml:space="preserve">When using the User Account Entitlement, managed user accounts are controlled by the entitlement in the Identity Vault. A delete in Active Directory does not delete the controlling object in the vault. A future change to the object in the Identity Vault or a merge operation may re-create the account in Active Directory.</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-global-variable mode="nocase" name="drv.entitlement.ACF2Logonid" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="not-equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-remove-association when="after">
+											<arg-association>
+												<token-association />
+											</arg-association>
+										</do-remove-association>
+										<do-veto />
+									</actions>
+								</rule>
+								

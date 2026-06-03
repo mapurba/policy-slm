@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - add interested properties to current doc for future use.</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">add|modify|delete|rename|move|status</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="current-node" op="equal">LDAPDN</if-local-variable>
+															<if-op-property name="AccountTracking-$current-node$" op="not-available" />
+															<if-src-dn op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-$current-node$">
+															<arg-string>
+																<token-src-dn />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="current-node" op="equal">association</if-local-variable>
+																	<if-op-property name="AccountTracking-$current-node$" op="not-available" />
+																	<if-association op="available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-op-property name="AccountTracking-$current-node$">
+																	<arg-string>
+																		<token-association />
+																	</arg-string>
+																</do-set-op-property>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-op-property name="AccountTracking-$current-node$" op="not-available" />
+																			<if-op-attr name="$current-node$" op="available" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-op-property name="AccountTracking-$current-node$">
+																			<arg-string>
+																				<token-op-attr name="$current-node$" />
+																			</arg-string>
+																		</do-set-op-property>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

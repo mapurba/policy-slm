@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Insert Optional CONNECT Attributes</description>
+									<conditions>
+										<or>
+											<if-op-attr name="DirXML-RACF-groups" op="changing" />
+										</or>
+										<or>
+											<if-global-variable name="racf-default-connect-owner" op="available" />
+											<if-global-variable name="racf-default-connect-authority" op="available" />
+											<if-global-variable name="racf-default-connect-uacc" op="available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="connect-string" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">;</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable name="racf-default-connect-owner" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="connect-string" scope="policy">
+													<arg-string>
+														<token-local-variable name="connect-string" />
+														<token-text xml:space="preserve"> owner(</token-text>
+														<token-global-variable name="racf-default-connect-owner" />
+														<token-text xml:space="preserve">) </token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable name="racf-default-connect-authority" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="connect-string" scope="policy">
+													<arg-string>
+														<token-local-variable name="connect-string" />
+														<token-text xml:space="preserve"> auth(</token-text>
+														<token-global-variable name="racf-default-connect-authority" />
+														<token-text xml:space="preserve">) </token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable name="racf-default-connect-uacc" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="connect-string" scope="policy">
+													<arg-string>
+														<token-local-variable name="connect-string" />
+														<token-text xml:space="preserve"> uacc(</token-text>
+														<token-global-variable name="racf-default-connect-uacc" />
+														<token-text xml:space="preserve">) </token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr[@attr-name='DirXML-RACF-groups']/add-value/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="group-value">
+													<arg-string>
+														<token-xpath expression="$current-node/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="$current-node/text()" />
+												<do-append-xml-text expression="$current-node">
+													<arg-string>
+														<token-local-variable name="group-value" />
+														<token-local-variable name="connect-string" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="add-attr[@attr-name='DirXML-RACF-groups']/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="group-value">
+													<arg-string>
+														<token-xpath expression="$current-node/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="$current-node/text()" />
+												<do-append-xml-text expression="$current-node">
+													<arg-string>
+														<token-local-variable name="group-value" />
+														<token-local-variable name="connect-string" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Match by Distinguished Name and Vault Name</description>
+									<comment xml:space="preserve">When a client attempts to create a new Identity object the Sentinel server performs internal matching using the Distinguished Name and Vault Name (and MSSP Customer ID, if needed).
+
+Therefore, we need to attempt that match first, because if a matching object exists then attempting to create a new object will be in vain, because the Sentinel server will convert our add into a modify of the existing object.
+
+(Note that MSSP Customer ID is added in the output transformation, if needed, so it is not necessary to specify it here in this rule.)</comment>
+									<conditions>
+										<and>
+											<if-association op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-find-matching-object scope="subtree">
+											<arg-match-attr name="Distinguished Name" />
+											<arg-match-attr name="Vault Name" />
+										</do-find-matching-object>
+									</actions>
+								</rule>
+								

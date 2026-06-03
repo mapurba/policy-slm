@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Normalize LoginName</description>
+									<comment xml:space="preserve">Remove the Domain portion of LoginName if present. We derive CN from the LoginName on the publisher channel.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="LoginName" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="LoginNameNodeSet" scope="policy">
+											<arg-node-set>
+												<token-split delimiter="\|">
+													<token-op-attr name="LoginName" />
+												</token-split>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="LoginName">
+											<arg-value type="string">
+												<token-xpath expression="$LoginNameNodeSet[last()]" />
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept SCIM System (tagged identity query) query status</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">../status[@event-id='query-driver-ident']/operation-data/@UserAccountEntitlementQuery</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="Name" scope="policy">
+											<arg-string>
+												<token-global-variable name="drv.connectedsystem" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">found name: </token-text>
+												<token-local-variable name="Name" />
+											</arg-string>
+										</do-trace-message>
+										<do-append-xml-element expression=".." name="instance" />
+										<do-set-xml-attr expression="../instance[last()]" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">SCIMSystem</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../instance[last()]" name="src-dn">
+											<arg-string>
+												<token-local-variable name="Name" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">DisplayName</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">Account for SCIM System </token-text>
+												<token-local-variable name="Name" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">Description</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">User account in SCIM System </token-text>
+												<token-local-variable name="Name" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">SCIMValue</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-local-variable name="Name" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

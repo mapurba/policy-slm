@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>UserAccount Entitlement not available: do not match existing accounts</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lsname" scope="policy">
+											<arg-string>
+												<token-op-property name="lsname" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="granted-lsname" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="granted-lsname" op="equal">$lsname$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="entitled" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="entitled" op="equal">true</if-local-variable>
+												</and>
+												<and>
+													<if-op-property name="renNew" op="available" />
+													<if-op-property name="renOld" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Entitled for $lsname$. Allowing matching.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-set-op-property name="attempt-to-match">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Not entitled for $lsname$. Prohibiting matching.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-set-op-property name="attempt-to-match">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

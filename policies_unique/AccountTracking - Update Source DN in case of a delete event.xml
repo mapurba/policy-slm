@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Update Source DN in case of a delete event</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-src-dn>
+											<arg-dn>
+												<token-src-dn length="-3" />
+											</arg-dn>
+										</do-set-op-src-dn>
+										<do-set-op-property name="AccountTracking-RealmName">
+											<arg-string>
+												<token-join delimiter=".">
+													<token-split delimiter="DC=">
+														<token-replace-all regex="," replace-with="">
+															<token-src-dn />
+														</token-replace-all>
+													</token-split>
+												</token-join>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+								

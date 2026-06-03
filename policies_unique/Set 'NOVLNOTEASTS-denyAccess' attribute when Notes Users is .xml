@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set 'NOVLNOTEASTS-denyAccess' attribute when Notes Users is being enabled or disabled and update Deny Access Group Member Cache</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+											<if-global-variable mode="nocase" name="drv.account.status.DenyAccessGroup.use" op="equal">true</if-global-variable>
+											<if-operation op="equal">modify</if-operation>
+											<if-op-attr name="Members" op="changing" />
+											<if-local-variable name="DenyAccessGrpUNID" op="available" />
+											<if-local-variable name="DenyAccessGrpUNID" op="not-equal" />
+											<if-association mode="case" op="equal">$DenyAccessGrpUNID$</if-association>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$DenyAccessGrpMembers//value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">count(add-attr[@attr-name='Members']/value[@association-ref=$current-node/@association-ref])=0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value class-name="Person" name="NOVLNOTEASTS-denyAccess">
+															<arg-association>
+																<token-xpath expression="$current-node/@association-ref" />
+															</arg-association>
+															<arg-value type="state">
+																<token-text xml:space="preserve">false</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-op-attr name="Members" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">count($DenyAccessGrpMembers//value[@association-ref=$current-node/@association-ref])=0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value class-name="Person" name="NOVLNOTEASTS-denyAccess">
+															<arg-association>
+																<token-xpath expression="$current-node/@association-ref" />
+															</arg-association>
+															<arg-value type="state">
+																<token-text xml:space="preserve">true</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-set-local-variable name="DenyAccessGrpMembers" scope="driver">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;members/&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="$DenyAccessGrpMembers/members" src-expression="add-attr[@attr-name='Members']/value" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.account.status.DenyAccessGroup.publish" op="not-equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

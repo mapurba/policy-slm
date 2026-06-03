@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Entitlement change (Delete Option)</description>
+									<comment xml:space="preserve">The User Account Entitlement grants the user an enabled account in Linux and Unix. Revoking the entitlement will disable or delete the Linux and Unix account depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the delete option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.LinuxUnixAccount" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">delete</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="LinuxUnixAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="nrfhistoryCheck" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+													<if-global-variable mode="nocase" name="drv.entitlement.LinuxUnixAccount.onboard" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="nrfhistoryValue" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="src" scope="entry">
+															<arg-dn>
+																<token-src-dn />
+															</arg-dn>
+															<arg-string>
+																<token-text xml:space="preserve">nrfResourceHistory</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="nrfhistoryCheck" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="empty" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="entitlementDN" scope="policy">
+													<arg-string>
+														<token-map dest="entitlementDN" src="entitlementName" table="..\PermissionEntMapping">
+															<token-text xml:space="preserve">LinuxUnixAccount</token-text>
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="resourceDNs" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="empty" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="resourceDNs" scope="policy">
+													<arg-node-set>
+														<token-map dest="resourceDN" src="entitlementName" table="..\PermissionEntMapping">
+															<token-text xml:space="preserve">LinuxUnixAccount</token-text>
+														</token-map>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="resourceDNs" scope="policy">
+													<arg-node-set>
+														<token-local-variable name="resourceDNs" />
+														<token-xpath expression="$static-map-xml/mapping-table/row[col/text()=&quot;LinuxUnixAccount&quot;]/col[3]/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="resourceDNs" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="resourceDN" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">\</token-text>
+																<token-global-variable name="dirxml.auto.treename" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-parse-dn dest-dn-format="slash" src-dn-format="ldap">
+																	<token-local-variable name="current-node" />
+																</token-parse-dn>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="nrfhistoryCheck" scope="policy">
+															<arg-node-set>
+																<token-local-variable name="nrfhistoryCheck" />
+																<token-xpath expression="$nrfhistoryValue/attr/value[component[@name=&quot;volume&quot;]/text()=$resourceDN]" />
+															</arg-node-set>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="LinuxUnixAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="nrfhistoryCheck" op="not-equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="checkOperation" scope="policy">
+															<arg-node-set>
+																<token-xml-parse>
+																	<token-text xml:space="preserve">&lt;status&gt;&lt;/status&gt;</token-text>
+																</token-xml-parse>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-clone-xpath dest-expression="$checkOperation/status" src-expression="$nrfhistoryCheck[component[@name=&quot;nameSpace&quot;]/text()=&quot;0&quot;]/component[@name=&quot;path&quot;]/text()" />
+														<do-set-local-variable name="checkPayLoad" notrace="true" scope="policy">
+															<arg-string>
+																<token-base64-encode charset="UTF-8">
+																	<token-xml-serialize>
+																		<token-local-variable name="checkOperation" />
+																	</token-xml-serialize>
+																</token-base64-encode>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="payload" notrace="true" scope="policy">
+															<arg-string>
+																<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																	<token-base64-decode charset="UTF-8">
+																		<token-local-variable name="checkPayLoad" />
+																	</token-base64-decode>
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="checkPayLoad" scope="policy">
+															<arg-string>
+																<token-base64-encode charset="UTF-8">
+																	<token-local-variable name="payload" />
+																</token-base64-encode>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+															<arg-string>
+																<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+																	<token-global-variable name="UAProvAdmin" />
+																</token-parse-dn>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="timeStamp" scope="policy">
+															<arg-string>
+																<token-xpath expression="./modify-attr[@attr-name=&quot;DirXML-EntitlementRef&quot;]/add-value/value[component[@name=&quot;volume&quot;]/text()=$entitlementDN]/@timestamp" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="rpStatus" scope="policy">
+															<arg-string>
+																<token-xpath expression="ps:AllowEntitlementGrantOrRevoke($adminQualifiedLDAPDn,$timeStamp,$checkPayLoad,true)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="rpStatus" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="entStatus" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="entStatus" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">false</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Ignoring entitlement change.</token-text>
+																	</arg-string>
+																</do-trace-message>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="entStatus" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="entStatus" op="equal">true</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-delete-dest-object />
+														<do-remove-association when="after">
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</do-remove-association>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="LinuxUnixAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="nrfhistoryCheck" op="not-equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="checkOperation" scope="policy">
+															<arg-node-set>
+																<token-xml-parse>
+																	<token-text xml:space="preserve">&lt;status&gt;&lt;/status&gt;</token-text>
+																</token-xml-parse>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-clone-xpath dest-expression="$checkOperation/status" src-expression="$nrfhistoryCheck[component[@name=&quot;nameSpace&quot;]/text()=&quot;1&quot;]/component[@name=&quot;path&quot;]/text()" />
+														<do-set-local-variable name="checkPayLoad" notrace="true" scope="policy">
+															<arg-string>
+																<token-base64-encode charset="UTF-8">
+																	<token-xml-serialize>
+																		<token-local-variable name="checkOperation" />
+																	</token-xml-serialize>
+																</token-base64-encode>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="payload" notrace="true" scope="policy">
+															<arg-string>
+																<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																	<token-base64-decode charset="UTF-8">
+																		<token-local-variable name="checkPayLoad" />
+																	</token-base64-decode>
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="checkPayLoad" scope="policy">
+															<arg-string>
+																<token-base64-encode charset="UTF-8">
+																	<token-local-variable name="payload" />
+																</token-base64-encode>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+															<arg-string>
+																<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+																	<token-global-variable name="UAProvAdmin" />
+																</token-parse-dn>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="timeStamp" scope="policy">
+															<arg-string>
+																<token-xpath expression="./modify-attr[@attr-name=&quot;DirXML-EntitlementRef&quot;]/add-value/value[component[@name=&quot;volume&quot;]/text()=$entitlementDN]/@timestamp" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="rpStatus" scope="policy">
+															<arg-string>
+																<token-xpath expression="ps:AllowEntitlementGrantOrRevoke($adminQualifiedLDAPDn,$timeStamp,$checkPayLoad,true)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="rpStatus" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="entStatus" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="entStatus" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">false</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Ignoring entitlement change.</token-text>
+																	</arg-string>
+																</do-trace-message>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="entStatus" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="entStatus" op="equal">true</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="Login Disabled">
+															<arg-value type="state">
+																<token-text>false</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

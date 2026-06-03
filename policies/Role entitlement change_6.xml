@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Role entitlement change</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Role" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="Role" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="Role" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable disabled="true" name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-remove-dest-attr-value class-name="User" name="ebsRoles">
+													<arg-value type="string">
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+												<do-set-xml-attr disabled="true" expression="../modify[last()]/modify-attr[last()]/remove-value[last()]/value[last()]" name="association-ref">
+													<arg-string>
+														<token-association />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="Role" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable disabled="true" name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="User" name="ebsRoles">
+													<arg-value type="string">
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-set-xml-attr disabled="true" expression="../modify[last()]/modify-attr[last()]/add-value[last()]/value[last()]" name="association-ref">
+													<arg-string>
+														<token-association />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

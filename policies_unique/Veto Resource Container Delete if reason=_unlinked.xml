@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto Resource Container Delete if reason="unlinked"</description>
+									<comment xml:space="preserve">If a Resource container is being deleted because AR is no longer interested in reflecting the Application into the Identitiy Vault, veto if GCV conditions specify</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">nrfResourceDefs</if-class-name>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+											<if-xpath op="true">self::delete[@reason = 'unlinked']</if-xpath>
+											<if-global-variable mode="nocase" name="drv.pub.resource.delete" op="equal">0</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-veto />
+									</actions>
+								</rule>
+							

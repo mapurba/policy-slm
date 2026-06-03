@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>modify: Map xattrs to simple attributes.</description>
+									<comment xml:space="preserve">Map any Sentinel Identity xattrs attribute values to simple attributes in the eDirectory User object.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">modify</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./modify-attr[@attr-name='xattrs']" />
+											</arg-node-set>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$current-node/add-value/value|$current-node/remove-value/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="new-modify-attr">
+															<arg-node-set>
+																<token-xpath expression="./modify-attr[@attr-name=$current-node/component[@name='name']]" />
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-local-variable name="new-modify-attr" op="equal" />
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-append-xml-element expression="." name="modify-attr" />
+																<do-set-local-variable name="new-modify-attr" scope="policy">
+																	<arg-node-set>
+																		<token-xpath expression="./modify-attr[last()]" />
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-xml-attr expression="$new-modify-attr" name="attr-name">
+																	<arg-string>
+																		<token-xpath expression="$current-node/component[@name='name']" />
+																	</arg-string>
+																</do-set-xml-attr>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-set-local-variable name="action-name">
+															<arg-string>
+																<token-xpath expression="local-name($current-node/..)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-append-xml-element expression="$new-modify-attr" name="$action-name$" />
+														<do-append-xml-element expression="$new-modify-attr/child::*[last()]" name="value" />
+														<do-set-xml-attr expression="$new-modify-attr/child::*[last()]/value" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">string</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$new-modify-attr/child::*[last()]/value">
+															<arg-string>
+																<token-xpath expression="$current-node/component[@name='value']" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="modify-attr[@attr-name='xattrs']" />
+									</actions>
+								</rule>
+							

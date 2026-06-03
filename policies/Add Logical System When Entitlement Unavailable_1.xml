@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add Logical System When Entitlement Unavailable</description>
+									<conditions>
+										<or>
+											<if-global-variable name="drv.entitlement.UserAccount" op="not-equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.UserAccount" op="not-available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="LogicalSystemName" scope="driver">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/definition[@name='nsap-ls-name']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-add-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+											<arg-value type="string">
+												<token-op-property name="lsname" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+											<arg-value type="string">
+												<token-local-variable name="LogicalSystemName" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

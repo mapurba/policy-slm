@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Determine the Entitlement values that required to be additionally generated</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">Entitlements-Granted</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="Entitlements-Granted/add-value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="ent-LIID" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node//param/text(),'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="connDN" scope="policy">
+													<arg-string>
+														<token-xpath expression="$entConfig//connection[@name=$ent-LIID]/query-attr[@name='connection-dn']/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="connDN" scope="policy">
+													<arg-string>
+														<token-local-variable name="ent-LIID" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">starts-with(association/text(),$connDN)</if-xpath>
+														</and>
+														<and>
+															<if-local-variable name="connection-dn" op="not-equal" />
+															<if-local-variable name="connection-dn" op="not-equal">$connDN$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="$current-node" />
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="stripEntValue" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">false</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="//association" />
+															</arg-node-set>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-xpath op="true">starts-with($current-node/text(),$connDN)</if-xpath>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="stripEntValue" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="stripEntValue" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="$current-node" />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

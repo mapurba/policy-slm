@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Employee-Name-Based (Variable Length)</description>
+									<comment xml:space="preserve">First character of urn:ietf:params:scim:schemas:core:2.0:User:name.givenName + urn:ietf:params:scim:schemas:core:2.0:User:name.familyName First character of urn:ietf:params:scim:schemas:core:2.0:User:name.givenName + first character of urn:ietf:params:scim:schemas:core:2.0:User:name.honorificPrefix + urn:ietf:params:scim:schemas:core:2.0:User:name.familyName First two characters of urn:ietf:params:scim:schemas:core:2.0:User:name.givenName + urn:ietf:params:scim:schemas:core:2.0:User:name.familyName First three characters of urn:ietf:params:scim:schemas:core:2.0:User:name.givenName + urn:ietf:params:scim:schemas:core:2.0:User:name.familyName First character of urn:ietf:params:scim:schemas:core:2.0:User:name.givenName + urn:ietf:params:scim:schemas:core:2.0:User:name.familyName + digit starting with 1 incremented until name is unique within eDirectory</comment>
+									<conditions>
+										<and>
+											<if-global-variable name="drv.new.user.naming.option" op="equal">1</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="obj-name" scope="policy">
+											<arg-string>
+												<token-unique-name counter-digits="3" counter-pad="false" name="urn:ietf:params:scim:schemas:ilm:core:1.0:DirXMLsapDMRoot:DirXML-sapDMRootName" scope="subtree">
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="1">
+																<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+															</token-substring>
+															<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="1">
+																<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+															</token-substring>
+															<token-substring length="1">
+																<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.honorificPrefix" />
+															</token-substring>
+															<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="2">
+																<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+															</token-substring>
+															<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="3">
+																<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+															</token-substring>
+															<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="1">
+																<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+															</token-substring>
+															<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+														</token-lower-case>
+													</arg-string>
+												</token-unique-name>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

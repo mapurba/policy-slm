@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Append &lt;association-ref&gt; for Modify User</description>
+									<conditions>
+										<or>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</or>
+										<or>
+											<if-class-name mode="nocase" op="equal">urn:ietf:params:scim:schemas:core:2.0:User</if-class-name>
+										</or>
+										<or>
+											<if-xpath op="true">./modify-attr[@attr-name='groups:value']</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="AddValueNode" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="./modify-attr[@attr-name='groups:value']/add-value/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="AddValueNode" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="current-node" op="not-equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable name="drv.SAPCloud" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="groupId">
+																	<arg-string>
+																		<token-query>
+																			<arg-match-attr name="CN">
+																				<arg-value>
+																					<token-local-variable name="current-node" />
+																				</arg-value>
+																			</arg-match-attr>
+																		</token-query>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-op-property name="publisher-type" op="available" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="queryResponse">
+																			<arg-node-set>
+																				<token-query class-name="Group">
+																					<arg-match-attr name="urn:ietf:params:scim:schemas:core:2.0:Group:id">
+																						<arg-value>
+																							<token-xpath expression="$current-node/text()" />
+																						</arg-value>
+																					</arg-match-attr>
+																				</token-query>
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="groupId">
+																			<arg-string>
+																				<token-xpath expression="$queryResponse/association/text()" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-set-local-variable name="groupId">
+																			<arg-string>
+																				<token-local-variable name="current-node" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+														<do-set-xml-attr expression="$current-node" name="association-ref">
+															<arg-string>
+																<token-local-variable name="groupId" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$current-node" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">dn</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-set-local-variable name="RemoveValueNode" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="./modify-attr[@attr-name='groups:value']/remove-value/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="RemoveValueNode" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="current-node" op="not-equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable name="drv.SAPCloud" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="groupId">
+																	<arg-string>
+																		<token-query>
+																			<arg-match-attr name="CN">
+																				<arg-value>
+																					<token-local-variable name="current-node" />
+																				</arg-value>
+																			</arg-match-attr>
+																		</token-query>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-op-property name="publisher-type" op="available" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="queryResponse">
+																			<arg-node-set>
+																				<token-query class-name="Group">
+																					<arg-match-attr name="urn:ietf:params:scim:schemas:core:2.0:Group:id">
+																						<arg-value>
+																							<token-xpath expression="$current-node/text()" />
+																						</arg-value>
+																					</arg-match-attr>
+																				</token-query>
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="groupId">
+																			<arg-string>
+																				<token-xpath expression="$queryResponse/association/text()" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-set-local-variable name="groupId">
+																			<arg-string>
+																				<token-local-variable name="current-node" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+														<do-set-xml-attr expression="$current-node" name="association-ref">
+															<arg-string>
+																<token-local-variable name="groupId" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$current-node" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">dn</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

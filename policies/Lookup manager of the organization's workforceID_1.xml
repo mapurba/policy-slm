@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Lookup manager of the organization's workforceID</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="DirXML-sapP-A-O" op="changing" />
+										</and>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">sync</if-operation>
+											<if-src-attr name="DirXML-sapP-A-O" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Lookup manager of the organization's workforceID ...</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',10),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="orgLevel" scope="policy">
+											<arg-string>
+												<token-src-attr class-name="DirXML-sapO" name="DirXML-sapOHierarchyLevel">
+													<arg-dn>
+														<token-global-variable name="dvr.saphr.driverdn" />
+														<token-text xml:space="preserve">\sap\om\o\</token-text>
+														<token-attr name="DirXML-sapP-A-O" />
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="orgMgrWfID" scope="policy">
+											<arg-string>
+												<token-src-attr class-name="DirXML-sapO" name="DirXML-sapOManagerWorkforceID">
+													<arg-dn>
+														<token-global-variable name="dvr.saphr.driverdn" />
+														<token-text xml:space="preserve">\sap\om\o\</token-text>
+														<token-attr name="DirXML-sapP-A-O" />
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="orgMgrWfID" op="equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-attr mode="nocase" name="workforceID" op="equal">$orgMgrWfID$</if-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="parentOrg" scope="policy">
+															<arg-string>
+																<token-src-attr class-name="DirXML-sapO" name="DirXML-sapO-R-A-O-002">
+																	<arg-dn>
+																		<token-global-variable name="dvr.saphr.driverdn" />
+																		<token-text xml:space="preserve">\sap\om\o\</token-text>
+																		<token-attr name="DirXML-sapP-A-O" />
+																	</arg-dn>
+																</token-src-attr>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="orgMgrWfID" scope="policy">
+															<arg-string>
+																<token-src-attr class-name="DirXML-sapO" name="DirXML-sapOManagerWorkforceID">
+																	<arg-dn>
+																		<token-global-variable name="dvr.saphr.driverdn" />
+																		<token-text xml:space="preserve">\sap\om\o\</token-text>
+																		<token-local-variable name="parentOrg" />
+																	</arg-dn>
+																</token-src-attr>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="orgLevelOU" scope="policy">
+													<arg-string>
+														<token-global-variable name="dvr.saphr.driverdn" />
+														<token-text xml:space="preserve">\sap\om\o\</token-text>
+														<token-attr name="DirXML-sapP-A-O" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-while>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="orgLevel" op="not-lt">0</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">check orgWfMgr for level: </token-text>
+																<token-local-variable name="orgLevel" />
+															</arg-string>
+														</do-trace-message>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="regex" name="orgMgrWfID" op="not-equal">.+</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="orgMgrWfID" scope="policy">
+																	<arg-string>
+																		<token-src-attr class-name="DirXML-sapO" name="DirXML-sapOManagerWorkforceID">
+																			<arg-dn>
+																				<token-local-variable name="orgLevelOU" />
+																			</arg-dn>
+																		</token-src-attr>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-set-local-variable name="orgLevel" scope="policy">
+															<arg-string>
+																<token-xpath expression="$orgLevel - 1" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="orgLevelOU" scope="policy">
+															<arg-string>
+																<token-global-variable name="dvr.saphr.driverdn" />
+																<token-text xml:space="preserve">\sap\om\o\</token-text>
+																<token-src-attr class-name="DirXML-sapO" name="DirXML-sapO-R-A-O-002">
+																	<arg-dn>
+																		<token-local-variable name="orgLevelOU" />
+																	</arg-dn>
+																</token-src-attr>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-while>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

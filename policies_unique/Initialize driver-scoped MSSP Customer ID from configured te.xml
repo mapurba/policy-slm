@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Initialize driver-scoped MSSP Customer ID from configured tenant name if necessary</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.sentinel.customer.id" op="not-equal" />
+											<if-global-variable mode="nocase" name="drv.sentinel.customer.id" op="not-equal">0</if-global-variable>
+											<if-global-variable mode="regex" name="drv.sentinel.customer.id" op="not-equal">[0-9]+</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="local.tenant.object" scope="policy">
+											<arg-node-set>
+												<token-query class-name="tenant">
+													<arg-match-attr name="name">
+														<arg-value type="string">
+															<token-global-variable name="drv.sentinel.customer.id" />
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="local.tenant.number" scope="policy">
+											<arg-string>
+												<token-xpath expression="substring-after($local.tenant.object//association[1],'tenant/')" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

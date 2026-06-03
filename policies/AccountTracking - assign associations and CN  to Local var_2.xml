@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - assign associations and CN  to Local variables</description>
+									<comment xml:space="preserve">Populate variables required for next rule</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="oldAssociationValue" scope="driver">
+											<arg-string>
+												<token-xpath expression="./association/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="newAssociationValue" scope="policy">
+											<arg-string>
+												<token-xpath expression="./association[last()]/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($newAssociationValue)&gt;0</if-xpath>
+													<if-xpath op="true">contains($newAssociationValue, "106")</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="VarUsrObj" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="src" scope="entry">
+															<arg-association>
+																<token-text xml:space="preserve">$newAssociationValue$</token-text>
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">50073</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="VarUsrCN" scope="policy">
+													<arg-string>
+														<token-xpath expression="$VarUsrObj/*[@attr-name=&quot;50073&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

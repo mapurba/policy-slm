@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept SAP HANA System (tagged identity query) query status</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">../status[@event-id='query-driver-ident']/operation-data/@UserAccountEntitlementQuery</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression=".." name="instance" />
+										<do-set-xml-attr expression="../instance[last()]" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">SAPHANASystem</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">DisplayName</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">Account for SAP HANA System </token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">Description</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">User account in SAPHANASystem </token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">SAPHANAValue</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+									</actions>
+								</rule>
+								

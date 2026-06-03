@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+
+15	
+
+                <description>Handle Delete events by renaming object before it is deleted in Google</description>
+
+16	
+
+                <conditions>
+
+17	
+
+                        <and />
+
+18	
+
+                </conditions>
+
+19	
+
+                <actions>
+
+20	
+
+                        <do-set-op-property name="newUserID">
+
+21	
+
+                                <arg-string>
+
+22	
+
+                                        <token-src-name />
+
+23	
+
+                                        <token-time format=".yyyy.MM.dd.hh.mm.ss" tz="UTC" />
+
+24	
+
+                                </arg-string>
+
+25	
+
+                        </do-set-op-property>
+
+26	
+
+                        <do-set-local-variable name="lv-old-name" scope="policy">
+
+27	
+
+                                <arg-string>
+
+28	
+
+                                        <token-src-name />
+
+29	
+
+                                </arg-string>
+
+30	
+
+                        </do-set-local-variable>
+
+31	
+
+                        <do-set-local-variable name="lv-new-name" scope="policy">
+
+32	
+
+                                <arg-string>
+
+33	
+
+                                        <token-op-property name="newUserID" />
+
+34	
+
+                                </arg-string>
+
+35	
+
+                        </do-set-local-variable>
+
+36	
+
+                        <do-rename-dest-object when="before">
+
+37	
+
+                                <arg-string>
+
+38	
+
+                                        <token-op-property name="newUserID" />
+
+39	
+
+                                </arg-string>
+
+40	
+
+                        </do-rename-dest-object>
+
+41	
+
+                        <do-set-op-association>
+
+42	
+
+                                <arg-association>
+
+43	
+
+                                        <token-replace-all regex="$lv-old-name$" replace-with="$lv-new-name$">
+
+44	
+
+                                                <token-association />
+
+45	
+
+                                        </token-replace-all>
+
+46	
+
+                                </arg-association>
+
+47	
+
+                        </do-set-op-association>
+
+48	
+
+                </actions>
+
+49	
+
+        </rule>
+							

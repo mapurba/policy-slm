@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add operation-data elements for Remove-Association operations</description>
+									<comment xml:space="preserve">Add user-id and empty ldap-dn and tree-name to operation data</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">remove-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="userId" scope="policy">
+											<arg-string>
+												<token-xpath expression="./text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-element expression="operation-data" name="ldap-dn" />
+										<do-append-xml-element expression="operation-data" name="tree-name" />
+										<do-append-xml-element expression="operation-data" name="user-id" />
+										<do-append-xml-text expression="operation-data/user-id">
+											<arg-string>
+												<token-local-variable name="userId" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

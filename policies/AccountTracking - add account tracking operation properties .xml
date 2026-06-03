@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - add account tracking operation properties for regular operations</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">add|modify|delete|rename|move</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="requireAccUpdate" op="equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-property name="AccountTracking-ObjectClass">
+													<arg-string>
+														<token-xpath expression="@class-name" />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="AccountTracking-Operation">
+													<arg-string>
+														<token-operation />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="AccountTracking-ObjectDN">
+													<arg-string>
+														<token-src-dn />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="AccountTracking-IdvAccountStatus">
+													<arg-string>
+														<token-local-variable name="idvAccStatus" />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="AccountTracking-AppAccountStatus">
+													<arg-string>
+														<token-text xml:space="preserve">-</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="jfoactrk.AccIdentifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="accTracked" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="$current-node$" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-$current-node$">
+															<arg-string>
+																<token-op-attr name="$current-node$" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-operation mode="nocase" op="not-equal">add</if-operation>
+																	<if-local-variable mode="nocase" name="current-node" op="equal">association</if-local-variable>
+																	<if-op-property name="AccountTracking-association" op="not-available" />
+																	<if-association op="available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-op-property name="AccountTracking-association">
+																	<arg-string>
+																		<token-association />
+																	</arg-string>
+																</do-set-op-property>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="accTracked" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">false</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="current-node" op="equal">LDAPDN</if-local-variable>
+																			<if-dest-dn op="available" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-op-property name="AccountTracking-LDAPDN">
+																			<arg-string>
+																				<token-dest-dn />
+																			</arg-string>
+																		</do-set-op-property>
+																		<do-set-local-variable name="accTracked" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="current-node" op="equal">DESTNAME</if-local-variable>
+																			<if-operation mode="regex" op="equal">add|rename</if-operation>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-op-property name="AccountTracking-DESTNAME">
+																			<arg-string>
+																				<token-dest-name />
+																				<token-xpath expression="new-name/text()" />
+																			</arg-string>
+																		</do-set-op-property>
+																		<do-set-local-variable name="accTracked" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="accTracked" op="equal">true</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">AccountTracking-Tracking account identifier $current-node$ for object </token-text>
+																<token-src-name />
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

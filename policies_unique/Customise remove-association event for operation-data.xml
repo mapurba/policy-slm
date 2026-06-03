@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Customise remove-association event for operation-data</description>
+									<comment xml:space="preserve">Modify remove-association event to strip association and add operation data for account tracking policies to work.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">remove-association</if-operation>
+											<if-local-variable mode="nocase" name="delete-event" op="equal">true</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="./text()" />
+										<do-set-op-property name="AccountTracking-ObjectDN">
+											<arg-string>
+												<token-local-variable name="AccountTracking-ObjectDN" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-association">
+											<arg-string>
+												<token-local-variable name="association" />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

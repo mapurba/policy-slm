@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept ADDomain (tagged identity query) query status</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">../status[@event-id='query-driver-ident']/operation-data/@UserAccountEntitlementQuery</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.domains" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-src-dn>
+													<arg-dn>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+													</arg-dn>
+												</do-set-op-src-dn>
+												<do-set-local-variable name="up_srcdn" scope="policy">
+													<arg-string>
+														<token-upper-case>
+															<token-src-dn />
+														</token-upper-case>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="in-subtree">$domain_val$</if-src-dn>
+															<if-xpath op="true">translate(concat("DC=",substring-after($up_srcdn,"DC=")), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = translate($domain_val,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="domainName" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">found domain name: </token-text>
+																<token-local-variable name="domainName" />
+															</arg-string>
+														</do-trace-message>
+														<do-append-xml-element expression=".." name="instance" />
+														<do-set-xml-attr expression="../instance[last()]" name="class-name">
+															<arg-string>
+																<token-text xml:space="preserve">ADDomain</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="../instance[last()]" name="src-dn">
+															<arg-string>
+																<token-local-variable name="domainName" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]" name="attr" />
+														<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">ADDomainDisplayName</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+														<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+															<arg-string>
+																<token-text xml:space="preserve">Account for domain: </token-text>
+																<token-local-variable name="domainName" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-append-xml-element expression="../instance[last()]" name="attr" />
+														<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">ADDomainDescription</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+														<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+															<arg-string>
+																<token-text xml:space="preserve">User account in Active Directory domain </token-text>
+																<token-local-variable name="domainName" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-append-xml-element expression="../instance[last()]" name="attr" />
+														<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">ADDomainValue</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+														<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+															<arg-string>
+																<token-local-variable name="domainName" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-strip-xpath disabled="true" expression=".[count(attr)=0]" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

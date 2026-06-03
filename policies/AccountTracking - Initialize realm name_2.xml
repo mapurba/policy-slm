@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Initialize realm name</description>
+									<conditions />
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.domains" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="domain_container" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="in-subtree">$domain_container$</if-src-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-RealmName">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

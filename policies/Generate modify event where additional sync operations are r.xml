@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Generate modify event where additional sync operations are required</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">Entitlements-Granted</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="modifyEvent" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;modify&gt;&lt;/modify&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="$modifyEvent/modify" src-expression="@*" />
+										<do-append-xml-element expression="$modifyEvent/modify" name="modify-attr" />
+										<do-set-xml-attr expression="$modifyEvent/modify/modify-attr" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">DirXML-EntitlementRef</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-clone-xpath dest-expression="$modifyEvent/modify/modify-attr" src-expression="Entitlements-Granted/node()" />
+										<do-set-xml-attr expression="$modifyEvent/modify" name="processed">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-clone-xpath dest-expression=".." src-expression="$modifyEvent/node()" />
+										<do-strip-xpath expression="Entitlements-Granted" />
+									</actions>
+								</rule>
+							

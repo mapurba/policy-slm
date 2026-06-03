@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat uniqueMember</description>
+									<conditions>
+										<and>
+											<if-op-attr name="uniqueMember" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="uniqueMember">
+											<arg-string>
+												<token-attr name="uniqueMember" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="uniqueMember">
+											<arg-value type="dn">
+												<token-parse-dn dest-dn-format="slash" src-dn-format="ldap">
+													<token-local-variable name="current-value" />
+												</token-parse-dn>
+											</arg-value>
+										</do-reformat-op-attr>
+										<do-for-each>
+											<arg-node-set>
+												<token-op-attr name="uniqueMember" />
+												<token-removed-attr name="uniqueMember" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-xml-attr expression="$current-node" name="association-ref">
+													<arg-string>
+														<token-local-variable name="uniqueMember" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Provide a required Surname for new Users.</description>
+									<comment xml:space="preserve">For the required Surname field, try to use the NAME field from Top Secret.  Otherwise, assign it the value of the Association.</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr name="Full Name" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="name-node-set" scope="policy">
+													<arg-node-set>
+														<token-split delimiter=" ">
+															<token-attr name="Full Name" />
+														</token-split>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-add-dest-attr-value name="Surname">
+													<arg-value type="string">
+														<token-xpath expression="$name-node-set[last()]" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-add-dest-attr-value name="Surname">
+													<arg-value type="string">
+														<token-association />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

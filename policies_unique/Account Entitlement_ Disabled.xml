@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Entitlement: Disabled</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable name="driver.gw.ent.account.add" op="equal">disable</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="gwDistLists" />
+											</arg-node-set>
+											<arg-actions>
+												<do-add-dest-attr-value class-name="User" name="Distribution List DN">
+													<arg-value>
+														<token-local-variable name="current-node" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-add-dest-attr-value class-name="User" name="Login Disabled">
+											<arg-value type="state">
+												<token-text xml:space="preserve">TRUE</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-break />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check PUM AccountDomain object has the type attribute before sync.</description>
+									<comment xml:space="preserve">The AccountDomain type is mandatory attribute for the creation of the object. The type can be either SSH or LDAP. SSH is for UNIX/Linux server and LDAP is for Windows servers.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXML-PUMAccountDomain</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-attr name="DirXML-pumAccDomType" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-status level="warning">
+											<arg-string>
+												<token-text xml:space="preserve">The AccountDomain type attribute is a mandatory attribute for the creation of this object.</token-text>
+											</arg-string>
+										</do-status>
+										<do-veto />
+									</actions>
+								</rule>
+								

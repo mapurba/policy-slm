@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Prepare to check exchange role entitlements after add</description>
+									<comment xml:space="preserve">Exchange Role entitlements are processed after the add completes because the added object needs to exist to be added to a Role. The add is flagged with an operational property that is checked in the input transform when add processing is complete.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.ExchangeRole" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-entitlement name="ExchangeRole" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="check-exchangeRole-entitlements">
+											<arg-string>
+												<token-text>true</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

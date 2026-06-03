@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>On unqualified query, add identity condition</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.query.unqualified.allow" op="equal">false</if-global-variable>
+											<if-operation mode="nocase" op="equal">query</if-operation>
+											<if-class-name mode="regex" op="equal">(User|Group)</if-class-name>
+											<if-xpath op="not-true">$current-op/search-attr/value</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="$current-op" name="search-attr" />
+										<do-append-xml-element expression="$current-op/search-attr[last()]" name="value" />
+										<do-set-xml-attr expression="$current-op/search-attr[position()=last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">Request_ID</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-text expression="$current-op/search-attr[position()=last()]/value">
+											<arg-string>
+												<token-text xml:space="preserve">%</token-text>
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

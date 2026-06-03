@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Match by GCV-specified attributes</description>
+									<comment xml:space="preserve">Finally, we attempt to find a matching object via uniquely identifying data of the person represented by the eDirectory User object.
+
+The attributes used are specified by the GCV named drv.matching_attrs.
+
+Unfortunately, DirXML-Script provides no way to dynamically specify the matching attributes for a do-find-matching-object verb, so we've got to perform the query ourselves.</comment>
+									<conditions>
+										<and>
+											<if-association op="not-available" />
+											<if-xpath op="true">$drv.matching_attrs</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression=".." name="query" />
+										<do-set-local-variable name="query-element" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="../query[last()]" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="$query-element" name="scope">
+											<arg-string>
+												<token-text xml:space="preserve">subtree</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="$query-element" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">User</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="$query-element" name="search-class" />
+										<do-set-xml-attr expression="$query-element/search-class" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">User</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.matching_attrs" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="$query-element" name="search-attr" />
+												<do-set-xml-attr expression="$query-element/search-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$query-element/search-attr[last()]" name="value" />
+												<do-set-xml-attr expression="$query-element/search-attr[last()]/value" name="type">
+													<arg-string>
+														<token-text xml:space="preserve">string</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-text expression="$query-element/search-attr[last()]/value">
+													<arg-string>
+														<token-xpath expression="$current-op/add-attr[@attr-name=$current-node]" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+										<do-append-xml-element expression="$query-element" name="read-attr" />
+										<do-set-local-variable name="query-results" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="query:query($destQueryProcessor, $query-element)//instance" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-xpath expression="$query-element" />
+									</actions>
+								</rule>
+								

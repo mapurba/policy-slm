@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle rename operation on user</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="attrValue" scope="policy">
+											<arg-string>
+												<token-xpath expression="./new-name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:userName" when="after">
+											<arg-value type="string">
+												<token-local-variable name="attrValue" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-strip-xpath expression="../rename" />
+									</actions>
+								</rule>
+								

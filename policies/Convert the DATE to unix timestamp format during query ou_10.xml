@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert the DATE to unix timestamp format during query output</description>
+									<comment xml:space="preserve">Convert the DATE to unix timestamp format during query output</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">instance</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="attributename" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="attributename" op="equal">.*_DATE.*|.*_DT|.*_UPDATED</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-reformat-op-attr name="$attributename$">
+															<arg-value type="string">
+																<token-convert-time dest-format="!CTIME" dest-tz="UTC" src-format="MM/dd/yyyy hh:mm:ss">
+																	<token-op-attr name="$attributename$" />
+																</token-convert-time>
+															</arg-value>
+														</do-reformat-op-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

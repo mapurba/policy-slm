@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Initialize encrypted attributes global variable, if not already initiated.</description>
+									<conditions>
+										<and>
+											<if-local-variable name="lvSubEAInited" op="not-available" />
+											<if-xpath op="true">self::status[@type='heartbeat']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="intSubencryptedAttrs" scope="driver">
+											<arg-node-set>
+												<token-query class-name="__enc-attrs__" datastore="src">
+													<arg-string>
+														<token-text xml:space="preserve">__enc-attrs__</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvSubEAInited" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

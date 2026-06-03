@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>convert modify CN to rename</description>
+									<conditions>
+										<and>
+											<if-class-name mode="regex" op="equal">User|Group</if-class-name>
+											<if-operation mode="regex" op="equal">modify</if-operation>
+											<if-op-attr name="CN" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="classNameValue" scope="policy">
+											<arg-string>
+												<token-class-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-rename-dest-object class-name="$classNameValue$">
+											<arg-string>
+												<token-xpath expression="./modify-attr[@attr-name=&quot;CN&quot;]/add-value/value/text()" />
+											</arg-string>
+										</do-rename-dest-object>
+										<do-strip-xpath expression="./modify-attr[@attr-name=&quot;CN&quot;]" />
+									</actions>
+								</rule>
+								

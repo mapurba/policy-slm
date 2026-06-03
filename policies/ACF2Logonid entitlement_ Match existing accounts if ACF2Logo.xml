@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>ACF2Logonid entitlement: Match existing accounts if ACF2Logonid Onboarding enabled</description>
+									<comment xml:space="preserve">If the ACF2Logonid GCV is set to true, this policy prevents the onboarding of user accounts from ACF2 unless the ACF2Logonid AND ACF2Logonid.onboard GCV is also set to true.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-property mode="nocase" name="attempt-to-match" op="equal">true</if-op-property>
+											<if-global-variable mode="nocase" name="drv.entitlement.ACF2Logonid" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="not-equal">true</if-global-variable>
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-property mode="nocase" name="attempt-to-match" op="equal">true</if-op-property>
+											<if-global-variable mode="nocase" name="drv.entitlement.ACF2Logonid" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.AllowUserAdd" op="not-equal">true</if-global-variable>
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-property mode="nocase" name="attempt-to-match" op="equal">true</if-op-property>
+											<if-global-variable mode="nocase" name="drv.entitlement.ACF2Logonid" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-op-attr mode="nocase" name="Login Disabled" op="equal">true</if-op-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

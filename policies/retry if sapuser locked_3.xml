@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>retry if sapuser locked</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-xpath disabled="true" op="true">contains('operation-date/errorMessage/*[local-name()='errorMessage']/text()','locked')</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="../status/text()" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message notrace="true">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-trace-message>
+												<do-if notrace="true">
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">contains($current-node,'locked by user')</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">issue retry</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-status level="retry">
+															<arg-string />
+														</do-status>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

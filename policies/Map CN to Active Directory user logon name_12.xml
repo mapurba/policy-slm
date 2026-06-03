@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Map CN to Active Directory user logon name</description>
+									<comment xml:space="preserve">Windows logon name mapping: When userPrincipalName is configured to follow the eDirectory user name, set userPrincipalName to the eDirectory object name plus the name of the Active Directory domain. A reference to the userPrincipalName is stored in eDirectory in the urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName attribute.</comment>
+									<conditions>
+										<and>
+											<if-global-variable name="UpnMap" op="equal">edir-name-auth</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName">
+											<arg-value>
+												<token-local-variable name="object-name" />
+												<token-text xml:space="preserve">@</token-text>
+												<token-global-variable name="drv.domain.dns.name" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Login Expiration Time</description>
+									<comment xml:space="preserve">Transforms RACF revoke date (mm/dd/yy) into eDirectory format.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="DirXML-RACF-revokedate" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="revokedate" scope="policy">
+											<arg-string>
+												<token-attr name="DirXML-RACF-revokedate" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="DirXML-RACF-revokedate">
+											<arg-value type="int">
+												<token-xpath expression="util:racfToEdirTime($revokedate)" />
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+								

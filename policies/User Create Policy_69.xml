@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Create Policy</description>
+									<conditions>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+									</conditions>
+									<actions>
+										<do-veto-if-op-attr-not-available name="CN" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="Surname" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">Surname does NOT exist -&gt; Veto </token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lvFile" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-veto />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

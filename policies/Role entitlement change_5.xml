@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Role entitlement change</description>
+									<comment name="lastchanged" xml:space="preserve">Account entitlement change (Delete Option)</comment>
+									<conditions>
+										<and>
+											<if-entitlement name="Role" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="Role" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="userRoleId" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-remove-dest-attr-value name="UserRoleId">
+													<arg-value type="string">
+														<token-local-variable name="userRoleId" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="Role" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="userRoleId" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-dest-attr-value name="UserRoleId">
+													<arg-value type="string">
+														<token-local-variable name="userRoleId" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

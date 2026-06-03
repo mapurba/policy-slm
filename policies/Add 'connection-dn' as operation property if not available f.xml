@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add 'connection-dn' as operation property if not available for Entitlement Events</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-op-property name="connection-dn" op="not-available" />
+											<if-xpath op="true">node()[@attr-name='DirXML-EntitlementRef']//param/text()</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-association op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-property name="connection-dn">
+													<arg-string>
+														<token-substring>
+															<token-split delimiter="\$">
+																<token-association />
+															</token-split>
+														</token-substring>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="ent-value" scope="policy">
+													<arg-string>
+														<token-xpath expression="node()[@attr-name='DirXML-EntitlementRef']//param[1]/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="ent-LIID" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($ent-value, 'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-op-property name="connection-dn">
+													<arg-string>
+														<token-xpath expression="$entConfig//connection[@name=$ent-LIID]/query-attr[@name='connection-dn']/text()" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-if>
+										<do-set-op-property name="entitlement-event">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>ModifyMergeEventforDuplicateattributes</description>
+									<comment xml:space="preserve">For the merge event from IDV modify the event to merge duplicate attribute events.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-xpath op="true">@from-merge='true'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr/@attr-name" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="attr" scope="policy">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">modify-attr[@attr-name=$attr]/add-value</if-xpath>
+															<if-xpath op="true">modify-attr[@attr-name=$attr]/remove-value|modify-attr[@attr-name=$attr]/remove-all-values</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">modify-attr[@attr-name=$attr]/remove-all-values</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="modify-attr[@attr-name=$attr]/remove-all-values" />
+																<do-strip-xpath expression="modify-attr[ not(*)]" />
+																<do-append-xml-element before="add-value" expression="modify-attr[@attr-name=$attr]" name="remove-all-values" />
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="type" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="modify-attr[@attr-name=$attr]/remove-value/value/@type" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="remove-value" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="modify-attr[@attr-name=$attr]/remove-value/value/text()" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-strip-xpath expression="modify-attr[@attr-name=$attr]/remove-value" />
+																<do-strip-xpath expression="modify-attr[ not(*)]" />
+																<do-append-xml-element before="add-value" expression="modify-attr[@attr-name=$attr]" name="remove-value" />
+																<do-append-xml-element expression="modify-attr[@attr-name=$attr]/remove-value" name="value" />
+																<do-set-xml-attr expression="modify-attr[@attr-name=$attr]/remove-value/value" name="type">
+																	<arg-string>
+																		<token-local-variable name="type" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-append-xml-text expression="modify-attr[@attr-name=$attr]/remove-value/value">
+																	<arg-string>
+																		<token-local-variable name="remove-value" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="modify-attr[ not(*)]" />
+									</actions>
+								</rule>
+							

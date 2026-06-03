@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create Delta Object from Add</description>
+									<comment xml:space="preserve">Create Delta Object from Add</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:wd-TransactionLog" op="changing" />
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.wd.bp.createDelta" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="IDType" scope="policy">
+											<arg-string>
+												<token-attr name="wd-WorkerIDType" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="format" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">base64</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="workforceID" scope="policy">
+											<arg-string>
+												<token-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:workforceID" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="WDrdn" scope="policy">
+											<arg-string>
+												<token-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:wd-UserName" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="IDVAsso" scope="policy">
+											<arg-string>
+												<token-global-variable name="gvUserContainer" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-local-variable name="WDrdn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="WDAsso" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="adddoc" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="." />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="encodedAdd" scope="policy">
+											<arg-string>
+												<token-base64-encode>
+													<token-xml-serialize>
+														<token-local-variable name="adddoc" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="wdCurrentState" scope="policy">
+											<arg-string>
+												<token-base64-encode>
+													<token-xpath expression="wdbp:convertAddToInstance($encodedAdd)" />
+												</token-base64-encode>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="effectiveDates" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$uniqueED/effective-dates/value/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="effectiveDates" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="effectiveDate" scope="policy">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable disabled="true" name="isTerminate" scope="policy">
+													<arg-string>
+														<token-xpath expression="wdbp:isContain($logEntries,&quot;Terminate&quot;)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if disabled="true">
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="isTerminate" op="equal">true</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="effectiveDate" scope="policy">
+															<arg-string>
+																<token-xpath expression="wdbp:effectiveDateUpdate($current-node)" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="effectiveDate" scope="policy">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+												<do-set-local-variable name="wdQueryString" scope="policy">
+													<arg-string>
+														<token-xpath expression="wdbp:queryFormat($wdQueryTemplate,$IDType,$workforceID,$effectiveDate)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="wdQueryDoc" scope="policy">
+													<arg-node-set>
+														<token-xml-parse>
+															<token-local-variable name="wdQueryString" />
+														</token-xml-parse>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="wdFutureStateDoc" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="query:query($srcQueryProcessor,$wdQueryDoc)" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="wdFutureState" scope="policy">
+													<arg-string>
+														<token-base64-encode>
+															<token-xml-serialize>
+																<token-local-variable name="wdFutureStateDoc" />
+															</token-xml-serialize>
+														</token-base64-encode>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="deltaString" scope="policy">
+													<arg-string>
+														<token-xpath expression="wdbp:createDeltaDoc($wdCurrentState,$wdFutureState,$format)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="deltaString" op="not-equal">equal</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="deltaStringEnc" scope="policy">
+															<arg-string>
+																<token-base64-encode>
+																	<token-local-variable name="deltaString" />
+																</token-base64-encode>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="response" scope="policy">
+															<arg-string>
+																<token-xpath expression="delta:createDeltaObject($deltaStringEnc, $WDAsso, $IDVAsso, $dcont, $effectiveDate,$WDrdn, $IDType,$logEntries,$driver-entry-id)" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-trace-message>
+											<arg-string>
+												<token-local-variable name="response" />
+											</arg-string>
+										</do-trace-message>
+										<do-trace-message disabled="true">
+											<arg-string>
+												<token-local-variable name="logEntries" />
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

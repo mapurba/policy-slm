@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>unmap e-mail address from Active Directory logon name on merge</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="UpnMap" op="equal">edir-mail-auth</if-global-variable>
+											<if-xpath op="true">.[@from-merge='true']</if-xpath>
+											<if-op-attr name="Internet EMail Address" op="not-available" />
+											<if-src-attr name="Internet EMail Address" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-src-attr name="DirXML-MDADAliasName" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-src-attr-value name="DirXML-MDADAliasName">
+															<arg-value type="structured">
+																<arg-component name="nameSpace">
+																	<token-xpath expression="$current-node/component[@name=&quot;nameSpace&quot;]" />
+																</arg-component>
+																<arg-component name="volume">
+																	<token-xpath expression="$current-node/component[@name=&quot;volume&quot;]" />
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</arg-component>
+															</arg-value>
+														</do-remove-src-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

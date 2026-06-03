@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>logonHours: Convert to Active Directory form</description>
+									<comment xml:space="preserve">The ILM Vault urn:ietf:params:scim:schemas:ilm:static:1.0:User:LoginAllowedTimeMap is an octet string holding one bit for each half-hour period in a week. Users can logon when the bit representing the current half-hour is a 1.  The Active Directory logonHours works similarly except that there is one bit for each 1 hour period in a week. This rule converts to the logonHours format. Logon is allowed for any 1 hour period in Active Directory if logon is allowed in the ILM Vault for at least one of the two 1/2 hour periods. Use jadutil:translateTimMap2ADStrict for a conversion policy where logon is granted in Active Directory only if both 1/2 hour periods allow logon in the ILM Vault. Although this is a subscriber policy it can effect the ILM Vault. If the Active Directory value is synchronized back to the ILM Vault, the 1/2 hour granularity in the vault is lost.</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-reformat-op-attr name="logonHours">
+											<arg-value type="octet">
+												<token-xpath expression="jadutil:translateTimeMap2ADLenient($current-value)" />
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+								

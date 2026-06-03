@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>304B0 - Account Create By Entitlement Grant</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+											<if-op-property mode="nocase" name="accountAction" op="equal">accountCreateByEntitlementGrant</if-op-property>
+											<if-xpath op="true">./operation-data/entitlement-impl/@state = '1'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="auditEventID" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">1200</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="eventName" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Account Create By Entitlement Grant</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="eventMessage" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Account {duser} created in driver {deviceProcessName}; Status:{outcome}</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="add_association_value" scope="policy">
+											<arg-string>
+												<token-xpath expression="./text()[1]" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="add_association_value" op="not-equal" />
+													<if-op-property name="dest-dn" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="appUserQueryResponse" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="src">
+															<arg-association>
+																<token-local-variable name="add_association_value" />
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">CN</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-op-property name="dest-dn">
+													<arg-string>
+														<token-xpath expression="$appUserQueryResponse/@src-dn" />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="association">
+													<arg-string>
+														<token-local-variable name="add_association_value" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>add account tracking for retry status</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">@level="retry"</if-xpath>
+											<if-op-property mode="nocase" name="AccountTracking-AccountStatusChanged" op="equal">true</if-op-property>
+											<if-op-property name="AccountTracking-AppAccountStatus" op="available" />
+											<if-op-property name="AccountTracking-IdvAccountStatus" op="available" />
+											<if-op-property name="AccountTracking-ObjectDN" op="available" />
+											<if-op-property mode="nocase" name="AccountTracking-Operation" op="equal">add</if-op-property>
+											<if-op-property name="AccountTracking-UserPrincipalName" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="query-back" scope="policy">
+											<arg-node-set>
+												<token-query class-name="MSolUser" datastore="src" scope="subtree">
+													<arg-match-attr name="UserPrincipalName">
+														<arg-value type="string">
+															<token-xpath expression="./operation-data/@AccountTracking-UserPrincipalName" />
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-text xml:space="preserve">query-back</token-text>
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">./instance/association</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="@level" />
+														<do-set-xml-attr expression="." name="level">
+															<arg-string>
+																<token-text xml:space="preserve">success</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

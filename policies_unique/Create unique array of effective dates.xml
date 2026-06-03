@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create unique array of effective dates</description>
+									<comment xml:space="preserve">Create unique array of effective dates</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:wd-TransactionLog" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="uniqueED" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;effective-dates&gt;&lt;/effective-dates&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="wdtransLog" scope="policy">
+											<arg-node-set>
+												<token-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:wd-TransactionLog" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="dcont" scope="policy">
+											<arg-string>
+												<token-global-variable name="drv.wd.bp.deltacontainer" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="wdQueryTemplate" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+  &lt;source&gt;
+    &lt;product edition="Advanced" version="4.8.0.0"&gt;DirXML&lt;/product&gt;
+    &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+  &lt;/source&gt;
+  &lt;input&gt;
+    &lt;query-ex class-name="User" event-id="0" max-result-count="50" scope="subtree"&gt;
+      &lt;search-class class-name="User"/&gt;
+      &lt;search-attr attr-name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:wd-WorkerIDType"&gt;
+        &lt;value&gt;%s&lt;/value&gt;
+      &lt;/search-attr&gt;
+      &lt;search-attr attr-name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:workforceID"&gt;
+        &lt;value&gt;%s&lt;/value&gt;
+      &lt;/search-attr&gt;
+      &lt;driver-operation-data&gt;
+        &lt;WD-WorkforceID&gt;%s&lt;/WD-WorkforceID&gt;
+        &lt;WD-WorkerIDType&gt;%s&lt;/WD-WorkerIDType&gt;
+        &lt;WD-effectiveDate&gt;%s&lt;/WD-effectiveDate&gt;
+      &lt;/driver-operation-data&gt;
+      &lt;read-attr/&gt;
+    &lt;/query-ex&gt;
+  &lt;/input&gt;
+&lt;/nds&gt;</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="logEntries" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="wdtransLog" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="current-node" op="equal">\d\d\d\d-\d\d-\d\dT.*</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="isTerminate" scope="policy">
+															<arg-string>
+																<token-xpath expression="wdbp:isContain($current-node,&quot;Terminate&quot;)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="isContractEnd">
+															<arg-string>
+																<token-xpath expression="wdbp:isContain($current-node,&quot;End Contract&quot;)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-local-variable mode="nocase" name="isTerminate" op="equal">true</if-local-variable>
+																	<if-local-variable name="isContractEnd" op="equal">true</if-local-variable>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="dateString" scope="policy">
+																	<arg-string>
+																		<token-substring length="10">
+																			<token-local-variable name="current-node" />
+																		</token-substring>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="dayString" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="wdbp:effectiveDateUpdate($dateString)" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="dayString" scope="policy">
+																	<arg-string>
+																		<token-substring length="10">
+																			<token-local-variable name="current-node" />
+																		</token-substring>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-set-local-variable name="effectiveDates" scope="policy">
+															<arg-node-set>
+																<token-xpath expression="$uniqueED/effective-dates/value/text()" />
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-set-local-variable name="createDeltaObjFlag" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">True</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="effectiveDates" />
+															</arg-node-set>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="dayString" op="equal">$current-node$</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="createDeltaObjFlag" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">False</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="createDeltaObjFlag" op="equal">True</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-append-xml-element expression="$uniqueED/effective-dates" name="value" />
+																<do-append-xml-text expression="$uniqueED/effective-dates/value[last()]">
+																	<arg-string>
+																		<token-local-variable name="dayString" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-set-local-variable name="logEntries" scope="policy">
+															<arg-string>
+																<token-local-variable name="logEntries" />
+																<token-text xml:space="preserve">|</token-text>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-trace-message disabled="true" level="5">
+											<arg-string>
+												<token-xml-serialize>
+													<token-local-variable name="uniqueED" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="logEntries" scope="policy">
+											<arg-string>
+												<token-substring start="1">
+													<token-local-variable name="logEntries" />
+												</token-substring>
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message disabled="true" level="5">
+											<arg-string>
+												<token-local-variable name="logEntries" />
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

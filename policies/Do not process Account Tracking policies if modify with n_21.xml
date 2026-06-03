@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Do not process Account Tracking policies if modify with no source-dn &amp; from-merge</description>
+									<comment xml:space="preserve">(Use Case: when using entitlements if account is deleted in the IDVault, it prevents to show an error while updating DirXML-Account attribute @ IDVault side)</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="not-equal">modify</if-operation>
+											<if-src-dn op="not-available" />
+											<if-xml-attr name="from-merge" op="not-available" />
+											<if-xml-attr mode="nocase" name="from-merge" op="not-equal">true</if-xml-attr>
+											<if-op-property name="AccountTracking-AccountStatusChanged" op="available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-break />
+									</actions>
+								</rule>
+								

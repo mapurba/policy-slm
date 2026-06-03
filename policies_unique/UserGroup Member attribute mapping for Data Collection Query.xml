@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>UserGroup Member attribute mapping for Data Collection Query support</description>
+									<comment xml:space="preserve">Maps 'UG_MEMBER' attribute of PAM UserGroup to the Group member attribute under Entitlement Extension for UserGroup.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<or>
+															<if-xpath op="true">$current-node/@attr-name="UG_MEMBER"</if-xpath>
+														</or>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="$current-node/@attr-name" />
+														<do-set-xml-attr expression="$current-node" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">member</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Initialize Server Cache</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="SRVR__CACHE" scope="driver">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;cache/&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="ncpServer" scope="policy">
+											<arg-node-set>
+												<token-query class-name="NCP Server" scope="entry">
+													<arg-dn>
+														<token-parse-dn src-dn-format="ldap">
+															<token-global-variable name="dirxml.auto.localserverdn" />
+														</token-parse-dn>
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">Network Address</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">GUID</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="serverGuid" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:guid2string($ncpServer/attr[@attr-name='GUID']/value/text())" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Found NCP Server: </token-text>
+												<token-xpath expression="$ncpServer/@src-dn" />
+												<token-text xml:space="preserve"> with GUID: </token-text>
+												<token-local-variable name="serverGuid" />
+											</arg-string>
+										</do-trace-message>
+										<do-append-xml-element expression="$SRVR__CACHE/cache" name="instance" />
+										<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">SERVER_INTERFACE</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]" name="src-dn">
+											<arg-string>
+												<token-global-variable name="dirxml.auto.localserverdn" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]" name="association" />
+										<do-append-xml-text expression="$SRVR__CACHE/cache/instance[last()]/association">
+											<arg-string>
+												<token-local-variable name="serverGuid" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]" name="attr" />
+										<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">interface</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-local-variable name="driverJavaModule" scope="policy">
+											<arg-string>
+												<token-dest-attr name="DirXML-JavaModule">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+												</token-dest-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="case" name="driverJavaModule" op="equal">com.novell.nds.dirxml.remote.driver.DriverShimImpl</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="remote" scope="driver">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="remote" scope="driver">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="netAddrs" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$ncpServer/attr[@attr-name='Network Address']/value[component[@name='netAddrType']/text()=9]/component[@name='netAddr']/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="netAddrs" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="address" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getIPFromHexNetAddr(es:octet2AsciiHex($current-node))" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="port" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getPortFromHexNetAddr(es:octet2AsciiHex($current-node))" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]" name="value" />
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="component" />
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">protocol</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]">
+															<arg-string>
+																<token-text xml:space="preserve">NCP</token-text>
+															</arg-string>
+														</do-append-xml-text>
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">structured</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="component" />
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">address</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]">
+															<arg-string>
+																<token-local-variable name="address" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="component" />
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">port</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]">
+															<arg-string>
+																<token-local-variable name="port" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="URLs" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$ncpServer/attr[@attr-name='Network Address']/value[component[@name='netAddrType']/text()=13]/component[@name='netAddr']/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="URLs" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="url" scope="policy">
+													<arg-string>
+														<token-base64-decode charset="UTF-16LE">
+															<token-local-variable name="current-node" />
+														</token-base64-decode>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="protocol" scope="policy">
+													<arg-string>
+														<token-upper-case>
+															<token-xpath expression="es:getProtocolFromURL($url)" />
+														</token-upper-case>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="protocol" op="equal">ldap|ldaps</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="address" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getIPFromURL($url)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="port" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getPortFromURL($url)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]" name="value" />
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">structured</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="component" />
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">protocol</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]">
+															<arg-string>
+																<token-local-variable name="protocol" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="component" />
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">address</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]">
+															<arg-string>
+																<token-local-variable name="address" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-append-xml-element expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]" name="component" />
+														<do-set-xml-attr expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">port</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$SRVR__CACHE/cache/instance[last()]/attr[last()]/value[last()]/component[last()]">
+															<arg-string>
+																<token-local-variable name="port" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Initialized server cache: </token-text>
+												<token-xml-serialize>
+													<token-local-variable name="SRVR__CACHE" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

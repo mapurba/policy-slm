@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>map rename to NT logon name</description>
+									<comment xml:space="preserve">Logon name policy: Keep destination sAMAccountName in sync with source object name.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="LogonNameMap" op="equal">true</if-global-variable>
+											<if-operation op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:userName">
+											<arg-value>
+												<token-substring length="20">
+													<token-local-variable name="object-name" />
+												</token-substring>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

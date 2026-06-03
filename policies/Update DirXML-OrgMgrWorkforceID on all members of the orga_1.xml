@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Update DirXML-OrgMgrWorkforceID on all members of the organization and on all managers of all child organizations</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXML-sapS</if-class-name>
+											<if-op-attr name="DirXML-sapS-R-A-P-008" op="changing" />
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXML-sapS</if-class-name>
+											<if-operation mode="case" op="equal">sync</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message color="yellow">
+											<arg-string>
+												<token-text xml:space="preserve">Position "</token-text>
+												<token-attr name="DirXML-sapSShortName" />
+												<token-text xml:space="preserve">" (</token-text>
+												<token-src-name />
+												<token-text xml:space="preserve">) re-assigned to person "</token-text>
+												<token-attr name="DirXML-sapS-R-A-P-008" />
+												<token-text xml:space="preserve">".</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-trace-message color="yellow">
+											<arg-string>
+												<token-text xml:space="preserve">Updating persons that are members of organizations managed by this position</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="managedOrganizations" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-sapO" datastore="src">
+													<arg-dn>
+														<token-global-variable name="dvr.saphr.driverdn" />
+														<token-text xml:space="preserve">\sap\om\o</token-text>
+													</arg-dn>
+													<arg-match-attr name="DirXML-sapO-R-B-S-012">
+														<arg-value type="string">
+															<token-src-name />
+														</arg-value>
+													</arg-match-attr>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-sapOID</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-sapOShortName</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-sapO-R-B-O-002</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-sapOManagerWorkforceID</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="managedOrganizations" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="managedOrganization" scope="policy">
+													<arg-node-set>
+														<token-local-variable name="current-node" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="managedOrganizationID" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$managedOrganization[1]/attr[@attr-name='DirXML-sapOID']/value[1]" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-trace-message color="yellow">
+													<arg-string>
+														<token-text xml:space="preserve">- Updating members of the organization "</token-text>
+														<token-local-variable name="managedOrganizationID" />
+														<token-text xml:space="preserve">"...</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="orgMgrWFID" scope="policy">
+													<arg-string>
+														<token-xpath expression="$managedOrganization[1]/attr[@attr-name='DirXML-sapOManagerWorkforceID']/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="orgMembers" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="src">
+															<arg-dn>
+																<token-global-variable name="idv.dit.data.users" />
+															</arg-dn>
+															<arg-match-attr name="DirXML-sapP-A-O">
+																<arg-value type="string">
+																	<token-local-variable name="managedOrganizationID" />
+																</arg-value>
+															</arg-match-attr>
+															<arg-string>
+																<token-text xml:space="preserve">DirXML-sapPID</token-text>
+															</arg-string>
+															<arg-string>
+																<token-text xml:space="preserve">Full Name</token-text>
+															</arg-string>
+															<arg-string>
+																<token-text xml:space="preserve">workforceID</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$orgMembers[attr[@attr-name='workforceID']/value/text()!=$orgMgrWFID]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-trace-message color="yellow">
+															<arg-string>
+																<token-text xml:space="preserve">-- </token-text>
+																<token-xpath expression="$current-node/attr[@attr-name='Full Name']/value[1]" />
+																<token-text xml:space="preserve"> (</token-text>
+																<token-xpath expression="$current-node/attr[@attr-name='DirXML-sapPID']/value" />
+																<token-text xml:space="preserve">)</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-attr mode="regex" name="DirXML-sapS-R-A-P-008" op="equal">.+</if-attr>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-src-attr-value name="DirXML-OrgMgrWorkforceID">
+																	<arg-dn>
+																		<token-xpath expression="$current-node/@src-dn" />
+																	</arg-dn>
+																	<arg-value>
+																		<token-attr name="DirXML-sapS-R-A-P-008" />
+																	</arg-value>
+																</do-set-src-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-clear-src-attr-value name="DirXML-OrgMgrWorkforceID">
+																	<arg-dn>
+																		<token-xpath expression="$current-node/@src-dn" />
+																	</arg-dn>
+																</do-clear-src-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+												<do-trace-message color="yellow">
+													<arg-string>
+														<token-text xml:space="preserve">- Updating managers of child organizations...</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$managedOrganization/attr[@attr-name='DirXML-sapO-R-B-O-002']/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="childOrgID" scope="policy">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message color="yellow">
+															<arg-string>
+																<token-text xml:space="preserve">-- Child organization </token-text>
+																<token-local-variable name="childOrgID" />
+															</arg-string>
+														</do-trace-message>
+														<do-set-local-variable name="childOrgMgrPosID" scope="policy">
+															<arg-node-set>
+																<token-src-attr name="DirXML-sapO-R-B-S-012">
+																	<arg-dn>
+																		<token-global-variable name="dvr.saphr.driverdn" />
+																		<token-text xml:space="preserve">\sap\om\o\</token-text>
+																		<token-local-variable name="childOrgID" />
+																	</arg-dn>
+																</token-src-attr>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-src-attr name="DirXML-sapS-R-A-P-008">
+																	<arg-dn>
+																		<token-global-variable name="dvr.saphr.driverdn" />
+																		<token-text xml:space="preserve">\sap\om\s\</token-text>
+																		<token-local-variable name="childOrgMgrPosID" />
+																	</arg-dn>
+																</token-src-attr>
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="childOrgMgrPerID" scope="policy">
+																	<arg-node-set>
+																		<token-local-variable name="current-node" />
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-local-variable name="childOrgMgrPer" scope="policy">
+																	<arg-node-set>
+																		<token-query scope="subtree">
+																			<arg-dn>
+																				<token-global-variable name="idv.dit.data.users" />
+																			</arg-dn>
+																			<arg-match-attr name="DirXML-sapPID">
+																				<arg-value type="string">
+																					<token-local-variable name="childOrgMgrPerID" />
+																				</arg-value>
+																			</arg-match-attr>
+																			<arg-string>
+																				<token-text xml:space="preserve">Full Name</token-text>
+																			</arg-string>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-trace-message color="yellow">
+																	<arg-string>
+																		<token-text xml:space="preserve">--- </token-text>
+																		<token-xpath expression="$childOrgMgrPer/attr[@attr-name='Full Name']/value[1]" />
+																		<token-text xml:space="preserve"> (</token-text>
+																		<token-local-variable name="childOrgMgrPerID" />
+																		<token-text xml:space="preserve">)</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-attr mode="regex" name="DirXML-sapS-R-A-P-008" op="equal">.+</if-attr>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-src-attr-value name="DirXML-OrgMgrWorkforceID">
+																			<arg-dn>
+																				<token-xpath expression="$childOrgMgrPer/@src-dn" />
+																			</arg-dn>
+																			<arg-value>
+																				<token-attr name="DirXML-sapS-R-A-P-008" />
+																			</arg-value>
+																		</do-set-src-attr-value>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-clear-src-attr-value name="DirXML-OrgMgrWorkforceID">
+																			<arg-dn>
+																				<token-xpath expression="$childOrgMgrPer/@src-dn" />
+																			</arg-dn>
+																		</do-clear-src-attr-value>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

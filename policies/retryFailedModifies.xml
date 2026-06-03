@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>retryFailedModifies</description>
+									<comment xml:space="preserve">retryFailedModifies</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">trigger</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="modifyUserList" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" datastore="src">
+													<arg-dn>
+														<token-global-variable name="gvUserPlacementContainer" />
+													</arg-dn>
+													<arg-query-condition name="or">
+														<arg-match-attr name="DirXML-WDSyncAttr">
+															<arg-value>
+																<token-text>*</token-text>
+															</arg-value>
+														</arg-match-attr>
+													</arg-query-condition>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-WDSyncAttr</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="modifyUserList" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="associationValue" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/association" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="currentSrcDN" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@src-dn" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="attributeNames" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$current-node/attr[@attr-name = 'DirXML-WDSyncAttr']/value" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="attributeNames" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="attr2modify" scope="policy">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="attrValue" scope="policy">
+															<arg-node-set>
+																<token-src-attr class-name="User" name="$attr2modify$">
+																	<arg-dn>
+																		<token-local-variable name="currentSrcDN" />
+																	</arg-dn>
+																</token-src-attr>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="regex" name="attrValue" op="equal">.*</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-local-variable name="attrValue" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="regex" name="current-node" op="equal">.+</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-add-dest-attr-value class-name="User" name="$attr2modify$" when="after">
+																					<arg-association>
+																						<token-local-variable name="associationValue" />
+																					</arg-association>
+																					<arg-value type="string">
+																						<token-local-variable name="current-node" />
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>&gt;
+								</arg-actions>
+																</do-for-each>
+															</arg-actions>
+															<arg-actions>
+																<do-clear-dest-attr-value class-name="User" name="$attr2modify$" when="after">
+																	<arg-association>
+																		<token-local-variable name="associationValue" />
+																	</arg-association>
+																</do-clear-dest-attr-value>
+															</arg-actions>
+														</do-if>
+														<do-remove-src-attr-value class-name="User" name="DirXML-WDSyncAttr">
+															<arg-dn>
+																<token-local-variable name="currentSrcDN" />
+															</arg-dn>
+															<arg-value type="string">
+																<token-local-variable name="attr2modify" />
+															</arg-value>
+														</do-remove-src-attr-value>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+										<do-veto />
+									</actions>
+								</rule>
+							

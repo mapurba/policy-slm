@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>restore</description>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="restore-attr-names" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">restore @attr-name's for </token-text>
+												<token-xpath expression="@src-dn" />
+											</arg-string>
+										</do-trace-message>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-xml-attr expression="$current-node" name="attr-name">
+													<arg-string>
+														<token-xpath expression="substring-before(substring-after($current-node/@attr-name,'{'),'}')" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+										<do-clear-op-property name="restore-attr-names" />
+									</actions>
+								</rule>
+							

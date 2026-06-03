@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check whether the driver has been fully initialized</description>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="primConnString" scope="driver">
+											<arg-string>
+												<token-dest-attr name="DirXML-ShimAuthServer">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+												</token-dest-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="primConnString" op="not-equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">starts-with($primConnString, 'REMOTE(')</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="primConnString" scope="driver">
+															<arg-string>
+																<token-xpath expression="substring-after($primConnString, ')')" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

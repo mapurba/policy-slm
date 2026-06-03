@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept GoogleAccount (tagged identity query) query response</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="UserAccountEntitlementQuery" op="equal">true</if-local-variable>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-class-name mode="nocase" op="equal">__driver_identification_class__</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="UserAccountEntitlementQuery" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-class-name>
+											<arg-string>
+												<token-text xml:space="preserve">GoogleAccount</token-text>
+											</arg-string>
+										</do-set-op-class-name>
+										<do-strip-xpath expression="attr" />
+										<do-set-op-src-dn>
+											<arg-dn>
+												<token-global-variable name="gcv.NOVLGGLEBCFG.domainName" />
+											</arg-dn>
+										</do-set-op-src-dn>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">GoogleAccountDisplayName</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="attr[last()]" name="value" />
+										<do-append-xml-text expression="attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">Google Apps Account in domain: </token-text>
+												<token-global-variable name="gcv.NOVLGGLEBCFG.domainName" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">GoogleAccountDescription</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="attr[last()]" name="value" />
+										<do-append-xml-text expression="attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">This entitlement will grant a the user an account in the domain "</token-text>
+												<token-global-variable name="gcv.NOVLGGLEBCFG.domainName" />
+												<token-text xml:space="preserve">" which means they will have the email address in Google Apps of "username@</token-text>
+												<token-global-variable name="gcv.NOVLGGLEBCFG.domainName" />
+												<token-text xml:space="preserve">".</token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">GoogleAccountValue</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="attr[last()]" name="value" />
+										<do-append-xml-text expression="attr[last()]/value[last()]">
+											<arg-string>
+												<token-global-variable name="gcv.NOVLGGLEBCFG.domainName" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression=".[count(attr)=0]" />
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="gcv.NOVLGGLEBCFG.subDomainNames" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="./parent::*" name="instance" />
+												<do-set-xml-attr expression="./following-sibling::instance[count(@class-name) = 0]" name="class-name">
+													<arg-string>
+														<token-text xml:space="preserve">GoogleAccount</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr expression="./following-sibling::instance[count(@src-dn) = 0]" name="src-dn">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="./following-sibling::instance[@src-dn = $current-node]" name="attr" />
+												<do-set-xml-attr expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">GoogleAccountDisplayName</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]" name="value" />
+												<do-append-xml-text expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]/value[last()]">
+													<arg-string>
+														<token-text xml:space="preserve">Google Apps Account in domain: </token-text>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="./following-sibling::instance[@src-dn = $current-node]" name="attr" />
+												<do-set-xml-attr expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">GoogleAccountDescription</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]" name="value" />
+												<do-append-xml-text expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]/value[last()]">
+													<arg-string>
+														<token-text xml:space="preserve">This entitlement will grant a the user an account in the domain "</token-text>
+														<token-local-variable name="current-node" />
+														<token-text xml:space="preserve">" which means they will have the email address in Google Apps of "username@</token-text>
+														<token-local-variable name="current-node" />
+														<token-text xml:space="preserve">".</token-text>
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="./following-sibling::instance[@src-dn = $current-node]" name="attr" />
+												<do-set-xml-attr expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">GoogleAccountValue</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]" name="value" />
+												<do-append-xml-text expression="./following-sibling::instance[@src-dn = $current-node]/attr[last()]/value[last()]">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto events for objects in remote driver sets (Primary)</description>
+									<conditions>
+										<or>
+											<if-global-variable mode="nocase" name="NOVLDCSSCPNG.drv.scoping.driverRole" op="equal">primary</if-global-variable>
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$NOVLDCSSCPNG__EXCLUDE__SUB/roots/root/text()" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="in-subtree">$current-node$</if-src-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Scoping: </token-text>
+																<token-text xml:space="preserve">Vetoing '</token-text>
+																<token-src-dn />
+																<token-text xml:space="preserve">' (remote driver set).</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-veto />
+														<do-break />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

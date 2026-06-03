@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Normalize Name</description>
+									<comment xml:space="preserve">Remove the Domain portion of Name if present. The default schema mapping maps Name to Full Name.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="Name" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="NameNodeSet" scope="policy">
+											<arg-node-set>
+												<token-split delimiter="\\">
+													<token-op-attr name="Name" />
+												</token-split>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="Name">
+											<arg-value type="string">
+												<token-xpath expression="$NameNodeSet[last()]" />
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+							

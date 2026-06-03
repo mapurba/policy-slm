@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip  urn:ietf:params:scim:schemas:core:2.0:Group:members.value Attribute if Entitlements are enabled</description>
+									<comment xml:space="preserve">The rule will strip member attribute if entitlements are enabled. The group membership is granted only through Group Entitlement grants.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group" op="equal">true</if-global-variable>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+											<if-op-attr name="urn:ietf:params:scim:schemas:core:2.0:Group:members.value" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="urn:ietf:params:scim:schemas:core:2.0:Group:members.value" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add operation attribute  EmployeeType</description>
+									<comment xml:space="preserve">Add operation attribute EmployeeType</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-attr name="wd-WorkerIDType" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-clone-op-attr dest-name="employeeType" src-name="wd-WorkerIDType" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr mode="nocase" name="wd-WorkerIDType" op="equal">Employee_ID</if-op-attr>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-reformat-op-attr name="employeeType">
+													<arg-value type="string">
+														<token-text xml:space="preserve">employee</token-text>
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+											<arg-actions>
+												<do-reformat-op-attr name="employeeType">
+													<arg-value type="string">
+														<token-text xml:space="preserve">nonEmployee</token-text>
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

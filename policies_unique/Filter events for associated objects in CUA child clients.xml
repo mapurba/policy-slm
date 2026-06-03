@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Filter events for associated objects in CUA child clients</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-operation mode="nocase" op="not-equal">query</if-operation>
+											<if-operation mode="nocase" op="not-equal">add</if-operation>
+											<if-association op="available" />
+											<if-association mode="regex" op="not-equal">fanout1-.+|fanout2-.+</if-association>
+											<if-entitlement name="UserAccount" op="not-changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lsname" scope="policy">
+											<arg-string>
+												<token-xpath expression="substring-after(substring-before(association/text(), '\USd'),'\')" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lsctype" scope="policy">
+											<arg-string>
+												<token-local-variable name="lsname" />
+												<token-text xml:space="preserve">-ctype</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Filter events for associated objects in CUA child clients [</token-text>
+												<token-local-variable name="lsname" />
+												<token-text xml:space="preserve">
+					</token-text>
+												<token-local-variable name="$lsctype$" />
+												<token-text xml:space="preserve">] ...</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="$lsctype$" op="available" />
+													<if-local-variable mode="nocase" name="$lsctype$" op="equal">cua-child</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-operation mode="case" op="equal">modify</if-operation>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="modify-attr[@attr-name != 'CLEARGRANULARLOCKS']" />
+															</arg-node-set>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-xpath op="true">count($shimConfigInfo/driver-config/driver-options/configuration-values/definitions[definition[@name='nsap-ls-name']/value/text()=$lsname]/group[definition[1][@name='nsap-client-type'][value/text()='cua-child']]/subordinates/definition[@name='nsap-cua-child-filter']/value/item[text()=$current-node/@attr-name])=0</if-xpath>
+																			<if-xpath op="true">count($shimConfigInfo/driver-config/subscriber-options/configuration-values/definitions/definition[@name='nsap-alt-conn-info']/value/instance[definition[@name='logicalSystemName']/value/text()=$lsname]/group[definition[1][@name='clientType'][value/text()='cua-child']]/subordinates/definition[@name='cuaChildFilter']/value/item[text()=$current-node/@attr-name])=0</if-xpath>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="lvTmp" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">Vetoing </token-text>
+																				<token-operation />
+																				<token-text xml:space="preserve"> of attribute </token-text>
+																				<token-xpath expression="$current-node/@attr-name" />
+																				<token-text xml:space="preserve"> for object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> in CUA child client </token-text>
+																				<token-local-variable name="lsname" />
+																				<token-text xml:space="preserve">. The change is propagated through the CUA central client.</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-strip-xpath expression="modify-attr[@attr-name=$current-node/@attr-name]" />
+																	</arg-actions>
+																	<arg-actions>
+																		<do-set-local-variable name="lvTmp" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">Allowing </token-text>
+																				<token-operation />
+																				<token-text xml:space="preserve"> of attribute </token-text>
+																				<token-xpath expression="$current-node/@attr-name" />
+																				<token-text xml:space="preserve"> for object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> in CUA child client </token-text>
+																				<token-local-variable name="lsname" />
+																				<token-text xml:space="preserve">.</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																</do-if>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="lvFile" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+														<do-strip-xpath expression=".[count(modify-attr)=0]" />
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">Vetoing </token-text>
+																<token-operation />
+																<token-text xml:space="preserve"> event for object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> in CUA child client </token-text>
+																<token-local-variable name="lsname" />
+																<token-text xml:space="preserve">. The change is propagated through the CUA central client.</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable name="$lsctype$" op="not-available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="assoc" scope="policy">
+															<arg-string>
+																<token-association />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">Invalid association "$assoc$". No logical system "$lsname$" defined.</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-status level="error">
+															<arg-string>
+																<token-local-variable name="lvTmp" />
+															</arg-string>
+														</do-status>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-strip-xpath expression="." />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Base Group Add/Modify Members</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UMEGroup" op="equal">false</if-global-variable>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr[@attr-name='Member']/add-value/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">UMEGroup member change  add user SPML.SAPUSER.</token-text>
+														<token-parse-dn length="1" start="-1">
+															<token-xpath expression="$current-node" />
+															<token-text xml:space="preserve"> to group </token-text>
+															<token-text xml:space="preserve">SPML.SAPGROUP.</token-text>
+															<token-src-name />
+														</token-parse-dn>
+													</arg-string>
+												</do-trace-message>
+												<do-add-dest-attr-value class-name="sapgroup" name="member" when="before">
+													<arg-dn>
+														<token-text xml:space="preserve">SPML.SAPGROUP.</token-text>
+														<token-src-name />
+													</arg-dn>
+													<arg-value>
+														<token-text xml:space="preserve">SPML.SAPUSER.</token-text>
+														<token-parse-dn length="1" start="-1">
+															<token-xpath expression="$current-node" />
+														</token-parse-dn>
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-set-op-property name="timestamp">
+													<arg-string>
+														<token-time format="!JTIME" tz="UTC" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr[@attr-name='Member']/remove-value/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">UMEGroup member change  remove </token-text>
+														<token-parse-dn length="1" start="-1">
+															<token-xpath expression="$current-node" />
+														</token-parse-dn>
+													</arg-string>
+												</do-trace-message>
+												<do-remove-dest-attr-value class-name="sapgroup" name="member" when="before">
+													<arg-dn>
+														<token-text xml:space="preserve">SPML.SAPGROUP.</token-text>
+														<token-src-name />
+													</arg-dn>
+													<arg-value>
+														<token-text xml:space="preserve">SPML.SAPUSER.</token-text>
+														<token-parse-dn length="1" start="-1">
+															<token-xpath expression="$current-node" />
+														</token-parse-dn>
+													</arg-value>
+												</do-remove-dest-attr-value>
+												<do-set-op-property name="timestamp">
+													<arg-string>
+														<token-time format="!JTIME" tz="UTC" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-op-attr name="Member" />
+									</actions>
+								</rule>
+							

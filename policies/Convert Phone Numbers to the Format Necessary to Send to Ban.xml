@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert Phone Numbers to the Format Necessary to Send to Banner</description>
+									<conditions>
+										<or>
+											<if-op-attr name="CampusPhone" op="changing" />
+											<if-op-attr name="MobilePhone" op="changing" />
+											<if-op-attr name="Fax" op="changing" />
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression=".//*[@attr-name='Fax']//value/component[@name='faxNumber']/text() | .//*[@attr-name='CampusPhone' or  @attr-name='MobilePhone']//value/text()" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-trace-message>
+												<do-append-xml-element expression=".//value[.//text() = $current-node]/.." name="value" />
+												<do-append-xml-text expression=".//value[.//text() = $current-node]/../value[not(node())]">
+													<arg-string>
+														<token-xpath expression="es:convertPhoneToBanner($current-node,$gcv.NOVLBNNRUSER.PrimaryPhoneFormat)" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression=".//value[.//text() = $current-node]" />
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

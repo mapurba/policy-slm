@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto events with fanout1 and fanout2 association for RENAME or DELETE</description>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">rename</if-operation>
+											<if-operation mode="case" op="equal">delete</if-operation>
+										</or>
+										<or>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-association mode="regex" op="equal">fanout2-.+</if-association>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Filter events which have 'fanout2' associations</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="." />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

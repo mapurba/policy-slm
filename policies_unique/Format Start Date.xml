@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Format Start Date</description>
+									<comment xml:space="preserve">Convert the format of the Start Date from eDirectory format to Epic format</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<comment name="lastchanged" xml:space="preserve">2/14/2024</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="~pdsepicedcfg.epic.date.start.attribute~" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="pdsepicedcfg.epic.date.start.attribute.type" op="equal">string</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-reformat-op-attr name="~pdsepicedcfg.epic.date.start.attribute~">
+													<arg-value type="string">
+														<token-convert-time dest-format="~pdsepicedcfg.epic.date.format~" dest-tz="UTC" src-format="~pdsepicedcfg.epic.date.start.attribute.format~" src-tz="UTC">
+															<token-op-attr name="~pdsepicedcfg.epic.date.start.attribute~" />
+														</token-convert-time>
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+											<arg-actions>
+												<do-reformat-op-attr name="~pdsepicedcfg.epic.date.start.attribute~">
+													<arg-value type="string">
+														<token-convert-time dest-format="~pdsepicedcfg.epic.date.format~" dest-tz="UTC" src-format="!CTIME" src-tz="UTC">
+															<token-op-attr name="~pdsepicedcfg.epic.date.start.attribute~" />
+														</token-convert-time>
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Granularly unlock new CUA child client accounts</description>
+									<conditions>
+										<and>
+											<if-op-property name="fanout-unlock-granular" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="case" op="equal">status</if-operation>
+													<if-xpath op="true">@level='success' or @level='warning'</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Executing scheduled granular unlock request for association </token-text>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-unlock-granular, 'assoc')" />
+													</arg-string>
+												</do-trace-message>
+												<do-add-src-attr-value name="CLEARGRANULARLOCKS">
+													<arg-association>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-unlock-granular, 'assoc')" />
+													</arg-association>
+													<arg-value type="structured">
+														<arg-component name="LOCK_LOCAL">
+															<token-text xml:space="preserve">X</token-text>
+														</arg-component>
+													</arg-value>
+												</do-add-src-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Not executing scheduled granular unlock request for association</token-text>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-unlock-granular, 'assoc')" />
+														<token-text xml:space="preserve"> because status is </token-text>
+														<token-xpath expression="@level" />
+														<token-text xml:space="preserve"> (expected: success or warning)</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+										<do-clear-op-property name="fanout-unlock-granular" />
+									</actions>
+								</rule>
+							

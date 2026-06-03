@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Rename Event to Modify in ServiceNow</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="newname" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="new-name/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-dest-attr-value name="CN">
+											<arg-value type="string">
+												<token-local-variable name="newname" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+							

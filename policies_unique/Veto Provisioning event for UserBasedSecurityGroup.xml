@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto Provisioning event for UserBasedSecurityGroup</description>
+									<conditions>
+										<or>
+											<if-global-variable name="drv.entitlement.UserBasedSecurityGroup" op="equal">false</if-global-variable>
+										</or>
+										<or>
+											<if-operation op="equal">modify</if-operation>
+										</or>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirXMLEntitlementRef" op="changing" />
+										</or>
+										<or>
+											<if-entitlement name="UserBasedSecurityGroup" op="changing" />
+										</or>
+									</conditions>
+									<actions>
+										<do-veto />
+									</actions>
+								</rule>
+								

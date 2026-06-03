@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: Synthesize Provider Address Data</description>
+									<comment xml:space="preserve">Synthesize individual practice names, addresses, phone numbers, email addresses and service areas from changes to pvProviderAddress.</comment>
+									<comment name="author" xml:space="preserve">PDS</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<comment name="lastchanged" xml:space="preserve">06-19-20</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-local-variable name="lv-providerAddress" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="counter" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">21001</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="new" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="lv-providerAddress" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="addressID" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('addressID',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="isPrimary" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('isPrimary',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="active" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('active',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="addr1" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('addr1',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="addr2" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('addr2',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="addr3" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('addr3',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="city" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('city',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="state" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('state',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="zip" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('zip',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="country" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('country',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="phone" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('phone',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="fax" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('fax',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="email" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getJsonValue('email',$current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="addressID" op="equal">.+</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21000</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-text xml:space="preserve">*</token-text>
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21010</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="addr1" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21020</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="addr2" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21030</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="addr3" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21040</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="city" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21050</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="state" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21060</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="zip" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21080</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="country" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21090</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="isPrimary" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21100</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="phone" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21110</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="fax" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21120</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="active" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21130</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="email" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="item" scope="policy">
+															<arg-string>
+																<token-local-variable name="counter" />
+																<token-text xml:space="preserve">.21200</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="$item$">
+															<arg-value type="string">
+																<token-local-variable name="addressID" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="counter" scope="policy">
+															<arg-string>
+																<token-xpath expression="$counter+1" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-trace-message level="3">
+															<arg-string>
+																<token-text xml:space="preserve">  **  Location does not have a unique identifier.  It will not be loaded to Epic **</token-text>
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

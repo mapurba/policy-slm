@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>move/rename: Convert to modify of src-dn-derived values.</description>
+									<comment xml:space="preserve">Map a move or rename operation on a User to a modification of the "dn" attribute and "LDAPDN" extended attribute in the Sentinel Identity object.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">move</if-operation>
+											<if-operation mode="case" op="equal">rename</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value class-name="User" name="Distinguished Name" when="after">
+											<arg-value type="string">
+												<token-text xml:space="preserve">\</token-text>
+												<token-parse-dn dest-dn-format="slash" start="1">
+													<token-src-dn />
+												</token-parse-dn>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-dest-attr-value class-name="User" name="LDAPDN" when="after">
+											<arg-value type="string">
+												<token-lower-case>
+													<token-parse-dn dest-dn-format="ldap">
+														<token-xpath expression="@qualified-src-dn" />
+													</token-parse-dn>
+												</token-lower-case>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+								

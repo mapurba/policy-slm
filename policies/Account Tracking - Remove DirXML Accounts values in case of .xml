@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Tracking - Remove DirXML Accounts values in case of a delete due to entitlement revoke</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+											<if-op-property mode="nocase" name="accountAction" op="equal">accountDeleteByEntitlementRevoke</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="AccountIdentifiers" scope="policy">
+											<arg-node-set>
+												<token-src-attr name="DirXML-Accounts" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$AccountIdentifiers[starts-with(.,$dirxml.auto.driverguid)]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-remove-src-attr-value name="DirXML-Accounts">
+													<arg-dn>
+														<token-op-property name="AccountTracking-ObjectDN" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-local-variable name="current-node" />
+													</arg-value>
+												</do-remove-src-attr-value>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Removing entry</token-text>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

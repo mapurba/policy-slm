@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add association for new CUA child client accounts</description>
+									<conditions>
+										<and>
+											<if-op-property name="fanout-add-association" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="case" op="equal">status</if-operation>
+													<if-xpath op="true">@level='success' or @level='warning'</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Executing scheduled add association </token-text>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-add-association, 'assoc')" />
+														<token-text xml:space="preserve"> request for </token-text>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-add-association, 'dn')" />
+													</arg-string>
+												</do-trace-message>
+												<do-add-association>
+													<arg-dn>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-add-association, 'dn')" />
+													</arg-dn>
+													<arg-association>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-add-association, 'assoc')" />
+													</arg-association>
+												</do-add-association>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Not executing scheduled add association </token-text>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-add-association, 'assoc')" />
+														<token-text xml:space="preserve"> request for </token-text>
+														<token-xpath expression="es:getParamValue(operation-data/@fanout-add-association, 'dn')" />
+														<token-text xml:space="preserve"> because status is </token-text>
+														<token-xpath expression="@level" />
+														<token-text xml:space="preserve"> (expected: success or warning)</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+										<do-clear-op-property name="fanout-add-association" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>userPrincipalName: Convert to structured</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="data-collection-query" op="not-equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-reformat-op-attr name="userPrincipalName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-local-variable name="current-value" />
+												</arg-component>
+											</arg-value>
+										</do-reformat-op-attr>
+										<do-set-xml-attr expression="attr[@attr-name='userPrincipalName']/value/component[@name='volume']" name="association-ref">
+											<arg-string>
+												<token-text xml:space="preserve">1</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+							

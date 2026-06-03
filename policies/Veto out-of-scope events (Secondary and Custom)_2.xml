@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto out-of-scope events (Secondary and Custom)</description>
+									<conditions>
+										<or>
+											<if-global-variable mode="nocase" name="NOVLDCSSCPNG.drv.scoping.driverRole" op="equal">secondary</if-global-variable>
+											<if-global-variable mode="nocase" name="NOVLDCSSCPNG.drv.scoping.driverRole" op="equal">custom</if-global-variable>
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$NOVLDCSSCPNG__SUB/roots/root/text()" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="in-subtree">$current-node$</if-src-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-break />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$NOVLDCSSCPNG__ONE/parents/parent/text()" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="in-container">$current-node$</if-src-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-break />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$NOVLDCSSCPNG__BASE/singles/single/text()" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="equal">$current-node$</if-src-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-break />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Scoping: </token-text>
+												<token-text xml:space="preserve">Vetoing '</token-text>
+												<token-src-dn />
+												<token-text xml:space="preserve">' (out of scope).</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-veto />
+									</actions>
+								</rule>
+							

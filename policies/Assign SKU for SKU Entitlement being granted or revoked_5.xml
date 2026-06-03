@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Assign SKU for SKU Entitlement being granted or revoked</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.SKU" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-entitlement name="SKU" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="nocase" op="not-equal">add</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-removed-entitlement name="License" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="assoc" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-remove-dest-attr-value class-name="User" name="assignLicense">
+															<arg-value type="string">
+																<token-local-variable name="assoc" />
+															</arg-value>
+														</do-remove-dest-attr-value>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="License" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="User" name="assignLicense">
+													<arg-value type="string">
+														<token-local-variable name="assoc" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

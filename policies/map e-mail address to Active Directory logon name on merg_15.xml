@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>map e-mail address to Active Directory logon name on merge</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="UpnMap" op="equal">edir-mail-auth</if-global-variable>
+											<if-xpath op="true">.[@from-merge='true']</if-xpath>
+											<if-op-attr name="Internet EMail Address" op="not-available" />
+											<if-src-attr name="Internet EMail Address" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="DirXML-ADAliasName">
+											<arg-value>
+												<token-src-attr name="Internet EMail Address" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-src-attr-value name="DirXML-ADAliasName">
+											<arg-value>
+												<token-src-attr name="Internet EMail Address" />
+											</arg-value>
+										</do-set-src-attr-value>
+									</actions>
+								</rule>
+								

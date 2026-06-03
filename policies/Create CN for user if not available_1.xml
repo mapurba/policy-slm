@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create CN for user if not available</description>
+									<conditions>
+										<and>
+											<if-attr name="CN" op="not-available" />
+											<if-attr name="Given Name" op="available" />
+											<if-attr name="Surname" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="User" name="CN">
+											<arg-value type="string">
+												<token-substring length="1">
+													<token-attr name="Given Name" />
+												</token-substring>
+												<token-attr name="Surname" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

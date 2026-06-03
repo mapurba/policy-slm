@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add: User - convert multi-valued Telephone to single value</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="telephoneNumber" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="phone-number">
+											<arg-string>
+												<token-xpath expression="./add-attr[@attr-name='telephoneNumber']/value[1]" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-op-attr name="telephoneNumber" />
+										<do-set-dest-attr-value name="telephoneNumber">
+											<arg-value type="string">
+												<token-local-variable name="phone-number" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert DN format after User Adds</description>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">status</if-operation>
+										</or>
+										<or>
+											<if-xml-attr mode="nocase" name="level" op="equal">success</if-xml-attr>
+										</or>
+										<or>
+											<if-xpath op="true">operation-data/dest-dn</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										
+										<do-set-local-variable name="userObj" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src" scope="entry">
+													<arg-dn>
+														<token-xpath expression="operation-data/dest-dn" />
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="userQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="$userObj/@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-element expression="operation-data" name="ldap-dn" />
+										
+										
+										<do-append-xml-text expression="operation-data/ldap-dn">
+											<arg-string>
+												<token-local-variable name="userQualifiedLDAPDn" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="operation-data/match" />
+									</actions>
+								</rule>
+								

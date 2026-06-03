@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set gidNumber using custom LUM Linux/UNIX Config Object</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">Group</if-class-name>
+											<if-src-attr name="gidNumber" op="not-available" />
+											<if-global-variable name="ModifyGroups" op="equal">true</if-global-variable>
+											<if-global-variable name="UseLUMForUIDGID" op="equal">true</if-global-variable>
+										</and>
+										
+										<and>
+											<if-class-name op="equal">Group</if-class-name>
+											<if-global-variable name="ReplaceValues" op="equal">true</if-global-variable>
+											<if-global-variable name="ModifyGroups" op="equal">true</if-global-variable>
+											<if-global-variable name="UseLUMForUIDGID" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="searchBase">
+											<arg-string>
+												<token-global-variable name="GIDInUseSearchSubtree" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="DriverDN">
+											<arg-string>
+												<token-global-variable name="DriverDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="driverShimInstance">
+											<arg-object>
+												<token-xpath expression="NxSettingsInstance:getInstance($DriverDN)" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-set-local-variable name="UnixConfigObject">
+											<arg-string>
+												<token-global-variable name="LUMUnixConfig" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-src-attr-value name="gidNumber">
+											<arg-value type="string">
+												<token-xpath expression="driverShim:getNextIDFromUnixConfig($driverShimInstance,$UnixConfigObject, &quot;gid&quot;, $searchBase)" />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-add-src-attr-value name="Object Class">
+											<arg-value type="string">
+												<token-text xml:space="preserve">posixGroup</token-text>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-src-attr-value name="Object Class">
+											<arg-value type="string">
+												<token-text xml:space="preserve">uamPosixGroup</token-text>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-association>
+											<arg-association>
+												<token-src-attr name="GUID" />
+											</arg-association>
+										</do-add-association>
+									</actions>
+								</rule>
+							

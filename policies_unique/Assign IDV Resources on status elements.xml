@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Assign IDV Resources on status elements</description>
+									<comment xml:space="preserve">The policy assigns the resources on status elements after successful user addition in publisher channel and reconciles these permissions with rbpm.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-xml-attr mode="nocase" name="level" op="equal">success</if-xml-attr>
+											<if-xpath op="true">operation-data/permission</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="objectDNComponents" scope="policy">
+											<arg-node-set>
+												<token-split csv="false" delimiter=" \(">
+													<token-xpath expression="$current-op/object-dn/text()" />
+												</token-split>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="eDirDN" scope="policy">
+											<arg-string>
+												<token-split delimiter="\)">
+													<token-xpath expression="$objectDNComponents[last()]" />
+												</token-split>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="userObj" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src" scope="entry">
+													<arg-dn>
+														<token-local-variable name="eDirDN" />
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="userQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="$userObj/@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+													<token-global-variable name="UAProvAdmin" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="./object-dn" />
+										<do-append-xml-text expression="./object-dn">
+											<arg-string>
+												<token-local-variable name="userQualifiedLDAPDn" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-set-local-variable name="ua-admin-pwd" notrace="true" scope="policy">
+											<arg-string>
+												<token-src-attr name="nspmDistributionPassword">
+													<arg-dn>
+														<token-parse-dn dest-dn-format="slash" src-dn-format="qualified-dot">
+															<token-global-variable name="UAProvAdmin" />
+														</token-parse-dn>
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="prov-payload" scope="policy">
+											<arg-string>
+												<token-base64-encode charset="UTF-8">
+													<token-xml-serialize>
+														<token-local-variable name="current-op" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="rpStatus" scope="policy">
+											<arg-string>
+												<token-xpath expression="ps:ReconcilePermissions($UAProvURL, $adminQualifiedLDAPDn, $ua-admin-pwd, $userQualifiedLDAPDn, 1000, $prov-payload, true)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">ReconcilePermissions status: </token-text>
+												<token-local-variable name="rpStatus" />
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+							

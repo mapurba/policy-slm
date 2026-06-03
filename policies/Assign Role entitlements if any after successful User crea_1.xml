@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Assign Role entitlements if any after successful User creation</description>
+									<comment xml:space="preserve">Role entitlements assigned to User being created in ServiceNow cannot be processed until the User is successfully created. The add-association signals that an object has been created by the driver in ServiceNow. If the object is also tagged for Role entitlement processing, assign the Role entitlements now.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Role" op="equal">true</if-global-variable>
+											<if-operation op="equal">add-association</if-operation>
+											<if-op-property mode="nocase" name="check-role-entitlements" op="equal">true</if-op-property>
+											<if-entitlement name="Role" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="Role" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="userId" scope="policy">
+													<arg-string>
+														<token-xpath expression="./text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="roleId" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dest-dn" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">/</token-text>
+														<token-local-variable name="roleId" />
+														<token-text xml:space="preserve">$</token-text>
+														<token-local-variable name="userId" />
+														<token-text xml:space="preserve">/RELATION</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-src-object class-name="sys_user_has_role">
+													<arg-dn>
+														<token-local-variable name="dest-dn" />
+													</arg-dn>
+												</do-add-src-object>
+												<do-add-src-attr-value class-name="sys_user_has_role" name="role">
+													<arg-dn>
+														<token-local-variable name="dest-dn" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-local-variable name="roleId" />
+													</arg-value>
+												</do-add-src-attr-value>
+												<do-add-src-attr-value class-name="sys_user_has_role" name="user">
+													<arg-dn>
+														<token-local-variable name="dest-dn" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-local-variable name="userId" />
+													</arg-value>
+												</do-add-src-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

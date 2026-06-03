@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add operation-data element   for query subscriber option</description>
+									<comment xml:space="preserve">Add operation-data element for query subscriber option.
+The WorkforceId and WorkerIdType driver level variable values will be used only if they are not available in Association attribute or in IDV.
+i.e., Only for initial migration of worker to IDV, these driver level values will be used</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-operation mode="nocase" op="equal">query</if-operation>
+										</or>
+										<or>
+											<if-xpath op="not-true">driver-operation-data</if-xpath>
+										</or>
+										<or>
+											<if-association op="available" />
+										</or>
+									</conditions>
+									<actions>
+										
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-association mode="regex" op="equal">.*Employee_ID.*|.*Contingent_Worker_ID.*</if-association>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-Association-user" scope="policy">
+													<arg-string>
+														<token-association />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-WorkforceID-user" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-after($LV-Association-user,'-')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-WorkerIDType-user" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before($LV-Association-user,'-')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="gvWorkersMergeIDV" op="equal">true</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-association>
+															<arg-association>
+																<token-local-variable name="LV-WorkforceID-user" />
+															</arg-association>
+														</do-set-op-association>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-association op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-src-attr name="workforceID" op="available" />
+																	<if-src-attr name="wd-WorkerIDType" op="available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="LV-Association-user" scope="policy">
+																	<arg-string>
+																		<token-src-attr class-name="User" name="wd-WorkerIDType" />
+																		<token-text xml:space="preserve">-</token-text>
+																		<token-src-attr class-name="User" name="workforceID" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="LV-WorkerIDType-user" scope="policy">
+																	<arg-string>
+																		<token-src-attr class-name="User" name="wd-WorkerIDType" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="LV-WorkforceID-user" scope="policy">
+																	<arg-string>
+																		<token-src-attr class-name="User" name="workforceID" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-association op="equal">$MergeQueryWFID$</if-association>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="LV-Association-user" scope="policy">
+																			<arg-string>
+																				<token-local-variable name="MergeQueryWDWorkerIDType" />
+																				<token-text xml:space="preserve">-</token-text>
+																				<token-local-variable name="MergeQueryWFID" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="LV-WorkerIDType-user" scope="policy">
+																			<arg-string>
+																				<token-local-variable name="MergeQueryWDWorkerIDType" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="LV-WorkforceID-user" scope="policy">
+																			<arg-string>
+																				<token-local-variable name="MergeQueryWFID" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="LV-WorkerIDType-user" op="equal">Employee_ID</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-attr name="wd-E-Hiredate" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="LV-wd-effectiveDate">
+															<arg-string>
+																<token-src-attr name="wd-E-Hiredate" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-src-attr name="wd-E-OriginalHiredate" op="available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="LV-wd-effectiveDate">
+																	<arg-string>
+																		<token-src-attr name="wd-E-OriginalHiredate" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="LV-wd-effectiveDate">
+																	<arg-string>
+																		<token-time format="yyyy-MM-dd" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-attr name="wd-C-Hiredate" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="LV-wd-effectiveDate">
+															<arg-string>
+																<token-src-attr name="wd-C-Hiredate" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-src-attr name="wd-C-OriginalHiredate" op="available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="LV-wd-effectiveDate">
+																	<arg-string>
+																		<token-src-attr name="wd-C-OriginalHiredate" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="LV-wd-effectiveDate">
+																	<arg-string>
+																		<token-time format="yyyy-MM-dd" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="LV-converted-effectiveDate">
+											<arg-string>
+												<token-convert-time dest-format="!CTIME" dest-tz="UTC" src-format="yyyy-MM-dd">
+													<token-local-variable name="LV-wd-effectiveDate" />
+												</token-convert-time>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="LV-current-date">
+											<arg-string>
+												<token-time format="!CTIME" tz="UTC" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="numeric" name="LV-converted-effectiveDate" op="gt">$LV-current-date$</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-wd-FutureHire">
+													<arg-string>
+														<token-text xml:space="preserve">True</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="DV-wd-FutureHire">
+													<arg-string>
+														<token-text xml:space="preserve">False</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="LV-wd-FutureHire" op="equal">True</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-effectiveDate-user" scope="policy">
+													<arg-string>
+														<token-local-variable name="LV-wd-effectiveDate" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="LV-effectiveDate-user" scope="policy">
+													<arg-string>
+														<token-time format="yyyy-MM-dd" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-src-attr name="wd-Merge-effectiveDate" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-Merge-Effective-date" scope="policy">
+													<arg-string>
+														<token-convert-time dest-format="!CTIME" dest-tz="UTC" src-format="yyyyMMdd">
+															<token-src-attr class-name="User" name="wd-Merge-effectiveDate" />
+														</token-convert-time>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-current-date" scope="policy">
+													<arg-string>
+														<token-time format="!CTIME" tz="UTC" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="numeric" name="LV-Merge-Effective-date" op="gt">$LV-current-date$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="LV-effectiveDate-user" scope="policy">
+															<arg-string>
+																<token-convert-time dest-format="yyyy-MM-dd" src-format="yyyyMMdd">
+																	<token-src-attr class-name="User" name="wd-Merge-effectiveDate" />
+																</token-convert-time>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-append-xml-element expression="." name="driver-operation-data" />
+										<do-append-xml-element expression="driver-operation-data" name="WD-WorkforceID" />
+										<do-append-xml-text expression="driver-operation-data/WD-WorkforceID">
+											<arg-string>
+												<token-local-variable name="LV-WorkforceID-user" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="driver-operation-data" name="WD-WorkerIDType" />
+										<do-append-xml-text expression="driver-operation-data/WD-WorkerIDType">
+											<arg-string>
+												<token-local-variable name="LV-WorkerIDType-user" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="driver-operation-data" name="WD-effectiveDate" />
+										<do-append-xml-text expression="driver-operation-data/WD-effectiveDate">
+											<arg-string>
+												<token-local-variable name="LV-effectiveDate-user" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-set-op-association>
+											<arg-association>
+												<token-local-variable name="LV-Association-user" />
+											</arg-association>
+										</do-set-op-association>
+									</actions>
+								</rule>
+								

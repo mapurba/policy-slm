@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>re-format Group CN</description>
+									<comment xml:space="preserve">Remove quotes from group name</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="groupName" scope="policy">
+											<arg-string>
+												<token-xpath expression="./add-attr[@attr-name=&quot;CN&quot;]/value/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="groupName" scope="policy">
+											<arg-string>
+												<token-join>
+													<token-split delimiter="'">
+														<token-local-variable name="groupName" />
+													</token-split>
+												</token-join>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="./add-attr[@attr-name=&quot;CN&quot;]/value/text()" />
+										<do-append-xml-text expression="./add-attr[@attr-name=&quot;CN&quot;]/value">
+											<arg-string>
+												<token-local-variable name="groupName" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

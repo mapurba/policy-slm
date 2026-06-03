@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Disable GroupWise External Entity on eDirectory GroupWise External Entity Expire/Disable</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="driver.gw.GWExternalEntityDisable" op="equal">disable</if-global-variable>
+											<if-global-variable mode="nocase" name="driver.gw.GWExternalEntityExpire" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">GroupWise External Entity</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-xpath op="true">./modify-attr[@attr-name='Login Expiration Time']</if-xpath>
+													<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']</if-xpath>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="Login Expiration Time" op="changing" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="not-true">./modify-attr[@attr-name='Login Expiration Time']/remove-value/value</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="*[@attr-name='Login Expiration Time']" />
+																<do-set-dest-attr-value class-name="User" name="Login Disabled">
+																	<arg-value type="string">
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-value>
+																</do-set-dest-attr-value>
+																<do-break />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="not-true">./modify-attr[@attr-name='Login Expiration Time']/add-value/value</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="*[@attr-name='Login Expiration Time']" />
+																<do-clear-dest-attr-value class-name="User" name="Login Disabled" />
+																<do-break />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<or>
+															<if-op-attr name="Login Disabled" op="changing" />
+														</or>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']/add-value/*[text() = 'false']</if-xpath>
+																	<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']/add-value/*[text() = 'true']</if-xpath>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="*[@attr-name='Login Expiration Time']" />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="combinationdone" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

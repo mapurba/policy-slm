@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Populate DirXML-ADContext on initial user add</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="association" scope="policy">
+											<arg-string>
+												<token-xpath expression="./text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="query-result" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src" scope="entry">
+													<arg-association>
+														<token-local-variable name="association" />
+													</arg-association>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-add-dest-attr-value direct="true" name="Object Class">
+											<arg-dn>
+												<token-xpath expression="@dest-dn" />
+											</arg-dn>
+											<arg-value type="string">
+												<token-text xml:space="preserve">DirXML-ApplicationAttrs</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value direct="true" name="DirXML-ADContext">
+											<arg-dn>
+												<token-xpath expression="@dest-dn" />
+											</arg-dn>
+											<arg-value type="string">
+												<token-xpath expression="$query-result/@src-dn" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

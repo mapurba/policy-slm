@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule notrace="true">
+									<description>getRDN</description>
+									<conditions>
+										<and>
+											<if-op-property name="userRDN" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="userRDN" notrace="true" scope="driver">
+											<arg-string>
+												<token-op-property name="userRDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if notrace="true">
+											<arg-conditions>
+												<and>
+													<if-op-property name="AccountTracking-association" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="driver">
+													<arg-string>
+														<token-replace-all regex="\." replace-with="#">
+															<token-op-property name="AccountTracking-association" />
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">operation-data/@src-dn</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="assoc" scope="policy">
+															<arg-string>
+																<token-replace-all regex="\." replace-with="#">
+																	<token-xpath expression="operation-data/@src-dn" />
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="nspm" notrace="true" scope="policy">
+											<arg-string>
+												<token-query class-name="User" notrace="true" scope="entry">
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+														<token-text xml:space="preserve">\</token-text>
+														<token-local-variable name="userRDN" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">nspmDistributionPassword</token-text>
+													</arg-string>
+												</token-query>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="nspm2" notrace="true" scope="policy">
+											<arg-string>
+												<token-join notrace="true">
+													<token-local-variable name="nspm" notrace="true" />
+												</token-join>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="nspm3" notrace="true" scope="policy">
+											<arg-string>
+												<token-replace-all notrace="true" regex="\." replace-with="#">
+													<token-local-variable name="nspm2" notrace="true" />
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="nspmfinal" notrace="true" scope="driver">
+											<arg-string>
+												<token-replace-all notrace="true" regex="$assoc$" replace-with="">
+													<token-local-variable name="nspm3" notrace="true" />
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message notrace="true">
+											<arg-string>
+												<token-local-variable name="nspmfinal" notrace="true" />
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

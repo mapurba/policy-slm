@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat Fax number for Google consumption</description>
+									<conditions>
+										<and>
+											<if-op-attr name="FaxPhoneNumber" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lv_FaxPhoneNumber" scope="policy">
+											<arg-string>
+												<token-xpath expression=".//*[@attr-name='FaxPhoneNumber' and last()]//value[last()]/component[@name='faxNumber']/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-op-attr name="FaxPhoneNumber" />
+										<do-set-dest-attr-value name="FaxPhoneNumber">
+											<arg-value type="string">
+												<token-local-variable name="lv_FaxPhoneNumber" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

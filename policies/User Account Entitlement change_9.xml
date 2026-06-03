@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Entitlement change</description>
+									<comment xml:space="preserve">The User Account Entitlement grants the user an enabled account in SAP. Revoking the entitlement will disable or delete the account depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the delete option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-entitlement name="UserAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="case" op="equal">modify</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-removed-entitlement name="UserAccount" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="removed-lsname" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="dvn" scope="policy">
+															<arg-string>
+																<token-local-variable name="removed-lsname" />
+																<token-text xml:space="preserve">-clsname</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="removed-clsname" scope="policy">
+															<arg-string>
+																<token-local-variable name="$dvn$" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="dvn" scope="policy">
+															<arg-string>
+																<token-local-variable name="removed-lsname" />
+																<token-text xml:space="preserve">-ctype</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="removed-ctype" scope="policy">
+															<arg-string>
+																<token-local-variable name="$dvn$" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="dvn" scope="policy">
+															<arg-string>
+																<token-local-variable name="removed-lsname" />
+																<token-text xml:space="preserve">-llo</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="removed-llo" scope="policy">
+															<arg-string>
+																<token-local-variable name="$dvn$" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="removed-ctype" op="not-equal">cua-child</if-local-variable>
+																	<if-local-variable mode="nocase" name="removed-lsname" op="equal">$lsname$</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Revoking UserAccount entitlement for object </token-text>
+																		<token-src-name />
+																		<token-text xml:space="preserve"> and logical system </token-text>
+																		<token-local-variable name="removed-lsname" />
+																	</arg-string>
+																</do-trace-message>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable name="drv.entitlement.remove" op="equal">delete</if-global-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Deleting object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> from logical system </token-text>
+																				<token-local-variable name="removed-lsname" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-delete-dest-object when="after" />
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Disabling object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> in logical system </token-text>
+																				<token-local-variable name="removed-lsname" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-set-dest-attr-value name="LOCKUSER">
+																			<arg-value type="state">
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-value>
+																		</do-set-dest-attr-value>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="removed-lsname" op="equal">$primLogicalSystemName$</if-local-variable>
+																					<if-local-variable mode="regex" name="primClientType" op="equal">non-cua|cua-central</if-local-variable>
+																					<if-global-variable mode="regex" name="drv.param.driverLSName" op="equal">.+</if-global-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-trace-message>
+																					<arg-string>
+																						<token-text xml:space="preserve">Removing object </token-text>
+																						<token-src-name />
+																						<token-text xml:space="preserve"> from the driver's logical system </token-text>
+																						<token-global-variable name="drv.param.driverLSName" />
+																						<token-text xml:space="preserve"> to terminate publication on primary connection.</token-text>
+																					</arg-string>
+																				</do-trace-message>
+																				<do-remove-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+																					<arg-value>
+																						<token-global-variable name="drv.param.driverLSName" />
+																					</arg-value>
+																				</do-remove-dest-attr-value>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+																<do-remove-association when="after">
+																	<arg-association>
+																		<token-association />
+																	</arg-association>
+																</do-remove-association>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="removed-ctype" op="equal">cua-child</if-local-variable>
+																	<if-local-variable mode="nocase" name="removed-clsname" op="equal">$lsname$</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable name="drv.entitlement.remove" op="equal">delete</if-global-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Revoking UserAccount entitlement for object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> and logical system </token-text>
+																				<token-local-variable name="removed-lsname" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Removing object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> from CUA child system </token-text>
+																				<token-local-variable name="removed-lsname" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-remove-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+																			<arg-value>
+																				<token-local-variable name="removed-lsname" />
+																			</arg-value>
+																		</do-remove-dest-attr-value>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Revoking UserAccount entitlement for object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> and logical system </token-text>
+																				<token-local-variable name="removed-lsname" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Centrally disabling object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> in logical system </token-text>
+																				<token-local-variable name="removed-lsname" />
+																				<token-text xml:space="preserve"> using the LOCKUSER BAPI.</token-text>
+																			</arg-string>
+																		</do-trace-message>
+																		<do-set-dest-attr-value name="LOCKUSER">
+																			<arg-value type="state">
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-value>
+																		</do-set-dest-attr-value>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+																<do-remove-association when="after">
+																	<arg-association>
+																		<token-replace-first regex="$lsname$" replace-with="$removed-lsname$">
+																			<token-association />
+																		</token-replace-first>
+																	</arg-association>
+																</do-remove-association>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="removed-ctype" op="equal">cua-child</if-local-variable>
+																	<if-local-variable mode="nocase" name="removed-lsname" op="equal">$lsname$</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Revoking UserAccount entitlement for object </token-text>
+																		<token-src-name />
+																		<token-text xml:space="preserve"> and logical system </token-text>
+																		<token-local-variable name="removed-lsname" />
+																	</arg-string>
+																</do-trace-message>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+																			<if-local-variable mode="nocase" name="removed-llo" op="equal">1</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Disabling object </token-text>
+																				<token-src-name />
+																				<token-text xml:space="preserve"> in logical system </token-text>
+																				<token-local-variable name="removed-lsname" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-set-dest-attr-value name="LOCKUSER">
+																			<arg-value type="string">
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-value>
+																		</do-set-dest-attr-value>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+																<do-remove-association when="after">
+																	<arg-association>
+																		<token-association />
+																	</arg-association>
+																</do-remove-association>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="added-lsname" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="added-lsname" />
+														<token-text xml:space="preserve">-clsname</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="added-clsname" scope="policy">
+													<arg-string>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="added-lsname" />
+														<token-text xml:space="preserve">-ctype</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="added-ctype" scope="policy">
+													<arg-string>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="added-lsname" />
+														<token-text xml:space="preserve">-llo</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="added-llo" scope="policy">
+													<arg-string>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="added-ctype" op="equal">non-cua</if-local-variable>
+															<if-local-variable mode="nocase" name="added-lsname" op="equal">$lsname$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Granting UserAccount entitlement for object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> and logical system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Enabling object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> in logical system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-set-dest-attr-value name="LOCKUSER">
+															<arg-value type="state">
+																<token-text>false</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="added-ctype" op="equal">cua-central</if-local-variable>
+															<if-local-variable mode="nocase" name="added-lsname" op="equal">$lsname$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Granting UserAccount entitlement for object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> and logical system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-add-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+															<arg-value type="string">
+																<token-local-variable name="added-lsname" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Enabling object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> in logical system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-set-dest-attr-value name="LOCKUSER">
+															<arg-value type="state">
+																<token-text>false</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="added-lsname" op="equal">$primLogicalSystemName$</if-local-variable>
+															<if-local-variable mode="regex" name="primClientType" op="equal">non-cua|cua-central</if-local-variable>
+															<if-global-variable mode="regex" name="drv.param.driverLSName" op="equal">.+</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Adding object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> to the driver's logical system </token-text>
+																<token-global-variable name="drv.param.driverLSName" />
+																<token-text xml:space="preserve"> for publication on primary connection.</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-add-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+															<arg-value>
+																<token-global-variable name="drv.param.driverLSName" />
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="added-ctype" op="equal">cua-child</if-local-variable>
+															<if-local-variable mode="nocase" name="added-clsname" op="equal">$lsname$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Granting UserAccount entitlement for object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> and logical system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Adding object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> to CUA child system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-add-dest-attr-value name="SYSTEMS:SUBSYSTEM">
+															<arg-value type="string">
+																<token-local-variable name="added-lsname" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-association op="available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="assoc" scope="policy">
+																	<arg-string>
+																		<token-replace-first regex="$lsname$" replace-with="$added-lsname$">
+																			<token-association />
+																		</token-replace-first>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="assoc" scope="policy">
+																	<arg-string>
+																		<token-replace-first regex="$lsname$\\" replace-with="$added-lsname$\\USd">
+																			<token-dest-dn />
+																		</token-replace-first>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="added-llo" op="equal">1</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Scheduling granular unlocking of </token-text>
+																		<token-src-name />
+																		<token-text xml:space="preserve"> in CUA child system </token-text>
+																		<token-local-variable name="added-lsname" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-op-property name="fanout-unlock-granular">
+																	<arg-string>
+																		<token-text xml:space="preserve">assoc=</token-text>
+																		<token-local-variable name="assoc" />
+																	</arg-string>
+																</do-set-op-property>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Scheduling adding association $assoc$ for object </token-text>
+																<token-src-name />
+																<token-text xml:space="preserve"> in CUA child system </token-text>
+																<token-local-variable name="added-lsname" />
+															</arg-string>
+														</do-trace-message>
+														<do-set-op-property name="fanout-add-association">
+															<arg-string>
+																<token-text xml:space="preserve">assoc=</token-text>
+																<token-local-variable name="assoc" />
+																<token-text xml:space="preserve">|dn=</token-text>
+																<token-src-dn />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Time to String</description>
+									<conditions>
+										<and>
+											<if-op-attr mode="regex" name="$srcAttrName$" op="changing-to">.+</if-op-attr>
+										</and>
+										<and>
+											<if-operation op="equal">sync</if-operation>
+											<if-src-attr mode="regex" name="$srcAttrName$" op="equal">.+</if-src-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="date" scope="policy">
+											<arg-string>
+												<token-attr name="$srcAttrName$" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-src-attr-value name="$destAttrName$">
+											<arg-value type="string">
+												<token-convert-time dest-format="yyyyMMddHHmmss" dest-tz="Zulu" src-format="!CTIME" src-tz="Zulu">
+													<token-local-variable name="date" />
+												</token-convert-time>
+											</arg-value>
+										</do-set-src-attr-value>
+									</actions>
+								</rule>
+							

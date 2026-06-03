@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto any change in DirXML-Driver or DirXML-resource if it is done before the driver start</description>
+									<conditions>
+										<or>
+											<if-class-name op="equal">DirXML-Resource</if-class-name>
+											<if-class-name op="equal">DirXML-Driver</if-class-name>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="cachedTime">
+											<arg-string>
+												<token-substring length="-2">
+													<token-xpath expression="@cached-time" />
+												</token-substring>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="eventTime">
+											<arg-string>
+												<token-xpath expression="es:getSeconds($cachedTime,'yyyyMMddHHmmss.SSS')" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="compareResult">
+											<arg-string>
+												<token-xpath expression="es:numericCompare($driverStartTime,$eventTime)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="case" name="compareResult" op="equal">1</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

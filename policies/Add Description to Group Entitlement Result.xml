@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add Description to Group Entitlement Result</description>
+									<comment xml:space="preserve">Add description node to instance results.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="Entitlement-Group-Query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="./attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">Description</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="./attr[last()]" name="value" />
+										<do-set-xml-attr expression="./attr[last()]/value" name="type">
+											<arg-string>
+												<token-text>string</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-text expression="./attr[last()]/value">
+											<arg-string>
+												<token-text xml:space="preserve">Group ID</token-text>
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

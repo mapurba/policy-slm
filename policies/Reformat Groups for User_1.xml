@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat Groups for User</description>
+									<conditions>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-op-attr name="Group Membership" op="changing" />
+										</or>
+										<or>
+											<if-global-variable name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+										</or>
+										<or>
+											<if-entitlement name="UserAccount" op="changing" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="addedGroups">
+											<arg-node-set>
+												<token-op-attr name="Group Membership" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="removedGroups">
+											<arg-node-set>
+												<token-removed-attr name="Group Membership" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-op-attr name="Group Membership" />
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="addedGroups" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="groupId">
+													<arg-string>
+														<token-resolve datastore="src">
+															<arg-dn>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+														</token-resolve>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="groupName">
+													<arg-string>
+														<token-dest-attr class-name="Group" name="CN">
+															<arg-association>
+																<token-local-variable name="groupId" />
+															</arg-association>
+														</token-dest-attr>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-dest-attr-value class-name="User" name="Group Membership">
+													<arg-value type="string">
+														<token-local-variable name="groupName" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="removedGroups" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="groupId">
+													<arg-string>
+														<token-resolve datastore="src">
+															<arg-dn>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+														</token-resolve>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="groupName">
+													<arg-string>
+														<token-dest-attr class-name="Group" name="CN">
+															<arg-association>
+																<token-local-variable name="groupId" />
+															</arg-association>
+														</token-dest-attr>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-dest-attr-value class-name="User" name="Group Membership">
+													<arg-value type="string">
+														<token-local-variable name="groupName" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

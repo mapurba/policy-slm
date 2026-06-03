@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Add: Default values</description>
+									<comment xml:space="preserve">Adding default values for mailNickName, displayName, Login Disabled, UsageLocation if not already available</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="regex" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value name="mailNickname">
+											<arg-value type="string">
+												<token-join>
+													<token-split delimiter=" ">
+														<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:userName" />
+													</token-split>
+												</token-join>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="displayName" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-add-dest-attr-value name="displayName">
+															<arg-value type="string">
+																<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted" />
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-add-dest-attr-value name="displayName">
+															<arg-value type="string">
+																<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+																<token-text xml:space="preserve"> </token-text>
+																<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled">
+													<arg-value type="state">
+														<token-text xml:space="preserve">false</token-text>
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:C" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:C">
+													<arg-value type="state">
+														<token-global-variable name="drv.usage.location" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

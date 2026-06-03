@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add Static Account Entitlement Content</description>
+									<comment xml:space="preserve">The Entitlement Query result set will be identified and static block will be returned to the user.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">status</if-operation>
+											<if-op-property mode="nocase" name="Entitlement-Account-Query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression=".." name="instance" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable name="jdbc.SyncModel" op="equal">indirect</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../instance" name="class-name">
+													<arg-string>
+														<token-text>indirect.usr</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable name="jdbc.SyncModel" op="equal">direct</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="../instance" name="class-name">
+													<arg-string>
+														<token-text>direct.view_usr</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+										<do-append-xml-element expression="../instance" name="attr" />
+										<do-set-xml-attr expression="../instance/attr" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">idu</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance/attr" name="value" />
+										<do-set-xml-attr expression="../instance/attr/value" name="type">
+											<arg-string>
+												<token-text>string</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-text expression="../instance/attr/value">
+											<arg-string>
+												<token-global-variable name="drv.entitlement.accvalue" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Connections</description>
+									<comment xml:space="preserve">The driver object becomes available for queries only after the publisher channel has started. So only proceed after the driver object is available.</comment>
+									<conditions />
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">connString=</token-text>
+												<token-local-variable name="connString" />
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="shimConfigInfo1" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="shimConfigInfo1" scope="driver">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-ShimConfigInfo</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="connDnNS" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$shimConfigInfo1/driver-config/subscriber-options/configuration-values/definitions/group/subordinates/definition/value/instance/definition[@name='drv.connection.dn']/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="xml" scope="driver">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;entitlement-configuration driver-type="Multi Domain AD Driver" min-driver-version="1.0.0.0"&gt;
+	&lt;entitlements/&gt;
+	&lt;connections/&gt;
+&lt;/entitlement-configuration&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="$xml/entitlement-configuration" name="modified">
+											<arg-string>
+												<token-time format="yyyyMMddhhmmss" tz="UTC" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-local-variable name="entitlements" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Entitlement" datastore="src" scope="subordinates">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">CN</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="connDnNS" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="domainConnection" scope="policy">
+													<arg-node-set>
+														<token-query class-name="DirXML-Resource" datastore="src" scope="entry">
+															<arg-dn>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+															<arg-string>
+																<token-text xml:space="preserve">DirXML-Data</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="connXML" scope="driver">
+													<arg-node-set>
+														<token-xml-parse>
+															<token-base64-decode>
+																<token-xpath expression="$domainConnection/attr/value" />
+															</token-base64-decode>
+														</token-xml-parse>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="connName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$connXML/connection/authentication-info/domain/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="domainDN" scope="policy">
+													<arg-string>
+														<token-local-variable name="connName" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message level="1">
+													<arg-string>
+														<token-text xml:space="preserve">Constructing connection data for : </token-text>
+														<token-local-variable name="connName" />
+													</arg-string>
+												</do-trace-message>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections" name="connection" />
+												<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]" name="name">
+													<arg-string>
+														<token-replace-first regex="dc=" replace-with="">
+															<token-parse-dn dest-dn-format="ldap" length="1" src-dn-format="ldap" start="-1">
+																<token-local-variable name="domainDN" />
+															</token-parse-dn>
+														</token-replace-first>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]" name="query-attr" />
+												<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]/query-attr[last()]" name="name">
+													<arg-string>
+														<token-text xml:space="preserve">dest-dn</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-text expression="$xml/entitlement-configuration/connections/connection[last()]/query-attr[last()]">
+													<arg-string>
+														<token-local-variable name="domainDN" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]" name="query-instance" />
+												<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]" name="langCode">
+													<arg-string>
+														<token-text xml:space="preserve">en</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]" name="query-xml" />
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

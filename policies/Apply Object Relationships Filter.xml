@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Apply Object Relationships Filter</description>
+									<comment name="author" xml:space="preserve">vscheuber</comment>
+									<comment name="version" xml:space="preserve">1.00</comment>
+									<comment name="lastchanged" xml:space="preserve">090714 - vscheuber</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.relationships.enable" op="equal">true</if-global-variable>
+											<if-class-name op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTHeader" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="configValues" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="configValues" scope="driver">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-ConfigValues</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$configValues//definition[@name='drv.relationships.filter']/value/instance" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="filterInstance" scope="policy">
+													<arg-node-set>
+														<token-local-variable name="current-node" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="className" scope="policy">
+													<arg-string>
+														<token-xpath expression="$filterInstance/definition[@name='objectClass']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="allowClass" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-class-name mode="nocase" op="equal">$className$</if-class-name>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="allowClass" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="lvTHeader" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">Applying Object Relationships Filter</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-local-variable name="lvTmp" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',10),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">ObjectClass: </token-text>
+																		<token-class-name />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-local-variable name="lvTmp" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">Object-ID: </token-text>
+																		<token-src-name />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-local-variable name="lvTmp" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="lvTHeader" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">false</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="node()[starts-with(@attr-name, concat($className, '-R-'))]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="attrName" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/@attr-name" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="allowAttr" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">false</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="$filterInstance/definition[@name='attrNames']/value/item/text()" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="filterAttrName" scope="policy">
+																	<arg-string>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="attrName" op="equal">$filterAttrName$</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="allowAttr" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="allowClass" op="equal">true</if-local-variable>
+																	<if-local-variable mode="nocase" name="allowAttr" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">Allow </token-text>
+																		<token-local-variable name="attrName" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-local-variable name="lvTmp" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$current-node/add-value/value" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-local-variable name="lvTmp" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="$current-node" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-local-variable name="lvTmp" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-set-local-variable name="lvFile" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																</do-for-each>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$current-node/value" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-local-variable name="lvTmp" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="$current-node" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-local-variable name="lvTmp" />
+																			</arg-string>
+																		</do-trace-message>
+																		<do-set-local-variable name="lvFile" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">Block </token-text>
+																		<token-local-variable name="attrName" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-local-variable name="lvTmp" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-strip-xpath expression="node()[@attr-name=$attrName]" />
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

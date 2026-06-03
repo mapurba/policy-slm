@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Collect required 'Managed System Information' about FanOut instances and append them</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="connDN" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Resource" scope="subordinates">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-match-attr name="DirXML-ContentType">
+														<arg-value>
+															<token-text xml:space="preserve">application/vnd.novell.dirxml.fanout-enabled+xml</token-text>
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">count($connDN)=0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Updating "MSysInfo" GCV resource by appending FanOut connections information...</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-clone-xpath dest-expression="$mSysInfoXML/configuration-values/definitions" src-expression="$insDefDoc/node()" />
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">No FanOut connection information is found. Kindly check if you have configured FanOut connections and enabled it.</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="connDN" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value" name="instance" />
+												<do-set-local-variable name="connName" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="slash" length="1" src-dn-format="slash" start="-1">
+															<token-xpath expression="$current-node/@src-dn" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-clone-xpath dest-expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]" src-expression="$insTemplate/template/node()" />
+												<do-append-xml-text expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]/definition[@name='name']/value">
+													<arg-string>
+														<token-local-variable name="connName" />
+														<token-text xml:space="preserve">.</token-text>
+														<token-parse-dn length="1" start="-1">
+															<token-global-variable name="dirxml.auto.driverdn" />
+														</token-parse-dn>
+													</arg-string>
+												</do-append-xml-text>
+												<do-set-local-variable name="connXML" scope="policy">
+													<arg-node-set>
+														<token-query class-name="DirXML-Resource" scope="entry">
+															<arg-dn>
+																<token-xpath expression="$current-node/@src-dn" />
+															</arg-dn>
+															<arg-string>
+																<token-text xml:space="preserve">DirXML-Data</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-append-xml-text expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='id']/value">
+													<arg-string>
+														<token-local-variable name="connName" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-set-local-variable name="connXML" scope="policy">
+													<arg-node-set>
+														<token-xml-parse>
+															<token-base64-decode>
+																<token-xpath expression="$connXML//attr[@attr-name='DirXML-Data']/value/text()" />
+															</token-base64-decode>
+														</token-xml-parse>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-append-xml-text expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.id']/value">
+													<arg-string>
+														<token-xpath expression="$connXML//user/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-set-local-variable name="connUrl" scope="policy">
+													<arg-string>
+														<token-xpath expression="$connXML//server/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="connString" scope="policy">
+													<arg-string>
+														<token-local-variable name="connUrl" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="templateDelimiter" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">,</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="jdbcTemplateString" scope="policy">
+													<arg-string>
+														<token-global-variable name="driver.connectionURL.jdbc" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="jdbcString" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before($jdbcTemplateString,$templateDelimiter)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="jdbcString" op="equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="jdbcString" scope="policy">
+															<arg-string>
+																<token-local-variable name="jdbcTemplateString" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-set-local-variable name="delimiter" scope="policy">
+													<arg-string />
+												</do-set-local-variable>
+												<do-set-local-variable name="terminator" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="loop-counter" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">3</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-while>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="numeric" name="loop-counter" op="gt">0</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="delimiter" op="equal" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="delimiter" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-before($jdbcString,'&lt;')" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-set-local-variable name="jdbcString" scope="policy">
+															<arg-string>
+																<token-xpath expression="substring-after($jdbcString,$delimiter)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="connString" scope="policy">
+															<arg-string>
+																<token-xpath expression="substring-after($connString,$delimiter)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="delimiter" scope="policy">
+															<arg-string>
+																<token-xpath expression="substring-before(substring-after($jdbcString,'&gt;'),'&lt;')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="delimiter" op="equal" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="delimiter" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-after($jdbcString,'&gt;')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="delimiter" op="equal" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="extractedValue" scope="policy">
+																			<arg-string>
+																				<token-local-variable name="connString" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="valueof" scope="policy">
+																			<arg-string>
+																				<token-replace-all regex="&lt;|&gt;" replace-with="">
+																					<token-local-variable name="jdbcString" />
+																				</token-replace-all>
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="terminator" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="terminator" op="not-equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="extractedValue" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-before($connString,$delimiter)" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="valueof" scope="policy">
+																	<arg-string>
+																		<token-replace-all regex="&lt;|&gt;" replace-with="">
+																			<token-xpath expression="substring-before($jdbcString,$delimiter)" />
+																		</token-replace-all>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-set-local-variable name="loop-counter" scope="policy">
+															<arg-string>
+																<token-xpath expression="$loop-counter - 1" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="$valueof$" scope="policy">
+															<arg-string>
+																<token-local-variable name="extractedValue" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="loop-counter" op="equal">0</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<or>
+																			<if-local-variable mode="nocase" name="HOST" op="equal" />
+																			<if-local-variable mode="nocase" name="PORT" op="equal" />
+																			<if-local-variable mode="nocase" name="DB" op="equal" />
+																		</or>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="jdbcString" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="substring-after($jdbcTemplateString,$templateDelimiter)" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="jdbcString" op="not-equal" />
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="jdbcTemplateString" scope="policy">
+																					<arg-string>
+																						<token-xpath expression="substring-after($jdbcTemplateString,$templateDelimiter)" />
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-set-local-variable name="connString" scope="policy">
+																					<arg-string>
+																						<token-local-variable name="connUrl" />
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-set-local-variable name="loop-counter" scope="policy">
+																					<arg-string>
+																						<token-text xml:space="preserve">3</token-text>
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-set-local-variable name="delimiter" scope="policy">
+																					<arg-string />
+																				</do-set-local-variable>
+																				<do-set-local-variable name="terminator" scope="policy">
+																					<arg-string>
+																						<token-text xml:space="preserve">false</token-text>
+																					</arg-string>
+																				</do-set-local-variable>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-while>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Server information for connection object $connName$ are host: $HOST$, port address: $PORT$ , Database/SID: $DB$.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-append-xml-text expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.ip']/value">
+													<arg-string>
+														<token-local-variable name="HOST" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-text expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.port']/value">
+													<arg-string>
+														<token-local-variable name="PORT" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-text expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='dbschema']/value">
+													<arg-string>
+														<token-local-variable name="DB" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+										<do-set-local-variable name="mSysInfoDN" scope="policy">
+											<arg-string>
+												<token-replace-all regex="/" replace-with="\\">
+													<token-local-variable name="mSysInfoDN" />
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value class-name="DirXML-GlobalConfigDef" direct="true" name="DirXML-ConfigValues">
+											<arg-dn>
+												<token-local-variable name="mSysInfoDN" />
+											</arg-dn>
+											<arg-value type="octet">
+												<token-base64-encode>
+													<token-xml-serialize>
+														<token-local-variable name="mSysInfoXML" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

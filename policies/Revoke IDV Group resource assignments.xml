@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Revoke IDV Group resource assignments</description>
+									<comment xml:space="preserve">For all delete operations on Group objects an operation-data/entitlement-assignment data node is created in etp caching policy.Policy looks for this xpath sequence and revokes all IDM Resources based on those values.</comment>
+									<conditions>
+										<or>
+											<if-xpath op="true">self::operation-data/entitlement-assignments</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										
+										
+										<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+													<token-global-variable name="UAProvAdmin" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="ua-admin-pwd" notrace="true" scope="policy">
+											<arg-string>
+												<token-src-attr name="nspmDistributionPassword">
+													<arg-dn>
+														<token-parse-dn dest-dn-format="slash" src-dn-format="qualified-dot">
+															<token-global-variable name="UAProvAdmin" />
+														</token-parse-dn>
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="payload" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="./entitlement-assignments" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="prov-payload" scope="policy">
+											<arg-string>
+												<token-base64-encode charset="UTF-8">
+													<token-xml-serialize>
+														<token-local-variable name="payload" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="groupDn" scope="policy">
+											<arg-string>
+												<token-xpath expression=".//@qualified-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression=".//@qualified-src-dn" />
+										<do-set-local-variable name="groupName" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-local-variable name="groupDn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="rpStatus" scope="policy">
+											<arg-string>
+												<token-xpath expression="ps:ReconcileGroupMemberPermissions($UAProvURL, $adminQualifiedLDAPDn, $ua-admin-pwd, $groupName, 1000, $prov-payload, true)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">ReconcilePermissions status: </token-text>
+												<token-local-variable name="rpStatus" />
+											</arg-string>
+										</do-trace-message>
+										<do-strip-xpath expression="." />
+										<do-break />
+									</actions>
+								</rule>
+								

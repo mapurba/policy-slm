@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Split gidNumber into GID Component on Instance Events</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="gidNumber" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./attr[@attr-name=&quot;gidNumber&quot;]/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-xml-attr expression="$current-node" name="nxdrv:gidNumber">
+													<arg-string>
+														<token-xpath expression="$current-node/text()" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

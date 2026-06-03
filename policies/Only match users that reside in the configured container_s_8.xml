@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Only match users that reside in the configured container/subtree</description>
+									<comment xml:space="preserve">This rule marks events in the given containers for processing by adding the unmached-src-dn and attempt-to-match operation properties. You can add subtrees in the Identity Vault for inclusion by adding if-src-dn conditionals here. The attempt-to-match property determines whether the matching policies following this initializing policy should try to match the object or whether its out of scope.</comment>
+									<conditions>
+										<or>
+											<if-src-dn op="in-subtree">~idv.dit.data.users~</if-src-dn>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-op-property name="unmatched-src-dn">
+											<arg-string>
+												<token-unmatched-src-dn convert="true" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

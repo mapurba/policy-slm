@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip out of scope modify events</description>
+									<conditions>
+										<and>
+											<if-global-variable name="drv.entitlement.GWAccount" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="gwAccount" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="IsAddAssoc" op="equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="IsAddAssoc" scope="driver">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

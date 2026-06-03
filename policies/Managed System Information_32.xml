@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Managed System Information</description>
+									<conditions>
+										<or>
+											<if-global-variable mode="nocase" name="drv.rolemapping.enable" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.resourcemapping.enable" op="equal">true</if-global-variable>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="msysinfo" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-GlobalConfigDef" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\MSysInfo</token-text>
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-ConfigValues</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="xml" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-base64-decode>
+														<token-xpath expression="$msysinfo//attr[@attr-name='DirXML-ConfigValues']/value/text()" />
+													</token-base64-decode>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="driver" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Driver" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">GUID</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-ShimConfigInfo</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-ShimAuthID</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-ShimAuthServer</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="driverGuid" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:guid2string($driver//attr[@attr-name='GUID']/value/text())" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.id']/value/text()" />
+										<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.id']/value">
+											<arg-string>
+												<token-local-variable name="driverGuid" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.type']/value/text()" />
+										<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.type']/value">
+											<arg-string>
+												<token-text xml:space="preserve">NOTES</token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-set-local-variable name="authServer" scope="policy">
+											<arg-string>
+												<token-xpath expression="$driver//attr[@attr-name='DirXML-ShimAuthServer']/value/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">starts-with($authServer, 'REMOTE(')</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="ip" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before(substring-after($authServer, 'hostname='), ' ')" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="ncpServer" scope="policy">
+													<arg-node-set>
+														<token-query class-name="NCP Server" scope="entry">
+															<arg-dn>
+																<token-parse-dn src-dn-format="ldap">
+																	<token-global-variable name="dirxml.auto.localserverdn" />
+																</token-parse-dn>
+															</arg-dn>
+															<arg-string>
+																<token-text xml:space="preserve">Network Address</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="netAddrs" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$ncpServer/attr[@attr-name='Network Address']/value[component[@name='netAddrType']/text()=9]/component[@name='netAddr']/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="netAddrs" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="address" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getIPFromHexNetAddr(es:octet2AsciiHex($current-node))" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-local-variable mode="regex" name="ip" op="not-equal">.+</if-local-variable>
+																	<if-local-variable mode="nocase" name="ip" op="equal">127.0.0.1</if-local-variable>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="ip" scope="policy">
+																	<arg-string>
+																		<token-local-variable name="address" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-if>
+										<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.auth.ip']/value/text()" />
+										<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.auth.ip']/value">
+											<arg-string>
+												<token-local-variable name="ip" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.auth.port']/value/text()" />
+										<do-set-local-variable name="authID" scope="policy">
+											<arg-string>
+												<token-xpath expression="$driver//attr[@attr-name='DirXML-ShimAuthID']/value/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.auth.id']/value/text()" />
+										<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.auth.id']/value">
+											<arg-string>
+												<token-local-variable name="authID" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

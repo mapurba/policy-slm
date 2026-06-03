@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>interceptModifiesMail</description>
+									<comment xml:space="preserve">Intercept Modifies of mail</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="modAttrList" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="./modify-attr/@attr-name" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="modAttrCSV" scope="policy">
+											<arg-string />
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="modAttrList" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="regex" name="attrsToRetryWhenActivated" op="equal">.*$current-node$.*</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="modAttrCSV" scope="policy">
+															<arg-string>
+																<token-local-variable name="modAttrCSV" />
+																<token-text xml:space="preserve">,</token-text>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-set-op-property name="modifiedAttribute">
+											<arg-string>
+												<token-substring start="1">
+													<token-local-variable name="modAttrCSV" />
+												</token-substring>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="UserAssociation">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="User-srcDN">
+											<arg-string>
+												<token-xpath expression="./@src-dn" />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

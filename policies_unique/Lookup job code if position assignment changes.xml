@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Lookup job code if position assignment changes</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-attr name="DirXML-sapP-A-S" op="changing" />
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation op="equal">sync</if-operation>
+											<if-src-attr name="DirXML-sapP-A-S" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="jobCode">
+											<arg-string>
+												<token-src-attr class-name="DirXML-sapS" name="DirXML-sapSShortName">
+													<arg-dn>
+														<token-global-variable name="dvr.saphr.driverdn" />
+														<token-text xml:space="preserve">\sap\om\s\</token-text>
+														<token-attr name="DirXML-sapP-A-S" />
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

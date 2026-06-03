@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule notrace="true">
+									<description>Display Incoming Event Data</description>
+									<comment name="author" xml:space="preserve">hdopp</comment>
+									<comment name="version" xml:space="preserve">1.01</comment>
+									<comment name="lastchanged" xml:space="preserve">090630 - hdopp</comment>
+									<conditions>
+										<or>
+											<if-class-name op="available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">SAP Business Operation "</token-text>
+												<token-operation />
+												<token-text xml:space="preserve">" detected</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvFile" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',10),$lvTmp))" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">ObjectClass: </token-text>
+												<token-class-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvFile" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Object-ID: </token-text>
+												<token-src-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="add-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$current-node/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">av: </token-text>
+																<token-xpath expression="$current-node" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lvFile" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr[@attr-name!='DirXML-EntitlementRef' and @attr-name!='nspmDistributionPassword']" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$current-node/add-value/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">av: </token-text>
+																<token-xpath expression="$current-node" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lvFile" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$current-node/remove-value/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">rv: </token-text>
+																<token-xpath expression="$current-node" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lvFile" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$current-node/remove-all-values" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">[remove ALL values]</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lvFile" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>EMP: Modify Operations</description>
+									<comment xml:space="preserve">Identify the attributes being updated on Modify operations for the Epic ContactComment</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lv-modifyActions" scope="policy">
+											<arg-string />
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lv-modifyActions" scope="policy">
+													<arg-string>
+														<token-local-variable name="lv-modifyActions" />
+														<token-text xml:space="preserve"> </token-text>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

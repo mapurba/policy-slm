@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Assign IDV User Related Resources during Sync</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-src-dn op="in-subtree">~driver.ldap.base.container~</if-src-dn>
+											<if-operation mode="nocase" op="equal">sync</if-operation>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="unmatchedsrcdn" scope="policy">
+											<arg-string>
+												<token-unmatched-src-dn convert="true" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.pubPlacementType" op="equal">flat</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="UserDN" scope="policy">
+													<arg-node-set>
+														<token-query datastore="dest" scope="entry">
+															<arg-dn>
+																<token-global-variable name="idv.dit.data.users" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-src-name />
+															</arg-dn>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="UserDN" scope="policy">
+													<arg-node-set>
+														<token-query datastore="dest" scope="entry">
+															<arg-dn>
+																<token-global-variable name="idv.dit.data.users" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="unmatchedsrcdn" />
+															</arg-dn>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="DestDN" scope="policy">
+											<arg-string>
+												<token-xpath expression="$UserDN/@src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="qualifiedDestDn" scope="policy">
+											<arg-string>
+												<token-xpath expression="$UserDN/@qualified-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="case" name="DestDN" op="not-equal" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">operation-data</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-element expression="." name="operation-data" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-append-xml-element expression="operation-data" name="mapping-table" />
+												<do-clone-xpath dest-expression="operation-data/mapping-table" src-expression="$static-map-xml/mapping-table/col-def" />
+												<do-set-local-variable name="onboardEnt" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$perm-map-xml/mapping-table/row/col[1]/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="onboardEnt" />
+													</arg-node-set>
+													<arg-actions>
+														<do-clone-xpath dest-expression="operation-data/mapping-table" src-expression="$static-map-xml/mapping-table/row[col/text() = $current-node]" />
+													</arg-actions>
+												</do-for-each>
+												<do-set-local-variable name="perm-attrs" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$perm-map-xml/mapping-table/row/col[last()]/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="perm-attrs" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="assignAttr" scope="policy">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="reconcileAttrFlg" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">false</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="current-node" op="equal">Group Membership</if-local-variable>
+																	<if-global-variable mode="nocase" name="drv.entitlement.Group.onboard" op="equal">true</if-global-variable>
+																</and>
+																<and>
+																	<if-local-variable mode="nocase" name="current-node" op="equal">Login Disabled</if-local-variable>
+																	<if-global-variable mode="nocase" name="drv.entitlement.Account.onboard" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Reconciling permission for attribute: </token-text>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="reconcileAttrFlg" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="current-node" op="not-equal">Group Membership</if-local-variable>
+																			<if-local-variable mode="nocase" name="current-node" op="not-equal">Login Disabled</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-global-variable mode="nocase" name="drv.entitlement.onboarding.all" op="equal">true</if-global-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-trace-message>
+																					<arg-string>
+																						<token-text xml:space="preserve">Reconciling permission for attribute: </token-text>
+																						<token-local-variable name="assignAttr" />
+																					</arg-string>
+																				</do-trace-message>
+																				<do-set-local-variable name="reconcileAttrFlg" scope="policy">
+																					<arg-string>
+																						<token-text xml:space="preserve">true</token-text>
+																					</arg-string>
+																				</do-set-local-variable>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-for-each>
+																					<arg-node-set>
+																						<token-global-variable name="drv.entitlement.onboardEnt" />
+																					</arg-node-set>
+																					<arg-actions>
+																						<do-set-local-variable name="givenAttr" scope="policy">
+																							<arg-string>
+																								<token-xpath expression="$current-node/definition[@name=&quot;drv.entitlement.entName&quot;]/value/text()" />
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-if>
+																							<arg-conditions>
+																								<and>
+																									<if-local-variable mode="nocase" name="assignAttr" op="equal">$givenAttr$</if-local-variable>
+																								</and>
+																							</arg-conditions>
+																							<arg-actions>
+																								<do-trace-message>
+																									<arg-string>
+																										<token-text xml:space="preserve">Reconciling permission for attribute: </token-text>
+																										<token-local-variable name="givenAttr" />
+																									</arg-string>
+																								</do-trace-message>
+																								<do-set-local-variable name="reconcileAttrFlg" scope="policy">
+																									<arg-string>
+																										<token-text xml:space="preserve">true</token-text>
+																									</arg-string>
+																								</do-set-local-variable>
+																							</arg-actions>
+																							<arg-actions />
+																						</do-if>
+																					</arg-actions>
+																				</do-for-each>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="reconcileAttrFlg" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="permission-values" scope="policy">
+																	<arg-node-set>
+																		<token-src-attr name="$current-node$" />
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-append-xml-element expression="operation-data" name="permission" />
+																<do-set-xml-attr expression="operation-data/permission[last()]" name="name">
+																	<arg-string>
+																		<token-local-variable name="assignAttr" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-set-local-variable name="entitlementDN" scope="policy">
+																	<arg-string>
+																		<token-map dest="entitlementDN" src="assignmentAttribute" table="..\PermissionEntMapping">
+																			<token-local-variable name="assignAttr" />
+																		</token-map>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="entitlementObj" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="DirXML-Entitlement" scope="entry">
+																			<arg-dn>
+																				<token-local-variable name="entitlementDN" />
+																			</arg-dn>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-local-variable name="entitlementQualifiedDn" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$entitlementObj/@qualified-src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-xml-attr expression="operation-data/permission[last()]" name="entitlement">
+																	<arg-string>
+																		<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+																			<token-local-variable name="entitlementQualifiedDn" />
+																		</token-parse-dn>
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-set-xml-attr expression="operation-data/permission[last()]" name="dynamic">
+																	<arg-string>
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-set-xml-attr expression="operation-data/permission[last()]" name="resource">
+																	<arg-string>
+																		<token-map dest="resourceDN" src="assignmentAttribute" table="..\PermissionEntMapping">
+																			<token-local-variable name="assignAttr" />
+																		</token-map>
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-local-variable name="permission-values" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="assignAttr" op="equal">Group Membership</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="staticMappedGroupResource" scope="policy">
+																					<arg-string>
+																						<token-map dest="staticResource" src="entitlementValue" table="..\StaticValueEntitlementMap">
+																							<token-local-variable name="current-node" />
+																						</token-map>
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-if>
+																					<arg-conditions>
+																						<and>
+																							<if-local-variable mode="nocase" name="staticMappedGroupResource" op="equal" />
+																						</and>
+																					</arg-conditions>
+																					<arg-actions>
+																						<do-append-xml-element expression="operation-data/permission[@dynamic='true'][last()]" name="pvalue" />
+																						<do-set-local-variable name="permValue" scope="policy">
+																							<arg-string>
+																								<token-map dest="entValue" src="nativeName" table="..\Group_Values">
+																									<token-local-variable name="current-node" />
+																								</token-map>
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-append-xml-text expression="operation-data/permission[@dynamic='true'][last()]/pvalue[last()]">
+																							<arg-string>
+																								<token-local-variable name="permValue" />
+																							</arg-string>
+																						</do-append-xml-text>
+																					</arg-actions>
+																					<arg-actions>
+																						<do-append-xml-element expression="operation-data" name="permission" />
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="entitlement">
+																							<arg-string>
+																								<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+																									<token-local-variable name="entitlementQualifiedDn" />
+																								</token-parse-dn>
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="resource">
+																							<arg-string>
+																								<token-local-variable name="staticMappedGroupResource" />
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="dynamic">
+																							<arg-string>
+																								<token-text xml:space="preserve">false</token-text>
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="name">
+																							<arg-string>
+																								<token-local-variable name="assignAttr" />
+																							</arg-string>
+																						</do-set-xml-attr>
+																					</arg-actions>
+																				</do-if>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-if>
+																					<arg-conditions>
+																						<and>
+																							<if-local-variable mode="nocase" name="assignAttr" op="equal">Login Disabled</if-local-variable>
+																						</and>
+																					</arg-conditions>
+																					<arg-actions>
+																						<do-if>
+																							<arg-conditions>
+																								<and>
+																									<if-local-variable mode="nocase" name="current-node" op="equal">false</if-local-variable>
+																								</and>
+																							</arg-conditions>
+																							<arg-actions>
+																								<do-set-local-variable name="allowAccountGrant" scope="policy">
+																									<arg-string>
+																										<token-text xml:space="preserve">true</token-text>
+																									</arg-string>
+																								</do-set-local-variable>
+																								<do-set-local-variable name="prevEntRef" scope="policy">
+																									<arg-node-set>
+																										<token-query class-name="User" scope="entry">
+																											<arg-dn>
+																												<token-local-variable name="DestDN" />
+																											</arg-dn>
+																											<arg-string>
+																												<token-text xml:space="preserve">DirXML-EntitlementRef</token-text>
+																											</arg-string>
+																										</token-query>
+																									</arg-node-set>
+																								</do-set-local-variable>
+																								<do-for-each>
+																									<arg-node-set>
+																										<token-local-variable name="prevEntRef" />
+																									</arg-node-set>
+																									<arg-actions>
+																										<do-if>
+																											<arg-conditions>
+																												<and>
+																													<if-xpath op="true">$current-node/attr/value[component[@name="volume"]/text()=$entitlementDN and component[@name="nameSpace"]/text()="1"]
+</if-xpath>
+																												</and>
+																											</arg-conditions>
+																											<arg-actions>
+																												<do-set-local-variable name="allowAccountGrant" scope="policy">
+																													<arg-string>
+																														<token-text xml:space="preserve">false</token-text>
+																													</arg-string>
+																												</do-set-local-variable>
+																											</arg-actions>
+																											<arg-actions>
+																												<do-set-local-variable name="allowAccountGrant" scope="policy">
+																													<arg-string>
+																														<token-text xml:space="preserve">true</token-text>
+																													</arg-string>
+																												</do-set-local-variable>
+																											</arg-actions>
+																										</do-if>
+																									</arg-actions>
+																								</do-for-each>
+																								<do-if>
+																									<arg-conditions>
+																										<and>
+																											<if-local-variable mode="nocase" name="allowAccountGrant" op="equal">true</if-local-variable>
+																										</and>
+																									</arg-conditions>
+																									<arg-actions>
+																										<do-append-xml-element expression="operation-data/permission[last()]" name="pvalue" />
+																										<do-append-xml-text expression="operation-data/permission[last()]/pvalue[last()]">
+																											<arg-string>
+																												<token-text xml:space="preserve">{"ID":"LDAP Server"}</token-text>
+																											</arg-string>
+																										</do-append-xml-text>
+																									</arg-actions>
+																									<arg-actions>
+																										<do-strip-xpath expression="./operation-data/permission[last()]" />
+																									</arg-actions>
+																								</do-if>
+																							</arg-actions>
+																							<arg-actions />
+																						</do-if>
+																					</arg-actions>
+																					<arg-actions>
+																						<do-set-local-variable name="staticMappedResource" scope="policy">
+																							<arg-string>
+																								<token-map dest="staticResource" src="entitlementValue" table="..\StaticValueEntitlementMap">
+																									<token-local-variable name="current-node" />
+																								</token-map>
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-if>
+																							<arg-conditions>
+																								<and>
+																									<if-local-variable mode="nocase" name="staticMappedResource" op="equal" />
+																								</and>
+																							</arg-conditions>
+																							<arg-actions>
+																								<do-append-xml-element expression="operation-data/permission[@dynamic='true'][last()]" name="pvalue" />
+																								<do-append-xml-text expression="operation-data/permission[@dynamic='true'][last()]/pvalue[last()]">
+																									<arg-string>
+																										<token-text xml:space="preserve">{"ID":"</token-text>
+																										<token-local-variable name="current-node" />
+																										<token-text xml:space="preserve">"}</token-text>
+																									</arg-string>
+																								</do-append-xml-text>
+																							</arg-actions>
+																							<arg-actions>
+																								<do-append-xml-element expression="operation-data" name="permission" />
+																								<do-set-xml-attr expression="operation-data/permission[last()]" name="entitlement">
+																									<arg-string>
+																										<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+																											<token-local-variable name="entitlementQualifiedDn" />
+																										</token-parse-dn>
+																									</arg-string>
+																								</do-set-xml-attr>
+																								<do-set-xml-attr expression="operation-data/permission[last()]" name="resource">
+																									<arg-string>
+																										<token-local-variable name="staticMappedResource" />
+																									</arg-string>
+																								</do-set-xml-attr>
+																								<do-set-xml-attr expression="operation-data/permission[last()]" name="dynamic">
+																									<arg-string>
+																										<token-text xml:space="preserve">false</token-text>
+																									</arg-string>
+																								</do-set-xml-attr>
+																								<do-set-xml-attr expression="operation-data/permission[last()]" name="name">
+																									<arg-string>
+																										<token-local-variable name="assignAttr" />
+																									</arg-string>
+																								</do-set-xml-attr>
+																							</arg-actions>
+																						</do-if>
+																					</arg-actions>
+																				</do-if>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="addStaticValues" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">false</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<or>
+																			<if-local-variable mode="nocase" name="assignAttr" op="equal">Login Disabled</if-local-variable>
+																			<if-local-variable mode="nocase" name="assignAttr" op="equal">Group Membership</if-local-variable>
+																		</or>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="addStaticValues" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">true</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-global-variable mode="nocase" name="drv.entitlement.onboarding.all" op="equal">true</if-global-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="addStaticValues" scope="policy">
+																					<arg-string>
+																						<token-text xml:space="preserve">true</token-text>
+																					</arg-string>
+																				</do-set-local-variable>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-for-each>
+																					<arg-node-set>
+																						<token-global-variable name="drv.entitlement.onboardEnt" />
+																					</arg-node-set>
+																					<arg-actions>
+																						<do-set-local-variable name="givenAttr" scope="policy">
+																							<arg-string>
+																								<token-xpath expression="$current-node/definition[@name=&quot;drv.entitlement.entName&quot;]/value/text()" />
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-if>
+																							<arg-conditions>
+																								<and>
+																									<if-local-variable mode="nocase" name="givenAttr" op="equal">$assignAttr$</if-local-variable>
+																								</and>
+																							</arg-conditions>
+																							<arg-actions>
+																								<do-set-local-variable name="addStaticValues" scope="policy">
+																									<arg-string>
+																										<token-text xml:space="preserve">true</token-text>
+																									</arg-string>
+																								</do-set-local-variable>
+																							</arg-actions>
+																							<arg-actions />
+																						</do-if>
+																					</arg-actions>
+																				</do-for-each>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																</do-if>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="addStaticValues" op="equal">true</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="static-values" scope="policy">
+																			<arg-node-set>
+																				<token-src-attr name="$current-node$" />
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-for-each>
+																			<arg-node-set>
+																				<token-local-variable name="static-values" />
+																			</arg-node-set>
+																			<arg-actions>
+																				<do-set-local-variable name="staticMappedUserResource" scope="policy">
+																					<arg-string>
+																						<token-map dest="staticResource" src="entitlementValue" table="..\StaticValueEntitlementMap">
+																							<token-local-variable name="current-node" />
+																						</token-map>
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-if>
+																					<arg-conditions>
+																						<and>
+																							<if-local-variable mode="nocase" name="staticMappedUserResource" op="not-equal" />
+																						</and>
+																					</arg-conditions>
+																					<arg-actions>
+																						<do-set-local-variable name="entitlementDN" scope="policy">
+																							<arg-string>
+																								<token-map dest="entitlementDN" src="assignmentAttribute" table="..\PermissionEntMapping">
+																									<token-local-variable name="assignAttr" />
+																								</token-map>
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-set-local-variable name="entitlementObj" scope="policy">
+																							<arg-node-set>
+																								<token-query class-name="DirXML-Entitlement" scope="entry">
+																									<arg-dn>
+																										<token-local-variable name="entitlementDN" />
+																									</arg-dn>
+																								</token-query>
+																							</arg-node-set>
+																						</do-set-local-variable>
+																						<do-set-local-variable name="entitlementQualifiedDn" scope="policy">
+																							<arg-string>
+																								<token-xpath expression="$entitlementObj/@qualified-src-dn" />
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-append-xml-element expression="operation-data" name="permission" />
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="entitlement">
+																							<arg-string>
+																								<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+																									<token-local-variable name="entitlementQualifiedDn" />
+																								</token-parse-dn>
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="resource">
+																							<arg-string>
+																								<token-local-variable name="staticMappedUserResource" />
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="dynamic">
+																							<arg-string>
+																								<token-text xml:space="preserve">false</token-text>
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-set-xml-attr expression="operation-data/permission[last()]" name="name">
+																							<arg-string>
+																								<token-local-variable name="assignAttr" />
+																							</arg-string>
+																						</do-set-xml-attr>
+																					</arg-actions>
+																					<arg-actions />
+																				</do-if>
+																			</arg-actions>
+																		</do-for-each>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-if>
+														
+														
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">operation-data/permission</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="userQualifiedLDAPDn">
+													<arg-string>
+														<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+															<token-local-variable name="qualifiedDestDn" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-append-xml-element expression="operation-data" name="object-dn" />
+												<do-append-xml-text expression="operation-data/object-dn">
+													<arg-string>
+														<token-local-variable name="userQualifiedLDAPDn" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+															<token-global-variable name="UAProvAdmin" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="ua-admin-pwd" notrace="true" scope="policy">
+													<arg-string>
+														<token-dest-attr name="nspmDistributionPassword">
+															<arg-dn>
+																<token-parse-dn dest-dn-format="slash" src-dn-format="qualified-dot">
+																	<token-global-variable name="UAProvAdmin" />
+																</token-parse-dn>
+															</arg-dn>
+														</token-dest-attr>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="payload" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$current-op/operation-data" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="prov-payload" scope="policy">
+													<arg-string>
+														<token-base64-encode charset="UTF-8">
+															<token-xml-serialize>
+																<token-local-variable name="payload" />
+															</token-xml-serialize>
+														</token-base64-encode>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="rpStatus" scope="policy">
+													<arg-string>
+														<token-xpath expression="ps:ReconcilePermissions($UAProvURL, $adminQualifiedLDAPDn, $ua-admin-pwd, $userQualifiedLDAPDn, 1000, $prov-payload, true)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">ReconcilePermissions status: </token-text>
+														<token-local-variable name="rpStatus" />
+													</arg-string>
+												</do-trace-message>
+												<do-strip-xpath expression="./operation-data/permission" />
+												<do-strip-xpath expression="./operation-data/object-dn" />
+												<do-strip-xpath expression="./operation-data/mapping-table" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

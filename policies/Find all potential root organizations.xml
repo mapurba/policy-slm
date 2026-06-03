@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Find all potential root organizations</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">trigger</if-operation>
+											<if-xpath op="true">@source='dm-maintenance'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="potRootOrgs" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-sapO" datastore="src">
+													<arg-dn>
+														<token-global-variable name="dvr.saphr.driverdn" />
+														<token-text xml:space="preserve">\sap\om\o</token-text>
+													</arg-dn>
+													<arg-match-attr name="DirXML-sapO-R-B-O-002">
+														<arg-value type="string">
+															<token-text xml:space="preserve">*</token-text>
+														</arg-value>
+													</arg-match-attr>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-sapO-R-B-O-002</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-sapO-R-A-O-002</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">GUID</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

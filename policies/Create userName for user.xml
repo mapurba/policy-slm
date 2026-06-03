@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create userName for user</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">user</if-class-name>
+											<if-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" op="available" />
+											<if-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="User" name="urn:ietf:params:scim:schemas:core:2.0:User:userName">
+											<arg-value type="string">
+												<token-substring length="1">
+													<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+												</token-substring>
+												<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

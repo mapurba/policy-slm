@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account entitlement: do not match existing accounts</description>
+									<comment xml:space="preserve">When using the Account entitlement with the Identity Manager user application or Role Based Entitlements, accounts are created and deleted/disabled by granting or revoking the entitlement. Default policy does not create accounts from DB because the accounts are controlled by an entitlement in the vault. Replace this rule with your own matching policy if you want accounts to match existing accounts in the vault.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-entitlement name="Account" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

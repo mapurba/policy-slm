@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Update EntitlementConfiguration resource with necessary changes</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="entConfigDN" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</token-parse-dn>
+												<token-text xml:space="preserve">/EntitlementConfiguration</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="entConfigXML" scope="policy">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-text xml:space="preserve">vnd.nds.stream:/</token-text>
+														<token-local-variable name="entConfigDN" />
+														<token-text xml:space="preserve">#DirXML-Data</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-xpath expression="$entConfigXML//connections" />
+										<do-set-local-variable name="connDN" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Resource" scope="subordinates">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-match-attr name="DirXML-ContentType">
+														<arg-value>
+															<token-text xml:space="preserve">application/vnd.novell.dirxml.fanout-enabled+xml</token-text>
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">count($connDN)=0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Updating "EntilementConfiguration" resource by appending FanOut connections information...</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-append-xml-element expression="$entConfigXML/entitlement-configuration" name="connections" />
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">No FanOut connection information is found. Kindly check if you have configured FanOut connections and enabled it.</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="connDN" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="connName" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="slash" length="1" src-dn-format="slash" start="-1">
+															<token-xpath expression="$current-node/@src-dn" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-append-xml-element expression="$entConfigXML/entitlement-configuration/connections" name="connection" />
+												<do-set-xml-attr expression="$entConfigXML/entitlement-configuration/connections/connection[last()]" name="name">
+													<arg-string>
+														<token-local-variable name="connName" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$entConfigXML/entitlement-configuration/connections/connection[last()]" name="query-attr" />
+												<do-set-xml-attr expression="$entConfigXML/entitlement-configuration/connections/connection[last()]/query-attr" name="name">
+													<arg-string>
+														<token-text xml:space="preserve">connection-dn</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-text expression="$entConfigXML/entitlement-configuration/connections/connection[last()]/query-attr">
+													<arg-string>
+														<token-local-variable name="connName" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="$entConfigXML/entitlement-configuration/connections/connection[last()]" name="query-instance" />
+												<do-set-xml-attr expression="$entConfigXML/entitlement-configuration/connections/connection[last()]/query-instance" name="langCode">
+													<arg-string>
+														<token-text xml:space="preserve">en</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$entConfigXML/entitlement-configuration/connections/connection[last()]/query-instance" name="query-xml" />
+											</arg-actions>
+										</do-for-each>
+										<do-append-xml-element expression="$entConfigXML//entitlement/parameters[parameter/@name='ID']" name="parameter" />
+										<do-set-xml-attr expression="$entConfigXML//entitlement/parameters[parameter/@name='ID']/parameter[last()]" name="name">
+											<arg-string>
+												<token-text xml:space="preserve">LIID</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="$entConfigXML//parameter[@name='LIID']" name="mandatory">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="$entConfigXML//parameter[@name='LIID']" name="source">
+											<arg-string>
+												<token-text xml:space="preserve">connection</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-strip-xpath expression="$entConfigXML//entitlement/parameters/parameter[@name='ID2']" />
+										<do-set-local-variable name="entConfigDN" scope="policy">
+											<arg-string>
+												<token-replace-all regex="/" replace-with="\\">
+													<token-local-variable name="entConfigDN" />
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-Data">
+											<arg-dn>
+												<token-local-variable name="entConfigDN" />
+											</arg-dn>
+											<arg-value type="octet">
+												<token-base64-encode>
+													<token-xml-serialize>
+														<token-local-variable name="entConfigXML" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

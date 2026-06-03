@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Disable and Expire GroupWise External Entity on eDirectory GroupWise External Entity Disable</description>
+									<conditions>
+										<and>
+											<if-global-variable name="driver.gw.GWExternalEntityDisable" op="equal">dispire</if-global-variable>
+											<if-op-attr name="Login Disabled" op="equal">true</if-op-attr>
+											<if-class-name op="equal">GroupWise External Entity</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="NGW: Mailbox Expiration Time">
+											<arg-value>
+												
+												<token-xpath expression="int:new(date:getTime(date:new()) div 1000)" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-break />
+									</actions>
+								</rule>
+								

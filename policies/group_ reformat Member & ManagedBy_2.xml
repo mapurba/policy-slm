@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>group: reformat Member &amp; ManagedBy</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="attrNS" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="modify-attr[@attr-name='Member']//value | add-attr[@attr-name='Member']/value | modify-attr[@attr-name='ManagedBy']//value | add-attr[@attr-name='ManagedBy']/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="attrNS" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="nodeVal" scope="policy">
+													<arg-string>
+														<token-parse-dn length="1" start="-1">
+															<token-xpath expression="$current-node/text()" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="$current-node/text()" />
+												<do-append-xml-text expression="$current-node">
+													<arg-string>
+														<token-xpath expression="$nodeVal" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

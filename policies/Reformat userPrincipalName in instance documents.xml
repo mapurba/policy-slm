@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat userPrincipalName in instance documents</description>
+									<comment xml:space="preserve">remove domain name from userPrincipleName attribute in instance documents for non-data collection queries</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-attr name="userPrincipalName" op="available" />
+											<if-op-property mode="nocase" name="data-collection-query" op="not-equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-reformat-op-attr name="userPrincipalName">
+											<arg-value type="string">
+												<token-split delimiter="@">
+													<token-op-attr name="userPrincipalName" />
+												</token-split>
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+							

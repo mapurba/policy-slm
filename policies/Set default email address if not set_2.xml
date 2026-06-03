@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set default email address if not set</description>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="BBObjectType" op="equal">DirXML-BB-Person</if-op-property>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-op-attr name="DirXML-BB-p-email" op="not-available" />
+											<if-global-variable mode="nocase" name="auto_set_email" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-default-attr-value name="Internet EMail Address" write-back="true">
+											<arg-value type="string">
+												<token-attr name="CN" />
+												<token-text>@</token-text>
+												<token-global-variable name="default_email_domain" />
+											</arg-value>
+										</do-set-default-attr-value>
+									</actions>
+								</rule>
+								

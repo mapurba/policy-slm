@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>strip out future and historic values</description>
+									<comment xml:space="preserve">changed by hdopp@novell to fix Bug 523509
+</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="now" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:getSeconds(es:xdsQschedule(0), 'yyyyMMddhhmmss')" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="add-attr/value[(es:getSeconds(substring-before(@timestamp, '-'), 'yyyyMMdd') &gt; $now) and (string-length(substring-before(@timestamp, '-')) &gt; 0) and (../@attr-name!='DirXML-sapPID') and (../@attr-name!='DirXML-sapPActions')]" />
+										<do-strip-xpath expression="add-attr/value[(es:getSeconds(substring-after(@timestamp, '-'), 'yyyyMMdd') &lt; $now) and (string-length(substring-before(@timestamp, '-')) &gt; 0)  and (../@attr-name!='DirXML-sapPID') and (../@attr-name!='DirXML-sapPActions')]" />
+									</actions>
+								</rule>
+							

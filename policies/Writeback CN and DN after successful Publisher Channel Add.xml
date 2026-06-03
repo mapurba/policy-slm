@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Writeback CN and DN after successful Publisher Channel Add</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">status</if-operation>
+											<if-xpath op="true">self::status[@level = 'success']/operation-data/peoplesoft-cn</if-xpath>
+											<if-xpath op="true">self::status[@level = 'success']/operation-data/peoplesoft-dn</if-xpath>
+											<if-xpath op="true">self::status[@level = 'success']/operation-data/peoplesoft-src-id</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value direct="true" name="COMMON_NAME">
+											<arg-association>
+												<token-xpath expression="operation-data/peoplesoft-src-id" />
+											</arg-association>
+											<arg-value type="string">
+												<token-xpath expression="operation-data/peoplesoft-cn" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value direct="true" name="DISTINGUISHED_NAME">
+											<arg-association>
+												<token-xpath expression="operation-data/peoplesoft-src-id" />
+											</arg-association>
+											<arg-value type="string">
+												<token-xpath expression="operation-data/peoplesoft-dn" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

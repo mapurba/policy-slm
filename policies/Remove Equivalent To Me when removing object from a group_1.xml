@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove Equivalent To Me when removing object from a group</description>
+									<comment xml:space="preserve">The identity Vault gives group members the rights of the group by adding the object to the "Equivalent to Me" attribute. Remove the object now.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="case" op="equal">Group</if-class-name>
+											<if-op-attr mode="regex" name="Member" op="changing-from">.+</if-op-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-remove-dest-attr-value name="Equivalent To Me">
+											<arg-value type="string">
+												<token-xpath expression="./modify-attr[@attr-name='Member']/remove-value/value" />
+											</arg-value>
+										</do-remove-dest-attr-value>
+									</actions>
+								</rule>
+								

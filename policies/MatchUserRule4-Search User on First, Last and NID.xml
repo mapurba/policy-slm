@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>MatchUserRule4-Search User on First, Last and NID</description>
+									<comment xml:space="preserve">This rule will match user on on First, Last, NID</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="regex" name="gvUserMatchAttr" op="equal">worker-pub-match-name-nid|worker-pub-match-all</if-global-variable>
+											<if-local-variable mode="nocase" name="lvUserStopSearch" op="equal">false</if-local-variable>
+											<if-operation op="equal">add</if-operation>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="~gvNIDAttr~" op="available" />
+											<if-op-attr name="~gvLegalFirstNameAttr~" op="available" />
+											<if-op-attr name="~gvLegalLastNameAttr~" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvUserNodeSetMatchOnFirstLastNID" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" max-result-count="100">
+													<arg-dn>
+														<token-global-variable name="gvUserContainer" />
+													</arg-dn>
+													<arg-match-attr name="~gvLegalFirstNameAttr~" />
+													<arg-match-attr name="~gvLegalLastNameAttr~" />
+													<arg-match-attr name="~gvNIDAttr~">
+														<arg-value type="string">
+															<token-local-variable name="lvNationalID" />
+														</arg-value>
+													</arg-match-attr>
+													<arg-string>
+														<token-text xml:space="preserve">CN</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-trace-message level="1">
+											<arg-string>
+												<token-text xml:space="preserve">User Count Match On First, Last and NID including associated: </token-text>
+												<token-xpath expression="count($lvUserNodeSetMatchOnFirstLastNID)" />
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="lvCountUnAssociatedUserMatch" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">0</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvIDVUserIDListWithMultipleMatch" scope="policy">
+											<arg-string />
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$lvUserNodeSetMatchOnFirstLastNID//attr[@attr-name='CN']/value/." />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">starts-with($current-node/../../association,'WorkforceID=')</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lvCountUnAssociatedUserMatch" scope="policy">
+															<arg-string>
+																<token-xpath expression="$lvCountUnAssociatedUserMatch + 1" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lvIDVUserIDListWithMultipleMatch" scope="policy">
+															<arg-string>
+																<token-local-variable name="lvIDVUserIDListWithMultipleMatch" />
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">; </token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-trace-message level="1">
+											<arg-string>
+												<token-text xml:space="preserve">Count of Unassociated User Match: </token-text>
+												<token-local-variable name="lvCountUnAssociatedUserMatch" />
+											</arg-string>
+										</do-trace-message>
+										<do-trace-message level="1">
+											<arg-string>
+												<token-text xml:space="preserve">lvIDVUserIDListWithMultipleMatch: </token-text>
+												<token-local-variable name="lvIDVUserIDListWithMultipleMatch" />
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">$lvCountUnAssociatedUserMatch = 1</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$lvUserNodeSetMatchOnFirstLastNID//attr[@attr-name='CN']/value/." />
+													</arg-node-set>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="not-true">starts-with($current-node/../../association,'WorkforceID=')</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvUserCN" scope="driver">
+																	<arg-string>
+																		<token-xpath expression="$lvUserNodeSetMatchOnFirstLastNID//attr[@attr-name='CN']/value/." />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="lvUserStopSearch" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-find-matching-object scope="subtree">
+																	<arg-dn>
+																		<token-global-variable name="gvUserContainer" />
+																	</arg-dn>
+																	<arg-match-attr name="CN">
+																		<arg-value type="string">
+																			<token-local-variable name="lvUserCN" />
+																		</arg-value>
+																	</arg-match-attr>
+																</do-find-matching-object>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">$lvCountUnAssociatedUserMatch &gt; 1</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvUserStopSearch" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvMultipleUserSearchCountOnFirstLastNID" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvUserStopSearchIDMAdminNotify" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvMatchingCritera" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">FirstName,LastName,NID</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message level="1">
+													<arg-string>
+														<token-text xml:space="preserve">User Count NOT ASSOCIATED with Match On First, Last, Last4SSN:</token-text>
+														<token-local-variable name="lvCountUnAssociatedUserMatch" />
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

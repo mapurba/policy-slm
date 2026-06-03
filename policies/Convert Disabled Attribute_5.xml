@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert Disabled Attribute</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-class-name mode="regex" op="equal">indirect.usr|direct.view_usr</if-class-name>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="disabled" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr mode="regex" name="disabled" op="equal">t|true|1</if-op-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="./attr[@attr-name='disabled']/value/text()" />
+														<do-append-xml-text expression="./attr[@attr-name='disabled']/value">
+															<arg-string>
+																<token-text>TRUE</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions>
+														<do-strip-xpath expression="./attr[@attr-name='disabled']/value/text()" />
+														<do-append-xml-text expression="./attr[@attr-name='disabled']/value">
+															<arg-string>
+																<token-text>FALSE</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

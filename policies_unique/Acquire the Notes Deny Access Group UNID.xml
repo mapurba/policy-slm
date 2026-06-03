@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Acquire the Notes Deny Access Group UNID</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="regex" name="DenyAccessGrpUNID" op="not-equal">.+</if-local-variable>
+											<if-global-variable mode="nocase" name="drv.account.status.DenyAccessGroup.use" op="equal">true</if-global-variable>
+											<if-operation op="equal">modify</if-operation>
+											<if-class-name mode="nocase" op="equal">Person</if-class-name>
+											<if-op-attr name="NOVLNOTEASTS-denyAccess" op="changing" />
+											<if-global-variable mode="regex" name="drv.account.status.DenyAccessGroup.name" op="equal">.+</if-global-variable>
+										</and>
+										<and>
+											<if-local-variable mode="regex" name="DenyAccessGrpUNID" op="not-equal">.+</if-local-variable>
+											<if-global-variable mode="nocase" name="drv.account.status.DenyAccessGroup.use" op="equal">true</if-global-variable>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">Person</if-class-name>
+											<if-global-variable mode="regex" name="drv.account.status.DenyAccessGroup.name" op="equal">.+</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ReturnDenyAccessGrpDoc" scope="policy">
+											<arg-node-set>
+												<token-query class-name="Group" datastore="dest" scope="entry">
+													<arg-dn>
+														<token-global-variable name="drv.account.status.DenyAccessGroup.name" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">Members</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="DenyAccessGrpUNID" scope="driver">
+											<arg-string>
+												<token-xpath expression="$ReturnDenyAccessGrpDoc/association/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Acc Status: Acquired DenyAccessGrpUNID: </token-text>
+												<token-local-variable name="DenyAccessGrpUNID" />
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="DenyAccessGrpMembers" scope="driver">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;members/&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="$DenyAccessGrpMembers/members" src-expression="$ReturnDenyAccessGrpDoc/attr[@attr-name='Members']/value" />
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Acc Status: Acquired DenyAccessGrpMembers: </token-text>
+												<token-xml-serialize>
+													<token-local-variable name="DenyAccessGrpMembers" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>map rename to Active Directory logon name</description>
+									<comment xml:space="preserve">Active Directory logon name  (userPrincipalName) policy: keep destination userPrincipalName in sync with source object name.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="UpnMap" op="equal">edir-name-auth</if-global-variable>
+											<if-operation op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName">
+											<arg-value>
+												<token-local-variable name="object-name" />
+												<token-text xml:space="preserve">@</token-text>
+												<token-global-variable name="drv.domain.dns.name" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName">
+											<arg-value>
+												<token-local-variable name="object-name" />
+												<token-text xml:space="preserve">@</token-text>
+												<token-global-variable name="drv.domain.dns.name" />
+											</arg-value>
+										</do-set-src-attr-value>
+									</actions>
+								</rule>
+								

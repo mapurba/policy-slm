@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Fanout unassociated objects by UserAccount Entitlement Grant</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-entitlement name="UserAccount" op="changing" />
+											<if-association op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="fanout" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="granted-lsname" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="granted-lsname" op="not-equal">$primLogicalSystemName$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="fanout" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="fanout" op="equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Detected fanout condition. Preparing to fanout event for un-associated object: </token-text>
+														<token-src-name />
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="filter" scope="policy">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-DriverFilter</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-added-entitlement name="UserAccount" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="granted-lsname" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">granted-lsname=$granted-lsname$</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-set-local-variable name="granted-clsname-dvn" scope="policy">
+															<arg-string>
+																<token-local-variable name="granted-lsname" />
+																<token-text xml:space="preserve">-clsname</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="granted-clsname" scope="policy">
+															<arg-string>
+																<token-local-variable name="$granted-clsname-dvn$" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">granted-clsname=$granted-clsname$</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-set-local-variable name="granted-ctype-dvn" scope="policy">
+															<arg-string>
+																<token-local-variable name="granted-lsname" />
+																<token-text xml:space="preserve">-ctype</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="granted-ctype" scope="policy">
+															<arg-string>
+																<token-local-variable name="$granted-ctype-dvn$" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">granted-ctype=$granted-ctype$</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="granted-ctype" op="not-equal">cua-child</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Fanning-out to system: $granted-lsname$</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="class-name" scope="policy">
+																	<arg-string>
+																		<token-class-name />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-add-dest-object class-name="$class-name$" when="after">
+																	<arg-dn>
+																		<token-text xml:space="preserve">fanout</token-text>
+																	</arg-dn>
+																</do-add-dest-object>
+																<do-set-xml-attr expression="../add[last()]/operation-data" name="lsname">
+																	<arg-string>
+																		<token-local-variable name="granted-lsname" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$filter/filter/filter-class[@class-name=@class-name]/filter-attr[@subscriber='sync' or @subscriber='notify']/@attr-name" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-local-variable name="value" scope="policy">
+																			<arg-node-set>
+																				<token-attr name="$current-node$" />
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-xpath op="true">count($value)&gt;0</if-xpath>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-add-dest-attr-value class-name="$class-name$" name="$current-node$" when="after">
+																					<arg-dn>
+																						<token-text xml:space="preserve">fanout</token-text>
+																					</arg-dn>
+																					<arg-value />
+																				</do-add-dest-attr-value>
+																				<do-strip-xpath expression="../add[last()]/add-attr[@attr-name=$current-node]/value" />
+																				<do-clone-xpath dest-expression="../add[last()]/add-attr[@attr-name=$current-node]" src-expression="$value" />
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																</do-for-each>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="../add[last()]/add-attr[@attr-name='DirXML-EntitlementRef']/value" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-local-variable name="edn" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="$current-node/component[@name='volume']/text()" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="edn" op="equal">$dirxml.auto.driverdn$</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="entref-lsname" scope="policy">
+																					<arg-string>
+																						<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node/component[@name='path.xml']/ref/param, 'LIID', 'LSNAME')" />
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-if>
+																					<arg-conditions>
+																						<and>
+																							<if-local-variable mode="regex" name="entref-lsname" op="equal">.+</if-local-variable>
+																						</and>
+																					</arg-conditions>
+																					<arg-actions>
+																						<do-set-local-variable name="dvn" scope="policy">
+																							<arg-string>
+																								<token-local-variable name="entref-lsname" />
+																								<token-text xml:space="preserve">-clsname</token-text>
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-set-local-variable name="entref-clsname" scope="policy">
+																							<arg-string>
+																								<token-local-variable name="$dvn$" />
+																							</arg-string>
+																						</do-set-local-variable>
+																						<do-if>
+																							<arg-conditions>
+																								<and>
+																									<if-local-variable mode="nocase" name="entref-lsname" op="not-equal">$granted-lsname$</if-local-variable>
+																									<if-local-variable mode="nocase" name="entref-clsname" op="not-equal">$granted-lsname$</if-local-variable>
+																								</and>
+																							</arg-conditions>
+																							<arg-actions>
+																								<do-strip-xpath expression="../add[last()]/add-attr[@attr-name='DirXML-EntitlementRef']/value[es:getEntParamFieldBackwardsCompatible(component[@name='path.xml']/ref/param/text(), 'LIID', 'LSNAME')=$entref-lsname]" />
+																							</arg-actions>
+																							<arg-actions />
+																						</do-if>
+																					</arg-actions>
+																					<arg-actions />
+																				</do-if>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																</do-for-each>
+																<do-set-xml-attr expression="../add[last()]" name="src-dn">
+																	<arg-string>
+																		<token-src-dn />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-strip-xpath expression="../add[last()]/@dest-dn" />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+												<do-strip-xpath expression="../add/operation-data/entitlement-impl" />
+												<do-strip-xpath expression=".[count(operation-data/@lsname)=0]" />
+											</arg-actions>
+											<arg-actions>
+												<do-set-op-property name="lsname">
+													<arg-string>
+														<token-local-variable name="primLogicalSystemName" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-src-attr name="DirXML-EntitlementRef" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="edn" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="src-dn" length="-2">
+															<token-xpath expression="$current-node/component[@name='volume']/text()" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="edn" op="equal">$dirxml.auto.driverdn$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="entref-lsname" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node/component[@name='path.xml']/ref/param, 'LIID', 'LSNAME')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="regex" name="entref-lsname" op="equal">.+</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="dvn" scope="policy">
+																	<arg-string>
+																		<token-local-variable name="entref-lsname" />
+																		<token-text xml:space="preserve">-clsname</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="entref-clsname" scope="policy">
+																	<arg-string>
+																		<token-local-variable name="$dvn$" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="entref-lsname" op="not-equal">$lsname$</if-local-variable>
+																			<if-local-variable mode="nocase" name="entref-clsname" op="not-equal">$lsname$</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-strip-xpath expression="./add-attr[@attr-name='DirXML-EntitlementRef']/value[es:getEntParamFieldBackwardsCompatible(component[@name='path.xml']/ref/param/text(), 'LIID', 'LSNAME')=$entref-lsname]" />
+																		<do-strip-xpath expression="./modify-attr[@attr-name='DirXML-EntitlementRef']/node()[es:getEntParamFieldBackwardsCompatible(value/component[@name='path.xml']/ref/param/text(), 'LIID', 'LSNAME')=$entref-lsname]" />
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="./node()[@attr-name='DirXML-EntitlementRef'][count(node())=0]" />
+										<do-strip-xpath expression=".[count(modify-attr)=0 and count(add-attr)=0]" />
+									</actions>
+								</rule>
+								

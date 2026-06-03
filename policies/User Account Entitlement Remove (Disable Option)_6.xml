@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Entitlement Remove (Disable Option)</description>
+									<comment>The User Account Entitlement grants the user an enabled account in Active Directory. Revoking the entitlement will disable or delete the Active Directory account depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the disable option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-entitlement name="UserAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled">
+													<arg-value type="state">
+														<token-text>true</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+												<do-clear-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName" />
+												<do-clear-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:Group:DirXML-ADContext" />
+												<do-remove-association when="after">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</do-remove-association>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

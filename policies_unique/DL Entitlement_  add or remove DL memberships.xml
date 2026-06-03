@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>DL Entitlement:  add or remove DL memberships</description>
+									<conditions>
+										<and>
+											<if-entitlement name="gwDistLists" op="changing" />
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="gwDistLists" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="dlDn" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="User" name="Distribution List DN">
+													<arg-value type="string">
+														<token-local-variable name="dlDn" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="gwDistLists" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="dlDn" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-remove-dest-attr-value class-name="User" name="Distribution List DN">
+													<arg-value type="string">
+														<token-local-variable name="dlDn" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

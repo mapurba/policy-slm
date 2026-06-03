@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>generate full name if not in ILM Vault</description>
+									<comment xml:space="preserve">Full name policy: Generate a urn:ietf:params:scim:schemas:core:2.0:User:name.formatted from urn:ietf:params:scim:schemas:core:2.0:User:name.givenName + urn:ietf:params:scim:schemas:core:2.0:User:name.familyName if one does not already exist. The value is set in the ILM Vault and in the current operation to Active Directory. This policy assumes that urn:ietf:params:scim:schemas:core:2.0:User:name.formatted synchronization is enabled in the subscriber filter. If you disable urn:ietf:params:scim:schemas:core:2.0:User:name.formatted in the subscriber filter you should not use urn:ietf:params:scim:schemas:core:2.0:User:name.formatted mapping.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="case" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="FullNameMap" op="equal">true</if-global-variable>
+											<if-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted" op="not-available" />
+											<if-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="gen-full-name">
+											<arg-string>
+												<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+												<token-text xml:space="preserve"> </token-text>
+												<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-src-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted">
+											<arg-value>
+												<token-xpath expression="normalize-space($gen-full-name)" />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted">
+											<arg-value>
+												<token-xpath expression="normalize-space($gen-full-name)" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

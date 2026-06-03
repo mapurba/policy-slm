@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Group Add: Default values</description>
+									<conditions>
+										<and>
+											<if-class-name mode="regex" op="equal">Group</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value name="mailNickname">
+											<arg-value type="string">
+												<token-replace-all regex="[^A-Za-z0-9-_!#~]" replace-with="">
+													<token-join>
+														<token-split delimiter=" ">
+															<token-op-attr name="CN" />
+														</token-split>
+													</token-join>
+												</token-replace-all>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value class-name="User" name="mailEnabled">
+											<arg-value type="string">
+												<token-text xml:space="preserve">false</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value class-name="User" name="securityEnabled">
+											<arg-value type="string">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

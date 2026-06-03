@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Secondary connections</description>
+									<conditions />
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$shimConfigInfo/driver-config/subscriber-options/configuration-values/definitions/definition[@name='nsap-alt-conn-info']/value/instance" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="logicalSystemName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name='logicalSystemName']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">--- </token-text>
+														<token-text xml:space="preserve">logicalSystemName=</token-text>
+														<token-local-variable name="logicalSystemName" />
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="langCode" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name='langCode']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">--- </token-text>
+														<token-text xml:space="preserve">langCode=</token-text>
+														<token-local-variable name="langCode" />
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="availableLanguageCodes" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$current-node/definition[@name='availableLanguageCodes']/value/item" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">--- additional available language codes:</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$availableLanguageCodes[./text()!=$langCode]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">---- </token-text>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+												</do-for-each>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections" name="connection" />
+												<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]" name="name">
+													<arg-string>
+														<token-local-variable name="logicalSystemName" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]" name="query-attr" />
+												<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]/query-attr[last()]" name="name">
+													<arg-string>
+														<token-text xml:space="preserve">dest-dn</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-text expression="$xml/entitlement-configuration/connections/connection[last()]/query-attr[last()]">
+													<arg-string>
+														<token-text xml:space="preserve">\</token-text>
+														<token-local-variable name="logicalSystemName" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]" name="query-instance" />
+												<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]" name="langCode">
+													<arg-string>
+														<token-local-variable name="langCode" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]" name="query-xml" />
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]" name="search-attr" />
+												<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]/search-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">LANGCODE</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]/search-attr[last()]" name="value" />
+												<do-append-xml-text expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]/search-attr[last()]/value[last()]">
+													<arg-string>
+														<token-local-variable name="langCode" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$availableLanguageCodes[./text()!=$langCode]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]" name="query-instance" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]" name="langCode">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]" name="query-xml" />
+														<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]" name="search-attr" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]/search-attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">LANGCODE</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]/search-attr[last()]" name="value" />
+														<do-append-xml-text expression="$xml/entitlement-configuration/connections/connection[last()]/query-instance[last()]/query-xml[last()]/search-attr[last()]/value[last()]">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

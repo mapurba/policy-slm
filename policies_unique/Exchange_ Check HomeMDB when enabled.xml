@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Exchange: Check HomeMDB when enabled</description>
+									<comment xml:space="preserve">Provision Exchange during merge operations. Skip provisioning if the Active Directory user is already mail enabled (e-mail contact only) or mailbox enabled (e-mail user account)</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">user</if-class-name>
+											<if-global-variable mode="nocase" name="drv.exchMailboxMethod" op="equal">policy</if-global-variable>
+											<if-operation op="equal">modify</if-operation>
+											<if-xpath op="true">@from-merge='true'</if-xpath>
+											<if-dest-attr name="homeMDB" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="homeMDB">
+											<arg-value type="string">
+												<token-global-variable name="drv.exchDefaultMDB" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

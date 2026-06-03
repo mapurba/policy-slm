@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>match users based on full name</description>
+									<comment xml:space="preserve">Full name policy: Match user objects in Active Directory whose object name matches the Identity Vault Full Name. Because objects names are only unique within a container, this rule only looks for objects in the same relative position in the hierarchy. This match is not performed if a matching object was found in a previous rule.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="case" op="equal">User</if-class-name>
+											<if-global-variable mode="case" name="name-mapping" op="equal">FullNameMap</if-global-variable>
+											<if-op-attr name="Full Name" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-find-matching-object scope="entry">
+											<arg-dn>
+												<token-text xml:space="preserve">CN=</token-text>
+												<token-escape-for-dest-dn>
+													<token-attr name="Full Name" />
+												</token-escape-for-dest-dn>
+												<token-text>,</token-text>
+												<token-global-variable name="ad-base" />
+											</arg-dn>
+										</do-find-matching-object>
+									</actions>
+								</rule>
+								

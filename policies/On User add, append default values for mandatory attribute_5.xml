@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>On User add, append default values for mandatory attributes</description>
+									<comment xml:space="preserve">salesforce requires the following attributes to create an user object: 
+Alias, Username, Surname, User License (ProfileID), Email, TimeZoneSidKey, EmailEncodingKey, LocaleSidKey and LanguageLocaleKey.
+
+On an add event, this rule will add the values for Alias, Username, TimeZoneSidKey, EmailEncodingKey, LocaleSidKey and LanguageLocaleKey if they are not already present.
+
+The Alias generated here will be the 1st character of the Given Name plus the first 6 characters of the Surname.
+
+The Username generated here will be generated using the value for Email, unless a different value was provided earlier.
+
+The attributes User License (ProfileID), TimeZoneSidKey, EmailEncodingKey, LocaleSidKey and LanguageLocaleKey are read from the driver's GCV if not already present in the add event.
+</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">add</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="Alias" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="Alias">
+													<arg-value type="string">
+														<token-substring length="1">
+															<token-op-attr name="FirstName" />
+														</token-substring>
+														<token-substring length="6">
+															<token-op-attr name="LastName" />
+														</token-substring>
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="Username" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="Username">
+													<arg-value type="string">
+														<token-op-attr name="Email" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="ProfileId" op="not-available" />
+													<if-global-variable mode="nocase" name="NOVLSFBASE.drv.sf.profileid" op="not-equal" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="ProfileId">
+													<arg-value type="string">
+														<token-global-variable name="NOVLSFBASE.drv.sf.profileid" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="TimeZoneSidKey" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="TimeZoneSidKey">
+													<arg-value type="string">
+														<token-global-variable name="NOVLSFBASE.drv.sf.timezonesidkey" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="EmailEncodingKey" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="EmailEncodingKey">
+													<arg-value type="string">
+														<token-global-variable name="NOVLSFBASE.drv.sf.emailencodingkey" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="LocaleSidKey" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="LocaleSidKey">
+													<arg-value type="string">
+														<token-global-variable name="NOVLSFBASE.drv.sf.localesidkey" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="LanguageLocaleKey" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="LanguageLocaleKey">
+													<arg-value type="string">
+														<token-global-variable name="NOVLSFBASE.drv.sf.languagelocalekey" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

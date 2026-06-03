@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>process rename operation</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.role.rename.option" op="equal">2</if-global-variable>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-op-property mode="regex" name="renOld" op="equal">.+</if-op-property>
+											<if-op-property mode="regex" name="renNew" op="equal">.+</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">CopyTo event (out) found ... [</token-text>
+												<token-association />
+												<token-text xml:space="preserve"> - </token-text>
+												<token-op-property name="renOld" />
+												<token-text xml:space="preserve"> --&gt; </token-text>
+												<token-op-property name="renNew" />
+												<token-text xml:space="preserve">]</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',18),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="flow.counter" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">1</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="flow.attr" scope="policy">
+											<arg-string>
+												<token-map default-value="UNKNOWN" dest="block" src="number" table="CopyBlocks">
+													<token-local-variable name="flow.counter" />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="flow.type" scope="policy">
+											<arg-string>
+												<token-map default-value="UNKNOWN" dest="type" src="number" table="CopyBlocks">
+													<token-local-variable name="flow.counter" />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="flow.gcv" scope="policy">
+											<arg-string>
+												<token-map default-value="UNKNOWN" dest="gcv" src="number" table="CopyBlocks">
+													<token-local-variable name="flow.counter" />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+										<do-while>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="flow.attr" op="not-equal">UNKNOWN</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="$flow.gcv$" op="equal">true</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-local-variable name="flow.attr" />
+																<token-text xml:space="preserve"> - </token-text>
+																<token-local-variable name="flow.gcv" />
+																<token-text xml:space="preserve">=</token-text>
+																<token-global-variable name="$flow.gcv$" />
+																<token-text xml:space="preserve"> - </token-text>
+																<token-local-variable name="flow.type" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',22),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="US" scope="entry">
+																			<arg-dn>
+																				<token-dest-dn length="1" />
+																				<token-text xml:space="preserve">\</token-text>
+																				<token-op-property name="renOld" />
+																			</arg-dn>
+																			<arg-string>
+																				<token-text xml:space="preserve">$flow.attr$</token-text>
+																			</arg-string>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="lvTmp" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="US" scope="entry">
+																			<arg-dn>
+																				<token-op-property name="renOld" />
+																			</arg-dn>
+																			<arg-string>
+																				<token-text xml:space="preserve">$flow.attr$</token-text>
+																			</arg-string>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-set-local-variable disabled="true" name="lvTmp" scope="policy">
+															<arg-node-set>
+																<token-query class-name="US" scope="entry">
+																	<arg-dn>
+																		<token-dest-dn length="1" />
+																		<token-text xml:space="preserve">\</token-text>
+																		<token-op-property name="renOld" />
+																	</arg-dn>
+																	<arg-string>
+																		<token-text xml:space="preserve">$flow.attr$</token-text>
+																	</arg-string>
+																</token-query>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-xpath op="true">$lvTmp/attr/value[@subtype='structure']</if-xpath>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="./add-attr[starts-with(@attr-name,$flow.attr)]" />
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$lvTmp/attr/value/component[string-length(.) &gt; 0]" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-local-variable name="this.attr.name" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="$current-node/@name" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-add-dest-attr-value name="$flow.attr$:$this.attr.name$">
+																			<arg-value>
+																				<token-xpath expression="$current-node" />
+																			</arg-value>
+																		</do-add-dest-attr-value>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-xpath op="true">$lvTmp/attr/value[@subtype='table']</if-xpath>
+																	<if-xpath disabled="true" op="true">$lvTmp/attr/value[string-length(@subtype)=0]</if-xpath>
+																	<if-local-variable mode="nocase" name="flow.type" op="equal">table</if-local-variable>
+																</or>
+																<or>
+																	<if-xpath op="true">string-length($lvTmp/attr/@attr-name)!=0</if-xpath>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="./add-attr[starts-with(@attr-name,$flow.attr)]" />
+																<do-append-xml-element expression="." name="add-attr" />
+																<do-set-xml-attr expression="./add-attr[last()]" name="attr-name">
+																	<arg-string>
+																		<token-xpath expression="$lvTmp/attr/@attr-name" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-clone-xpath dest-expression="./add-attr[last()]" src-expression="$lvTmp/attr/value" />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-set-local-variable name="flow.counter" scope="policy">
+													<arg-string>
+														<token-xpath expression="number($flow.counter) + 1" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="flow.attr" scope="policy">
+													<arg-string>
+														<token-map default-value="UNKNOWN" dest="block" src="number" table="CopyBlocks">
+															<token-local-variable name="flow.counter" />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="flow.type" scope="policy">
+													<arg-string>
+														<token-map default-value="UNKNOWN" dest="type" src="number" table="CopyBlocks">
+															<token-local-variable name="flow.counter" />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="flow.gcv" scope="policy">
+													<arg-string>
+														<token-map default-value="UNKNOWN" dest="gcv" src="number" table="CopyBlocks">
+															<token-local-variable name="flow.counter" />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-while>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvDestDN" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">\</token-text>
+														<token-op-property name="lsname" />
+														<token-text xml:space="preserve">\</token-text>
+														<token-op-property name="renOld" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvAss" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">\</token-text>
+														<token-op-property name="lsname" />
+														<token-text xml:space="preserve">\USd</token-text>
+														<token-upper-case>
+															<token-op-property name="renOld" />
+														</token-upper-case>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="lvAss" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">USd</token-text>
+														<token-upper-case>
+															<token-op-property name="renOld" />
+														</token-upper-case>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvDestDN" scope="policy">
+													<arg-string>
+														<token-op-property name="renOld" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="lvCopyTo" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">0</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

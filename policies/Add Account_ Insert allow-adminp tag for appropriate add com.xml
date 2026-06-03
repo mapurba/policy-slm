@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description> Add Account: Insert allow-adminp tag for appropriate add commands</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-global-variable mode="nocase" name="account.cert.pwdchksetting" op="not-equal">default</if-global-variable>
+										</and>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-global-variable name="account.cert.pwdchginterval" op="not-equal" />
+										</and>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-global-variable name="account.cert.pwdgraceperiod" op="not-equal" />
+										</and>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-global-variable name="account.cert.forceinternetpwdchange" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-xml-attr expression="../add[@class-name='User']" name="allow-adminp-support">
+											<arg-string>
+												<token-text>true</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+								

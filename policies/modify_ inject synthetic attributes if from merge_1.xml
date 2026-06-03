@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>modify: inject synthetic attributes if from merge</description>
+									<comment xml:space="preserve">If modify operation is from a merge (due to a match or a sync) then inject the synthetic attributes that we create for the Sentinel Identity attributes that don't have an analogue in eDirectory User attributes (Vault Name, Distinguished Name)</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-xml-attr mode="nocase" name="from-merge" op="equal">true</if-xml-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value class-name="User" name="Distinguished Name">
+											<arg-value type="string">
+												<token-text xml:space="preserve">\</token-text>
+												<token-parse-dn dest-dn-format="slash" length="-1" start="1">
+													<token-src-dn />
+												</token-parse-dn>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-dest-attr-value class-name="identity" name="Vault Name">
+											<arg-value type="string">
+												<token-substring start="1">
+													<token-src-dn length="1" />
+												</token-substring>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-dest-attr-value class-name="User" name="LDAPDN">
+											<arg-value type="string">
+												<token-lower-case>
+													<token-parse-dn dest-dn-format="ldap">
+														<token-xpath expression="@qualified-src-dn" />
+													</token-parse-dn>
+												</token-lower-case>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

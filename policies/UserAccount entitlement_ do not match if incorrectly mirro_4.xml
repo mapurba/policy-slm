@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>UserAccount entitlement: do not match if incorrectly mirrored</description>
+									<comment xml:space="preserve">When using the User Account entitlement with the Identity Manager user application or Role Based Entitlements, accounts are only created for users that are specifically granted the account entitlement and reside in the eDirectory container chosen to mirror. This rule vetoes user account creation when the user resides outsiden the respective mirror container.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-property mode="nocase" name="attempt-to-match" op="not-equal">false</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="addedDomain" scope="policy">
+											<arg-string>
+												<token-added-entitlement name="UserAccount" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="addedDomain" op="not-equal" />
+													<if-local-variable mode="nocase" name="addedDomain" op="not-equal">ID</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="addedDomain" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getIDM4EntParamField($addedDomain,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-property mode="nocase" name="drv.domain.dns.name" op="not-equal">$addedDomain$</if-op-property>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="attempt-to-match">
+															<arg-string>
+																<token-text xml:space="preserve">false</token-text>
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

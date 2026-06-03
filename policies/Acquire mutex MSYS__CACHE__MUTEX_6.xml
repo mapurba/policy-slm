@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Acquire mutex MSYS__CACHE__MUTEX</description>
+									<comment xml:space="preserve">Each IDM driver has two threads: the subscriber and the publisher thread. Both threads might be manipulating the same data, in this case the MSYS__CACHE driver scope variable. To avoid cache corruption, the policy acquires a mutex before manipulating or reading the cache and releases the mutex when done. If the policy finds the mutex unavailable, that means that the same policy has been invoked by the other thread and has to finish its job, before the policy on the current thread can continue. The mutex is another driver scope vairable MSYS__CACHE__MUTEX.</comment>
+									<conditions />
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="MSYS__CACHE__MUTEX" op="equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">MSys Cache: </token-text>
+														<token-text xml:space="preserve">Mutex MSYS__CACHE__MUTEX not available. Retrying in 1 second...</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="tmp" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:doWait('1000')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="MSYS__CACHE__MUTEX" op="equal">true</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">MSys Cache: </token-text>
+																<token-text xml:space="preserve">Mutex MSYS__CACHE__MUTEX not available. Retrying in 1 second...</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-set-local-variable name="tmp" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:doWait('1000')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="MSYS__CACHE__MUTEX" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">MSys Cache: </token-text>
+																		<token-text xml:space="preserve">Mutex MSYS__CACHE__MUTEX not available. Retrying in 1 second...</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-set-local-variable name="tmp" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:doWait('1000')" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="MSYS__CACHE__MUTEX" op="not-equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="MSYS__CACHE__MUTEX" scope="driver">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">MSys Cache: </token-text>
+														<token-text xml:space="preserve">Successfully acquired mutex MSYS__CACHE__MUTEX.</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions>
+												<do-status level="error">
+													<arg-string>
+														<token-text xml:space="preserve">MSys Cache: </token-text>
+														<token-text xml:space="preserve">Unable to acquire mutex MSYS__CACHE__MUTEX. Aborting MSYS__CACHE operation.</token-text>
+													</arg-string>
+												</do-status>
+												<do-break />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

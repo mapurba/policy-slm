@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Entitlements</description>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="xml" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;entitlement-configuration&gt;&lt;entitlements/&gt;&lt;/entitlement-configuration&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="$xml/entitlement-configuration" name="modified">
+											<arg-string>
+												<token-time format="yyyyMMddhhmmss" tz="UTC" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-local-variable name="entitlements" scope="policy">
+											<arg-node-set>
+												<token-query class-name="Entitlement" datastore="src" scope="subordinates">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">cn</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="entitlements" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="entName" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$current-node/attr[@attr-name='cn']/value[1]/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="locTables" scope="policy">
+													<arg-node-set>
+														<token-query class-name="Resource" datastore="src" scope="subordinates">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+															</arg-dn>
+															<arg-match-attr name="cn">
+																<arg-value type="string">
+																	<token-text xml:space="preserve">L10N*</token-text>
+																</arg-value>
+															</arg-match-attr>
+															<arg-string>
+																<token-text xml:space="preserve">cn</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="handledEntitlement" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="entName" op="equal">Account</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Found supported entitlement "$entName$"</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements" name="entitlement" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" name="dn">
+															<arg-string>
+																<token-xpath expression="$current-node/@src-dn" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" name="type" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="id">
+															<arg-string>
+																<token-text xml:space="preserve">user</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">account</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="category">
+															<arg-string>
+																<token-text xml:space="preserve">security account</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="display-name" />
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="locTables" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="locTableDN" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$current-node/@src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="langCode" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-after($current-node/attr[@attr-name='cn']/value[1], 'L10N_')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="value" scope="policy">
+																	<arg-string>
+																		<token-map dest="value" src="key" table="$locTableDN$">
+																			<token-text xml:space="preserve">ent$entName$DisplayName</token-text>
+																		</token-map>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">localizing $entName$ entitlement display name: $langCode$: $value$</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]" name="value" />
+																<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]/value[last()]" name="langCode">
+																	<arg-string>
+																		<token-local-variable name="langCode" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-append-xml-text expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]/value[last()]">
+																	<arg-string>
+																		<token-local-variable name="value" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+														</do-for-each>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.entitlement.format.Account" op="equal">idm4</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="parameters" scope="policy">
+																	<arg-node-set>
+																		<token-xml-parse>
+																			<token-text xml:space="preserve">&lt;parameters&gt; 
+	&lt;parameter mandatory="true" name="ID" source="read-attr" source-name="JDBCIdu"/&gt;
+&lt;/parameters&gt;</token-text>
+																		</token-xml-parse>
+																	</arg-node-set>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-set-local-variable name="var-AccountExtensions" scope="policy">
+															<arg-node-set>
+																<token-xml-parse>
+																	<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																		<token-xml-serialize>
+																			<token-global-variable name="drv.entitlement.extensions.Account" />
+																		</token-xml-serialize>
+																	</token-replace-all>
+																</token-xml-parse>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="jdbc-SyncModel" op="equal">direct</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$var-AccountExtensions//read-attr[@attr-name='idu']" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-xml-attr expression="$current-node" name="attr-name">
+																			<arg-string>
+																				<token-text>pk_idu</token-text>
+																			</arg-string>
+																		</do-set-xml-attr>
+																	</arg-actions>
+																</do-for-each>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-xpath expression="$var-AccountExtensions//account-id[@source-name='idu']" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-xml-attr expression="$current-node" name="source-name">
+																			<arg-string>
+																				<token-text>pk_idu</token-text>
+																			</arg-string>
+																		</do-set-xml-attr>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+														</do-if>
+														<do-clone-xpath dest-expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" src-expression="$parameters" />
+														<do-set-local-variable name="extensions" scope="policy">
+															<arg-node-set>
+																<token-xml-parse>
+																	<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																		
+																		<token-xml-serialize>
+																			<token-local-variable name="var-AccountExtensions" />
+																		</token-xml-serialize>
+																	</token-replace-all>
+																</token-xml-parse>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-clone-xpath dest-expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" src-expression="$extensions/entitlement-extensions/node()" />
+														<do-set-local-variable name="handledEntitlement" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="entName" op="equal">Group</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Found supported entitlement "$entName$"</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements" name="entitlement" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" name="dn">
+															<arg-string>
+																<token-xpath expression="$current-node/@src-dn" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" name="type" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="id">
+															<arg-string>
+																<token-text xml:space="preserve">group</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">group</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="category">
+															<arg-string>
+																<token-text xml:space="preserve">security grouping</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="display-name" />
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="locTables" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="locTableDN" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$current-node/@src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="langCode" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-after($current-node/attr[@attr-name='cn']/value[1], 'L10N_')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="value" scope="policy">
+																	<arg-string>
+																		<token-map dest="value" src="key" table="$locTableDN$">
+																			<token-text xml:space="preserve">ent$entName$DisplayName</token-text>
+																		</token-map>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">localizing $entName$ entitlement display name: $langCode$: $value$</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]" name="value" />
+																<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]/value[last()]" name="langCode">
+																	<arg-string>
+																		<token-local-variable name="langCode" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-append-xml-text expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]/value[last()]">
+																	<arg-string>
+																		<token-local-variable name="value" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+														</do-for-each>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.entitlement.format.Group" op="equal">idm4</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="parameters" scope="policy">
+																	<arg-node-set>
+																		<token-xml-parse>
+																			<token-text xml:space="preserve">&lt;parameters&gt; 
+	&lt;parameter mandatory="true" name="ID" source="read-attr" source-name="idg"/&gt;
+	&lt;parameter mandatory="true" name="ID2" source="read-attr" source-name="idg"/&gt;
+&lt;/parameters&gt;</token-text>
+																		</token-xml-parse>
+																	</arg-node-set>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-clone-xpath dest-expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" src-expression="$parameters" />
+														<do-set-local-variable name="extensions" scope="policy">
+															<arg-node-set>
+																<token-xml-parse>
+																	<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																		<token-global-variable name="drv.entitlement.extensions.Group" />
+																	</token-replace-all>
+																</token-xml-parse>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-clone-xpath dest-expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" src-expression="$extensions/entitlement-extensions/node()" />
+														<do-set-local-variable name="handledEntitlement" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="handledEntitlement" op="not-equal">true</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Found custom or disabled entitlement "$entName$"</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements" name="entitlement" />
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" name="type" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="id">
+															<arg-string>
+																<token-text xml:space="preserve">$entName$</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">$entName$</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="category">
+															<arg-string>
+																<token-text xml:space="preserve">Custom Entitlement</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]" name="display-name" />
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="locTables" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="locTableDN" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$current-node/@src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="langCode" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-after($current-node/attr[@attr-name='cn']/value[1], 'L10N_')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="value" scope="policy">
+																	<arg-string>
+																		<token-map dest="value" src="key" table="$locTableDN$">
+																			<token-text xml:space="preserve">ent$entName$DisplayName</token-text>
+																		</token-map>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">localizing $entName$ entitlement display name: $langCode$: $value$</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-append-xml-element expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]" name="value" />
+																<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]/value[last()]" name="langCode">
+																	<arg-string>
+																		<token-local-variable name="langCode" />
+																	</arg-string>
+																</do-set-xml-attr>
+																<do-append-xml-text expression="$xml/entitlement-configuration/entitlements/entitlement[last()]/type[last()]/display-name[last()]/value[last()]">
+																	<arg-string>
+																		<token-local-variable name="value" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+														</do-for-each>
+														<do-set-local-variable name="extensions" scope="policy">
+															<arg-node-set>
+																<token-xml-parse>
+																	<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																		<token-global-variable name="drv.entitlement.extensions.$entName$" />
+																	</token-replace-all>
+																</token-xml-parse>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-clone-xpath dest-expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" src-expression="$extensions/entitlement-extensions/node()" />
+														<do-set-xml-attr expression="$xml/entitlement-configuration/entitlements/entitlement[last()]" name="dn">
+															<arg-string>
+																<token-xpath expression="$current-node/@src-dn" />
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

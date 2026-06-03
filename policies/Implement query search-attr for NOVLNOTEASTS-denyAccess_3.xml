@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Implement query search-attr for NOVLNOTEASTS-denyAccess</description>
+									<comment xml:space="preserve">This rule partially implements queries with a &lt;search-attr attr-name="NOVLNOTEASTS-denyAccess"&gt;... The other part is done in the output transformation policy.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-global-variable mode="nocase" name="drv.account.status.DenyAccessGroup.use" op="equal">true</if-global-variable>
+											<if-op-property name="NOVLNOTEASTS-denyAccessSearchAttr" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="assoc" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="searchValue" scope="policy">
+											<arg-string>
+												<token-op-property name="NOVLNOTEASTS-denyAccessSearchAttr" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="attrValue" scope="policy">
+											<arg-string>
+												<token-xpath expression="string(boolean($DenyAccessGrpMembers//value[@association-ref=$assoc]))" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">$attrValue!=$searchValue</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-strip-xpath expression="." />
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Acc Status: search-attr NOVLNOTEASTS-denyAccess searchValue=$searchValue$, attrValue=$attrValue$, dropping instance $assoc$</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Acc Status: search-attr NOVLNOTEASTS-denyAccess searchValue=$searchValue$, attrValue=$attrValue$, including instance $assoc$</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Login Disabled to values for DirXML-BB-p-row-status and DirXML-BB-p-available-ind</description>
+									<comment xml:space="preserve">Transform changes on user object attribute “Login Disabled” to Blackboard DirXML-BB-Person object attributes DirXML-BB-p-row-status and DirXML-BB-p-available-ind.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="Login Disabled" op="changing" />
+											<if-op-property mode="nocase" name="BBObjectType" op="equal">DirXML-BB-Person</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="DirXML-BB-p-row-status" />
+										<do-strip-op-attr name="DirXML-BB-p-available-ind" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr mode="nocase" name="Login Disabled" op="equal">false</if-op-attr>
+												</and>
+												<and>
+													<if-op-attr name="Login Disabled" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-dest-attr-value name="DirXML-BB-p-row-status">
+													<arg-value>
+														<token-text>ENABLED</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+												<do-set-dest-attr-value name="DirXML-BB-p-available-ind">
+													<arg-value>
+														<token-text>true</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-set-dest-attr-value name="DirXML-BB-p-row-status">
+													<arg-value>
+														<token-text>DISABLED</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+												<do-set-dest-attr-value name="DirXML-BB-p-available-ind">
+													<arg-value>
+														<token-text>false</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-strip-op-attr name="Login Disabled" />
+									</actions>
+								</rule>
+							

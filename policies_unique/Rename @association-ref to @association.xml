@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Rename @association-ref to @association </description>
+									<comment xml:space="preserve">The engine tries to resolve the association in @association-ref of values with @type="dn" to an object in the IDV and removes the value if the association cannot be resolved. For data collection to work, we need all values to be returned at all times.</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="ig-collection-query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./attr/value[@association-ref]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-xml-attr expression="$current-node" name="association">
+													<arg-string>
+														<token-xpath expression="$current-node/@association-ref" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr disabled="true" expression="$current-node" name="type">
+													<arg-string>
+														<token-text xml:space="preserve">string</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-strip-xpath expression="$current-node/@association-ref" />
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

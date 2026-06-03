@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking-Resolve the LDAPDN using src-dn</description>
+									<comment xml:space="preserve">In case of add operation resolve the dest-dn in dot format by quering using the src-dn of the generated event.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-operation />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="VarNodeSet" scope="policy">
+													<arg-node-set>
+														<token-query class-name="GroupWise Post Office">
+															<arg-dn>
+																<token-dest-dn />
+															</arg-dn>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="VarTemp1" scope="policy">
+													<arg-string>
+														<token-xpath expression="$VarNodeSet/@src-dn" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="VarTemp2" scope="policy">
+													<arg-node-set>
+														<token-split delimiter="\{">
+															<token-local-variable name="VarTemp1" />
+														</token-split>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="VarDn" scope="policy">
+													<arg-string>
+														<token-xpath expression="$VarTemp2[1]" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="VarLdapDn" scope="driver">
+													<arg-string>
+														<token-xpath expression="concat($VarDn,'.',$current-op/*[@attr-name=&quot;CN&quot;]/value/text())" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

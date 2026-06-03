@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>ActivityGroup (Role) Entitlement change</description>
+									<comment xml:space="preserve">Check for role membership being granted or revoked</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.ActivityGroup" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-entitlement name="ActivityGroup" op="changing" />
+											<if-operation op="equal">modify</if-operation>
+										</and>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.ActivityGroup" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="dvn" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">$lsname$-ctype</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="event-ctype" scope="policy">
+											<arg-string>
+												<token-local-variable name="$dvn$" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="ActivityGroup" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="event-ctype" op="equal">cua-central|cua-child</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="LOCACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="SUBSYSTEM">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+																		</arg-component>
+																		<arg-component name="AGR_NAME">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG')" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_FROM', 'FROM')" />
+																		</arg-component>
+																		<arg-component name="TO_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_TO', 'TO')" />
+																		</arg-component>
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="ACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="AGR_NAME">
+																			<token-local-variable name="current-node" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT" />
+																		<arg-component name="TO_DAT" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="ACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="AGR_NAME">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG')" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_FROM', 'FROM')" />
+																		</arg-component>
+																		<arg-component name="TO_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_TO', 'TO')" />
+																		</arg-component>
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="ACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="AGR_NAME">
+																			<token-local-variable name="current-node" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT" />
+																		<arg-component name="TO_DAT" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="ActivityGroup" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="event-ctype" op="equal">cua-central|cua-child</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="LOCACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="SUBSYSTEM">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+																		</arg-component>
+																		<arg-component name="AGR_NAME">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG')" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_FROM', 'FROM')" />
+																		</arg-component>
+																		<arg-component name="TO_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_TO', 'TO')" />
+																		</arg-component>
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="ACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="AGR_NAME">
+																			<token-local-variable name="current-node" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT" />
+																		<arg-component name="TO_DAT" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="ACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="AGR_NAME">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'AG')" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_FROM', 'FROM')" />
+																		</arg-component>
+																		<arg-component name="TO_DAT">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, '_TO', 'TO')" />
+																		</arg-component>
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="ACTIVITYGROUPS">
+																	<arg-value type="structured">
+																		<arg-component name="AGR_NAME">
+																			<token-local-variable name="current-node" />
+																		</arg-component>
+																		<arg-component name="FROM_DAT" />
+																		<arg-component name="TO_DAT" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

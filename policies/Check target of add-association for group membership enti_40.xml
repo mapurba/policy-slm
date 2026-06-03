@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check target of add-association for group membership entitlements that need to be granted</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">add-association</if-operation>
+											<if-op-property name="notes-check-group-entitlements" op="equal">true</if-op-property>
+											<if-entitlement name="notesGroup2" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="notesGroup2" />
+											</arg-node-set>
+											<arg-actions>
+												<do-remove-src-attr-value class-name="Group" name="Members">
+													<arg-association>
+														<token-local-variable name="current-node" />
+													</arg-association>
+													<arg-value type="dn">
+														<token-dest-dn />
+													</arg-value>
+												</do-remove-src-attr-value>
+												<do-set-xml-attr expression="../modify[last()]/modify-attr[last()]/remove-value[last()]/value[last()]" name="association-ref">
+													<arg-string>
+														<token-xpath expression="./text()" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-add-src-attr-value class-name="Group" name="Members">
+													<arg-association>
+														<token-local-variable name="current-node" />
+													</arg-association>
+													<arg-value type="dn">
+														<token-dest-dn />
+													</arg-value>
+												</do-add-src-attr-value>
+												<do-set-xml-attr expression="../modify[last()]/modify-attr[last()]/add-value[last()]/value[last()]" name="association-ref">
+													<arg-string>
+														<token-xpath expression="./text()" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

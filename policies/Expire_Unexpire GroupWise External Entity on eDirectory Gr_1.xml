@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Expire/Unexpire GroupWise External Entity on eDirectory GroupWise External Entity Enable</description>
+									<conditions>
+										<and>
+											<if-global-variable name="driver.gw.GWExternalEntityDisable" op="equal">expire</if-global-variable>
+											<if-class-name op="equal">GroupWise External Entity</if-class-name>
+											<if-local-variable mode="nocase" name="combinationdone" op="not-equal">true</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']/add-value/*[text() = 'false']</if-xpath>
+													<if-local-variable mode="nocase" name="entriedlogindisabled" op="not-equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-strip-xpath expression="*[@attr-name='Login Disabled']" />
+												<do-clear-dest-attr-value class-name="User" name="NGW: Mailbox Expiration Time" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">./modify-attr[@attr-name='Login Disabled']/add-value/*[text() = 'true']</if-xpath>
+													<if-local-variable mode="nocase" name="entriedlogindisabled" op="not-equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-strip-xpath expression="*[@attr-name='Login Disabled']" />
+												<do-set-dest-attr-value name="NGW: Mailbox Expiration Time">
+													<arg-value type="string">
+														
+														<token-xpath expression="int:new(date:getTime(date:new()))" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

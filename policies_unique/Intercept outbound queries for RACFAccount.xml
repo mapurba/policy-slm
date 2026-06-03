@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept outbound queries for RACFAccount</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">RACFAccount</if-class-name>
+											<if-operation mode="case" op="equal">query</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="../query[last()]/@class-name" />
+										<do-set-xml-attr expression="../query[last()]" name="event-id">
+											<arg-string>
+												<token-text xml:space="preserve">query-driver-ident</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../query[last()]" name="scope">
+											<arg-string>
+												<token-text xml:space="preserve">entry</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-strip-xpath expression="../query[last()]/search-class" />
+										<do-append-xml-element expression="../query[last()]" name="search-class" />
+										<do-set-xml-attr expression="../query[last()]/search-class[last()]" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">__driver_identification_class__</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-strip-xpath expression="../query[last()]/read-attr" />
+										<do-append-xml-element expression="../query[last()]" name="read-attr" />
+										<do-set-op-property name="UserAccountEntitlementQuery">
+											<arg-string>
+												<token-dest-dn />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

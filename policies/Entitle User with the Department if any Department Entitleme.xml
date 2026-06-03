@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Entitle User with the Department if any Department Entitlement found.</description>
+									<comment xml:space="preserve">Department is an attribute to User Object, hence assign the department ID during the user creation itself.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Department" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-entitlement name="Department" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="Department" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="departmentId" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="User" name="department">
+													<arg-value type="string">
+														<token-local-variable name="departmentId" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create or update Entitlement Configuration resource object</description>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="entConfigResObj" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Resource" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+													<arg-match-attr name="DirXML-ContentType">
+														<arg-value type="string">
+															<token-text xml:space="preserve">text/vnd.novell.idm.entitlementConfiguration+xml</token-text>
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($entConfigResObj/@src-dn)&gt;0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="currentXml" scope="policy">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-xpath expression="$entConfigResObj/@src-dn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-Data</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="currentXmlStr" scope="policy">
+													<arg-string>
+														<token-replace-all regex="\s" replace-with="">
+															<token-xml-serialize>
+																<token-xpath expression="$currentXml/entitlement-configuration/node()" />
+															</token-xml-serialize>
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="xmlStr" scope="policy">
+													<arg-string>
+														<token-replace-all regex="\s" replace-with="">
+															<token-xml-serialize>
+																<token-xpath expression="$xml/entitlement-configuration/node()" />
+															</token-xml-serialize>
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="case" name="currentXmlStr" op="equal">$xmlStr$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Configuration still up-to-date. No update necessary.</token-text>
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Update existing Entitlement Configuration resource object</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-set-dest-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-Data">
+															<arg-dn>
+																<token-xpath expression="$entConfigResObj/@src-dn" />
+															</arg-dn>
+															<arg-value type="octet">
+																<token-base64-encode>
+																	<token-xml-serialize>
+																		<token-local-variable name="xml" />
+																	</token-xml-serialize>
+																</token-base64-encode>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Creating new Entitlement Configuration resource object</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-add-dest-object class-name="DirXML-Resource" direct="true">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+												</do-add-dest-object>
+												<do-add-dest-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-ContentType">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+													<arg-value>
+														<token-text xml:space="preserve">text/vnd.novell.idm.entitlementConfiguration+xml</token-text>
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-add-dest-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-Data">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+													<arg-value type="octet">
+														<token-base64-encode>
+															<token-xml-serialize>
+																<token-local-variable name="xml" />
+															</token-xml-serialize>
+														</token-base64-encode>
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-trace-message>
+											<arg-string>
+												<token-xml-serialize>
+													<token-local-variable name="xml" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

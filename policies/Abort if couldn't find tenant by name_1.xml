@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Abort if couldn't find tenant by name</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.sentinel.customer.id" op="not-equal" />
+											<if-global-variable mode="nocase" name="drv.sentinel.customer.id" op="not-equal">0</if-global-variable>
+											<if-global-variable mode="regex" name="drv.sentinel.customer.id" op="not-equal">[0-9]+</if-global-variable>
+											<if-local-variable mode="nocase" name="local.tenant.number" op="equal" />
+										</and>
+									</conditions>
+									<actions>
+										<do-status level="fatal">
+											<arg-string>
+												<token-text xml:space="preserve">Could not resolve tenant name'</token-text>
+												<token-global-variable name="drv.sentinel.customer.id" />
+												<token-text xml:space="preserve">' to numeric identifier.</token-text>
+											</arg-string>
+										</do-status>
+									</actions>
+								</rule>
+								

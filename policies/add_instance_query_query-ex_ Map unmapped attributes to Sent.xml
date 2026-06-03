@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>add/instance/query/query-ex: Map unmapped attributes to Sentinel "extra" attributes.</description>
+									<comment xml:space="preserve">Map any attributes whose names are not mapped to known Sentinel Identity attributes to values for the Sentinel Identity's "extra attributes" attribute.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-operation mode="case" op="equal">query</if-operation>
+											<if-operation mode="case" op="equal">query-ex</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./add-attr|./attr|./search-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="mapped-attr-name" scope="policy">
+													<arg-string>
+														<token-map default-value="*" dest="edir" src="sentinel" table="NIQSENIDTRK-IdentityAttrMap">
+															<token-xpath expression="$current-node/@attr-name" />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="mapped-attr-name" op="equal">*</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable name="ext-attrs-node" op="not-available" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="current-node-name" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="local-name($current-node)" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-append-xml-element expression="$current-node/.." name="$current-node-name$" />
+																<do-set-local-variable name="ext-attrs-node" scope="policy">
+																	<arg-node-set>
+																		<token-xpath expression="$current-node/../*[last()]" />
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-xml-attr expression="$ext-attrs-node" name="attr-name">
+																	<arg-string>
+																		<token-text xml:space="preserve">xattrs</token-text>
+																	</arg-string>
+																</do-set-xml-attr>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-set-local-variable name="attr-name" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/@attr-name" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="attr-value" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/value" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-strip-xpath expression="$current-node" />
+														<do-append-xml-element expression="$ext-attrs-node" name="value" />
+														<do-set-xml-attr expression="$ext-attrs-node/value[last()]" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">structured</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$ext-attrs-node/value[last()]" name="component" />
+														<do-append-xml-text expression="$ext-attrs-node/value[last()]/component[1]">
+															<arg-string>
+																<token-local-variable name="attr-name" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-set-xml-attr expression="$ext-attrs-node/value[last()]/component[1]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">name</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$ext-attrs-node/value[last()]/component[1]" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">string</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="$ext-attrs-node/value[last()]" name="component" />
+														<do-append-xml-text expression="$ext-attrs-node/value[last()]/component[2]">
+															<arg-string>
+																<token-local-variable name="attr-value" />
+															</arg-string>
+														</do-append-xml-text>
+														<do-set-xml-attr expression="$ext-attrs-node/value[last()]/component[2]" name="name">
+															<arg-string>
+																<token-text xml:space="preserve">value</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$ext-attrs-node/value[last()]/component[2]" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">string</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create DirXML-GAGroupEMailAddress if absent</description>
+									<comment xml:space="preserve">A group email address (mapped to DirXML-GAGroupEMailAddress by default) is required for groups in Google and is also used for group matching. This policy will synthesize a value for this attribute from the group's CN, if missing. This policy should be modified to match any custom requirements for generating group email addresses. Note that the resulting value for group email address MUST be a well-formed email address. </comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="DirXML-GAGroupEMailAddress" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-GroupEmailAddr" scope="policy">
+													<arg-string>
+														<token-src-name />
+														<token-text xml:space="preserve">@</token-text>
+														<token-global-variable name="gcv.NOVLGGLEBCFG.domainName" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-default-attr-value name="DirXML-GAGroupEMailAddress" write-back="true">
+													<arg-value type="string">
+														<token-local-variable name="lv-GroupEmailAddr" />
+													</arg-value>
+												</do-set-default-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="lv-GroupEmailAddr" scope="policy">
+													<arg-string>
+														<token-op-attr name="DirXML-GAGroupEMailAddress" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

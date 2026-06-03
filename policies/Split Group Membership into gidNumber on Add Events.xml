@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Split Group Membership into gidNumber on Add Events</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="Group Membership" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./add-attr[@attr-name=&quot;Group Membership&quot;]/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-add-dest-attr-value name="gidNumber">
+													<arg-value type="string">
+														<token-xpath expression="$current-node/@nxdrv:gidNumber" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-break />
+									</actions>
+								</rule>
+								

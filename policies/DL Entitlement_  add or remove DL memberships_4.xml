@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>DL Entitlement:  add or remove DL memberships</description>
+									<conditions>
+										<and>
+											<if-entitlement name="gwDistLists" op="changing" />
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="gwDistLists" />
+											</arg-node-set>
+											<arg-actions>
+												<do-add-dest-attr-value class-name="User" name="Distribution List DN">
+													<arg-value>
+														<token-local-variable name="current-node" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="gwDistLists" />
+											</arg-node-set>
+											<arg-actions>
+												<do-remove-dest-attr-value class-name="User" name="Distribution List DN">
+													<arg-value>
+														<token-local-variable name="current-node" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

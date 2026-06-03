@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Dirty Cache</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXML-Driver</if-class-name>
+											<if-op-attr name="DirXML-Policies" op="changing" />
+											<if-src-dn op="not-equal">$dirxml.auto.driverdn$</if-src-dn>
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXML-Rule</if-class-name>
+											<if-op-attr name="XmlData" op="changing" />
+											<if-src-dn op="not-in-subtree">$dirxml.auto.driverdn$</if-src-dn>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ruleCacheInitialized" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Detected changes that require refreshing the rule cache. Dirtying RULE__CACHE.</token-text>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Append DirXML-Accounts attribute to Migrate Add events</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">add</if-operation>
+											<if-xpath op="true">starts-with(@event-id, 'migrate-app-sync')</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value name="Object Class">
+											<arg-value type="string">
+												<token-text xml:space="preserve">DirXML-Identity</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-strip-op-attr name="DirXML-Accounts" />
+										<do-add-dest-attr-value name="DirXML-Accounts">
+											<arg-value type="string">
+												<token-association />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-set-local-variable name="userCn" scope="policy">
+											<arg-string>
+												<token-parse-dn length="-1" src-dn-format="dest-dn" start="-1">
+													<token-dest-dn />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="containerObj" scope="policy">
+											<arg-node-set>
+												<token-query scope="entry">
+													<arg-dn>
+														<token-dest-dn length="-2" />
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="qualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="$containerObj/@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-add-src-attr-value name="DirXML-Accounts">
+											<arg-value type="string">
+												<token-text xml:space="preserve">CN=</token-text>
+												<token-local-variable name="userCn" />
+												<token-text xml:space="preserve">,</token-text>
+												<token-local-variable name="qualifiedLDAPDn" />
+												<token-text xml:space="preserve">#</token-text>
+												<token-xpath expression="operation-data/tree-name" />
+											</arg-value>
+										</do-add-src-attr-value>
+									</actions>
+								</rule>
+								

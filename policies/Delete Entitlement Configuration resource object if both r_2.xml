@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Delete Entitlement Configuration resource object if both role and resource mapping are disabled</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.rolemapping.enable" op="not-equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.resourcemapping.enable" op="not-equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="entConfigResObj" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Resource" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\EntitlementConfiguration</token-text>
+													</arg-dn>
+													<arg-match-attr name="DirXML-ContentType">
+														<arg-value type="string">
+															<token-text xml:space="preserve">text/vnd.novell.idm.entitlementConfiguration+xml</token-text>
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($entConfigResObj/@src-dn)&gt;0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Role- and Resource-Mapping disabled. Deleting existing Entitlement Configuration resource object: </token-text>
+														<token-xpath expression="$entConfigResObj/@src-dn" />
+													</arg-string>
+												</do-trace-message>
+												<do-delete-dest-object direct="true">
+													<arg-dn>
+														<token-xpath expression="$entConfigResObj/@src-dn" />
+													</arg-dn>
+												</do-delete-dest-object>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Role- and Resource-Mapping disabled.</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>map e-mail address to Active Directory logon name</description>
+									<comment>Update Active Directory logon name (userPrincipalName) when logon name is configured to follow Active Directory e-mail address and e-mail address is being added.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="UpnMap" op="equal">ad-mail-auth</if-global-variable>
+											<if-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:emails.value" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName">
+											<arg-value>
+												<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:emails.value" />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName">
+											<arg-value>
+												<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:emails.value" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

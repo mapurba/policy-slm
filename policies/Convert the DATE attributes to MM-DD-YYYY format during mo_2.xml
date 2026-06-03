@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert the DATE attributes to MM-DD-YYYY format during modify</description>
+									<comment xml:space="preserve">Convert the unix time stamp to MM-DD-YYYY format.</comment>
+									<conditions />
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="attributename" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="attributename" op="equal">.*_DATE.*|.*_DT|.*_UPDATED</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">$current-node/add-value/value</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="new_date" scope="policy">
+																	<arg-string>
+																		<token-convert-time dest-format="MM/dd/yyyy hh:mm:ss" src-format="!CTIME">
+																			<token-op-attr name="$attributename$" />
+																		</token-convert-time>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-strip-xpath expression="$current-node[@attr-name=$attributename]/add-value/value/text()" />
+																<do-append-xml-text expression="$current-node[@attr-name=$attributename]/add-value/value">
+																	<arg-string>
+																		<token-local-variable name="new_date" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">$current-node/remove-value/value</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="old_date" scope="policy">
+																	<arg-string>
+																		<token-convert-time dest-format="MM/dd/yyyy hh:mm:ss" src-format="!CTIME">
+																			<token-removed-attr name="$attributename$" />
+																		</token-convert-time>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-strip-xpath expression="$current-node[@attr-name=$attributename]/remove-value/value/text()" />
+																<do-append-xml-text expression="$current-node[@attr-name=$attributename]/remove-value/value">
+																	<arg-string>
+																		<token-local-variable name="old_date" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

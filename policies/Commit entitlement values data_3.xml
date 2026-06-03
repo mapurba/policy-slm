@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Commit entitlement values data</description>
+									<comment xml:space="preserve">Commit the entitlement key-to-value mapping info to Group_Values object</comment>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="getInstances" op="equal">true</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										
+										<do-add-dest-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-Data">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\Group_Values</token-text>
+											</arg-dn>
+											<arg-value type="octet">
+												<token-base64-encode>
+													<token-xml-serialize>
+														<token-local-variable name="values-xml" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-set-local-variable name="getInstances" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Change configuration of Account Entitlement to multi-valued if required</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="accDN" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</token-parse-dn>
+												<token-text xml:space="preserve">/Account</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="accEnti" scope="policy">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-text xml:space="preserve">vnd.nds.stream:/</token-text>
+														<token-local-variable name="accDN" />
+														<token-text xml:space="preserve">#XmlData</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">$accEnti/entitlement/values/@multi-valued='false'</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-strip-xpath expression="$accEnti/entitlement/values/@multi-valued" />
+												<do-set-xml-attr expression="$accEnti/entitlement/values" name="multi-valued">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-local-variable name="accDN" scope="policy">
+													<arg-string>
+														<token-replace-all regex="/" replace-with="\\">
+															<token-local-variable name="accDN" />
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-dest-attr-value class-name="DirXML-Entitlement" direct="true" name="XmlData">
+													<arg-dn>
+														<token-local-variable name="accDN" />
+													</arg-dn>
+													<arg-value type="octet">
+														<token-base64-encode>
+															<token-xml-serialize>
+																<token-local-variable name="accEnti" />
+															</token-xml-serialize>
+														</token-base64-encode>
+													</arg-value>
+												</do-set-dest-attr-value>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Updated "Account" entitlement configuration from single valued to multi-valued.</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Account entitlement is already multi-valued. No update is necessary.</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

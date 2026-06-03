@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Validate the application type AccountDomain</description>
+									<comment xml:space="preserve">The name of the application type AccountDomain has to has to follow the format &lt;name&gt;_&lt;subType&gt;, e.g. blr-srv1_sap, where blr-srv1 is the server name and sap is the subType of the application.</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">DirXML-PUMAccountDomain</if-class-name>
+										</or>
+										<or>
+											<if-attr mode="nocase" name="DirXML-pumAccDomType" op="equal">appl</if-attr>
+										</or>
+										<or>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-operation mode="nocase" op="equal">rename</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="accDomName" scope="policy">
+											<arg-string>
+												<token-attr name="OU" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-xpath op="not-true">es:match($accDomName, "._")</if-xpath>
+													<if-xpath op="true">es:endsWith($accDomName, "_")</if-xpath>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">The name of an AccountDomain of type application should be of the format '&lt;name&gt;_&lt;subType&gt;'. e.g. blr-srv1_sap, where blr-srv1 is the server name and sap is the subType of the application.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-veto />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

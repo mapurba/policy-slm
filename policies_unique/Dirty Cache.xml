@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Dirty Cache</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXML-Driver</if-class-name>
+											<if-op-attr name="DirXML-ApplicationSchema" op="changing" />
+											<if-src-dn op="not-equal">$dirxml.auto.driverdn$</if-src-dn>
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">DirXML-GlobalConfigDef</if-class-name>
+											<if-op-attr name="DirXML-ConfigValues" op="changing" />
+											<if-src-dn op="in-subtree">$driversetdn$</if-src-dn>
+											<if-src-dn op="not-in-subtree">$dirxml.auto.driverdn$</if-src-dn>
+											<if-xml-attr mode="regex" name="src-dn" op="equal">.+MSysInfo</if-xml-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="msysCacheInitialized" scope="driver">
+											<arg-string>
+												<token-time format="!FILETIME" tz="UTC" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">MSys Cache: </token-text>
+												<token-text xml:space="preserve">Detected changes that require refreshing the managed system cache. Dirtying MSYS__CACHE [</token-text>
+												<token-local-variable name="msysCacheInitialized" />
+												<token-text xml:space="preserve">].</token-text>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+							

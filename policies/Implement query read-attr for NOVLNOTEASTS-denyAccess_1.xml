@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Implement query read-attr for NOVLNOTEASTS-denyAccess</description>
+									<comment xml:space="preserve">This rule partially implements queries with a &lt;read-attr attr-name="NOVLNOTEASTS-denyAccess"/&gt;. The other part is done in the output transformation policy.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-global-variable mode="nocase" name="drv.account.status.DenyAccessGroup.use" op="equal">true</if-global-variable>
+											<if-op-property mode="nocase" name="NOVLNOTEASTS-handleDenyAccessReadAttr" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">NOVLNOTEASTS-denyAccess</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="attr[last()]" name="value" />
+										<do-set-local-variable name="assoc" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-text expression="attr[last()]/value[last()]">
+											<arg-string>
+												<token-xpath expression="string(boolean($DenyAccessGrpMembers//value[@association-ref=$assoc]))" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

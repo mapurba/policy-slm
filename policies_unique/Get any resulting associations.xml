@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Get any resulting associations</description>
+									<comment xml:space="preserve">If any instances were returned by the query from the preceding rule, append the associations to the current operation (mimicking what the engine does).</comment>
+									<conditions>
+										<or>
+											<if-xpath op="true">$query-results</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$query-results" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element before="child::*[not(local-name()='association')][1]" expression="." name="association" />
+												<do-append-xml-text expression="./association[last()]">
+													<arg-string>
+														<token-xpath expression="$current-node/association" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

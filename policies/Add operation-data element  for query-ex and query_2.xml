@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add operation-data element  for query-ex and query</description>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-class-name mode="nocase" op="equal">wd-Relation</if-class-name>
+										</or>
+										<or>
+											<if-operation mode="nocase" op="equal">query</if-operation>
+											<if-operation mode="nocase" op="equal">query-ex</if-operation>
+										</or>
+										<or>
+											<if-xpath op="not-true">driver-operation-data</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										
+										<do-append-xml-element expression="." name="driver-operation-data" />
+										<do-append-xml-element expression="driver-operation-data" name="WD-WorkforceID" />
+										<do-set-local-variable name="MergeQueryWFID" scope="driver">
+											<arg-string>
+												<token-op-attr name="workforceID" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-text expression="driver-operation-data/WD-WorkforceID">
+											<arg-string>
+												<token-op-attr name="workforceID" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="driver-operation-data" name="WD-WorkerIDType" />
+										<do-set-local-variable name="MergeQueryWDWorkerIDType" scope="driver">
+											<arg-string>
+												<token-attr name="wd-WorkerIDType" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-text expression="driver-operation-data/WD-WorkerIDType">
+											<arg-string>
+												<token-attr name="wd-WorkerIDType" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="driver-operation-data" name="WD-effectiveDate" />
+										<do-append-xml-text expression="driver-operation-data/WD-effectiveDate">
+											<arg-string>
+												<token-time format="yyyy-MM-dd" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

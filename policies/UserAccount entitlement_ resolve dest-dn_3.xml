@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>UserAccount entitlement: resolve dest-dn</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-op-property mode="nocase" name="attempt-to-match" op="not-equal">false</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="domain.dnsName" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-global-variable name="drv.domains" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="domain_container" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="domain.dnsName" op="equal">$domain_container$</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-op-property name="drv.domain.container.name">
+																	<arg-string>
+																		<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.container.name&quot;]/value/text()" />
+																	</arg-string>
+																</do-set-op-property>
+																<do-set-op-property name="drv.domain.dns.name">
+																	<arg-string>
+																		<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+																	</arg-string>
+																</do-set-op-property>
+																<do-set-op-property name="drv.user.container">
+																	<arg-string>
+																		<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+																	</arg-string>
+																</do-set-op-property>
+																<do-set-op-property name="drv.subPlacementType">
+																	<arg-string>
+																		<token-xpath expression="$current-node/definition[@name=&quot;drv.subPlacementType&quot;]/value/text()" />
+																	</arg-string>
+																</do-set-op-property>
+																<do-set-op-property name="drv.pubPlacementType">
+																	<arg-string>
+																		<token-xpath expression="$current-node/definition[@name=&quot;drv.pubPlacementType&quot;]/value/text()" />
+																	</arg-string>
+																</do-set-op-property>
+																<do-set-op-property name="attempt-to-match">
+																	<arg-string>
+																		<token-text xml:space="preserve">true</token-text>
+																	</arg-string>
+																</do-set-op-property>
+																<do-break />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

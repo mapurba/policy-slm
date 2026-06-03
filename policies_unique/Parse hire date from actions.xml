@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Parse hire date from actions</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.bl.hiredate.parsefromactions" op="equal">true</if-global-variable>
+											<if-op-attr name="DirXML-sapPActions" op="available" />
+										</and>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation op="equal">sync</if-operation>
+											<if-global-variable mode="nocase" name="drv.bl.hiredate.parsefromactions" op="equal">true</if-global-variable>
+											<if-src-attr name="DirXML-sapPActions" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Check for Hire Actions ...</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',10),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-attr name="DirXML-sapPActions" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="action" scope="policy">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="massn" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before(substring-after($action, '#MASSN='), '#')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="massn" op="equal">$drv.bl.hiredate.massn$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="regex" name="drv.bl.hiredate.massg" op="equal">.+</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="massg" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-before(substring-after($action, '#MASSG='), '#')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-global-variable name="drv.bl.hiredate.massg" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="current-node" op="equal">$massg$</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="hireDateStr" scope="policy">
+																					<arg-string>
+																						<token-xpath expression="substring-before(substring-after($action, '#BEGDA='), '#')" />
+																					</arg-string>
+																				</do-set-local-variable>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="hireDateStr" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="substring-before(substring-after($action, '#BEGDA='), '#')" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

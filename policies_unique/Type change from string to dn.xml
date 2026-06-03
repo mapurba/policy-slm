@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Type change from string to dn</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">USERS</if-class-name>
+											<if-op-attr name="USERGROUP_NAME" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation op="equal">add</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="./add-attr[@attr-name='USERGROUP_NAME']/value" name="type">
+													<arg-string>
+														<token-text xml:space="preserve">dn</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-local-variable name="queryResponse">
+													<arg-string>
+														<token-query class-name="sapHanaUserGroup">
+															<arg-match-attr name="CN">
+																<arg-value>
+																	<token-xpath expression="./add-attr[@attr-name='USERGROUP_NAME']/value" />
+																</arg-value>
+															</arg-match-attr>
+														</token-query>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-xml-attr expression="./add-attr[@attr-name='USERGROUP_NAME']/value" name="association-ref">
+													<arg-string>
+														<token-local-variable name="queryResponse" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation op="equal">modify</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">./modify-attr[@attr-name='USERGROUP_NAME']/remove-value/value</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-xml-attr expression="./modify-attr[@attr-name='USERGROUP_NAME']/remove-value/value" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">dn</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-local-variable name="queryResponse">
+															<arg-string>
+																<token-query class-name="sapHanaUserGroup">
+																	<arg-match-attr name="CN">
+																		<arg-value>
+																			<token-xpath expression="./modify-attr[@attr-name='USERGROUP_NAME']/remove-value/value" />
+																		</arg-value>
+																	</arg-match-attr>
+																</token-query>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-xml-attr expression="./modify-attr[@attr-name='USERGROUP_NAME']/remove-value/value" name="association-ref">
+															<arg-string>
+																<token-local-variable name="queryResponse" />
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">./modify-attr[@attr-name='USERGROUP_NAME']/add-value/value</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-xml-attr expression="./modify-attr[@attr-name='USERGROUP_NAME']/add-value/value" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">dn</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-local-variable name="queryResponse">
+															<arg-string>
+																<token-query class-name="sapHanaUserGroup">
+																	<arg-match-attr name="CN">
+																		<arg-value>
+																			<token-xpath expression="./modify-attr[@attr-name='USERGROUP_NAME']/add-value/value" />
+																		</arg-value>
+																	</arg-match-attr>
+																</token-query>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-xml-attr expression="./modify-attr[@attr-name='USERGROUP_NAME']/add-value/value" name="association-ref">
+															<arg-string>
+																<token-local-variable name="queryResponse" />
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

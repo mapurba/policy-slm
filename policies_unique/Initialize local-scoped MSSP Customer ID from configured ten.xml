@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Initialize local-scoped MSSP Customer ID from configured tenant ID if necessary</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.sentinel.customer.id" op="not-equal" />
+											<if-global-variable mode="nocase" name="drv.sentinel.customer.id" op="not-equal">0</if-global-variable>
+											<if-global-variable mode="regex" name="drv.sentinel.customer.id" op="equal">[0-9]+</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="local.tenant.number" scope="policy">
+											<arg-string>
+												<token-global-variable name="drv.sentinel.customer.id" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

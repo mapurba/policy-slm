@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Append connection-dn if not available in the query from MSGW</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">query|query-ex</if-operation>
+											<if-xml-attr name="connection-dn" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">./operation-data/msgw-data-collection</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="endpointurl">
+													<arg-string>
+														<token-xpath expression="./operation-data/msgw-data-collection/@end-point-url" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">//operation-data/msgw-data-collection</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="endpointurl">
+															<arg-string>
+																<token-xpath expression="//operation-data/msgw-data-collection/@end-point-url" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="endpointurl" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="changedUrl" scope="policy">
+													<arg-string>
+														<token-replace-all regex="/" replace-with="\\">
+															<token-local-variable name="endpointurl" />
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="connDn">
+													<arg-string>
+														<token-parse-dn dest-dn-format="slash" length="1" src-dn-format="slash" start="-1">
+															<token-local-variable name="changedUrl" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-xml-attr expression="." name="connection-dn">
+													<arg-string>
+														<token-local-variable name="connDn" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

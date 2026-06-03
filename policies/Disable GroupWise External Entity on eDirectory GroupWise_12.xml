@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Disable GroupWise External Entity on eDirectory GroupWise External Entity Delete</description>
+									<conditions>
+										<and>
+											<if-global-variable name="driver.gw.GWExternalEntityDelete" op="equal">disable</if-global-variable>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name op="equal">GroupWise External Entity</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="Login Disabled">
+											<arg-value type="state">
+												<token-text>true</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-xml-attr expression="../modify" name="gw:original-event">
+											<arg-string>
+												<token-text>delete</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-veto />
+									</actions>
+								</rule>
+								

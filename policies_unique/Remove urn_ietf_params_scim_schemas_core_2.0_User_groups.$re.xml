@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove urn:ietf:params:scim:schemas:core:2.0:User:groups.$ref changes if using Group Entitlement</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group" op="equal">true</if-global-variable>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-op-attr name="urn:ietf:params:scim:schemas:core:2.0:Group:members.$ref" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="urn:ietf:params:scim:schemas:core:2.0:Group:members.$ref" />
+									</actions>
+								</rule>
+								

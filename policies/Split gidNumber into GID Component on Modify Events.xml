@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Split gidNumber into GID Component on Modify Events</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-attr name="gidNumber" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./modify-attr[@attr-name=&quot;gidNumber&quot;]/add-value/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-xml-attr expression="$current-node" name="nxdrv:gidNumber">
+													<arg-string>
+														<token-xpath expression="$current-node/text()" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./modify-attr[@attr-name=&quot;gidNumber&quot;]/remove-value/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-xml-attr expression="$current-node" name="nxdrv:gidNumber">
+													<arg-string>
+														<token-xpath expression="$current-node/text()" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+										<do-break />
+									</actions>
+								</rule>
+								

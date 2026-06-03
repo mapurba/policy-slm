@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check for AD driver association</description>
+									<comment xml:space="preserve">Typically, SharePoint is configured to authenticate users to an AD Domain. If this is the case, the user should already exist in the AD Domain before being synchronized to SharePoint. This rule checks for an AD driver association as a prerequisite to synchronizing the user to the SharePoint site collection.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-xpath op="true">count(add-attr[@attr-name='DirXML-Associations']/value[component[@name='nameSpace']/text()='1' and component[@name='volume' and contains(.,$drv-ad-driver-dn)]])=0</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-status level="warning">
+											<arg-string>
+												<token-text xml:space="preserve">Vetoed the add because there is no association for the AD driver "$drv-ad-driver-dn$"</token-text>
+											</arg-string>
+										</do-status>
+										<do-veto />
+									</actions>
+								</rule>
+								

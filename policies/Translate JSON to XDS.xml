@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Translate JSON to XDS</description>
+									<conditions>
+										<and>
+											<if-class-name op="available" />
+											<if-class-name mode="nocase" op="not-equal">DirXML-Driver</if-class-name>
+										</and>
+										<and>
+											<if-operation mode="regex" op="equal">status</if-operation>
+											<if-xpath disabled="true" op="not-true">$current-op/driver-operation-data [@class-name="DirXML-Driver"]</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-operation mode="regex" op="equal">status</if-operation>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length(./driver-operation-data/response/value/text())&gt;0</if-xpath>
+															<if-xpath op="true">./driver-operation-data[@command="query"]</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="xmlInput" notrace="true" scope="policy">
+															<arg-string>
+																<token-base64-encode charset="UTF-8">
+																	<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																		<token-xml-serialize>
+																			<token-xpath expression="." />
+																		</token-xml-serialize>
+																	</token-replace-all>
+																</token-base64-encode>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="applicationContent" notrace="true" scope="policy">
+															<arg-string>
+																<token-xpath expression="rs:jsonToXDS($xmlInput)" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if notrace="true">
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="applicationContent" op="not-equal" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="xdscontent" scope="policy">
+																	<arg-node-set>
+																		<token-xml-parse>
+																			<token-local-variable name="applicationContent" />
+																		</token-xml-parse>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-clone-xpath dest-expression=".." src-expression="$xdscontent/status/instance" />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-strip-xpath expression="./driver-operation-data" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xml-attr name="command" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xml-attr mode="nocase" name="command" op="equal">poll</if-xml-attr>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-xpath op="true">string-length(./response/value/text())&gt;0</if-xpath>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="xmlInput" notrace="true" scope="policy">
+																			<arg-string>
+																				<token-base64-encode charset="UTF-8">
+																					<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																						<token-xml-serialize>
+																							<token-xpath expression="." />
+																						</token-xml-serialize>
+																					</token-replace-all>
+																				</token-base64-encode>
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="applicationContent" notrace="true" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="rs:jsonToXDS($xmlInput)" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-if notrace="true">
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="applicationContent" op="not-equal" />
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-local-variable name="xdscontent" scope="policy">
+																					<arg-node-set>
+																						<token-xml-parse>
+																							<token-local-variable name="applicationContent" />
+																						</token-xml-parse>
+																					</arg-node-set>
+																				</do-set-local-variable>
+																				<do-clone-xpath dest-expression=".." src-expression="$xdscontent/input/modify" />
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																		<do-strip-xpath expression="." />
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="operations" scope="policy">
+																	<arg-node-set>
+																		<token-xpath expression="." />
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-local-variable name="operations" />
+																	</arg-node-set>
+																	<arg-actions>
+																		<do-set-local-variable name="command" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="@command" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="regex" name="command" op="equal">query|delete</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-if>
+																					<arg-conditions>
+																						<and>
+																							<if-local-variable mode="nocase" name="command" op="equal">query</if-local-variable>
+																						</and>
+																					</arg-conditions>
+																					<arg-actions>
+																						<do-append-xml-element expression="//nds/input" name="query" />
+																						<do-set-xml-attr expression="//nds/input/query[last()]" name="class-name">
+																							<arg-string>
+																								<token-xpath expression="@class-name" />
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-append-xml-element expression="//nds/input/query[last()]" name="search-class" />
+																						<do-set-xml-attr expression="//nds/input/query[last()]/search-class[last()]" name="class-name">
+																							<arg-string>
+																								<token-xpath expression="@class-name" />
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-if>
+																							<arg-conditions>
+																								<and>
+																									<if-xpath op="true">@association</if-xpath>
+																								</and>
+																							</arg-conditions>
+																							<arg-actions>
+																								<do-append-xml-element expression="//nds/input/query[last()]" name="association" />
+																								<do-append-xml-text expression="//nds/input/query[last()]/association">
+																									<arg-string>
+																										<token-xpath expression="@association" />
+																									</arg-string>
+																								</do-append-xml-text>
+																								<do-set-local-variable name="filterText" scope="policy">
+																									<arg-string>
+																										<token-xpath expression="@filter" />
+																									</arg-string>
+																								</do-set-local-variable>
+																								<do-set-local-variable name="filterTextSplit" scope="policy">
+																									<arg-node-set>
+																										<token-split delimiter="&amp;">
+																											<token-local-variable name="filterText" />
+																										</token-split>
+																									</arg-node-set>
+																								</do-set-local-variable>
+																								<do-set-local-variable name="readAttrText" scope="policy">
+																									<arg-string>
+																										<token-substring start="10">
+																											<token-xpath expression="rs:urlDecode($filterTextSplit[2])" />
+																										</token-substring>
+																									</arg-string>
+																								</do-set-local-variable>
+																								<do-if>
+																									<arg-conditions>
+																										<and>
+																											<if-local-variable mode="case" name="readAttrText" op="not-equal" />
+																										</and>
+																									</arg-conditions>
+																									<arg-actions>
+																										<do-if>
+																											<arg-conditions>
+																												<and>
+																													<if-local-variable mode="case" name="readAttrText" op="not-equal">*</if-local-variable>
+																												</and>
+																											</arg-conditions>
+																											<arg-actions>
+																												<do-set-local-variable name="readAttrs" scope="policy">
+																													<arg-node-set>
+																														<token-split delimiter="and">
+																															<token-local-variable name="readAttrText" />
+																														</token-split>
+																													</arg-node-set>
+																												</do-set-local-variable>
+																												<do-for-each>
+																													<arg-node-set>
+																														<token-local-variable name="readAttrs" />
+																													</arg-node-set>
+																													<arg-actions>
+																														<do-append-xml-element expression="//nds/input/query[last()]" name="read-attr" />
+																														<do-set-xml-attr expression="//nds/input/query[last()]/read-attr[last()]" name="attr-name">
+																															<arg-string>
+																																<token-replace-all regex="'" replace-with="">
+																																	<token-local-variable name="current-node" />
+																																</token-replace-all>
+																															</arg-string>
+																														</do-set-xml-attr>
+																													</arg-actions>
+																												</do-for-each>
+																											</arg-actions>
+																											<arg-actions />
+																										</do-if>
+																									</arg-actions>
+																									<arg-actions>
+																										<do-append-xml-element expression="//nds/input/query[last()]" name="read-attr" />
+																									</arg-actions>
+																								</do-if>
+																							</arg-actions>
+																							<arg-actions>
+																								
+																								<do-set-local-variable name="filterText" scope="policy">
+																									<arg-string>
+																										<token-xpath expression="@filter" />
+																									</arg-string>
+																								</do-set-local-variable>
+																								<do-set-local-variable name="filterTextSplit" scope="policy">
+																									<arg-node-set>
+																										<token-split delimiter="&amp;">
+																											<token-local-variable name="filterText" />
+																										</token-split>
+																									</arg-node-set>
+																								</do-set-local-variable>
+																								<do-set-local-variable name="filterTextNode" scope="policy">
+																									<arg-node-set>
+																										<token-split delimiter="and">
+																											<token-substring start="12">
+																												<token-xpath expression="rs:urlDecode($filterTextSplit[1])" />
+																											</token-substring>
+																										</token-split>
+																									</arg-node-set>
+																								</do-set-local-variable>
+																								<do-for-each>
+																									<arg-node-set>
+																										<token-local-variable name="filterTextNode" />
+																									</arg-node-set>
+																									<arg-actions>
+																										<do-set-local-variable name="search-attr" scope="policy">
+																											<arg-node-set>
+																												<token-split delimiter="eq">
+																													<token-local-variable name="current-node" />
+																												</token-split>
+																											</arg-node-set>
+																										</do-set-local-variable>
+																										<do-append-xml-element expression="//nds/input/query[last()]" name="search-attr" />
+																										<do-set-xml-attr expression="//nds/input/query[last()]/search-attr[last()]" name="attr-name">
+																											<arg-string>
+																												<token-xpath expression="$search-attr[1]" />
+																											</arg-string>
+																										</do-set-xml-attr>
+																										<do-append-xml-element expression="//nds/input/query[last()]/search-attr[last()]" name="value" />
+																										<do-append-xml-text expression="//nds/input/query[last()]/search-attr[last()]/value">
+																											<arg-string>
+																												<token-replace-all regex="'" replace-with="">
+																													<token-xpath expression="$search-attr[2]" />
+																												</token-replace-all>
+																											</arg-string>
+																										</do-append-xml-text>
+																									</arg-actions>
+																								</do-for-each>
+																								<do-set-local-variable name="readAttrText" scope="policy">
+																									<arg-string>
+																										<token-substring start="10">
+																											<token-xpath expression="rs:urlDecode($filterTextSplit[2])" />
+																										</token-substring>
+																									</arg-string>
+																								</do-set-local-variable>
+																								<do-if>
+																									<arg-conditions>
+																										<and>
+																											<if-local-variable mode="case" name="readAttrText" op="not-equal" />
+																										</and>
+																									</arg-conditions>
+																									<arg-actions>
+																										<do-if>
+																											<arg-conditions>
+																												<and>
+																													<if-local-variable mode="case" name="readAttrText" op="not-equal">*</if-local-variable>
+																												</and>
+																											</arg-conditions>
+																											<arg-actions>
+																												<do-set-local-variable name="readAttrs" scope="policy">
+																													<arg-node-set>
+																														<token-split delimiter="and">
+																															<token-local-variable name="readAttrText" />
+																														</token-split>
+																													</arg-node-set>
+																												</do-set-local-variable>
+																												<do-for-each>
+																													<arg-node-set>
+																														<token-local-variable name="readAttrs" />
+																													</arg-node-set>
+																													<arg-actions>
+																														<do-append-xml-element expression="//nds/input/query[last()]" name="read-attr" />
+																														<do-set-xml-attr expression="//nds/input/query[last()]/read-attr[last()]" name="attr-name">
+																															<arg-string>
+																																<token-replace-all regex="'" replace-with="">
+																																	<token-local-variable name="current-node" />
+																																</token-replace-all>
+																															</arg-string>
+																														</do-set-xml-attr>
+																													</arg-actions>
+																												</do-for-each>
+																											</arg-actions>
+																											<arg-actions />
+																										</do-if>
+																									</arg-actions>
+																									<arg-actions>
+																										<do-append-xml-element expression="//nds/input/query[last()]" name="read-attr" />
+																									</arg-actions>
+																								</do-if>
+																							</arg-actions>
+																						</do-if>
+																					</arg-actions>
+																					<arg-actions>
+																						<do-append-xml-element expression="//nds/input" name="delete" />
+																						<do-set-xml-attr expression="//nds/input/delete[last()]" name="class-name">
+																							<arg-string>
+																								<token-xpath expression="@class-name" />
+																							</arg-string>
+																						</do-set-xml-attr>
+																						<do-if>
+																							<arg-conditions>
+																								<and>
+																									<if-xpath op="true">@association</if-xpath>
+																								</and>
+																							</arg-conditions>
+																							<arg-actions>
+																								<do-append-xml-element expression="//nds/input/delete[last()]" name="association" />
+																								<do-append-xml-text expression="//nds/input/delete[last()]/association">
+																									<arg-string>
+																										<token-xpath expression="@association" />
+																									</arg-string>
+																								</do-append-xml-text>
+																							</arg-actions>
+																							<arg-actions />
+																						</do-if>
+																					</arg-actions>
+																				</do-if>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-set-local-variable name="xmlInput" notrace="true" scope="policy">
+																					<arg-string>
+																						<token-base64-encode charset="UTF-8">
+																							<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+																								<token-xml-serialize>
+																									<token-xpath expression="." />
+																								</token-xml-serialize>
+																							</token-replace-all>
+																						</token-base64-encode>
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-set-local-variable name="applicationContent" notrace="true" scope="policy">
+																					<arg-string>
+																						<token-xpath expression="rs:jsonToXDS($xmlInput)" />
+																					</arg-string>
+																				</do-set-local-variable>
+																				<do-if notrace="true">
+																					<arg-conditions>
+																						<and>
+																							<if-local-variable mode="nocase" name="applicationContent" op="not-equal" />
+																						</and>
+																					</arg-conditions>
+																					<arg-actions>
+																						<do-set-local-variable name="xdscontent" scope="policy">
+																							<arg-node-set>
+																								<token-xml-parse>
+																									<token-local-variable name="applicationContent" />
+																								</token-xml-parse>
+																							</arg-node-set>
+																						</do-set-local-variable>
+																						<do-clone-xpath dest-expression="/nds/input" src-expression="$xdscontent" />
+																					</arg-actions>
+																					<arg-actions />
+																				</do-if>
+																			</arg-actions>
+																		</do-if>
+																		<do-strip-xpath expression="." />
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

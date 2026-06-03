@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto entitlement changes when Entitlements are off</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">false</if-global-variable>
+											<if-entitlement name="UserAccount" op="changing" />
+										</and>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group" op="equal">false</if-global-variable>
+											<if-entitlement name="Group" op="changing" />
+										</and>
+										<and>
+											<if-global-variable mode="nocase" name="drv.exchMailboxMethod" op="not-equal">entitlement</if-global-variable>
+											<if-entitlement name="ExchangeMailbox" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-veto />
+										<do-break />
+									</actions>
+								</rule>
+								

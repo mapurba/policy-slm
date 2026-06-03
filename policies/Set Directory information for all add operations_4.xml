@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set Directory information for all add operations</description>
+									<comment xml:space="preserve">Set tree name, ldap dn, ldap id for all add operations. This information is necessary  to reference back the objects from the application.</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvGuid" scope="policy">
+											<arg-string>
+												<token-src-attr name="GUID" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvAsciGuid" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:guid2str($lvGuid)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value name="50422">
+											<arg-value type="string">
+												<token-text xml:space="preserve">$lvAsciGuid$</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-dest-attr-value name="directoryid">
+											<arg-value type="string">
+												<token-global-variable name="dirxml.auto.treename" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-dest-attr-value name="50420">
+											<arg-value type="string">
+												<token-global-variable name="dirxml.auto.treename" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-dest-attr-value name="58056">
+											<arg-value type="string">
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

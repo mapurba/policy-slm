@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Match nrfResourceDefs by CN</description>
+									<comment xml:space="preserve">Attempt matching of new Resource Containers</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">nrfResourceDefs</if-class-name>
+											<if-op-attr name="CN" op="available" />
+											<if-op-attr name="OU" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="destDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="slash" length="-2" src-dn-format="slash">
+													<token-op-attr name="OU" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-find-matching-object scope="subtree">
+											<arg-dn>
+												<token-local-variable name="destDn" />
+											</arg-dn>
+											<arg-match-attr name="CN" />
+										</do-find-matching-object>
+									</actions>
+								</rule>
+							

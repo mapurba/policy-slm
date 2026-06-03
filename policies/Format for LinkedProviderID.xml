@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Format for LinkedProviderID</description>
+									<comment xml:space="preserve">The LinkedProviderID in Epic has a specific format requirement.  This policy formats the designated attribute.</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.1</comment>
+									<comment name="lastchanged" xml:space="preserve">2/16/2023</comment>
+									<conditions>
+										<or>
+											<if-op-attr name="~pdsepicedcfg.SER.SerID.attr~" op="available" />
+											<if-op-attr name="~pdsepicedcfg.SER.SerID.trigger~" op="available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr mode="nocase" name="~pdsepicedcfg.SER.SerID.trigger~" op="equal">TRUE</if-attr>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="pdsepicedcfg.SER.SerID.attr" op="equal">CN</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="LinkedProviderID">
+															<arg-value type="string">
+																<token-text xml:space="preserve">{ "ID": "</token-text>
+																<token-attr name="~pdsepicedcfg.SER.SerID.attr~" />
+																<token-text xml:space="preserve">", "Type": "~pdsepicedcfg.SER.SerID.MPI.type~" }</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-strip-op-attr name="~pdsepicedcfg.SER.SerID.attr~" />
+														<do-set-dest-attr-value name="LinkedProviderID">
+															<arg-value type="string">
+																<token-text xml:space="preserve">{ "ID": "</token-text>
+																<token-attr name="~pdsepicedcfg.SER.SerID.attr~" />
+																<token-text xml:space="preserve">", "Type": "~pdsepicedcfg.SER.SerID.MPI.type~" }</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="pdsepicedcfg.SER.SerID.attr" op="not-equal">CN</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-op-attr name="~pdsepicedcfg.SER.SerID.attr~" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

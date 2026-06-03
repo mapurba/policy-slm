@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Parse Account LDAP DN</description>
+									<comment xml:space="preserve">Parse LDAP format DNs to get the App-Name (Authority) and Identifier (Name) attribute values for an account.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-operation mode="case" op="equal">modify</if-operation>
+										</or>
+										<or>
+											<if-class-name mode="nocase" op="equal">Sentinel-Account</if-class-name>
+										</or>
+										<or>
+											<if-op-attr mode="nocase" name="Identifier-Type" op="equal">LDAPDN</if-op-attr>
+										</or>
+									</conditions>
+									<actions>
+										<do-reformat-op-attr name="Identifier">
+											<arg-value type="string">
+												<token-parse-dn dest-dn-format="slash" length="1" src-dn-format="ldap" start="-1">
+													<token-local-variable name="current-value" />
+												</token-parse-dn>
+											</arg-value>
+										</do-reformat-op-attr>
+										<do-reformat-op-attr name="App-Name">
+											<arg-value type="string">
+												<token-text xml:space="preserve">\</token-text>
+												<token-parse-dn dest-dn-format="slash" length="-2" src-dn-format="ldap" start="0">
+													<token-local-variable name="current-value" />
+												</token-parse-dn>
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+							

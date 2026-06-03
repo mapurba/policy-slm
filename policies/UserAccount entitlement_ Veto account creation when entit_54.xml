@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>UserAccount entitlement: Veto account creation when entitlement not granted</description>
+									<comment xml:space="preserve">When using the User Account entitlement with the ILM Manager user application or Role Based Entitlements, accounts are only created for users that are specifically granted the account entitlement. This rule vetoes user account creation when the entitlement is not granted.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lsname" scope="policy">
+											<arg-string>
+												<token-op-property name="lsname" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="entitled" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="granted-lsname" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="granted-lsname" op="equal">$lsname$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="entitled" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="entitled" op="equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Entitled for $lsname$. Allowing add operation.</token-text>
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Not entitled for $lsname$. Vetoing add operation.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-veto />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

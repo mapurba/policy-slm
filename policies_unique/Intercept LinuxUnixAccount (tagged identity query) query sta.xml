@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept LinuxUnixAccount (tagged identity query) query status</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">../status[@event-id='query-driver-ident']/operation-data/@UserAccountEntitlementQuery</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ConnectedSystemName" scope="policy">
+											<arg-string>
+												<token-global-variable name="ConnectedSystemName" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">found Linux and Unix system name: </token-text>
+												<token-local-variable name="ConnectedSystemName" />
+											</arg-string>
+										</do-trace-message>
+										<do-append-xml-element expression=".." name="instance" />
+										<do-set-xml-attr expression="../instance[last()]" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">LinuxUnixAccount</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../instance[last()]" name="src-dn">
+											<arg-string>
+												<token-local-variable name="ConnectedSystemName" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">LinuxUnixAccountDisplayName</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">Account for system: </token-text>
+												<token-local-variable name="ConnectedSystemName" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">LinuxUnixAccountDescription</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">User account in Linux and Unix system </token-text>
+												<token-local-variable name="ConnectedSystemName" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../instance[last()]" name="attr" />
+										<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">LinuxUnixAccountValue</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+										<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+											<arg-string>
+												<token-local-variable name="ConnectedSystemName" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression=".[count(attr)=0]" />
+									</actions>
+								</rule>
+							

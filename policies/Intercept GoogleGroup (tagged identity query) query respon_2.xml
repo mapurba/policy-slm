@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept GoogleGroup (tagged identity query) query response</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="GroupEntitlementQuery" op="equal">true</if-local-variable>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-class-name mode="nocase" op="equal">__driver_identification_class__</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="GroupEntitlementQuery" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-class-name>
+											<arg-string>
+												<token-text xml:space="preserve">GoogleGroup</token-text>
+											</arg-string>
+										</do-set-op-class-name>
+										<do-strip-xpath expression="attr" />
+										<do-set-op-src-dn>
+											<arg-dn>
+												<token-text xml:space="preserve">Google Apps</token-text>
+											</arg-dn>
+										</do-set-op-src-dn>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">GoogleGroupDisplayName</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="attr[last()]" name="value" />
+										<do-append-xml-text expression="attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">Google Apps Group</token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">GoogleGroupDescription</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="attr[last()]" name="value" />
+										<do-append-xml-text expression="attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">Google Apps Group</token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">GoogleGroupValue</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="attr[last()]" name="value" />
+										<do-append-xml-text expression="attr[last()]/value[last()]">
+											<arg-string>
+												<token-text xml:space="preserve">Google Apps</token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression=".[count(attr)=0]" />
+									</actions>
+								</rule>
+							

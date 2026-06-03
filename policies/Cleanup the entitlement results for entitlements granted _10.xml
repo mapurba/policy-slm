@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Cleanup the entitlement results for entitlements granted by NRF</description>
+									<comment xml:space="preserve">An entitlement agent is responsible for cleaning up the entitlement results corresponding to entitlements that it grants or revokes. If a change to entitlement results is detected, loop through and delete all the results that belong to the NRF agent. If the only change in this event is entitlement results, then veto the operation so no commands are generated to the driver shim</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-op-attr name="DirXML-EntitlementResult" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-src-attr name="DirXML-EntitlementResult" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/result/src = 'NRF'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-src-attr-value name="DirXML-EntitlementResult">
+															<arg-value>
+																<token-text xml:space="preserve">"placeholder"</token-text>
+															</arg-value>
+														</do-remove-src-attr-value>
+														<do-strip-xpath expression="../modify[last()]/modify-attr[last()]/remove-value[last()]/value[last()]/text()" />
+														<do-clone-xpath dest-expression="../modify[last()]/modify-attr[last()]/remove-value[last()]/value[last()]" src-expression="$current-node/node()" />
+														<do-set-xml-attr expression="../modify[last()]/modify-attr[last()]/remove-value[last()]/value[last()]" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">xml</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-op-attr name="DirXML-EntitlementResult" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">modify-attr</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Process Logging - Check for drv.proc.log enabled</description>
+									<comment name="lastchanged" xml:space="preserve">Process Logging - Check for drv.proc.log enabled</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">... passed (no match found)</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-dest-dn op="available" />
+													<if-dest-dn op="not-equal">&amp;#xFFFD;</if-dest-dn>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">... passed (single match found dest-dn : </token-text>
+														<token-dest-dn />
+														<token-text xml:space="preserve">)</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-dest-dn op="equal">&amp;#xFFFD;</if-dest-dn>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">... passed (multiple matches found)</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="lvFile" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

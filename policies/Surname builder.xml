@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Surname builder</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-attr name="Full Name" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="full-name">
+											<arg-string>
+												<token-attr name="Full Name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value class-name="User" name="Surname">
+											<arg-value type="string">
+												<token-xpath expression="jstring:substring($full-name,jstring:indexOf($full-name,' ')+1,jstring:length($full-name))" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-local-variable name="given-name-exists">
+											<arg-string>
+												<token-xpath expression="jstring:indexOf($full-name,' ')" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

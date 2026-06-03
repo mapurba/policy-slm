@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>setup for move validation</description>
+									<comment>Gather information needed for move validation.</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">move</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-dest-attr name="DirXML-MDADContext" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="cached-object-value" scope="policy">
+															<arg-string>
+																<token-parse-dn length="-2">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</token-parse-dn>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="current-object-value" scope="policy">
+															<arg-string>
+																<token-src-dn convert="true" length="-2" start="0" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

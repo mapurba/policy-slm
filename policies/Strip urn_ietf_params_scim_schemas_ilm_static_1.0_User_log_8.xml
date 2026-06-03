@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled from operation</description>
+									<comment xml:space="preserve">If entitlements are enabled, the urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled attribute is controlled by Account Entitlement grant or revoke and urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled attribute will be removed from the event based on global configuration value.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.subAllowLoginDisabled" op="equal">false</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:loginDisabled" />
+									</actions>
+								</rule>
+								

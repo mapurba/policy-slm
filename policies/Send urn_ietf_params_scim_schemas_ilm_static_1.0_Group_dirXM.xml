@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Send urn:ietf:params:scim:schemas:ilm:static:1.0:Group:dirXMLMDADAliasName to AD when a Group is being created</description>
+									<comment xml:space="preserve">Since urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName is mapped to sAMAccountName in the smp policy, this will populate the pre-windows 2000 logon name in AD with the object name in eDirectory. Since Windows 2000 is no longer supported by Microsoft, this policy won' t trim the value to 20 characters like it was required to work with that OS.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="object-name">
+											<arg-string>
+												<token-replace-all regex="[^a-zA-Z0-9\x21\x23-\x29\x2d\x2e\x40\x5e-\x60\x7b\x7d\x7e\xc0-\xf6\xf8-\xff\u0410-\u044f]" replace-with="">
+													<token-src-name />
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-add-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:Group:dirXMLMDADAliasName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-local-variable name="object-name" />
+												</arg-component>
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

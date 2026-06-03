@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Store associations in operation-data</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-association op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="associations" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="association/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-xpath expression="association" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">operation-data</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element expression="." name="operation-data" />
+											</arg-actions>
+										</do-if>
+										<do-append-xml-element expression="operation-data" name="existing-associations" />
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="associations" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="operation-data/existing-associations" name="association" />
+												<do-append-xml-text expression="operation-data/existing-associations/association[last()]">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

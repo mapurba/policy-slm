@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle Create Group entitlement to Google changes</description>
+									<conditions>
+										<and>
+											<if-entitlement name="NOVLGGLEGRPS-GroupProvisioning" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="NOVLGGLEGRPS-GroupProvisioning" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Enabling </token-text>
+														<token-src-name />
+														<token-text xml:space="preserve">In the Google System and moving them to new location if appropriate</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-operation mode="case" op="equal">modify</if-operation>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="Permission">
+															<arg-value type="string">
+																<token-global-variable name="gcv.NOVLGGLEGRPS.DefaultVisibility" />
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="NOVLGGLEGRPS-GroupProvisioning" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Revoking </token-text>
+														<token-src-name />
+														<token-text xml:space="preserve"> entitlement to Google</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="gcv.NOVLGGLEGRPS.GroupCreateEntitlementLossHandler" op="equal">owner</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="Permission">
+															<arg-value type="string">
+																<token-text xml:space="preserve">Owner</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+														<do-remove-association>
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</do-remove-association>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="gcv.NOVLGGLEGRPS.GroupCreateEntitlementLossHandler" op="equal">DELETE</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-delete-dest-object />
+														<do-remove-association>
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</do-remove-association>
+														<do-veto />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

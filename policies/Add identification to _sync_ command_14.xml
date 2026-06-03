@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add identification to &lt;sync&gt; command</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">sync</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="." name="operation-data" />
+										<do-append-xml-element expression="operation-data" name="from-sync" />
+										<do-append-xml-text expression="operation-data/from-sync">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-append-xml-text>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-association op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="syncAssoc" scope="policy">
+													<arg-string>
+														<token-association />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="varTemp1" scope="policy">
+													<arg-node-set>
+														<token-split delimiter="\{">
+															<token-local-variable name="syncAssoc" />
+														</token-split>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">count($varTemp1) = 2</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="syncEventId" scope="driver">
+															<arg-string>
+																<token-xpath expression="./@event-id" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-op-property name="Assoc-from-sync">
+															<arg-string>
+																<token-text xml:space="preserve">$syncAssoc$</token-text>
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="syncEventId" scope="driver">
+															<arg-string>
+																<token-text xml:space="preserve">-1</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								
+								
+								
+								

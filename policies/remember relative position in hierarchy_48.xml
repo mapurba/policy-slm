@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>remember relative position in hierarchy</description>
+									<comment>The default policy assumes that you want to synchronize a subset of Active Directory with the Identity Vault. this rule marks events in the given containers for processing by adding the unmached-src-dn operational property. You can add subtrees in Active Directory t for inclusion by adding if-src-dn conditionals here. If you are using mirrored placement, the unmatched-src-dn is used later in the placement rule. If you do not use container based scoping, this rule may be modified or removed. If you change this rule, the placement rules must also be changed to reflect your policy.</comment>
+									<conditions>
+										<and>
+											<if-src-dn op="in-subtree">~drv.user.container~</if-src-dn>
+											<if-op-property mode="nocase" name="attempt-to-match" op="not-equal">false</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="unmatched-src-dn">
+											<arg-string>
+												<token-unmatched-src-dn convert="true" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

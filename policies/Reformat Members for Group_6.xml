@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat Members for Group</description>
+									<comment xml:space="preserve">Reformat group member values</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+										</or>
+										<or>
+											<if-op-attr name="Member" op="changing" />
+										</or>
+										<or>
+											<if-global-variable name="drv.entitlement.Group" op="not-available" />
+											<if-global-variable name="drv.entitlement.Group" op="equal">false</if-global-variable>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="removedMembers" scope="policy">
+											<arg-node-set>
+												<token-removed-attr name="Member" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="addedMembers" scope="policy">
+											<arg-node-set>
+												<token-op-attr name="Member" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="addedMembers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="userId" scope="policy">
+													<arg-string>
+														<token-resolve datastore="src">
+															<arg-dn>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+														</token-resolve>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="drv.SAPCloud" op="equal">true</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="userDisplayName" scope="policy">
+															<arg-string>
+																<token-src-attr class-name="User" name="displayName">
+																	<arg-dn>
+																		<token-local-variable name="current-node" />
+																	</arg-dn>
+																</token-src-attr>
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value class-name="Group" name="members">
+															<arg-value type="string">
+																<token-json-object>
+																	<arg-string name="value">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-local-variable name="userId" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																	<arg-string name="$ref">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-global-variable name="driverHttpScimBaseUrlGCV" />
+																		<token-text xml:space="preserve">/Users/</token-text>
+																		<token-local-variable name="userId" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																	<arg-string name="display">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-local-variable name="userDisplayName" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																</token-json-object>
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-add-dest-attr-value class-name="Group" name="members">
+															<arg-value type="string">
+																<token-json-object>
+																	<arg-string name="value">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-local-variable name="userId" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																	<arg-string name="$ref">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-global-variable name="driverHttpScimBaseUrlGCV" />
+																		<token-text xml:space="preserve">/Users/</token-text>
+																		<token-local-variable name="userId" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																</token-json-object>
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="removedMembers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="userId" scope="policy">
+													<arg-string>
+														<token-resolve datastore="src">
+															<arg-dn>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+														</token-resolve>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="drv.SAPCloud" op="equal">true</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="userDisplayName" scope="policy">
+															<arg-string>
+																<token-dest-attr class-name="User" name="displayName">
+																	<arg-association>
+																		<token-local-variable name="userId" />
+																	</arg-association>
+																</token-dest-attr>
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="userDisplayName" op="equal" />
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="firstname">
+																	<arg-string>
+																		<token-dest-attr class-name="User" name="Given Name">
+																			<arg-association>
+																				<token-local-variable name="userId" />
+																			</arg-association>
+																		</token-dest-attr>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="surname">
+																	<arg-string>
+																		<token-dest-attr class-name="User" name="Surname">
+																			<arg-association>
+																				<token-local-variable name="userId" />
+																			</arg-association>
+																		</token-dest-attr>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="seperator">
+																	<arg-string>
+																		<token-text xml:space="preserve"> </token-text>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="userDisplayName">
+																	<arg-string>
+																		<token-local-variable name="firstname" />
+																		<token-local-variable name="seperator" />
+																		<token-local-variable name="surname" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-remove-dest-attr-value class-name="Group" name="members">
+															<arg-value type="string">
+																<token-json-object>
+																	<arg-string name="value">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-local-variable name="userId" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																	<arg-string name="$ref">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-global-variable name="driverHttpScimBaseUrlGCV" />
+																		<token-text xml:space="preserve">/Users/</token-text>
+																		<token-local-variable name="userId" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																	<arg-string name="display">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-local-variable name="userDisplayName" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																</token-json-object>
+															</arg-value>
+														</do-remove-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-remove-dest-attr-value class-name="Group" name="members">
+															<arg-value type="string">
+																<token-json-object>
+																	<arg-string name="value">
+																		<token-text xml:space="preserve">"</token-text>
+																		<token-local-variable name="userId" />
+																		<token-text xml:space="preserve">"</token-text>
+																	</arg-string>
+																</token-json-object>
+															</arg-value>
+														</do-remove-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-op-attr name="Member" />
+									</actions>
+								</rule>
+								

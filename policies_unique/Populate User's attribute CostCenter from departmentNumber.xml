@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule disabled="true">
+									<description>Populate User's attribute CostCenter from departmentNumber</description>
+									<comment xml:space="preserve">Populate user's attribute  as per IDV attribute format :CostCenter from departmentNumber</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="departmentNumber" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvdepartmentNumber" scope="policy">
+											<arg-string>
+												<token-attr name="departmentNumber" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value name="costCenter">
+											<arg-value type="string">
+												<token-xpath expression="substring-after($lvdepartmentNumber,'_')" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

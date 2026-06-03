@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - on add operation add Dirxml-Accounts</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">batchResponse</if-operation>
+											<if-xpath op="true">@result='urn:oasis:names:tc:SPML:1:0#success'</if-xpath>
+											<if-xpath disabled="true" op="true">status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='operation-data']/@AccountTracking-Operation='add'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='operation-data']/@*" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="thisName" scope="policy">
+													<arg-string>
+														<token-xpath expression="name($current-node)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-op-property name="$thisName$">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-set-op-property name="AccountTracking-association">
+											<arg-string>
+												<token-text xml:space="preserve">SPML.SAPUSER.</token-text>
+												<token-xpath expression="status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='operation-data']/@AccountTracking-logonname" />
+											</arg-string>
+										</do-set-op-property>
+										<do-add-dest-attr-value name="Object Class">
+											<arg-dn>
+												<token-xpath expression="add-association/@dest-dn" />
+											</arg-dn>
+											<arg-value>
+												<token-text xml:space="preserve">DirXMLIdentity</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-property name="AccountTracking-$current-node$" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="tmp" scope="policy">
+															<arg-string>
+																<token-op-property name="AccountTracking-$current-node$" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length($tmp) &gt; 0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-add-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts">
+																	<arg-dn>
+																		<token-xpath expression="add-association/@dest-dn" />
+																	</arg-dn>
+																	<arg-value>
+																		<token-join delimiter="#">
+																			<token-global-variable name="dirxml.auto.driverguid" />
+																			<token-local-variable name="current-node" />
+																			<token-op-property name="AccountTracking-$current-node$" />
+																			<token-op-property name="AccountTracking-IdvAccountStatus" />
+																			<token-op-property name="AccountTracking-AppAccountStatus" />
+																			<token-global-variable name="drv.acctTrk.realm" />
+																		</token-join>
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-clear-op-property name="AccountTracking-$current-node$" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-clear-op-property name="AccountTracking-IdvAccountStatus" />
+										<do-clear-op-property name="AccountTracking-AppAccountStatus" />
+									</actions>
+								</rule>
+							

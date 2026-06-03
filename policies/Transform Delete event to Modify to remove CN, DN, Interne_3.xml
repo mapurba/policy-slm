@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Delete event to Modify to remove CN, DN, Internet Email Address and Description</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-clear-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:userName" when="after" />
+										<do-clear-dest-attr-value name="DISTINGUISHED_NAME" when="after" />
+										<do-clear-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:emails.value" when="after" />
+										<do-clear-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:description" when="after" />
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:employeeStatus" when="after">
+											<arg-value type="string">
+												<token-text xml:space="preserve">I</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+								

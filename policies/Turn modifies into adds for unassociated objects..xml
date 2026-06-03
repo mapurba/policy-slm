@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Turn modifies into adds for unassociated objects.</description>
+									<comment xml:space="preserve">This rule only applies to applications that do not support the query processor.  When modify events for unassociated objects are found, this rule transforms the document into an add command instead.  This allows the engine to treat it as an add event and not perform merging which would require an application query.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="app-query" op="equal">false</if-global-variable>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-association op="not-associated" />
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="//input" name="add" />
+										<do-set-xml-attr expression="//input/add" name="class-name">
+											<arg-string>
+												<token-class-name />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="//input/add" name="association" />
+										<do-append-xml-text expression="//input/add/association">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-append-xml-text>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="modify-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="//input/add" name="add-attr" />
+												<do-set-xml-attr expression="//add/add-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-clone-xpath dest-expression="//add/add-attr[last()]" src-expression="$current-node/add-value/value" />
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="." />
+									</actions>
+								</rule>
+							

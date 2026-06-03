@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Update PermissionOnboarding JobManager configuration</description>
+									<comment xml:space="preserve">Now that all of the job parameters are configured, this command will force the engine to reload the job so it can be executed in the subsequent policy.</comment>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="JOBDN" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">PermissionOnboarding.</token-text>
+												<token-parse-dn dest-dn-format="dot" src-dn-format="slash" start="1">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="JOBADMIN" scope="policy">
+											<arg-string>
+												<token-src-attr name="Security Equals">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="PASSWORD" notrace="true" scope="policy">
+											<arg-string>
+												<token-src-attr name="nspmDistributionPassword">
+													<arg-dn>
+														<token-local-variable name="JOBADMIN" />
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="JOBADMIN" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="dot" src-dn-format="slash" start="1">
+													<token-local-variable name="JOBADMIN" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="JOBCMD" notrace="true" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve"> -user </token-text>
+												<token-local-variable name="JOBADMIN" />
+												<token-text xml:space="preserve"> -password </token-text>
+												<token-local-variable name="PASSWORD" />
+												<token-text xml:space="preserve"> -updatejob '</token-text>
+												<token-local-variable name="JOBDN" />
+												<token-text xml:space="preserve">'</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="updatePermOnboard" scope="policy">
+											<arg-object>
+												<token-xpath expression="jcmd:commandLine(string($JOBCMD))" />
+											</arg-object>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

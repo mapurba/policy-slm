@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Populating Surname attribute</description>
+									<comment xml:space="preserve">The policy populates the Surname field,If it is not available.
+</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-src-attr name="Surname" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value class-name="User" name="Surname">
+											<arg-value type="string">
+												<token-split delimiter="@">
+													<token-src-attr class-name="User" name="CN" />
+												</token-split>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

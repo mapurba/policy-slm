@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>query: Map unmapped read-attr attributes to Sentinel xattr attribute</description>
+									<comment xml:space="preserve">If a query command has a read-attr element for an attribute that is otherwise unmapped, remove the read-attr for the unmapped attribute and add a read-attr for the Sentinel "xattrs" attribute.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">query</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="read-attr[@attr-name]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="mapped-attr-name" scope="policy">
+													<arg-string>
+														<token-map default-value="*" dest="edir" src="sentinel" table="NIQSENIDTRK-IdentityAttrMap">
+															<token-xpath expression="$current-node/@attr-name" />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="mapped-attr-name" op="equal">*</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="need-read-attr" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-strip-xpath expression="$current-node" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="need-read-attr" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element expression="." name="read-attr" />
+												<do-set-xml-attr expression="read-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">xattrs</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Initialize status properties on published events</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">add|modify|delete|rename|move</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="var-idvAccountStatus" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">-</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="var-appAccountStatus" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">-</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="~drv.acctTrk.statusAttr~" op="changing" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-property name="AccountTracking-AccountStatusChanged">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="~drv.acctTrk.statusAttr~" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-op-attr mode="nocase" name="~drv.acctTrk.statusAttr~" op="equal">~drv.acctTrk.activeStatus~</if-op-attr>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="var-appAccountStatus" scope="policy">
+																	<arg-string>
+																		<token-text xml:space="preserve">A</token-text>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-op-attr mode="nocase" name="~drv.acctTrk.statusAttr~" op="equal">~drv.acctTrk.inactiveStatus~</if-op-attr>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="var-appAccountStatus" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">I</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-set-local-variable name="var-appAccountStatus" scope="policy">
+																			<arg-string>
+																				<token-text xml:space="preserve">U</token-text>
+																			</arg-string>
+																		</do-set-local-variable>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="var-appAccountStatus" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">A</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-operation mode="case" op="equal">add</if-operation>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="var-appAccountStatus" scope="policy">
+															<arg-string>
+																<token-global-variable name="drv.acctTrk.idvDefaultStatus" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-set-op-property name="AccountTracking-IdvAccountStatus">
+											<arg-string>
+												<token-local-variable name="var-idvAccountStatus" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-AppAccountStatus">
+											<arg-string>
+												<token-local-variable name="var-appAccountStatus" />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

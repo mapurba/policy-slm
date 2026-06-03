@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Add Operation - add required properties.</description>
+									<comment xml:space="preserve">The policy adds the required attrbutes to the operation data. These values will be used by the itp write accounts policy.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="regex" op="equal">indirect.usr|direct.view_usr</if-class-name>
+											<if-operation mode="regex" op="equal">add</if-operation>
+											<if-global-variable mode="nocase" name="drv.acctTrk.mode" op="not-equal">fanout</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="AccountTracking-Operation">
+											<arg-string>
+												<token-operation />
+											</arg-string>
+										</do-set-op-property>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-src-attr name="disabled" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="disabled" op="equal">1</if-op-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="disabled">
+															<arg-value>
+																<token-text>true</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="disabled" op="equal">0</if-op-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="disabled">
+															<arg-value>
+																<token-text>false</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="AccountTracking-$current-node$">
+													<arg-string>
+														<token-src-attr name="$current-node$" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle attribute conversion for Login Disabled on Modify events</description>
+									<comment xml:space="preserve">Due to schema differences between eDirectory and Office365, this rule will get only the 1st value of cn attribute being removed from eDirectory when sending it to office365.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-xpath op="true">./modify-attr[@attr-name="Login Disabled"]/add-value</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="accountValue" scope="policy">
+											<arg-string>
+												<token-xpath expression="./modify-attr[@attr-name=&quot;Login Disabled&quot;]/add-value/value/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="./modify-attr[@attr-name=&quot;Login Disabled&quot;]" />
+										<do-add-dest-attr-value name="Login Disabled">
+											<arg-value type="string">
+												<token-local-variable name="accountValue" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-append-xml-element expression="./modify-attr[@attr-name=&quot;BlockCredential&quot;]" name="remove-all-values" />
+									</actions>
+								</rule>
+							

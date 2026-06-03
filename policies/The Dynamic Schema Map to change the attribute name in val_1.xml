@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>The Dynamic Schema Map to change the attribute name in value based entitlement XML.</description>
+									<comment xml:space="preserve">IDV to App, Entitlement Schema Map Element Attribute Name Change.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">query</if-operation>
+											<if-xpath op="true">./read-attr[@attr-name='GID']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="Entitlement-Query">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="jdbc.SyncModel" op="equal">indirect</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="./read-attr[@attr-name='GID']" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">idg</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-break />
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="jdbc.SyncModel" op="equal">direct</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="./read-attr[@attr-name='GID']" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">pk_idg</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

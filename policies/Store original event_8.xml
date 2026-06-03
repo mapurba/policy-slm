@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Store original event</description>
+									<conditions>
+										<or>
+											<if-local-variable name="event" op="not-available" />
+											<if-xpath op="not-true">starts-with(@event-id, $prefix)</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="prefix" scope="driver">
+											<arg-string>
+												<token-xpath expression="substring-before(@event-id, '#')" />
+												<token-text xml:space="preserve">#</token-text>
+												<token-xpath expression="substring-before(substring-after(@event-id, '#'), '#')" />
+												<token-text xml:space="preserve">#</token-text>
+												<token-xpath expression="substring-before(substring-after(substring-after(@event-id, '#'), '#'), '#')" />
+												<token-text xml:space="preserve">#</token-text>
+												<token-xpath expression="substring-before(substring-after(substring-after(substring-after(@event-id, '#'), '#'), '#'), '#')" />
+												<token-text xml:space="preserve">#</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Storing new original event with event-id prefix: $prefix$</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="event" scope="driver">
+											<arg-node-set>
+												<token-xpath expression="//modify" />
+											</arg-node-set>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

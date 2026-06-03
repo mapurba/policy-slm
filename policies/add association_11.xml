@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>add association</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">sapspml:status[1]/@level='success'</if-xpath>
+											<if-xpath op="true">sapspml:status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='operation-data']/*[local-name()='return-to-me']/@command='add'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-association direct="true">
+											<arg-dn>
+												<token-xpath expression="sapspml:status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='operation-data']/*[local-name()='return-to-me']/@src-dn" />
+											</arg-dn>
+											<arg-association>
+												<token-xpath expression="sapspml:status[1]/*[local-name()='operation-data']/*[local-name()='errorMessage']/*[local-name()='identifier']/*[local-name()='id']" />
+											</arg-association>
+										</do-add-association>
+									</actions>
+								</rule>
+							

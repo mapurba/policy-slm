@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Moves and Renames into IDM data Modifies</description>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-operation mode="nocase" op="equal">move</if-operation>
+											<if-operation mode="nocase" op="equal">rename</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="qualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-add-dest-attr-value name="DirXML-Accounts" when="after">
+											<arg-value type="string">
+												<token-local-variable name="qualifiedLDAPDn" />
+												<token-text xml:space="preserve">#</token-text>
+												<token-global-variable name="dirxml.auto.treename" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+							

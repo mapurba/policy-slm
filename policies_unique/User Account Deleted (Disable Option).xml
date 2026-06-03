@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Deleted (Disable Option)</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="pdsepicedcfg.delete.action" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="IsActive" when="after">
+											<arg-value type="string">
+												<token-text xml:space="preserve">False</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-local-variable name="lv-BlockStatus" scope="policy">
+											<arg-object>
+												<token-xpath expression="es:BlockStatus($pdsepicedcfg.delete.action.disable.isblocked, &quot;0&quot;, &quot;0&quot;, $pdsepicedcfg.delete.action.disable.isblocked.comment)" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-set-dest-attr-value name="BlockStatus" when="after">
+											<arg-value type="string">
+												<token-xpath expression="es:BlockStatus_jsonify($lv-BlockStatus)" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>add/instance/query/query-ex: Map xattrs to simple attributes.</description>
+									<comment xml:space="preserve">Map any Sentinel Identity xattrs attribute values to simple attributes in the eDirectory User object.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-operation mode="case" op="equal">query</if-operation>
+											<if-operation mode="case" op="equal">query-ex</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./add-attr[@attr-name='xattrs']/value|./attr[@attr-name='xattrs']/value|./search-attr[@attr-name='xattrs']/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="element-name" scope="policy">
+													<arg-string>
+														<token-xpath expression="local-name($current-node/..)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="attr-name" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/component[@name='name']" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-append-xml-element expression="." name="$element-name$" />
+												<do-set-xml-attr expression="child::*[last()]" name="attr-name">
+													<arg-string>
+														<token-local-variable name="attr-name" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="child::*[last()]" name="value" />
+												<do-set-xml-attr expression="child::*[last()]/value" name="type">
+													<arg-string>
+														<token-text xml:space="preserve">string</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-text expression="child::*[last()]/value">
+													<arg-string>
+														<token-xpath expression="$current-node/component[@name='value']" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="child::*[@attr-name='xattrs']" />
+									</actions>
+								</rule>
+								

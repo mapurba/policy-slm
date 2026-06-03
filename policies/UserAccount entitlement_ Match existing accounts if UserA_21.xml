@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>UserAccount entitlement: Match existing accounts if UserAccount Onboarding enabled</description>
+									<comment xml:space="preserve">If the UserAccount GCV is set to true, this policy prevents the onboarding of user accounts from AD unless the UserAccount AND UserAccount.onboard GCV is also set to true.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-property mode="nocase" name="attempt-to-match" op="equal">true</if-op-property>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

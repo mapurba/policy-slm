@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Reformat OrgJobDescription</description>
+									<comment xml:space="preserve">OrgJobDescription is single valued within Google. This policy ensures that only one value is sent and it is preceeded with a "Remove all values" token to ensure proper update. By default, the last value present in the event is sent.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="OrgJobDescription" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lv-values" scope="policy">
+											<arg-node-set>
+												<token-op-attr name="OrgJobDescription" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-op-attr name="OrgJobDescription" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="case" op="equal">add</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="OrgJobDescription">
+													<arg-value type="string">
+														<token-xpath expression="$lv-values[last()]" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-set-dest-attr-value name="OrgJobDescription">
+													<arg-value type="string">
+														<token-xpath expression="$lv-values[last()]" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

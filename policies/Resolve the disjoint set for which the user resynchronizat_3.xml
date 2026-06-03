@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Resolve the disjoint set for which the user resynchronization request belongs to</description>
+									<comment xml:space="preserve">If the driver supports multi-threading then this rule will evaluate for which disjoint set does the user belongs to</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="targetdn" scope="policy">
+											<arg-string>
+												<token-xpath expression="@qualified-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-while>
+											<arg-conditions>
+												<or>
+													<if-local-variable mode="nocase" name="targetdn" op="not-equal" />
+												</or>
+												<or>
+													<if-local-variable name="disjointSet" op="not-available" />
+													<if-local-variable mode="nocase" name="disjointSet" op="equal" />
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="disjointSet" scope="policy">
+													<arg-string>
+														<token-map dest="Target" src="Problem-Set" table="..\NOVLRSERVB-MultiThreadedDisjointDataSetMappingTable">
+															<token-local-variable name="targetdn" />
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="targetdn" scope="policy">
+													<arg-string>
+														<token-parse-dn length="-2">
+															<token-local-variable name="targetdn" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-while>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-local-variable name="disjointSet" op="not-available" />
+													<if-local-variable mode="nocase" name="disjointSet" op="equal" />
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="disjointSet" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">Unknown</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

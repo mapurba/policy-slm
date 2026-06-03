@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Configure cleanup Job</description>
+									<comment xml:space="preserve">Configure cleanup Job</comment>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="jobXmlData" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-base64-decode charset="UTF-8">
+														<token-src-attr class-name="DirXML-Job" name="XmlData">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\CleanDeltaAndFutureObjects</token-text>
+															</arg-dn>
+														</token-src-attr>
+													</token-base64-decode>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-trace-message level="5">
+											<arg-string>
+												<token-xml-serialize>
+													<token-local-variable name="jobXmlData" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.wd.bp.createDelta" op="equal">false</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="$jobXmlData/job-aggregation/job-definition" name="disabled">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions>
+												<do-set-xml-attr expression="$jobXmlData/job-aggregation/job-definition" name="disabled">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+										<do-strip-xpath expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='delta-cont']/value/text()" />
+										<do-append-xml-text expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='delta-cont']/value">
+											<arg-string>
+												<token-global-variable name="drv.wd.bp.deltacontainer" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='fullstate-cont']/value/text()" />
+										<do-append-xml-text expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='fullstate-cont']/value">
+											<arg-string>
+												<token-global-variable name="drv.wd.bp.fscontainer" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='cleanupDays']/value/text()" />
+										<do-append-xml-text expression="$jobXmlData/job-aggregation/job-definition/configuration-values/definitions/definition[@name='cleanupDays']/value">
+											<arg-string>
+												<token-global-variable name="drv.wd.bp.cleanupdays" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-set-src-attr-value class-name="DirXML-Job" direct="true" name="XmlData">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\CleanDeltaAndFutureObjects</token-text>
+											</arg-dn>
+											<arg-value type="string">
+												<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</token-text>
+												<token-xml-serialize>
+													<token-local-variable name="jobXmlData" />
+												</token-xml-serialize>
+											</arg-value>
+										</do-set-src-attr-value>
+									</actions>
+								</rule>
+							

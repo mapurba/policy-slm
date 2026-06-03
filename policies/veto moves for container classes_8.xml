@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>veto moves for container classes</description>
+									<comment xml:space="preserve">eDirectory does not support moves of a container object unless it is its own partition but even then moves come with a risk. This policy will simply veto moves of all container classes regardless of whether they are partition roots or not.</comment>
+									<conditions>
+										<and disabled="true">
+											<if-class-name mode="regex" op="equal">User|Group|Organization Unit|Organization|domain</if-class-name>
+										</and>
+										<and>
+											<if-class-name mode="regex" op="not-equal">User|Group</if-class-name>
+											<if-dest-attr mode="nocase" name="Object Class" op="equal">ndsContainerLoginProperties</if-dest-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-veto />
+									</actions>
+								</rule>
+								

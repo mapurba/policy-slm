@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Prevent unassociated users from being removed from groups</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">modify</if-operation>
+											<if-class-name op="equal">Group</if-class-name>
+											<if-op-attr name="Member" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-attr name="Member" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="memberDN">
+													<arg-node-set>
+														<token-local-variable name="current-node" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="query:readObject($destQueryProcessor, '', $memberDN, '', '')[not(association[. != ''])]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-strip-xpath expression="$memberDN" />
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="modify-attr/remove-value[not(value)]" />
+										<do-strip-xpath expression="modify-attr[not(*)]" />
+									</actions>
+								</rule>
+							

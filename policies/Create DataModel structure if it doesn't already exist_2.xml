@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create DataModel structure if it doesn't already exist</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="driverFullyInitialized" scope="driver">
+											<arg-string>
+												<token-dest-attr name="Object Class">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+												</token-dest-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="driverFullyInitialized" op="not-equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="dmRoot" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-sapDMRoot" scope="subordinates">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-match-attr name="CN">
+														<arg-value type="string">
+															<token-text xml:space="preserve">sap</token-text>
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="dmRoot" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="dmInitialized" scope="driver">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-break />
+											</arg-actions>
+										</do-for-each>
+										<do-add-dest-object class-name="DirXML-sapDMRoot" direct="true">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\sap</token-text>
+											</arg-dn>
+										</do-add-dest-object>
+										<do-add-dest-object class-name="DirXML-sapOMRoot" direct="true">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\sap\om</token-text>
+											</arg-dn>
+										</do-add-dest-object>
+										<do-add-dest-object class-name="DirXML-sapOContainer" direct="true">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\sap\om\o</token-text>
+											</arg-dn>
+										</do-add-dest-object>
+										<do-add-dest-object class-name="DirXML-sapSContainer" direct="true">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\sap\om\s</token-text>
+											</arg-dn>
+										</do-add-dest-object>
+										<do-add-dest-object class-name="DirXML-sapCContainer" direct="true">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\sap\om\c</token-text>
+											</arg-dn>
+										</do-add-dest-object>
+										<do-set-local-variable name="dmInitialized" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: add jobCode (a position's short name)</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="jobCode">
+											<arg-string>
+												<token-dest-attr class-name="DirXML-sapS" name="DirXML-sapSShortName">
+													<arg-association>
+														<token-text xml:space="preserve">S</token-text>
+														<token-op-attr name="DirXML-sapP-A-S" />
+													</arg-association>
+												</token-dest-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="jobCode" op="equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="jobCode">
+													<arg-value type="string">
+														<token-local-variable name="jobCode" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

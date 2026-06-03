@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>MatchUserRule2-Search User on UserID</description>
+									<comment xml:space="preserve">This rule will match user on UserID</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="regex" name="gvUserMatchAttr" op="equal">worker-pub-match-cn|worker-pub-match-all</if-global-variable>
+											<if-global-variable mode="regex" name="gvUserNameMappingAttr" op="equal">.+</if-global-variable>
+											<if-op-attr name="~gvUserNameMappingAttr~" op="available" />
+											<if-local-variable mode="nocase" name="lvUserStopSearch" op="equal">false</if-local-variable>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvUserNodeSetMatchOnCN" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" max-result-count="100">
+													<arg-dn>
+														<token-global-variable name="gvUserContainer" />
+													</arg-dn>
+													<arg-match-attr name="~gvUserNameMappingAttr~" />
+													<arg-string>
+														<token-text xml:space="preserve">CN</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">workforceID</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-trace-message level="1">
+											<arg-string>
+												<token-text xml:space="preserve">User Count Match On CN</token-text>
+												<token-xpath expression="count($lvUserNodeSetMatchOnCN)" />
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="lvUserCN" op="equal">.+</if-local-variable>
+													<if-xpath op="true">count($lvUserNodeSetMatchOnCN) = 1</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvUserCN" scope="driver">
+													<arg-string>
+														<token-xpath expression="$lvUserNodeSetMatchOnCN//attr[@attr-name='CN']/value/." />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message level="1">
+													<arg-string>
+														<token-text xml:space="preserve">lvUserCN: </token-text>
+														<token-local-variable name="lvUserCN" />
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="lvUserStopSearch" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-find-matching-object scope="subtree">
+													<arg-dn>
+														<token-global-variable name="gvUserContainer" />
+													</arg-dn>
+													<arg-match-attr name="CN">
+														<arg-value type="string">
+															<token-local-variable name="lvUserCN" />
+														</arg-value>
+													</arg-match-attr>
+												</do-find-matching-object>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">count($lvUserNodeSetMatchOnCN) &gt; 1</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message level="1">
+													<arg-string>
+														<token-text xml:space="preserve">User Count Match On CN: </token-text>
+														<token-xpath expression="count($lvUserNodeSetMatchOnCN)" />
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="lvIDVUserIDListWithMultipleMatch" scope="policy">
+													<arg-string />
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$lvUserNodeSetMatchOnCN//attr[@attr-name='CN']/value/." />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="lvIDVUserIDListWithMultipleMatch" scope="policy">
+															<arg-string>
+																<token-local-variable name="lvIDVUserIDListWithMultipleMatch" />
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">; </token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+												<do-trace-message level="1">
+													<arg-string>
+														<token-text xml:space="preserve">lvIDVUserIDListWithMultipleMatch: </token-text>
+														<token-local-variable name="lvIDVUserIDListWithMultipleMatch" />
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="lvMultipleUserSearchCountOnCN" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvUserStopSearch" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

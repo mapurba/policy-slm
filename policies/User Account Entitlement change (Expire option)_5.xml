@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Entitlement change (Expire option) </description>
+									<comment xml:space="preserve">User gwAccount Entitlement grants/ revokes the user account in GroupWise System. This rule executes when the entitlement is changing and you have selected the expire option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="driver.gw.ent.account.remove" op="equal">expire</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="gwAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="gwAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="accountDisableByEntitlementRevoke">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-dest-attr-value name="Login Expiration Time">
+													<arg-value type="string">
+														
+														<token-xpath expression="int:new(date:getTime(date:new()))" />
+													</arg-value>
+												</do-set-dest-attr-value>
+												<do-set-op-property name="expire-account">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-remove-association when="after">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</do-remove-association>
+												<do-clear-src-attr-value class-name="User" name="NGW: GroupWise ID" />
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="gwAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="driver.gw.ent.account.add" op="equal">disable</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="Login Disabled">
+															<arg-value type="state">
+																<token-text xml:space="preserve">true</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-set-dest-attr-value name="Login Disabled">
+															<arg-value type="state">
+																<token-text xml:space="preserve">false</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+												</do-if>
+												<do-clear-dest-attr-value class-name="User" name="Login Expiration Time" />
+												<do-set-op-property name="expire-account">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-break />
+									</actions>
+								</rule>
+								

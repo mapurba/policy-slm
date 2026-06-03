@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>OrgUnit to Post Office User Placement</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable name="driver.gw.SyncOUToGWPO" op="equal">true</if-global-variable>
+											<if-local-variable name="association-count" op="equal">1</if-local-variable>
+											<if-xpath op="true">starts-with($ou2po-association,$dom-po-name)</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-xml-attr expression="../add" name="gw:classification">
+											<arg-string>
+												<token-text xml:space="preserve">external</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-add-dest-attr-value name="50035">
+											<arg-value type="string">
+												<token-global-variable name="driver.gw.SyncOU2GWEPODomainName" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value name="50062">
+											<arg-value type="string">
+												<token-src-dn length="1" start="-2" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-set-op-dest-dn>
+											<arg-dn>
+												<token-local-variable name="dom-po-name" />
+											</arg-dn>
+										</do-set-op-dest-dn>
+										<do-break />
+									</actions>
+								</rule>
+								

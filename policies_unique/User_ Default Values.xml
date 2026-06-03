@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: Default Values</description>
+									<comment xml:space="preserve">Set Default values for SER required attributes.  Epic attribute '35' is provided as an example.  The default driver packages manage attribute '35' as part of the entitlement management in the Command Transformation policies.</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-default-attr-value name="30" write-back="false">
+											<arg-value type="string">
+												<token-text xml:space="preserve">1</token-text>
+											</arg-value>
+										</do-set-default-attr-value>
+										<do-set-default-attr-value name="45" write-back="false">
+											<arg-value type="string">
+												<token-text xml:space="preserve">1</token-text>
+											</arg-value>
+										</do-set-default-attr-value>
+										<do-set-local-variable disabled="true" name="lv-idv-attribute-name" scope="policy">
+											<arg-string>
+												<token-xpath expression="$ln-epic-schema-mapping//attr-name-map/attr-name[app-name/text()=&quot;Status&quot;]/nds-name/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if disabled="true">
+											<arg-conditions>
+												<and>
+													<if-attr name="$lv-idv-attribute-name$" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-default-attr-value name="35" write-back="false">
+													<arg-value type="string">
+														<token-text xml:space="preserve">Active</token-text>
+													</arg-value>
+												</do-set-default-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

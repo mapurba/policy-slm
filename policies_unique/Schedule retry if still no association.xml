@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Schedule retry if still no association</description>
+									<conditions>
+										<and>
+											<if-association op="not-available" />
+											<if-operation mode="nocase" op="not-equal">trigger</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),'No association. Added association and scheduling retry.'))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-status level="retry">
+											<arg-string>
+												<token-text xml:space="preserve">No association. Added association and scheduling retry.</token-text>
+											</arg-string>
+										</do-status>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept GroupWise Group query response.</description>
+									<comment xml:space="preserve">This query resolves the association of individual members of the group using src-dn.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./attr[@attr-name='Member To']/value" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="VariableNode" scope="policy">
+													<arg-string>
+														<token-xpath expression="concat($driver.gw.SubSyncDestLocation,'.',$current-node/text())" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-xml-attr expression="$current-node" name="type">
+													<arg-string>
+														<token-text xml:space="preserve">dn</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-local-variable name="VariableAssociation" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="src" scope="entry">
+															<arg-dn>
+																<token-local-variable name="VariableNode" />
+															</arg-dn>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-xml-attr expression="$current-node" name="association-ref">
+													<arg-string>
+														<token-xpath expression="$VariableAssociation/association" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

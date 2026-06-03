@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check for User sync event</description>
+									<comment xml:space="preserve">Policy looks for the sync event and updates the event-id by appending #event:sync tag to it.
+</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="case" op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">sync</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="eventId" scope="policy">
+											<arg-string>
+												<token-xpath expression="./@event-id" />
+												<token-text xml:space="preserve">#event:sync</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="$current-op" name="event-id">
+											<arg-string>
+												<token-local-variable name="eventId" />
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+							

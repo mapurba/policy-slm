@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Inject synthetic attributes</description>
+									<comment xml:space="preserve">Inject various synthetic attributes that correspond to the Sentinel Identity object attributes, but do not have a direct analogue in eDirectory attributes.
+Do it here so that the attribute values are available for matching, if desired.</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="User" name="Distinguished Name">
+											<arg-value type="string">
+												<token-text xml:space="preserve">\</token-text>
+												<token-parse-dn dest-dn-format="slash" length="-1" start="1">
+													<token-src-dn />
+												</token-parse-dn>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value class-name="identity" name="Vault Name">
+											<arg-value type="string">
+												<token-substring start="1">
+													<token-src-dn length="1" />
+												</token-substring>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-set-dest-attr-value class-name="User" name="LDAPDN">
+											<arg-value type="string">
+												<token-lower-case>
+													<token-parse-dn dest-dn-format="ldap">
+														<token-xpath expression="@qualified-src-dn" />
+													</token-parse-dn>
+												</token-lower-case>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

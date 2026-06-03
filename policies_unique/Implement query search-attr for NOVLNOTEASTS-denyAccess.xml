@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Implement query search-attr for NOVLNOTEASTS-denyAccess</description>
+									<comment xml:space="preserve">This rule partially implements queries with a &lt;search-attr attr-name="NOVLNOTEASTS-denyAccess"&gt;... The other part is done in the input transformation policy.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">query</if-operation>
+											<if-global-variable mode="nocase" name="drv.account.status.DenyAccessGroup.use" op="equal">true</if-global-variable>
+											<if-xpath op="true">search-attr[@attr-name='NOVLNOTEASTS-denyAccess']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="NOVLNOTEASTS-denyAccessSearchAttr">
+											<arg-string>
+												<token-xpath expression="search-attr[@attr-name='NOVLNOTEASTS-denyAccess']/value[1]/text()" />
+											</arg-string>
+										</do-set-op-property>
+										<do-strip-xpath expression="search-attr[@attr-name='NOVLNOTEASTS-denyAccess']" />
+									</actions>
+								</rule>
+								

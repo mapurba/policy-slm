@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Name-Based Object Naming - Variable Length</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="tmpSurname">
+											<arg-string>
+												<token-op-attr name="Surname" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="stripSurname">
+											<arg-string>
+												<token-xpath expression="translate($tmpSurname,&quot;-+'&quot;,&quot;&quot;)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="tmpGivenname">
+											<arg-string>
+												<token-op-attr name="Given Name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="stripGivenname">
+											<arg-string>
+												<token-xpath expression="translate($tmpGivenname,&quot;-+'&quot;,&quot;&quot;)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="unique-cn" scope="driver">
+											<arg-string>
+												<token-unique-name counter-digits="3" counter-pad="false" counter-pattern="first" name="CN" scope="subtree">
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="1">
+																<token-local-variable name="stripGivenname" />
+															</token-substring>
+															<token-local-variable name="stripSurname" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="2">
+																<token-local-variable name="stripGivenname" />
+															</token-substring>
+															<token-local-variable name="stripSurname" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="3">
+																<token-local-variable name="stripGivenname" />
+															</token-substring>
+															<token-local-variable name="stripSurname" />
+														</token-lower-case>
+													</arg-string>
+												</token-unique-name>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

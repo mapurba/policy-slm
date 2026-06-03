@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add operation attribute  Organization (O)</description>
+									<comment xml:space="preserve">Add operation attribute Organization (O)</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-op-attr name="COMPANY_Code" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-clone-op-attr dest-name="O" src-name="COMPANY_Code" />
+										<do-set-local-variable name="lvorganization" scope="policy">
+											<arg-string>
+												<token-op-attr name="COMPANY_Code" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr mode="nocase" name="wd-WorkerIDType" op="equal">Employee_ID</if-op-attr>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-reformat-op-attr name="employeeType">
+													<arg-value type="string">
+														<token-text xml:space="preserve">employee</token-text>
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+											<arg-actions>
+												<do-reformat-op-attr name="employeeType">
+													<arg-value type="string">
+														<token-text xml:space="preserve">nonEmployee</token-text>
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

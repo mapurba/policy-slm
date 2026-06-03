@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip off Excees data from InstitutionRoles Attribute</description>
+									<conditions>
+										<and>
+											<if-op-attr name="InstitutionRoles" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression=".//*[@attr-name='InstitutionRoles']//value/text()" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lv_currentNode" scope="policy">
+													<arg-node-set>
+														<token-split delimiter=";">
+															<token-local-variable name="current-node" />
+														</token-split>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$lv_currentNode[position() &lt;= $gcv.NOVLBNNRUSER.institutionRolesFormat]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="lv_returnValue" scope="policy">
+															<arg-string>
+																<token-replace-all regex="\A[$gcv.NOVLBNNRUSER.institutionRolesSemiColonCharacter$]" replace-with="">
+																	<token-local-variable name="lv_returnValue" />
+																	<token-global-variable name="gcv.NOVLBNNRUSER.institutionRolesSemiColonCharacter" />
+																</token-replace-all>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+												<do-strip-xpath expression=".//value/text()[. = $current-node]" />
+												<do-append-xml-text expression=".//value[ancestor::*/@attr-name='InstitutionRoles' and not(node())]">
+													<arg-string>
+														<token-local-variable name="lv_returnValue" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-set-local-variable name="lv_returnValue" scope="policy">
+													<arg-string />
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

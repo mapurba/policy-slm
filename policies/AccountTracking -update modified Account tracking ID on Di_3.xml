@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking -update modified Account tracking ID on DirXML-Accounts</description>
+									<comment xml:space="preserve">update modified Account tracking ID on DirXML-Accounts</comment>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="AccountTracking-Operation" op="equal">modify</if-op-property>
+											<if-local-variable name="modifiedAccountTrackingId" op="available" />
+											<if-local-variable name="emailEvtAssociation" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="localTempAccntTrackId" scope="policy">
+											<arg-string>
+												<token-local-variable name="modifiedAccountTrackingId" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="localAssociation" scope="policy">
+											<arg-string>
+												<token-local-variable name="emailEvtAssociation" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="modifiedAccountTrackingId" scope="driver">
+											<arg-string />
+										</do-set-local-variable>
+										<do-set-local-variable name="emailEvtAssociation" scope="driver">
+											<arg-string />
+										</do-set-local-variable>
+										<do-set-local-variable name="AccountIdentifiers" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" scope="entry">
+													<arg-association>
+														<token-local-variable name="localAssociation" />
+													</arg-association>
+													<arg-string>
+														<token-text xml:space="preserve">urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="username" scope="policy">
+											<arg-string>
+												<token-local-variable name="localTempAccntTrackId" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="search-key" scope="policy">
+													<arg-string>
+														<token-join delimiter="#">
+															<token-global-variable name="dirxml.auto.driverguid" />
+															<token-local-variable name="current-node" />
+														</token-join>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="drv.acctTrk.mode" op="equal">121</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="realm" scope="policy">
+															<arg-string>
+																<token-global-variable name="drv.acctTrk.realm" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-set-local-variable name="var-accountElements" scope="policy">
+													<arg-node-set />
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$AccountIdentifiers/attr[@attr-name='urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts']/value[starts-with(.,$search-key) and contains(concat(.,'#'),concat('#',$realm,'#'))]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="var-accountElements" scope="policy">
+															<arg-node-set>
+																<token-split delimiter="#">
+																	<token-local-variable name="current-node" />
+																</token-split>
+															</arg-node-set>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$AccountIdentifiers</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">count($var-accountElements)&gt;1</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="var-idvStatus" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$var-accountElements[4]" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="var-appStatus" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$var-accountElements[5]" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable name="localTempAccntTrackId" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Account Tracking - Account identifier "$current-node$" changed</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-set-local-variable name="search-key" scope="policy">
+															<arg-string>
+																<token-join delimiter="#">
+																	<token-global-variable name="dirxml.auto.driverguid" />
+																	<token-local-variable name="current-node" />
+																</token-join>
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Account Tracking - Preparing to update entries with search-key "$search-key$" and realm "$realm$"</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="$AccountIdentifiers/attr[@attr-name='urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts']/value[starts-with(.,$search-key) and contains(concat(.,'#'),concat('#',$realm,'#'))]" />
+															</arg-node-set>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Account Tracking - Removing entry "$current-node$"</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-remove-dest-attr-value direct="true" name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts">
+																	<arg-association>
+																		<token-local-variable name="localAssociation" />
+																	</arg-association>
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+														</do-for-each>
+														<do-set-local-variable name="tmp" scope="policy">
+															<arg-string>
+																<token-local-variable name="localTempAccntTrackId" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length($tmp) &gt; 0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="tmp" scope="policy">
+																	<arg-string>
+																		<token-join delimiter="#">
+																			<token-global-variable name="dirxml.auto.driverguid" />
+																			<token-local-variable name="current-node" />
+																			<token-local-variable name="localTempAccntTrackId" />
+																			<token-local-variable name="var-idvStatus" />
+																			<token-local-variable name="var-appStatus" />
+																			<token-local-variable name="realm" />
+																		</token-join>
+																	</arg-string>
+																</do-set-local-variable>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">Account Tracking - Adding entry "$tmp$"</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-add-dest-attr-value direct="true" name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts">
+																	<arg-association>
+																		<token-local-variable name="localAssociation" />
+																	</arg-association>
+																	<arg-value type="string">
+																		<token-local-variable name="tmp" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-set-local-variable name="localTempAccntTrackId" scope="policy">
+											<arg-string />
+										</do-set-local-variable>
+										<do-set-local-variable name="localAssociation" scope="policy">
+											<arg-string />
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>immutableId: Set if not present</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-op-attr name="immutableId" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="query-back" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" datastore="src" scope="entry">
+													<arg-dn>
+														<token-src-dn />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">GUID</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-add-dest-attr-value name="immutableId">
+											<arg-value type="string">
+												<token-xpath expression="$query-back//attr[@attr-name=&quot;GUID&quot;]/value[1]/text()" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+								

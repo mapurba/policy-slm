@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check User's UserGroup membership being granted or revoked</description>
+									<comment xml:space="preserve">Provide PUM UserGroup membership to the user with the Entitlement granted. Remove PUM UserGroup membership to the user with the Entitlement revoked.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserGroup" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-entitlement name="UserGroup" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserGroup" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="hasUserGroupMembership" scope="policy">
+													<arg-node-set>
+														<token-query class-name="Group" scope="entry">
+															<arg-association>
+																<token-local-variable name="assoc" />
+															</arg-association>
+															<arg-match-attr name="Member">
+																<arg-value type="string">
+																	<token-src-attr name="CN" />
+																</arg-value>
+															</arg-match-attr>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">User Group Query Value :: </token-text>
+														<token-local-variable name="hasUserGroupMembership" />
+													</arg-string>
+												</do-trace-message>
+												<do-remove-dest-attr-value class-name="Group" name="Member">
+													<arg-association>
+														<token-local-variable name="assoc" />
+													</arg-association>
+													<arg-value type="string">
+														<token-src-attr name="CN" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserGroup" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="hasUserGroupMembership" scope="policy">
+													<arg-node-set>
+														<token-query class-name="Group" scope="entry">
+															<arg-association>
+																<token-local-variable name="assoc" />
+															</arg-association>
+															<arg-match-attr name="Member">
+																<arg-value type="string">
+																	<token-src-attr name="CN" />
+																</arg-value>
+															</arg-match-attr>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">User Group Membership Query Result :: </token-text>
+														<token-local-variable name="hasUserGroupMembership" />
+													</arg-string>
+												</do-trace-message>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="case" name="hasUserGroupMembership" op="equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Granting UserGroup membership to the user in PUM.</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-add-dest-attr-value class-name="Group" name="Member">
+															<arg-association>
+																<token-local-variable name="assoc" />
+															</arg-association>
+															<arg-value type="string">
+																<token-src-attr name="CN" />
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">User is already member of the UserGroup.</token-text>
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

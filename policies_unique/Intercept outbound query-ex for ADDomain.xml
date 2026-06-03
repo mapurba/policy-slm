@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept outbound query-ex for ADDomain</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">ADDomain</if-class-name>
+											<if-operation mode="case" op="equal">query-ex</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="../query-ex[last()]/@class-name" />
+										<do-set-xml-attr expression="../query-ex[last()]" name="event-id">
+											<arg-string>
+												<token-text xml:space="preserve">query-driver-ident</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../query-ex[last()]" name="scope">
+											<arg-string>
+												<token-text xml:space="preserve">entry</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-strip-xpath expression="../query-ex[last()]/search-class" />
+										<do-append-xml-element expression="../query-ex[last()]" name="search-class" />
+										<do-set-xml-attr expression="../query-ex[last()]/search-class[last()]" name="class-name">
+											<arg-string>
+												<token-text xml:space="preserve">__driver_identification_class__</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-strip-xpath expression="../query-ex[last()]/read-attr" />
+										<do-append-xml-element expression="../query-ex[last()]" name="read-attr" />
+										<do-set-op-property name="UserAccountEntitlementQuery">
+											<arg-string>
+												<token-dest-dn />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

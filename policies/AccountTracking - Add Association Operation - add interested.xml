@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Add Association Operation - add interested properties to current doc for future use.</description>
+									<comment xml:space="preserve">The policy adds the required attrbutes to the operation data. These values will be used by the itp write accounts policy.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">add-association</if-operation>
+											<if-global-variable mode="nocase" name="drv.acctTrk.enable" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.acctTrk.mode" op="not-equal">fanout</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-clear-op-property name="AccountTracking-Operation" />
+										<do-set-op-property name="AccountTracking-ObjectDN">
+											<arg-string>
+												<token-dest-dn />
+											</arg-string>
+										</do-set-op-property>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-query class-name="~drv.acctTrk.objectClass~" datastore="src" scope="entry">
+															<arg-association>
+																<token-xpath expression="./text()" />
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">$current-node$</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="acct-identifier-value" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/attr[last()]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-for-each>
+												<do-set-op-property name="AccountTracking-$current-node$">
+													<arg-string>
+														<token-local-variable name="acct-identifier-value" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

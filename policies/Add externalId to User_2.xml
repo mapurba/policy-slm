@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add externalId to User</description>
+									<conditions>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-operation op="equal">add</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="CN" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="guid" scope="policy">
+													<arg-string>
+														<token-query class-name="User" datastore="src">
+															<arg-match-attr name="CN" />
+															<arg-string>
+																<token-text xml:space="preserve">GUID</token-text>
+															</arg-string>
+														</token-query>
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="User" name="externalId">
+													<arg-value type="string">
+														<token-local-variable name="guid" />
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-add-dest-attr-value class-name="User" name="id">
+													<arg-value type="string">
+														<token-local-variable name="guid" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

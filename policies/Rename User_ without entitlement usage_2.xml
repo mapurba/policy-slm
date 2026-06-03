@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Rename User: without entitlement usage</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">rename</if-operation>
+											<if-global-variable mode="nocase" name="drv.role.rename.option" op="equal">2</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.enable" op="equal">false</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-remove-association direct="true">
+											<arg-association>
+												<token-association />
+											</arg-association>
+										</do-remove-association>
+										<do-strip-xpath expression="association" />
+										<do-set-op-property name="renOld">
+											<arg-string>
+												<token-local-variable name="lv.renOld" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="renNew">
+											<arg-string>
+												<token-local-variable name="lv.renNew" />
+											</arg-string>
+										</do-set-op-property>
+										<do-append-xml-element expression=".." name="add" />
+										<do-clone-xpath dest-expression="../add" src-expression="./@*|node()" />
+										<do-set-local-variable name="filter" scope="policy">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+														<token-text xml:space="preserve">/</token-text>
+														<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+															<token-global-variable name="dirxml.auto.driverdn" />
+														</token-parse-dn>
+														<token-text xml:space="preserve">#</token-text>
+														<token-text xml:space="preserve">DirXML-DriverFilter</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$filter/filter/filter-class[@class-name=@class-name]/filter-attr[@subscriber='sync' or @subscriber='notify']/@attr-name" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="value" scope="policy">
+													<arg-node-set>
+														<token-attr name="$current-node$" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">count($value)&gt;0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-element expression="../add[last()]" name="add-attr" />
+														<do-append-xml-element expression="../add[last()]/add-attr[last()]" name="value" />
+														<do-set-xml-attr expression="../add[last()]/add-attr[last()]" name="attr-name">
+															<arg-string>
+																<token-xpath expression="$current-node" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="../add[last()]/add-attr[@attr-name=$current-node]/value">
+															<arg-string>
+																<token-xpath expression="$value" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="." />
+									</actions>
+								</rule>
+								
+								

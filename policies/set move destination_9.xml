@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>set move destination</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">move</if-operation>
+											<if-op-property mode="nocase" name="ignore-move" op="not-equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="src-dn" scope="policy">
+											<arg-string>
+												<token-src-dn />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="qualified-src-dn" scope="policy">
+											<arg-string>
+												<token-xpath expression="./@qualified-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="old-src-dn" scope="policy">
+											<arg-string>
+												<token-xpath expression="@old-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="qualified-old-src-dn" scope="policy">
+											<arg-string>
+												<token-xpath expression="./@qualified-old-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.domains" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="domain_container" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.container.name&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="in-subtree">$domain_container$</if-src-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="unmatched-src-dn">
+															<arg-string>
+																<token-unmatched-src-dn convert="true" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-local-variable name="drv.domain.container.name" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.container.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-op-property name="drv.domain.container.name">
+															<arg-string>
+																<token-text xml:space="preserve">\</token-text>
+																<token-global-variable name="dirxml.auto.treename" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="drv.domain.container.name" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-local-variable name="drv.domain.dns.name" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="drv.user.container" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-op-property name="drv.user.container">
+															<arg-string>
+																<token-local-variable name="drv.user.container" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-local-variable name="drv.subPlacementType" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.subPlacementType&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="drv.subPlacementType" op="equal">flat</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-op-dest-dn>
+																	<arg-dn>
+																		<token-local-variable name="drv.user.container" />
+																	</arg-dn>
+																</do-set-op-dest-dn>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="umatched_container" scope="policy">
+																	<arg-string>
+																		<token-op-property name="unmatched-src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="regex" name="unmatched_container" op="equal" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-op-dest-dn>
+																			<arg-dn>
+																				<token-local-variable name="drv.user.container" />
+																			</arg-dn>
+																		</do-set-op-dest-dn>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-set-op-dest-dn>
+																			<arg-dn>
+																				<token-local-variable name="unmatched_container" />
+																				<token-text xml:space="preserve">,</token-text>
+																				<token-local-variable name="drv.user.container" />
+																			</arg-dn>
+																		</do-set-op-dest-dn>
+																	</arg-actions>
+																</do-if>
+																<do-set-op-dest-dn>
+																	<arg-dn>
+																		<token-op-property name="unmatched-src-dn" />
+																		<token-text xml:space="preserve">,</token-text>
+																		<token-local-variable name="drv.user.container" />
+																	</arg-dn>
+																</do-set-op-dest-dn>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-set-op-src-dn>
+															<arg-dn>
+																<token-local-variable name="old-src-dn" />
+															</arg-dn>
+														</do-set-op-src-dn>
+														<do-set-xml-attr expression="." name="qualified-src-dn">
+															<arg-string>
+																<token-local-variable name="qualified-old-src-dn" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-src-dn op="in-subtree">$domain_container$</if-src-dn>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-xml-attr expression="." name="old-dest-dn">
+																	<arg-string>
+																		<token-src-dn convert="true" length="1" start="-1" />
+																		<token-text xml:space="preserve">,</token-text>
+																		<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+																	</arg-string>
+																</do-set-xml-attr>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-set-op-src-dn>
+															<arg-dn>
+																<token-local-variable name="src-dn" />
+															</arg-dn>
+														</do-set-op-src-dn>
+														<do-set-xml-attr expression="." name="qualified-src-dn">
+															<arg-string>
+																<token-local-variable name="qualified-src-dn" />
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Login Expiration Time</description>
+									<comment xml:space="preserve">The Login Expiration Time needs to be converted to a RACF "UNTIL" value.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="Login Expiration Time" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="loginExpirationTime">
+											<arg-string>
+												<token-op-attr name="Login Expiration Time" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="untilTime">
+											<arg-string>
+												<token-xpath expression="racf:edirToRACFDate($loginExpirationTime)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="Login Expiration Time">
+											<arg-value>
+												<token-local-variable name="untilTime" />
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+								

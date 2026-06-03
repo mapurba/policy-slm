@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>i5osAccount entitlement: do not match existing accounts</description>
+									<comment xml:space="preserve">When using the i5OS Account entitlement with the Identity Manager user application or Role Based Entitlements, accounts are created and deleted/disabled by granting or revoking the entitlement. Default policy does not match an existing account in i5OS if the user is not entitled to an account in i5OS. Modify or remove this rule if you want entitlement policy to apply to matching accounts in i5OS. Notice that this may result in the i5OS account being deleted or disabled.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.i5osAccount" op="equal">true</if-global-variable>
+											<if-entitlement name="i5osAccount" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>add/modify/instance/query/query-ex strip non-identity association references</description>
+									<comment xml:space="preserve">Strip association references on values that result from having associations for Sentinel account objects on the eDir User object.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-operation mode="case" op="equal">query</if-operation>
+											<if-operation mode="case" op="equal">query-ex</if-operation>
+										</or>
+										<or>
+											<if-xpath op="true">.//value[@association-ref and not(starts-with(@association-ref,'identity/'))]</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression=".//value[@association-ref and not(starts-with(@association-ref,'identity/'))]" />
+									</actions>
+								</rule>
+							

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>updateRetryAttrs</description>
+									<comment xml:space="preserve">updateRetryAttrs</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">status</if-operation>
+											<if-xpath op="true">self::status[@level = 'error']</if-xpath>
+											<if-op-property name="modifiedAttribute" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="errorString" scope="policy">
+											<arg-string>
+												<token-xpath expression="self::status[@level = 'error']" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="errorString" op="equal">.*Validation error occurred.*</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="modAttrNS" scope="policy">
+													<arg-node-set>
+														<token-split delimiter=",">
+															<token-op-property name="modifiedAttribute" />
+														</token-split>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="modAttrNS" />
+													</arg-node-set>
+													<arg-actions>
+														<do-add-dest-attr-value class-name="User" name="DirXML-WDSyncAttr" when="before">
+															<arg-association>
+																<token-op-property name="UserAssociation" />
+															</arg-association>
+															<arg-value type="string">
+																<token-local-variable name="current-node" />
+															</arg-value>
+														</do-add-dest-attr-value>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

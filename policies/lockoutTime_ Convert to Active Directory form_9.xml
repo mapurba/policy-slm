@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>lockoutTime: Convert to Active Directory form</description>
+									<conditions>
+										<and>
+											<if-op-attr name="lockoutTime" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">./modify-attr[@attr-name='lockoutTime']/add-value</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">./modify-attr[@attr-name='lockoutTime']/remove-value</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="./modify-attr[@attr-name='lockoutTime']/remove-value" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-append-xml-element expression="./modify-attr[@attr-name='lockoutTime']" name="remove-all-values" />
+												<do-append-xml-element expression="./modify-attr[@attr-name='lockoutTime']" name="add-value" />
+												<do-append-xml-element expression="./modify-attr[@attr-name='lockoutTime']/add-value" name="value" />
+												<do-append-xml-text expression="./modify-attr[@attr-name='lockoutTime']/add-value/value">
+													<arg-string>
+														<token-text xml:space="preserve">0</token-text>
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr mode="numeric" name="lockoutTime" op="equal">0</if-op-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">./modify-attr[@attr-name='lockoutTime']/remove-value</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="./modify-attr[@attr-name='lockoutTime']/remove-value" />
+															</arg-actions>
+															<arg-actions>
+																<do-append-xml-element before="./add-value" expression="./modify-attr[@attr-name='lockoutTime']" name="remove-all-values" />
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-strip-op-attr name="lockoutTime" />
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-strip-xpath expression="./modify-attr[@attr-name='Locked By Intruder']" />
+									</actions>
+								</rule>
+								

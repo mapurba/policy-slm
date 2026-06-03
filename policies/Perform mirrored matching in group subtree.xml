@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Perform mirrored matching in group subtree</description>
+									<comment xml:space="preserve">Match objects coming from the remote eDirectory based on relative source location and object name.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.publisher.placement.type" op="equal">mirrored</if-global-variable>
+											<if-src-dn op="in-subtree">$drv.remote.dit.data.groups$</if-src-dn>
+										</and>
+									</conditions>
+									<actions>
+										<do-find-matching-object scope="entry">
+											<arg-dn>
+												<token-global-variable name="idv.dit.data.users" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-op-property name="unmatched-src-dn" />
+											</arg-dn>
+										</do-find-matching-object>
+									</actions>
+								</rule>
+							

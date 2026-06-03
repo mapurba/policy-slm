@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add CN attribute if not available</description>
+									<comment xml:space="preserve">Employee in Oracle EBS not contains any user name.So forming a user name from first name and last name</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-op-attr name="CN" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="User" name="CN">
+											<arg-value type="string">
+												<token-substring length="1">
+													<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+												</token-substring>
+												<token-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-set-op-src-dn>
+											<arg-dn>
+												<token-op-attr name="CN" />
+											</arg-dn>
+										</do-set-op-src-dn>
+									</actions>
+								</rule>
+								

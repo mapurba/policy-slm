@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Entitlement change (Delete Option)</description>
+									<comment xml:space="preserve">The User Account Entitlement adds the user to the SharePoint site collection. To be able to login, the user must also exist in whatever source SharePoint uses for login authentication (such as Active Directory). Revoking the entitlement will remove the user from the site collection.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">delete</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="UserAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-delete-dest-object />
+												<do-remove-association when="after">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</do-remove-association>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

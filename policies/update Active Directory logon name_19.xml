@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>update Active Directory logon name</description>
+									<comment xml:space="preserve">Update Active Directory logon name  (userPrincipalName) when logon name is configured to follow e-mail address and e-mail address is present.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="UpnMap" op="equal">ad-mail-auth</if-global-variable>
+											<if-op-attr name="Internet EMail Address" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="windows-2000-logon-name">
+											<arg-string>
+												<token-attr name="Internet EMail Address" />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

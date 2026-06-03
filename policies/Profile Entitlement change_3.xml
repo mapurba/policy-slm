@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Profile Entitlement change</description>
+									<comment xml:space="preserve">Check for profile membership being granted or revoked</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Profile" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-entitlement name="Profile" op="changing" />
+											<if-operation op="equal">modify</if-operation>
+										</and>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Profile" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="dvn" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">$lsname$-ctype</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="event-ctype" scope="policy">
+											<arg-string>
+												<token-local-variable name="$dvn$" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="Profile" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="event-ctype" op="equal">cua-central|cua-child</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="LOCPROFILES">
+																	<arg-value type="structured">
+																		<arg-component name="SUBSYSTEM">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+																		</arg-component>
+																		<arg-component name="PROFILE">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF')" />
+																		</arg-component>
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="PROFILES:BAPIPROF">
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="PROFILES:BAPIPROF">
+																	<arg-value type="string">
+																		<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF')&#10;" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-remove-dest-attr-value class-name="US" name="PROFILES:BAPIPROF">
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-remove-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="Profile" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="event-ctype" op="equal">cua-central|cua-child</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="LOCPROFILES">
+																	<arg-value type="structured">
+																		<arg-component name="SUBSYSTEM">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'LIID', 'LSNAME')" />
+																		</arg-component>
+																		<arg-component name="PROFILE">
+																			<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF')" />
+																		</arg-component>
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="PROFILES:BAPIPROF">
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length(es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF'))&gt;0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="PROFILES:BAPIPROF">
+																	<arg-value type="string">
+																		<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node, 'ID', 'PROF')" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+															<arg-actions>
+																<do-add-dest-attr-value class-name="US" name="PROFILES:BAPIPROF">
+																	<arg-value type="string">
+																		<token-local-variable name="current-node" />
+																	</arg-value>
+																</do-add-dest-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

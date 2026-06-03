@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Initialize fanout data from connection settings</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="fanoutDataInitialized" op="not-equal">true</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Initializing fanout data from connection settings</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="shimConfigInfo" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="shimConfigInfo" scope="driver">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-ShimConfigInfo</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="primLogicalSystemName" scope="driver">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/definition[@name='nsap-ls-name']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="primClientType" scope="driver">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/group/definition[@name='nsap-client-type']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="dvn" scope="policy">
+											<arg-string>
+												<token-local-variable name="primLogicalSystemName" />
+												<token-text xml:space="preserve">-ctype</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="$dvn$" scope="driver">
+											<arg-string>
+												<token-local-variable name="primClientType" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">$dvn$=</token-text>
+												<token-local-variable name="$dvn$" />
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="primClientType" op="equal">cua-child</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="primCentralLSName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/group/definition[@name='nsap-central-ls-name']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="primLogicalSystemName" />
+														<token-text xml:space="preserve">-clsname</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="$dvn$" scope="driver">
+													<arg-string>
+														<token-local-variable name="primCentralLSName" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">$dvn$=</token-text>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="primLocalLockOption" scope="policy">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/subscriber-options/configuration-values/definitions/definition[@name='nsap-local-lock-option']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="dvn" scope="policy">
+											<arg-string>
+												<token-local-variable name="primLogicalSystemName" />
+												<token-text xml:space="preserve">-llo</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="$dvn$" scope="driver">
+											<arg-string>
+												<token-local-variable name="primLocalLockOption" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">$dvn$=</token-text>
+												<token-local-variable name="$dvn$" />
+											</arg-string>
+										</do-trace-message>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$shimConfigInfo/driver-config/subscriber-options/configuration-values/definitions/definition[@name='nsap-alt-conn-info']/value/instance" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="logicalSystemName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name='logicalSystemName']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="clientType" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/group/definition[@name='clientType']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="logicalSystemName" />
+														<token-text xml:space="preserve">-ctype</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="$dvn$" scope="driver">
+													<arg-string>
+														<token-local-variable name="clientType" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">$dvn$=</token-text>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-trace-message>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="clientType" op="equal">cua-child</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="centralLSName" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/group/subordinates/definition[@name='centralLSName']/value" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="dvn" scope="policy">
+															<arg-string>
+																<token-local-variable name="logicalSystemName" />
+																<token-text xml:space="preserve">-clsname</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="$dvn$" scope="driver">
+															<arg-string>
+																<token-local-variable name="centralLSName" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">$dvn$=</token-text>
+																<token-local-variable name="$dvn$" />
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-set-local-variable name="localLockOption" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name='localLockOption']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dvn" scope="policy">
+													<arg-string>
+														<token-local-variable name="logicalSystemName" />
+														<token-text xml:space="preserve">-llo</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="$dvn$" scope="driver">
+													<arg-string>
+														<token-local-variable name="localLockOption" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">$dvn$=</token-text>
+														<token-local-variable name="$dvn$" />
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-for-each>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Fanout data initialized.</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="fanoutDataInitialized" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

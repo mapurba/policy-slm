@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>update Title on User if sapSLongName on position changes</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">DirXML-sapS</if-class-name>
+											<if-op-attr name="DirXML-sapSLongName" op="changing" />
+										</and>
+										<and>
+											<if-class-name op="equal">DirXML-sapS</if-class-name>
+											<if-operation op="equal">sync</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="target-object" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src">
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+													</arg-dn>
+													<arg-match-attr name="DirXML-sapPID">
+														<arg-value type="string">
+															<token-src-attr name="DirXML-sapS-R-A-P-008" />
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($target-object/@src-dn) &gt; 0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-attr mode="regex" name="DirXML-sapSLongName" op="equal">.+</if-src-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-src-attr-value name="Title">
+															<arg-dn>
+																<token-xpath expression="$target-object/@src-dn" />
+															</arg-dn>
+															<arg-value type="string">
+																<token-src-attr name="DirXML-sapSLongName" />
+															</arg-value>
+														</do-set-src-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-clear-src-attr-value name="Title">
+															<arg-dn>
+																<token-xpath expression="$target-object/@src-dn" />
+															</arg-dn>
+														</do-clear-src-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

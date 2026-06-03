@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remap urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName to CN</description>
+									<comment xml:space="preserve">In the default schema map, urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName in the ILM Vault maps to LoginName in SharePoint. However, on the publisher channel we don't want to set urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName (presumably the AD driver will do that) and we do need a value for CN. Therefore, this rule remaps urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName to CN for the publisher channel.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="CN" op="not-available" />
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-rename-op-attr dest-name="CN" src-name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto user modify-association operation when entitlement is revoked.</description>
+									<comment xml:space="preserve">If the modify-association queried user object is empty then set the attribute named ignore with true under modify element otherwise break the policy.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">modify-association</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="oldAssociationValue" scope="policy">
+											<arg-object>
+												<token-xpath expression="./association[position()=1]/text()" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-xpath op="true">string-length($oldAssociationValue)&gt;0</if-xpath>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="VarUsrObject" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="dest" scope="entry">
+															<arg-association>
+																<token-text xml:space="preserve">$oldAssociationValue$</token-text>
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">CN</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length($VarUsrObject)&gt;0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-break />
+													</arg-actions>
+													<arg-actions>
+														<do-set-xml-attr expression="//modify" name="ignore">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-veto />
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

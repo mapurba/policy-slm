@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Get rid of any association that might be there and veto the original event</description>
+									<comment xml:space="preserve">Clean up any association attribute associated with the source object because this driver doesn't need associations and in large numbers they cause a lot of overhead.</comment>
+									<conditions />
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-association op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-remove-association>
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</do-remove-association>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">association/@state='migrate'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-src-attr-value name="DirXML-Associations">
+															<arg-value type="structured">
+																<arg-component name="volume">
+																	<token-text xml:space="preserve">~dirxml.auto.driverdn~</token-text>
+																</arg-component>
+																<arg-component name="nameSpace">
+																	<token-text xml:space="preserve">4</token-text>
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="''" />
+																</arg-component>
+															</arg-value>
+														</do-remove-src-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+										<do-veto />
+									</actions>
+								</rule>
+							

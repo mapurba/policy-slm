@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking-Remove related Dirxml-Account values on regular delete operation or revoke</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">delete|remove-association</if-operation>
+										</and>
+										<and>
+											<if-operation mode="nocase" op="equal">status</if-operation>
+											<if-op-property mode="nocase" name="AccountTracking-Operation" op="equal">delete</if-op-property>
+										</and>
+										<and>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-op-property mode="nocase" name="accountAction" op="equal">accountDisableByEntitlementRevoke</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Account Tracking: removing DirXML-Accounts values for realm "$realm$"</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="relevantAccounts" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">AccountTracking-Removing account tracking entry '$current-node$' from </token-text>
+														<token-local-variable name="objectDN" />
+													</arg-string>
+												</do-trace-message>
+												<do-remove-dest-attr-value direct="true" name="DirXML-Accounts">
+													<arg-dn>
+														<token-local-variable name="objectDN" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-local-variable name="current-node" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

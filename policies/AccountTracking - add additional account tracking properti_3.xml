@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - add additional account tracking properties for future use</description>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="association" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="jfoactrk.AccIdentifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-property name="AccountTracking-$current-node$" op="not-available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="regex" name="current-node" op="equal">LDAPDN|DESTNAME</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions />
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="regex" name="current-node" op="equal">idu|pk_idu</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="lcase_assoc" scope="policy">
+																			<arg-string>
+																				<token-lower-case>
+																					<token-local-variable name="association" />
+																				</token-lower-case>
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="identifier" scope="policy">
+																			<arg-string>
+																				<token-join>
+																					<token-lower-case>
+																						<token-local-variable name="current-node" />
+																					</token-lower-case>
+																					<token-text xml:space="preserve">=</token-text>
+																				</token-join>
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-op-property name="AccountTracking-$current-node$">
+																			<arg-string>
+																				<token-xpath expression="substring-before(substring-after($lcase_assoc,$identifier),&quot;,&quot;)" />
+																			</arg-string>
+																		</do-set-op-property>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-set-local-variable name="appObjectQuery" scope="policy">
+																			<arg-node-set>
+																				<token-query class-name="~jfoactrk.ObjectClass~" datastore="src" scope="entry">
+																					<arg-association>
+																						<token-local-variable name="association" />
+																					</arg-association>
+																					<arg-string>
+																						<token-local-variable name="current-node" />
+																					</arg-string>
+																				</token-query>
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="value" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="$appObjectQuery/attr[last()]/value/text()" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-xpath op="true">string-length($value)!=0</if-xpath>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-set-op-property name="AccountTracking-$current-node$">
+																					<arg-string>
+																						<token-local-variable name="value" />
+																					</arg-string>
+																				</do-set-op-property>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

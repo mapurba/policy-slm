@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip irrelevant events for removed Account entitlement</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-association op="available" />
+											<if-entitlement name="Account" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="assocDN" scope="policy">
+											<arg-string>
+												<token-substring>
+													<token-split delimiter="\$">
+														<token-association />
+													</token-split>
+												</token-substring>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="Account" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="ent-LIID" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamFieldBackwardsCompatible($current-node/text(), 'LIID', 'LSNAME')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="connDN" scope="policy">
+													<arg-string>
+														<token-xpath expression="$entConfig//connection[@name=$ent-LIID]/query-attr[@name='connection-dn']/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="connDN" scope="policy">
+													<arg-string>
+														<token-local-variable name="ent-LIID" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="connDN" op="not-equal">$assocDN$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="modify-attr[@attr-name='DirXML-EntitlementRef']/node()[.//param/text()=$current-node/text()]" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

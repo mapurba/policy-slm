@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Status Event - add interested properties to current doc for future use.</description>
+									<comment xml:space="preserve">The policy adds the required attrbutes to the operation data. These values will be used by the itp write accounts policy.</comment>
+									<conditions>
+										<and>
+											<if-local-variable name="usr-assoc" op="available" />
+											<if-op-property name="AccountTracking-Operation" op="available" />
+											<if-global-variable mode="nocase" name="drv.acctTrk.enable" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.acctTrk.mode" op="not-equal">fanout</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="eventId" scope="policy">
+											<arg-string>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="AccountTrackingNodeName" scope="policy">
+													<arg-node-set>
+														<token-text>$current-node$</token-text>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable name="jdbc.SyncModel" op="equal">indirect</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-for-each>
+															<arg-node-set>
+																<token-query class-name="indirect.usr" datastore="src" scope="entry">
+																	<arg-association>
+																		<token-local-variable name="usr-assoc" />
+																	</arg-association>
+																	<arg-string>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</token-query>
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="iduval">
+																	<arg-string>
+																		<token-xpath expression="$current-node/attr/value" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-local-variable name="AccountTrackingNodeName" />
+																	</arg-node-set>
+																	<arg-actions>
+																		
+																		<do-set-xml-attr expression="//status[@event-id=$eventId]/operation-data" name="AccountTracking-$current-node$">
+																			<arg-string>
+																				<token-local-variable name="iduval" />
+																			</arg-string>
+																		</do-set-xml-attr>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable name="jdbc.SyncModel" op="equal">direct</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-for-each>
+															<arg-node-set>
+																<token-query class-name="direct.view_usr" datastore="src" scope="entry">
+																	<arg-association>
+																		<token-local-variable name="usr-assoc" />
+																	</arg-association>
+																	<arg-string>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</token-query>
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="iduval">
+																	<arg-string>
+																		<token-xpath expression="$current-node/attr/value" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-for-each>
+																	<arg-node-set>
+																		<token-local-variable name="AccountTrackingNodeName" />
+																	</arg-node-set>
+																	<arg-actions>
+																		
+																		<do-set-xml-attr expression="//status[@event-id=$eventId]/operation-data" name="AccountTracking-$current-node$">
+																			<arg-string>
+																				<token-local-variable name="iduval" />
+																			</arg-string>
+																		</do-set-xml-attr>
+																	</arg-actions>
+																</do-for-each>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

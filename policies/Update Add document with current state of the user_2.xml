@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule disabled="true">
+									<description>Update Add document with current state of the user</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="addDoc" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;add&gt;&lt;/add&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="$addDoc/add" src-expression="@*" />
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$instance//attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="$addDoc/add" name="add-attr" />
+												<do-set-xml-attr expression="$addDoc//add-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-xpath expression="$current-node/@attr-name" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-clone-xpath dest-expression="$addDoc//add-attr[last()]" src-expression="$current-node/value" />
+											</arg-actions>
+										</do-for-each>
+										<do-clone-xpath dest-expression=".." src-expression="$addDoc/node()" />
+										<do-strip-xpath expression="." />
+									</actions>
+								</rule>
+							

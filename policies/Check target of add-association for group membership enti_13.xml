@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check target of add-association for group membership entitlements</description>
+									<comment xml:space="preserve">Group membership entitlements assigned to users being created in Application cannot be processed until the user is successfully created. The add-association signals that an object has been created by the driver in Application. If the object is also tagged for group entitlement processing, do the work now.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserGroup" op="equal">true</if-global-variable>
+											<if-operation op="equal">add-association</if-operation>
+											<if-op-property name="check-group-entitlements" op="equal">true</if-op-property>
+											<if-entitlement name="UserGroup" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="UserGroup" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="group-assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-src-attr-value class-name="Usergroup" name="member">
+													<arg-association>
+														<token-local-variable name="group-assoc" />
+													</arg-association>
+													<arg-value type="dn">
+														<token-dest-dn />
+													</arg-value>
+												</do-add-src-attr-value>
+												<do-set-xml-attr expression="../modify[last()]/modify-attr[last()]/add-value[last()]/value[last()]" name="association-ref">
+													<arg-string>
+														<token-xpath expression="./text()" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

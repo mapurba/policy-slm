@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>query/query-ex: Restrict to current accounts only.</description>
+									<comment xml:space="preserve">If a query or query-ex for identity objects, restrict the query to include only "current" Sentinel account objects.</comment>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">query</if-operation>
+											<if-operation mode="case" op="equal">query-ex</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="." name="search-attr" />
+										<do-set-xml-attr expression="./search-attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">current</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="./search-attr[last()]" name="value" />
+										<do-append-xml-text expression="./search-attr[last()]/value">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

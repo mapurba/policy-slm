@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>LinuxUnixAccount entitlement: do not match existing accounts</description>
+									<comment xml:space="preserve">When using the LinuxUnixAccount entitlement with the Identity Manager user application or Role Based Entitlements, accounts are created and deleted/disabled by granting or revoking the entitlement. Default policy does not match an existing account in the Linux or Unix Application if the user is not entitled to an account in the Linux or Unix Application. Modify or remove this rule if you want entitlement policy to apply to matching accounts in the Linux or Unix Application. Notice that this may result in the the Linux or Unix Application account being deleted or disabled.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.LinuxUnixAccount" op="equal">true</if-global-variable>
+											<if-entitlement name="LinuxUnixAccount" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

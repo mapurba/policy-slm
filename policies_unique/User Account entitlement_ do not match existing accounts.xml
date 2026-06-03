@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account entitlement: do not match existing accounts</description>
+									<comment xml:space="preserve">When using the User Account (notesAccount2) entitlement with the Identity Manager user application, Roles-Based Provisioning Module, or Role-Based Entitlements, accounts are created and deleted/disabled by granting or revoking the entitlement. Default policy does not match an existing account in Notes if the user is not entitled to an account in Notes.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.notesAccount2.use" op="equal">true</if-global-variable>
+											<if-entitlement name="notesAccount2" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="attempt-to-match">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

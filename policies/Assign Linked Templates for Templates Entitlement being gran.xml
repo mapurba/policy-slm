@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Assign Linked Templates for Templates Entitlement being granted or revoked</description>
+									<comment xml:space="preserve">Build linkedtemplatesconfig</comment>
+									<conditions>
+										<or>
+											<if-global-variable mode="nocase" name="drv.entitlement.Template" op="equal">basic</if-global-variable>
+										</or>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+										<or disabled="true">
+											<if-operation disabled="true" mode="regex" op="equal">modify</if-operation>
+										</or>
+										<or>
+											<if-entitlement name="AppliedTemplate" op="changing" />
+											<if-entitlement name="AvailableTemplate" op="changing" />
+											<if-entitlement name="DefaultTemplate" op="changing" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lv-templatesJSON" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">{"IDs": [
+]}</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="AppliedTemplate" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lv-applied" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="DefaultTemplate" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lv-default" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="AvailableTemplate" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lv-currentID" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="lv-currentID" op="equal">$lv-applied$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lv-isApplied" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">True</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lv-applied" scope="policy">
+															<arg-string />
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="lv-isApplied" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">False</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="lv-currentID" op="equal">$lv-default$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lv-isDefault" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">True</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="lv-default" scope="policy">
+															<arg-string />
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="lv-isDefault" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">False</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+												</do-if>
+												<do-set-local-variable name="lv-templateJson" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:createTemplateJSON($lv-currentID, &quot;&quot;, &quot;&quot;, $lv-isDefault, $lv-isApplied, &quot;&quot;)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-templatesJSON" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:appendTemplate( $lv-templatesJSON, $lv-templateJson)" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="lv-applied" op="equal">.+</if-local-variable>
+													<if-local-variable mode="nocase" name="lv-applied" op="equal">$lv-default$</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-templateJson" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:createTemplateJSON($lv-applied, &quot;&quot;, &quot;&quot;, &quot;True&quot;, &quot;True&quot;, &quot;&quot;)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-templatesJSON" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:appendTemplate( $lv-templatesJSON, $lv-templateJson)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-applied" scope="policy">
+													<arg-string />
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-default" scope="policy">
+													<arg-string />
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="lv-applied" op="equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-templateJson" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:createTemplateJSON($lv-applied, &quot;&quot;, &quot;&quot;, &quot;False&quot;, &quot;True&quot;, &quot;&quot;)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-templatesJSON" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:appendTemplate( $lv-templatesJSON, $lv-templateJson)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-applied" scope="policy">
+													<arg-string />
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="lv-default" op="equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-templateJson" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:createTemplateJSON($lv-default, &quot;&quot;, &quot;&quot;, &quot;True&quot;, &quot;False&quot;, &quot;&quot;)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-templatesJSON" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:appendTemplate( $lv-templatesJSON, $lv-templateJson)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lv-default" scope="policy">
+													<arg-string />
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-dest-attr-value name="LinkedTemplatesConfig">
+											<arg-value type="string">
+												<token-local-variable name="lv-templatesJSON" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check for AD driver association</description>
+									<comment xml:space="preserve">Typically, Office365 is configured to authenticate users to an AD Domain. If this is the case, the user should already exist in the AD Domain before being synchronized to Office365. This rule checks for an AD driver association as a prerequisite to synchronizing the user to the Office365 site collection.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.sync.identities" op="equal">AD</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.sync.identity" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv-ad-driver-dn&quot;]/value/text()" />
+													</arg-string>
+												</do-trace-message>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">count(add-attr[@attr-name='DirXML-Associations']/value[component[@name='nameSpace']/text()='1' and component[@name='volume' and contains(.,$current-node/definition[@name="drv-ad-driver-dn"]/value/text())]])=0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-status level="warning">
+															<arg-string>
+																<token-text xml:space="preserve">Vetoed the add because there is no association for the AD driver </token-text>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv-ad-driver-dn&quot;]/value/text()" />
+															</arg-string>
+														</do-status>
+														<do-veto />
+														<do-break />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Migrate child positions</description>
+									<conditions>
+										<and>
+											<if-local-variable name="childPos" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="childOrgs" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length($current-node/association/text())&gt;0 and $current-node/association/@state='associated'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-add-dest-attr-value class-name="DirXML-sapS" name="migrate" when="after">
+															<arg-association>
+																<token-xpath expression="$current-node/attr[@attr-name='GUID']/value/text()" />
+															</arg-association>
+															<arg-value type="string">
+																<token-xpath expression="$current-node/@src-dn" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-set-local-variable name="lvTmp" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">Performing DM maintenance on child position: </token-text>
+																<token-parse-dn length="1" start="-1">
+																	<token-xpath expression="$current-node/@src-dn" />
+																</token-parse-dn>
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-local-variable name="lvTmp" />
+															</arg-string>
+														</do-trace-message>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lvFile" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),$lvTmp))" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

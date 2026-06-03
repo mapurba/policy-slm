@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Append dirSyncEnabled attribute to entitlment queries for group</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">query|query-ex</if-operation>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+											<if-xml-attr mode="nocase" name="event-id" op="equal">__entitlement_query__</if-xml-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="." name="read-attr" />
+										<do-set-xml-attr expression="./read-attr[not(@attr-name)]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">dirSyncEnabled</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-op-property name="filter-group-entitlement">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+							

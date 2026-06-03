@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert all attr-names to lowercase</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+											<if-xpath op="true">attr</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lcase_name" scope="policy">
+													<arg-string>
+														<token-lower-case>
+															<token-xpath expression="$current-node/@attr-name" />
+														</token-lower-case>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-xml-attr expression="$current-node" name="attr-name">
+													<arg-string>
+														<token-local-variable name="lcase_name" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

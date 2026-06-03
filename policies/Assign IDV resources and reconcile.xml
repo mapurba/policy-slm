@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Assign IDV resources and reconcile</description>
+									<comment xml:space="preserve">The policy assigns the resources  and reconciles these permissions with rbpm.</comment>
+									<conditions>
+										<and>
+											<if-xpath op="true">self::operation-data</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="wfOperation" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;status&gt;&lt;/status&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="userQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="./object-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="./object-dn" />
+										<do-clone-xpath dest-expression="$wfOperation/status" src-expression="." />
+										<do-clone-xpath dest-expression="$wfOperation/status/operation-data" src-expression="$static-map-xml" />
+										<do-append-xml-element expression="$wfOperation/status" name="object-dn" />
+										<do-strip-xpath expression="." />
+										<do-append-xml-text expression="$wfOperation/status/object-dn">
+											<arg-string>
+												<token-local-variable name="userQualifiedLDAPDn" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+													<token-global-variable name="UAProvAdmin" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="ua-admin-pwd" notrace="true" scope="policy">
+											<arg-string>
+												<token-src-attr name="nspmDistributionPassword">
+													<arg-dn>
+														<token-parse-dn dest-dn-format="slash" src-dn-format="qualified-dot">
+															<token-global-variable name="UAProvAdmin" />
+														</token-parse-dn>
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="prov-payload" scope="policy">
+											<arg-string>
+												<token-base64-encode charset="UTF-8">
+													<token-xml-serialize>
+														<token-local-variable name="wfOperation" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="rpStatus" scope="policy">
+											<arg-string>
+												<token-xpath expression="ps:ReconcilePermissions($UAProvURL, $adminQualifiedLDAPDn, $ua-admin-pwd, $userQualifiedLDAPDn, 1000, $prov-payload, true)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">ReconcilePermissions status: </token-text>
+												<token-local-variable name="rpStatus" />
+											</arg-string>
+										</do-trace-message>
+										<do-strip-xpath expression="." />
+									</actions>
+								</rule>
+							

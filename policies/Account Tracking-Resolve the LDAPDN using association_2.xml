@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Tracking-Resolve the LDAPDN using association</description>
+									<comment xml:space="preserve">In case of modify  operation generated during the regrant of entitlement resolve the dest-dn in dot format by quering using the association.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-association op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-operation />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="VarNodeSet" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" scope="entry">
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="VarLdapDn" scope="policy">
+													<arg-string>
+														<token-xpath expression="$VarNodeSet/@src-dn" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

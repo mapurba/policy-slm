@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>map e-mail address to Active Directory logon name</description>
+									<comment>Update Active Directory logon name (userPrincipalName) when logon name is configured to follow Active Directory e-mail address and e-mail address is being added.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="UpnMap" op="equal">ad-mail-auth</if-global-variable>
+											<if-op-attr name="Internet EMail Address" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-dest-attr name="DirXML-MDADAliasName" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-dest-attr-value direct="true" name="DirXML-MDADAliasName">
+															<arg-value type="structured">
+																<arg-component name="nameSpace">
+																	<token-xpath expression="$current-node/component[@name=&quot;nameSpace&quot;]" />
+																</arg-component>
+																<arg-component name="volume">
+																	<token-xpath expression="$current-node/component[@name=&quot;volume&quot;]" />
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</arg-component>
+															</arg-value>
+														</do-remove-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-set-src-attr-value name="DirXML-MDADAliasName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-op-attr name="Internet EMail Address" />
+												</arg-component>
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-add-dest-attr-value direct="true" name="DirXML-MDADAliasName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-op-attr name="Internet EMail Address" />
+												</arg-component>
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+								

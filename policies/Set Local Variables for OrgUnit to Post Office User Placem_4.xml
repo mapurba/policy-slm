@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set Local Variables for OrgUnit to Post Office User Placement</description>
+									<comment xml:space="preserve">Sets local variables for OrgUnit to Post Office User placement Management rules</comment>
+									<conditions>
+										<and>
+											<if-global-variable name="driver.gw.SyncOUToGWPO" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="dom-po-name">
+											<arg-string>
+												<token-global-variable name="driver.gw.SyncOU2GWEPODomainName" />
+												<token-text xml:space="preserve">.</token-text>
+												<token-src-dn length="1" start="-2" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="parent-dn">
+											<arg-string>
+												<token-src-dn length="-2" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="return-assoc">
+											<arg-node-set>
+												<token-xpath expression="query:search($srcQueryProcessor, 'entry','',$parent-dn,'Oranizational Unit','','','')" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="association-count">
+											<arg-string>
+												<token-xpath expression="count($return-assoc/association)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="ou2po-association">
+											<arg-node-set>
+												<token-xpath expression="$return-assoc/association" />
+											</arg-node-set>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

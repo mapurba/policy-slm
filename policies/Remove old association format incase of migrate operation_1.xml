@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove old association format incase of migrate operation</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">status</if-operation>
+											<if-xpath op="true">self::status[@level = 'success']</if-xpath>
+											<if-local-variable mode="nocase" name="syncEventId" op="not-equal">-1</if-local-variable>
+											<if-op-property name="Assoc-from-sync" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="varTemp1" scope="policy">
+											<arg-string>
+												<token-xpath expression="self::status/@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="varTemp2" scope="policy">
+											<arg-string>
+												<token-op-property name="Assoc-from-sync" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="syncEventId" op="equal">$varTemp1$</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="VarUsrObj" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="dest" scope="entry">
+															<arg-association>
+																<token-text xml:space="preserve">$varTemp2$</token-text>
+															</arg-association>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-append-xml-element expression=".." name="remove-association" />
+												<do-append-xml-text expression="../remove-association">
+													<arg-string>
+														<token-local-variable name="varTemp2" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="syncEventId" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">-1</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

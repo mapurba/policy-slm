@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add Login Disable attribute if not present</description>
+									<comment xml:space="preserve">Add the default value to loginDisable attribute if the loginDisable attribute is not present in the output.</comment>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="loginDisabledPresent" op="equal">true</if-op-property>
+											<if-xpath op="not-true">attr/@attr-name='loginDisabled'</if-xpath>
+											<if-operation mode="case" op="not-equal">status</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression="." name="attr" />
+										<do-set-xml-attr expression="./attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">loginDisabled</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="./attr[last()]" name="value" />
+										<do-set-xml-attr expression="./attr[last()]/value" name="type">
+											<arg-string>
+												<token-text xml:space="preserve">string</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-text expression="./attr[last()]/value">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

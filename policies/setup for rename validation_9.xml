@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>setup for rename validation</description>
+									<comment xml:space="preserve">Gather information needed for rename validation.</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="queryResult" scope="policy">
+											<arg-node-set>
+												<token-query scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="cached-object-value" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="slash" length="-1" src-dn-format="slash" start="-1">
+													<token-xpath expression="$queryResult/@src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="current-object-value" scope="policy">
+											<arg-string>
+												<token-src-dn convert="true" length="-1" start="-1" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

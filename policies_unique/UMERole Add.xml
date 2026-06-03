@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>UMERole Add</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UMERole" op="equal">true</if-global-variable>
+											<if-entitlement name="UMERole" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UMERole" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">UMERole entitlement add</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-add-dest-attr-value class-name="saprole" name="member" when="after">
+													<arg-dn>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-text xml:space="preserve">SPML.SAPUSER.</token-text>
+														<token-src-dn convert="false" length="1" start="-1" />
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-set-op-property name="timestamp">
+													<arg-string>
+														<token-time format="!JTIME" tz="UTC" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UMERole" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">UMERole entitlement remove</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-remove-dest-attr-value class-name="saprole" name="member" when="after">
+													<arg-dn>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-text xml:space="preserve">SPML.SAPUSER.</token-text>
+														<token-src-dn convert="false" length="1" start="-1" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+												<do-set-op-property name="timestamp">
+													<arg-string>
+														<token-time format="!JTIME" tz="UTC" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-op-attr name="Member" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add new user to associated groups</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-src-attr name="Group Membership" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="groupAssociations" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="query:readObject($srcQueryProcessor, '', $current-node, 'Group','')/association/text()[. != '']" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="Group" name="Member">
+													<arg-association>
+														<token-local-variable name="groupAssociations" />
+													</arg-association>
+													<arg-value type="string">
+														<token-dest-dn />
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-set-xml-attr expression="../modify[last()]" name="src-dn">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Append a Modiy Event on Login Disabled Attribute.</description>
+									<comment xml:space="preserve">Append a modiy event on Login Disabled attribute
+Reason: The GW server has a limitation updating Login Disabled Attribute while creating user REST operation call, hence we are appending the modify event sequentially after with the add event.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add</if-operation>
+											<if-class-name mode="case" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="Login Disabled" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="varLoginStatus" scope="policy">
+													<arg-string>
+														<token-xpath expression="./*[@attr-name=&quot;Login Disabled&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-dest-attr-value name="Login Disabled" when="after">
+													<arg-value type="state">
+														<token-local-variable name="varLoginStatus" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-set-dest-attr-value name="Login Disabled" when="after">
+													<arg-value type="state">
+														<token-text xml:space="preserve">false</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

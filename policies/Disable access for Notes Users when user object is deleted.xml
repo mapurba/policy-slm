@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Disable access for Notes Users when user object is deleted</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">delete</if-operation>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="User" name="Description">
+											<arg-value type="string">
+												<token-text xml:space="preserve">Password lock-out enabled</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-set-xml-attr expression="../modify[@class-name='User']" name="notes-password-check-setting">
+											<arg-string>
+												<token-text xml:space="preserve">PWD_CHK_LOCKOUT</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../modify[@class-name='User']" name="notes-password-grace-period">
+											<arg-string>
+												<token-text xml:space="preserve">0</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../modify[@class-name='User']" name="allow-adminp-support">
+											<arg-string>
+												<token-text>true</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-add-dest-attr-value class-name="User" name="NOVLNOTEASTS-denyAccess">
+											<arg-value type="state">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Tracking - Do not process Account Tracking policies if modify with no source-dn &amp; from-merge</description>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="not-equal">modify</if-operation>
+											<if-xpath op="true">count(modify-attr[@attr-name!='urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-EntitlementRef'])&gt;0</if-xpath>
+											<if-src-dn op="not-available" />
+											<if-xml-attr mode="nocase" name="from-merge" op="not-equal">true</if-xml-attr>
+											<if-class-name mode="nocase" op="not-equal">User</if-class-name>
+											<if-association op="not-available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-break />
+									</actions>
+								</rule>
+								

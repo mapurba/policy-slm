@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Assign Licenses for License Entitlement being granted or revoked</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.License" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-entitlement name="License" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="License" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-remove-dest-attr-value class-name="User" name="LicenseAssignment">
+													<arg-value type="string">
+														<token-local-variable name="assoc" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="License" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="User" name="LicenseAssignment">
+													<arg-value type="string">
+														<token-local-variable name="assoc" />
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-add-dest-attr-value class-name="User" name="UsageLocation">
+													<arg-value type="string">
+														<token-global-variable name="drv.usage.location" />
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-append-xml-element expression="./modify-attr[@attr-name=&quot;UsageLocation&quot;]" name="remove-all-values" />
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

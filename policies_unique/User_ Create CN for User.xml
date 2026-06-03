@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: Create CN for user</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">user</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="gvUserNameMap" op="equal">worker-pub-name-map-workforceID</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value class-name="User" name="CN">
+													<arg-value type="string">
+														<token-attr name="workforceID" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="gvUserNameMap" op="equal">worker-pub-name-map-userID</if-global-variable>
+													<if-op-attr name="CN" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value class-name="User" name="CN">
+													<arg-value type="string">
+														<token-attr name="CN" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

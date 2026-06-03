@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Query for Migration</description>
+									<comment xml:space="preserve">To use the merge feature made available by the wd-Merge attribute, create a custom, subscriber event transform policy that executes BEFORE this policy that ensures that the user object where wd-Merge is set to true has a value for the urn:ietf:params:scim:schemas:ilm:static:1.0:User:workforceID attribute and a value for the wd-WorkerIDType attribute of either “Employee_ID” or “Contingent_Worker_ID”. This custom policy may need to derive whether the user object is an employee or contingent worker and will then need to set the source attribute wd-WorkerIDType appropriately. Events where the wd-Merge is changing on objects without urn:ietf:params:scim:schemas:ilm:static:1.0:User:workforceID or wd-WorkerIDType will be vetoed. If appropriate, make urn:ietf:params:scim:schemas:ilm:static:1.0:User:workforceID and wd-WorkerIDType operation attributes to save additional queries as this policy is executed.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">user</if-class-name>
+											<if-op-attr mode="nocase" name="wd-Merge" op="changing-to">True</if-op-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="wd-Merge" />
+										<do-clear-src-attr-value name="wd-Merge" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:workforceID" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvQueryWFID" scope="policy">
+													<arg-string>
+														<token-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:workforceID" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr name="wd-WorkerIDType" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvQueryWDWorkerIDType" scope="policy">
+													<arg-string>
+														<token-attr name="wd-WorkerIDType" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+										</do-if>
+										<do-append-xml-element expression=".." name="query" />
+										<do-set-xml-attr expression="../query[last()]" name="class-name">
+											<arg-string>
+												<token-class-name />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../query[last()]" name="scope">
+											<arg-string>
+												<token-text xml:space="preserve">subtree</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../query" name="search-class" />
+										<do-set-xml-attr expression="../query/search-class[last()]" name="class-name">
+											<arg-string>
+												<token-class-name />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../query" name="search-attr" />
+										<do-set-xml-attr expression="../query/search-attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">wd-WorkerIDType</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../query/search-attr[last()]" name="value" />
+										<do-append-xml-text expression="../query/search-attr[last()]/value">
+											<arg-string>
+												<token-local-variable name="lvQueryWDWorkerIDType" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../query" name="search-attr" />
+										<do-set-xml-attr expression="../query/search-attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">workforceID</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../query/search-attr[last()]" name="value" />
+										<do-append-xml-text expression="../query/search-attr[last()]/value">
+											<arg-string>
+												<token-local-variable name="lvQueryWFID" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../query" name="driver-operation-data" />
+										<do-append-xml-element expression="../query/driver-operation-data" name="WD-WorkforceID" />
+										<do-append-xml-text expression="../query/driver-operation-data/WD-WorkforceID">
+											<arg-string>
+												<token-local-variable name="lvQueryWFID" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../query/driver-operation-data" name="WD-WorkerIDType" />
+										<do-append-xml-text expression="../query/driver-operation-data/WD-WorkerIDType">
+											<arg-string>
+												<token-attr name="wd-WorkerIDType" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="../query/driver-operation-data" name="WD-effectiveDate" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-src-attr name="wd-Merge-effectiveDate" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-effective-date" scope="policy">
+													<arg-string>
+														<token-convert-time dest-format="!CTIME" src-format="yyyyMMdd">
+															<token-src-attr class-name="User" name="wd-Merge-effectiveDate" />
+														</token-convert-time>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-current-date" scope="policy">
+													<arg-string>
+														<token-time format="!CTIME" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="numeric" name="LV-effective-date" op="gt">$LV-current-date$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-text expression="../query/driver-operation-data/WD-effectiveDate">
+															<arg-string>
+																<token-convert-time dest-format="yyyy-MM-dd" src-format="yyyyMMdd">
+																	<token-attr name="wd-Merge-effectiveDate" />
+																</token-convert-time>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions>
+														<do-append-xml-text expression="../query/driver-operation-data/WD-effectiveDate">
+															<arg-string>
+																<token-time format="yyyy-MM-dd" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-append-xml-text expression="../query/driver-operation-data/WD-effectiveDate">
+													<arg-string>
+														<token-time format="yyyy-MM-dd" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-if>
+										<do-clear-src-attr-value name="wd-Merge-effectiveDate" />
+										<do-veto />
+									</actions>
+								</rule>
+								

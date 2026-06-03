@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>assignCN</description>
+									<comment xml:space="preserve">assign CN if CN is not available or empty</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-xpath op="true">add-attr[@attr-name='CN']/value[.='']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="CN" />
+										<do-set-local-variable name="vl-scim-emails" scope="policy">
+											<arg-string>
+												<token-xpath expression="add-attr[@attr-name='scim-Emails']" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="vl-emails" scope="policy">
+											<arg-node-set>
+												<token-split delimiter="&quot;">
+													<token-local-variable name="vl-scim-emails" />
+												</token-split>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="vl-final-email" scope="policy">
+											<arg-string>
+												<token-split delimiter="@">
+													<token-xpath expression="$vl-emails[4]" />
+												</token-split>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value class-name="User" name="CN">
+											<arg-value type="string">
+												<token-local-variable name="vl-final-email" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

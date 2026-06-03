@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>resolve active directory domain - add</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">user</if-class-name>
+											<if-operation mode="regex" op="equal">add</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.domains" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="domain_container" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-dest-dn op="in-subtree">$domain_container$</if-dest-dn>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="drv.domain.dns.name" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="ldap.domain.dns.name" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">DC=</token-text>
+																<token-replace-all regex="\." replace-with=",DC=">
+																	<token-local-variable name="drv.domain.dns.name" />
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

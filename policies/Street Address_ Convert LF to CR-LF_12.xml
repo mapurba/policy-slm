@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Street Address: Convert LF to CR-LF</description>
+									<comment xml:space="preserve">The ILM Vault Street Address typically uses the Unix end-of-line convention (a single new line character) while Active Directory uses the Windows convention (carriage return plus new line characters). This rule converts values to the Windows format so that the synchronized values display properly in both systems.</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="CR-LF" scope="policy">
+											<arg-string>
+												<token-char value="13" />
+												<token-char value="10" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="streetAddress">
+											<arg-value type="string">
+												<token-replace-all regex="(?&lt;!\r)\n" replace-with="$CR-LF$">
+													<token-local-variable name="current-value" />
+												</token-replace-all>
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+								

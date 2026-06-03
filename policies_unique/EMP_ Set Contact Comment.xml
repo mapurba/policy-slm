@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>EMP: Set Contact Comment</description>
+									<comment xml:space="preserve">When a record is updated, set the Contact Comment to identify what the update contained.</comment>
+									<comment name="author" xml:space="preserve">PDS</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<comment name="lastchanged" xml:space="preserve">2/13/2024</comment>
+									<conditions>
+										<or>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="nocase" op="equal">add</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="ContactComment">
+													<arg-value type="string">
+														<token-text xml:space="preserve">Record added by IDM</token-text>
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-add-dest-attr-value name="ContactComment">
+													<arg-value type="string">
+														<token-text xml:space="preserve">Record updated by IDM - Updated Fields:</token-text>
+														<token-local-variable name="lv-modifyActions" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

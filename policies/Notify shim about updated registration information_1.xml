@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Notify shim about updated registration information</description>
+									<conditions>
+										<or>
+											<if-local-variable mode="nocase" name="regnCacheInitialized" op="equal">false</if-local-variable>
+										</or>
+										<or>
+											<if-local-variable mode="nocase" name="registered" op="equal">true</if-local-variable>
+											<if-local-variable name="registered" op="not-available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="registered" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Managed System Gateway Registration: Notifying shim of updated registration information.</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-dest-attr-value class-name="__DCS_REGISTRATION__" name="updateRegistration" when="after">
+											<arg-dn>
+												<token-lower-case>
+													<token-global-variable name="drv.registration.msgw.driverdn" />
+												</token-lower-case>
+											</arg-dn>
+											<arg-value type="string">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-xml-attr expression="../modify[@class-name='__DCS_REGISTRATION__']" name="src-dn">
+											<arg-string>
+												<token-parse-dn dest-dn-format="slash" src-dn-format="ldap">
+													<token-global-variable name="drv.registration.msgw.driverdn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+							

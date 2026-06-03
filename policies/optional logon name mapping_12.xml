@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>optional logon name mapping</description>
+									<comment xml:space="preserve">Logon name mapping: Modify the destination DN so that the NT Logon Name (sAMAccountName) names the object.</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable mode="case" name="LogonNameMap" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-dest-dn>
+											<arg-dn>
+												<token-dest-dn length="-2" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-escape-for-dest-dn>
+													<token-attr name="urn:ietf:params:scim:schemas:core:2.0:User:userName" />
+												</token-escape-for-dest-dn>
+											</arg-dn>
+										</do-set-op-dest-dn>
+									</actions>
+								</rule>
+							

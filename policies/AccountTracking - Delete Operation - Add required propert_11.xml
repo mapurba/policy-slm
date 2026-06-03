@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Delete Operation - Add required properties to current doc for future use</description>
+									<conditions>
+										<and>
+											<if-class-name mode="regex" op="equal">indirect.usr|direct.view_usr</if-class-name>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+										</and>
+										<and>
+											<if-operation mode="nocase" op="equal">remove-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="AccountTracking-Operation">
+											<arg-string>
+												<token-operation />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-association">
+											<arg-string>
+												<token-src-dn />
+											</arg-string>
+										</do-set-op-property>
+										<do-for-each>
+											<arg-node-set>
+												<token-query class-name="User" datastore="dest" scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+													<arg-string>
+														<token-text xml:space="preserve">dn</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="var-ObjectDN">
+													<arg-string>
+														<token-xpath expression="$current-node/@src-dn" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-for-each>
+										<do-set-op-property name="AccountTracking-ObjectDN">
+											<arg-string>
+												<token-local-variable name="var-ObjectDN" />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+								

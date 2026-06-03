@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Setup add-association.</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">status</if-operation>
+											<if-op-property name="op-type" op="equal">add</if-op-property>
+											<if-op-property name="dn" op="available" />
+											<if-op-property name="dn" op="not-equal" />
+											<if-xpath op="not-true">preceding-sibling::add-association or following-sibling::add-association</if-xpath>
+											<if-xpath op="true">jms:correlation-id/text() or jms:correlation-id/*</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="standardAssociation">
+											<arg-string>
+												<token-xpath expression="jms:correlation-id/jms:component[@jms:id='dr']/text()" />
+												<token-xpath expression="jms:correlation-id/jms:component[@jms:id='ms']/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="customAssociation">
+											<arg-string>
+												<token-xpath expression="jms:correlation-id/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="dn">
+											<arg-string>
+												<token-op-property name="dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="jms:correlation-id" />
+										<do-strip-xpath expression="operation-data" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - on add-association sync the operation-properties to status operations</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-property name="AccountTracking-association">
+											<arg-string>
+												<token-xpath expression="text()" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-local-variable name="eventId" scope="policy">
+											<arg-string>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="//status/operation-data" src-expression="operation-data/@AccountTracking-association" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept LogicalSystem (tagged identity query) query response</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">//status[@event-id='query-driver-ident']/operation-data/@UserAccountEntitlementQuery</if-xpath>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-class-name mode="nocase" op="equal">__driver_identification_class__</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lsname" scope="policy">
+											<arg-string>
+												<token-xpath expression="substring-after(//status[@event-id='query-driver-ident']/operation-data/@UserAccountEntitlementQuery, '\')" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="shimConfigInfo" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="shimConfigInfo" scope="driver">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-ShimConfigInfo</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="primLogicalSystemName" scope="policy">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/definition[@name='nsap-ls-name']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="primClientType" scope="policy">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/group/definition[@name='nsap-client-type']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">found primary logical sysem: </token-text>
+												<token-local-variable name="primLogicalSystemName" />
+												<token-text xml:space="preserve">, type: </token-text>
+												<token-local-variable name="primClientType" />
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="primCentralLSName" scope="policy">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/group/subordinates/definition[@name='nsap-central-ls-name']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="primClientType" op="equal">cua-child</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">CUA central client: </token-text>
+														<token-local-variable name="primCentralLSName" />
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-op-class-name>
+											<arg-string>
+												<token-text xml:space="preserve">LogicalSystem</token-text>
+											</arg-string>
+										</do-set-op-class-name>
+										<do-strip-xpath expression="attr" />
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-local-variable mode="nocase" name="primLogicalSystemName" op="equal">$lsname$</if-local-variable>
+													<if-local-variable mode="regex" name="lsname" op="not-equal">.+</if-local-variable>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-src-dn>
+													<arg-dn>
+														<token-text xml:space="preserve">\</token-text>
+														<token-local-variable name="primLogicalSystemName" />
+													</arg-dn>
+												</do-set-op-src-dn>
+												<do-append-xml-element expression="." name="attr" />
+												<do-set-xml-attr expression="attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">DisplayName</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="attr[last()]" name="value" />
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="primClientType" op="equal">non-cua</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-text expression="attr[last()]/value[last()]">
+															<arg-string>
+																<token-local-variable name="primLogicalSystemName" />
+																<token-text xml:space="preserve"> (primary)</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="primClientType" op="equal">cua-central</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-append-xml-text expression="attr[last()]/value[last()]">
+																	<arg-string>
+																		<token-local-variable name="primLogicalSystemName" />
+																		<token-text xml:space="preserve"> - CUA Central System</token-text>
+																		<token-text xml:space="preserve"> (primary)</token-text>
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="primClientType" op="equal">cua-child</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="attr[last()]/value[last()]">
+																			<arg-string>
+																				<token-local-variable name="primLogicalSystemName" />
+																				<token-text xml:space="preserve"> - CUA Child System, Central: </token-text>
+																				<token-local-variable name="primCentralLSName" />
+																				<token-text xml:space="preserve"> (primary)</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+												<do-append-xml-element expression="." name="attr" />
+												<do-set-xml-attr expression="attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">Description</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="attr[last()]" name="value" />
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="primClientType" op="equal">non-cua</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-text expression="attr[last()]/value[last()]">
+															<arg-string>
+																<token-text xml:space="preserve">Primary connection </token-text>
+																<token-local-variable name="primLogicalSystemName" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="primClientType" op="equal">cua-central</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-append-xml-text expression="attr[last()]/value[last()]">
+																	<arg-string>
+																		<token-text xml:space="preserve">Primary connection </token-text>
+																		<token-local-variable name="primLogicalSystemName" />
+																		<token-text xml:space="preserve"> - CUA Central System</token-text>
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="primClientType" op="equal">cua-child</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="attr[last()]/value[last()]">
+																			<arg-string>
+																				<token-text xml:space="preserve">Primary connection </token-text>
+																				<token-local-variable name="primLogicalSystemName" />
+																				<token-text xml:space="preserve"> - CUA Child System, Central: </token-text>
+																				<token-local-variable name="primCentralLSName" />
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+												<do-append-xml-element expression="." name="attr" />
+												<do-set-xml-attr expression="attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">Value</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="attr[last()]" name="value" />
+												<do-append-xml-text expression="attr[last()]/value[last()]">
+													<arg-string>
+														<token-text xml:space="preserve">LSNAME=</token-text>
+														<token-local-variable name="primLogicalSystemName" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$shimConfigInfo/driver-config/subscriber-options/configuration-values/definitions/definition[@name='nsap-alt-conn-info']/value/instance" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="logicalSystemName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name='logicalSystemName']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="clientType" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/group/definition[@name='clientType']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">found secondary logical system: </token-text>
+														<token-local-variable name="logicalSystemName" />
+														<token-text xml:space="preserve">, type: </token-text>
+														<token-local-variable name="clientType" />
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="centralLSName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/group/subordinates/definition[@name='centralLSName']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="clientType" op="equal">cua-child</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">CUA central client: </token-text>
+																<token-local-variable name="centralLSName" />
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<or>
+															<if-local-variable mode="nocase" name="logicalSystemName" op="equal">$lsname$</if-local-variable>
+															<if-local-variable mode="regex" name="lsname" op="not-equal">.+</if-local-variable>
+														</or>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-element expression=".." name="instance" />
+														<do-set-xml-attr expression="../instance[last()]" name="class-name">
+															<arg-string>
+																<token-text xml:space="preserve">LogicalSystem</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="../instance[last()]" name="src-dn">
+															<arg-string>
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="logicalSystemName" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]" name="attr" />
+														<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">DisplayName</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="clientType" op="equal">non-cua</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+																	<arg-string>
+																		<token-local-variable name="logicalSystemName" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="clientType" op="equal">cua-central</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+																			<arg-string>
+																				<token-local-variable name="logicalSystemName" />
+																				<token-text xml:space="preserve"> - CUA Central System</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="clientType" op="equal">cua-child</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+																					<arg-string>
+																						<token-local-variable name="logicalSystemName" />
+																						<token-text xml:space="preserve"> - CUA Child System, Central: </token-text>
+																						<token-local-variable name="centralLSName" />
+																					</arg-string>
+																				</do-append-xml-text>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+														<do-append-xml-element expression="../instance[last()]" name="attr" />
+														<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">Description</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="clientType" op="equal">non-cua</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+																	<arg-string>
+																		<token-text xml:space="preserve">Secondary connection </token-text>
+																		<token-local-variable name="logicalSystemName" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="nocase" name="clientType" op="equal">cua-central</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+																			<arg-string>
+																				<token-text xml:space="preserve">Secondary connection </token-text>
+																				<token-local-variable name="logicalSystemName" />
+																				<token-text xml:space="preserve"> - CUA Central System</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="clientType" op="equal">cua-child</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+																					<arg-string>
+																						<token-text xml:space="preserve">Secondary connection </token-text>
+																						<token-local-variable name="logicalSystemName" />
+																						<token-text xml:space="preserve"> - CUA Child System, Central: </token-text>
+																						<token-local-variable name="centralLSName" />
+																					</arg-string>
+																				</do-append-xml-text>
+																			</arg-actions>
+																			<arg-actions />
+																		</do-if>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+														<do-append-xml-element expression="../instance[last()]" name="attr" />
+														<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">Value</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+														<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+															<arg-string>
+																<token-text xml:space="preserve">LSNAME=</token-text>
+																<token-local-variable name="logicalSystemName" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression=".[count(attr)=0]" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set Sentinel Identity reference</description>
+									<comment xml:space="preserve">If the Identity-GUID attribute isn't set in the add, then add the requisite data to the operation that ties the Sentinel Account to the Sentinel Identity.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="Identity-GUID" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="Sentinel-Account" name="Identity-GUID">
+											<arg-value type="string">
+												<token-xpath expression="string(jmap:get($drv.identity.map,jstring:new($op-entry-id)))" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+								

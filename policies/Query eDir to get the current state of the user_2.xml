@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule disabled="true">
+									<description>Query eDir to get the current state of the user</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="instanceAll" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" datastore="src">
+													<arg-dn>
+														<token-src-dn />
+													</arg-dn>
+													<arg-match-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dn">
+														<arg-value>
+															<token-src-dn />
+														</arg-value>
+													</arg-match-attr>
+													<arg-string>
+														<token-text xml:space="preserve">*</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="instance" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;instance&gt;&lt;/instance&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="filterAttrUser" />
+											</arg-node-set>
+											<arg-actions>
+												<do-clone-xpath dest-expression="$instance/instance" src-expression="$instanceAll//attr[@attr-name=$current-node]" />
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

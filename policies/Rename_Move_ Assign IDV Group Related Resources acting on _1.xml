@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Rename/Move: Assign IDV Group Related Resources acting on modiy-association</description>
+									<comment xml:space="preserve">When a group is renamed in the LDAP direcotry, this policy acts on modify-association event and removes the old group name from rbpm resource values</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify-association</if-operation>
+											<if-xpath op="not-true">operation-data/entitlement-assignments</if-xpath>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group.onboard" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="newassoc" scope="policy">
+											<arg-string>
+												<token-xpath expression="$current-op/association[last()]/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="targetObj">
+											<arg-node-set>
+												<token-query class-name="Group" datastore="src" scope="entry">
+													<arg-dn>
+														<token-local-variable name="newassoc" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">objectClass</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="classname">
+											<arg-string>
+												<token-xpath expression="$targetObj/@class-name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="classname" op="equal">Group</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="entitlementObj" scope="policy">
+													<arg-node-set>
+														<token-query class-name="DirXML-Entitlement" scope="entry">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\Group</token-text>
+															</arg-dn>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="entitlementQualifiedDn" scope="policy">
+													<arg-string>
+														<token-xpath expression="$entitlementObj/@qualified-src-dn" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="groupEntitlementLDAPDn" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+															<token-local-variable name="entitlementQualifiedDn" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												
+												
+												<do-set-local-variable name="adminQualifiedLDAPDn" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-dot">
+															<token-global-variable name="UAProvAdmin" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="ua-admin-pwd" notrace="true" scope="policy">
+													<arg-string>
+														<token-dest-attr name="nspmDistributionPassword">
+															<arg-dn>
+																<token-parse-dn dest-dn-format="slash" src-dn-format="qualified-dot">
+																	<token-global-variable name="UAProvAdmin" />
+																</token-parse-dn>
+															</arg-dn>
+														</token-dest-attr>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="oldGrpDN" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-op/association[1]/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="GroupValues" scope="policy">
+													<arg-string>
+														<token-query class-name="DirXML-Resource" datastore="dest" scope="subordinates">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+															</arg-dn>
+															<arg-match-attr name="CN">
+																<arg-value type="string">
+																	<token-text xml:space="preserve">Group_Values</token-text>
+																</arg-value>
+															</arg-match-attr>
+															<arg-string>
+																<token-text xml:space="preserve">DirXML-Data</token-text>
+															</arg-string>
+														</token-query>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="resourceldapDN" scope="policy">
+													<arg-string>
+														<token-map dest="resourceDN" src="entitlementName" table="..\PermissionEntMapping">
+															<token-text xml:space="preserve">Group</token-text>
+														</token-map>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="rpStatus" scope="policy">
+													<arg-string>
+														<token-xpath expression="ps:RefreshValuesOnGroupAssignments($UAProvURL, $adminQualifiedLDAPDn, $ua-admin-pwd, $groupEntitlementLDAPDn,$resourceldapDN,$oldGrpDN, 1000,$GroupValues, true)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">RefreshValuesForGroup Status: </token-text>
+														<token-local-variable name="rpStatus" />
+													</arg-string>
+												</do-trace-message>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

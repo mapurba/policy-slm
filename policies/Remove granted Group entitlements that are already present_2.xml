@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove granted Group entitlements that are already present</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group" op="equal">true</if-global-variable>
+											<if-association op="available" />
+											<if-entitlement name="Group" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="grpMbrQuery" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+													<arg-string>
+														<token-text xml:space="preserve">Group Membership</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="grpMbrExisting" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$grpMbrQuery/attr[@attr-name='Group Membership']/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="userAssocValue" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="userIDU" scope="policy">
+											<arg-string>
+												<token-xpath expression="substring-before(substring-after($userAssocValue,&quot;=&quot;),&quot;,&quot;)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="MbrQuery" scope="policy">
+											<arg-node-set>
+												<token-query class-name="Group">
+													<arg-match-attr name="Member">
+														<arg-value>
+															<token-local-variable name="userIDU" />
+														</arg-value>
+													</arg-match-attr>
+													<arg-match-attr name="connection-dn">
+														<arg-value>
+															<token-local-variable name="assocDN" />
+														</arg-value>
+													</arg-match-attr>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="MbrExisiting" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$MbrQuery/association" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">operation-data</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element expression="." name="operation-data" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-append-xml-element expression="operation-data" name="existing-groupmembers" />
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="grpMbrExisting" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="operation-data/existing-groupmembers" name="value" />
+												<do-set-local-variable name="grpMbrID" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="substring-before(substring-after($current-node/text(),&quot;IDG=&quot;),&quot;,&quot;)" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-append-xml-text expression="operation-data/existing-groupmembers/value[last()]">
+													<arg-string>
+														<token-local-variable name="grpMbrID" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+										<do-append-xml-element expression="operation-data" name="existing-members" />
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="MbrExisiting" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="operation-data/existing-members" name="value" />
+												<do-set-local-variable name="mbrID" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="substring-before(substring-after($current-node/text(),&quot;IDG=&quot;),&quot;,&quot;)" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-append-xml-text expression="operation-data/existing-members/value[last()]">
+													<arg-string>
+														<token-local-variable name="mbrID" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

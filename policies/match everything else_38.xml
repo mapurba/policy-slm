@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>match everything else</description>
+									<comment xml:space="preserve">Match objects in LDAP based on the object name and relative position in the hierarchy. This match is not performed if a matching object was found in a previous rule.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="case" op="not-equal">User</if-class-name>
+											<if-src-dn op="in-subtree">~driver.ldap.base.container~</if-src-dn>
+										</and>
+									</conditions>
+									<actions>
+										<do-find-matching-object scope="entry">
+											<arg-dn>
+												<token-global-variable name="idv.dit.data.users" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-unmatched-src-dn convert="true" />
+											</arg-dn>
+										</do-find-matching-object>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.pubPlacementType" op="equal">flat</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-find-matching-object scope="entry">
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+														<token-text xml:space="preserve">\</token-text>
+														<token-src-name />
+													</arg-dn>
+												</do-find-matching-object>
+											</arg-actions>
+											<arg-actions>
+												<do-find-matching-object scope="entry">
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+														<token-text xml:space="preserve">\</token-text>
+														<token-unmatched-src-dn convert="true" />
+													</arg-dn>
+												</do-find-matching-object>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

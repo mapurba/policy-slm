@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check for invalid endpoint urls</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">query|query-ex</if-operation>
+											<if-xpath op="true">./operation-data/msgw-data-collection</if-xpath>
+										</and>
+										<and>
+											<if-operation mode="regex" op="equal">query|query-ex</if-operation>
+											<if-xpath op="true">//operation-data/msgw-data-collection</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="guid" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">GUID</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="guidString" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:guid2string($guid/attr[@attr-name='GUID']/value/text())" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-xpath op="true">$guidString=substring(./operation-data/msgw-data-collection/@end-point-url,string-length(./operation-data/msgw-data-collection/@end-point-url)-string-length($guidString) +1)</if-xpath>
+													<if-xpath op="true">$guidString=substring(//operation-data/msgw-data-collection/@end-point-url,string-length(//operation-data/msgw-data-collection/@end-point-url)-string-length($guidString) +1)</if-xpath>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="." name="connection-dn">
+													<arg-string>
+														<token-local-variable name="guidString" />
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

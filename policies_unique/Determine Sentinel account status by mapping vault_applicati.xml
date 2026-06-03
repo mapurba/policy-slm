@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Determine Sentinel account status by mapping vault/application status combination</description>
+									<comment xml:space="preserve">Set the Sentinel account status value by looking up the value in a mapping table.</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="combined-status" scope="policy">
+											<arg-string>
+												<token-local-variable name="vault-status" />
+												<token-text xml:space="preserve">/</token-text>
+												<token-local-variable name="app-status" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="account-status" scope="policy">
+											<arg-string>
+												<token-map default-value="Undefined" dest="Sentinel Status" src="Vault/App Status" table="NIQSENIDTRK-OutboundAccountStatusMap">
+													<token-local-variable name="combined-status" />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

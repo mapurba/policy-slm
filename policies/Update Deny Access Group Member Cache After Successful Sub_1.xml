@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Update Deny Access Group Member Cache After Successful Subscriber Operations</description>
+									<conditions>
+										<and>
+											<if-op-property name="NOVLNOTEASTS-addToDenyAccessGroup" op="available" />
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-xml-attr mode="nocase" name="level" op="equal">success</if-xml-attr>
+											<if-local-variable name="DenyAccessGrpMembers" op="available" />
+										</and>
+										<and>
+											<if-op-property name="NOVLNOTEASTS-removeFromDenyAccessGroup" op="available" />
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-xml-attr mode="nocase" name="level" op="equal">success</if-xml-attr>
+											<if-local-variable name="DenyAccessGrpMembers" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-property mode="regex" name="NOVLNOTEASTS-removeFromDenyAccessGroup" op="equal">.+</if-op-property>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="removeFromDenyAccessGroup" scope="policy">
+													<arg-string>
+														<token-op-property name="NOVLNOTEASTS-removeFromDenyAccessGroup" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="$DenyAccessGrpMembers//value[@association-ref=$removeFromDenyAccessGroup]" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-property mode="regex" name="NOVLNOTEASTS-addToDenyAccessGroup" op="equal">.+</if-op-property>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="addedMember" scope="policy">
+													<arg-node-set>
+														<token-xml-parse>
+															<token-text xml:space="preserve">&lt;value association-ref="</token-text>
+															<token-op-property name="NOVLNOTEASTS-addToDenyAccessGroup" />
+															<token-text xml:space="preserve">"/&gt;</token-text>
+														</token-xml-parse>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-clone-xpath dest-expression="$DenyAccessGrpMembers/members" src-expression="$addedMember" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Acc Status: Updated DenyAccessGrpMembers: </token-text>
+												<token-xml-serialize>
+													<token-local-variable name="DenyAccessGrpMembers" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

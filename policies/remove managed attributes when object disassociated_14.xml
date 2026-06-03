@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>remove managed attributes when object disassociated</description>
+									<comment>Remove the attributes used to manage the state of the object for this driver when it is disassociated. Since the driver does not maintain the state of a disassociated object, these values are not reliable.</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">remove-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-dest-attr name="DirXML-MDADAliasName">
+													<arg-association>
+														<token-xpath expression="./text()" />
+													</arg-association>
+												</token-dest-attr>
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-dest-attr-value name="DirXML-MDADAliasName" when="before">
+															<arg-association>
+																<token-xpath expression="./text()" />
+															</arg-association>
+															<arg-value type="structured">
+																<arg-component name="nameSpace">
+																	<token-xpath expression="$current-node/component[@name=&quot;nameSpace&quot;]" />
+																</arg-component>
+																<arg-component name="volume">
+																	<token-xpath expression="$current-node/component[@name=&quot;volume&quot;]" />
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</arg-component>
+															</arg-value>
+														</do-remove-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-dest-attr name="DirXML-MDADContext">
+													<arg-association>
+														<token-xpath expression="./text()" />
+													</arg-association>
+												</token-dest-attr>
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-dest-attr-value name="DirXML-MDADContext" when="before">
+															<arg-association>
+																<token-xpath expression="./text()" />
+															</arg-association>
+															<arg-value type="structured">
+																<arg-component name="nameSpace">
+																	<token-xpath expression="$current-node/component[@name=&quot;nameSpace&quot;]" />
+																</arg-component>
+																<arg-component name="volume">
+																	<token-xpath expression="$current-node/component[@name=&quot;volume&quot;]" />
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</arg-component>
+															</arg-value>
+														</do-remove-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

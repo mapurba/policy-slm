@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>remember relative position in hierarchy</description>
+									<comment>The default policy assumes that you want to synchronize a subset of Active Directory with the Identity Vault. this rule marks events in the given containers for processing by adding the unmached-src-dn operational property. You can add subtrees in Active Directory t for inclusion by adding if-src-dn conditionals here. If you are using mirrored placement, the unmatched-src-dn is used later in the placement rule. If you do not use container based scoping, this rule may be modified or removed. If you change this rule, the placement rules must also be changed to reflect your policy.</comment>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="attempt-to-match" op="not-equal">false</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.domains" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="ad_user_container" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="resUserContainer" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-src-dn op="in-subtree">$ad_user_container$</if-src-dn>
+															<if-local-variable mode="nocase" name="resUserContainer" op="equal">false</if-local-variable>
+															<if-op-property mode="nocase" name="attempt-to-match" op="not-equal">false</if-op-property>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="drv.domain.container.name">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.container.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-op-property name="drv.domain.dns.name">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.domain.dns.name&quot;]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-op-property name="drv.user.container">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.user.container&quot;]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-op-property name="drv.subPlacementType">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.subPlacementType&quot;]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-op-property name="drv.pubPlacementType">
+															<arg-string>
+																<token-xpath expression="$current-node/definition[@name=&quot;drv.pubPlacementType&quot;]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-local-variable name="resUserContainer" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-op-property name="unmatched-src-dn">
+															<arg-string>
+																<token-unmatched-src-dn convert="true" />
+															</arg-string>
+														</do-set-op-property>
+														<do-set-op-property name="attempt-to-match">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Lookup managing position holder's workforceID</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="DirXML-sapP-A-S" op="changing" />
+										</and>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">sync</if-operation>
+											<if-src-attr name="DirXML-sapP-A-S" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvTmp" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">Lookup manager of the position's workforceID ...</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvFile" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',10),$lvTmp))" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="posMgrWfID" scope="policy">
+											<arg-string>
+												<token-src-attr class-name="DirXML-sapS" name="DirXML-sapS-R-A-P-008">
+													<arg-dn>
+														<token-global-variable name="dvr.saphr.driverdn" />
+														<token-text xml:space="preserve">\sap\om\s\</token-text>
+														<token-src-attr class-name="DirXML-sapS" name="DirXML-sapS-R-A-S-002">
+															<arg-dn>
+																<token-global-variable name="dvr.saphr.driverdn" />
+																<token-text xml:space="preserve">\sap\om\s\</token-text>
+																<token-attr name="DirXML-sapP-A-S" />
+															</arg-dn>
+														</token-src-attr>
+													</arg-dn>
+												</token-src-attr>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

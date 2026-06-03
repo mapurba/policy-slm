@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Find 'connection-dn' for granted Account entitlement</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Account" op="equal">true</if-global-variable>
+											<if-op-property name="attempt-to-match" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ent-value" scope="policy">
+											<arg-string>
+												<token-xpath expression="add-attr[@attr-name='DirXML-EntitlementRef']//param/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="ent-LIID" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:getEntParamFieldBackwardsCompatible($ent-value, 'LIID', 'LSNAME')" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="connDN" scope="policy">
+											<arg-string>
+												<token-xpath expression="$entConfig//connection[@name=$ent-LIID]/query-attr[@name='connection-dn']/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($connDN)&gt;0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-property name="connection-dn">
+													<arg-string>
+														<token-local-variable name="connDN" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

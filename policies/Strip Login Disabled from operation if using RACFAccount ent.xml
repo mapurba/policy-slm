@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip Login Disabled from operation if using RACFAccount entitlement</description>
+									<comment xml:space="preserve">At this point, all resource assignment related to Login Disabled have been achieved. Strip the attribute from the event</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.RACFAccount" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.RACFAccount.onboard" op="not-equal">true</if-global-variable>
+											<if-op-attr name="Login Disabled" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="Login Disabled" />
+									</actions>
+								</rule>
+								

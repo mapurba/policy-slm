@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Entitlement: Disable account</description>
+									<conditions>
+										<and>
+											<if-global-variable name="driver.gw.ent.account.remove" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="gwAccount" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="Login Disabled">
+											<arg-value type="state">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-op-property name="accountDisableByEntitlementRevoke">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.entitlement.gwDistLists" op="equal">true</if-global-variable>
+													<if-entitlement name="gwDistLists" op="changing" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+											<arg-actions>
+												<do-remove-association when="after">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</do-remove-association>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

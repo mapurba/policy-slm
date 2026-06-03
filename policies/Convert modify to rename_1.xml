@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert modify to rename</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">modify</if-operation>
+											<if-op-attr name="CN" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression=".." name="rename" />
+										<do-append-xml-element expression="../rename[last()]" name="association" />
+										<do-append-xml-text expression="../rename[last()]/association">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-append-xml-text>
+										<do-set-xml-attr expression="../rename[last()]" name="event-id">
+											<arg-string>
+												<token-xpath expression="$current-op/@event-id" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../rename[last()]" name="src-dn">
+											<arg-string>
+												<token-xpath expression="$current-op/@src-dn" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="../rename[last()]" name="new-name" />
+										<do-append-xml-text expression="../rename[last()]/new-name">
+											<arg-string>
+												<token-xpath expression="$current-op/modify-attr[@attr-name='CN']/add-value/value/text()" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-op-attr name="CN" />
+									</actions>
+								</rule>
+							

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Group Class - Perform Operations on Data Collection Query</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-class-name mode="regex" op="equal">direct.view_grp|indirect.grp</if-class-name>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="fk_mbr" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="./attr[@attr-name='fk_mbr']/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="var-association" scope="policy">
+															<arg-string>
+																<token-replace-all regex="," replace-with="|">
+																	<token-xpath expression="$current-node/text()" />
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="var-idu" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getParamValue($var-association,'PK_IDU')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-strip-xpath expression="$current-node/text()" />
+														<do-strip-xpath expression="$current-node/@association-ref" />
+														<do-set-xml-attr expression="$current-node" name="type">
+															<arg-string>
+																<token-text>integer</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$current-node">
+															<arg-string>
+																<token-local-variable name="var-idu" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="grp_member.idu" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="./attr[@attr-name='grp_member.idu']/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="var-association" scope="policy">
+															<arg-string>
+																<token-replace-all regex="," replace-with="|">
+																	<token-xpath expression="$current-node/text()" />
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="var-idu" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:getParamValue($var-association,'IDU')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-strip-xpath expression="$current-node/text()" />
+														<do-strip-xpath expression="$current-node/@association-ref" />
+														<do-set-xml-attr expression="$current-node" name="type">
+															<arg-string>
+																<token-text>integer</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-text expression="$current-node">
+															<arg-string>
+																<token-local-variable name="var-idu" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

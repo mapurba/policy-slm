@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Lower Case Rename new-name if configured</description>
+									<conditions>
+										<and>
+											<if-global-variable name="lower-case-cn" op="equal">true</if-global-variable>
+											<if-operation op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="newName">
+											<arg-string>
+												<token-xpath expression="./new-name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="new-name" />
+										<do-append-xml-element expression="." name="new-name" />
+										<do-append-xml-text expression="./new-name">
+											<arg-string>
+												<token-lower-case>
+													<token-local-variable name="newName" />
+												</token-lower-case>
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

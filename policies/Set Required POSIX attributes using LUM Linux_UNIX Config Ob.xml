@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set Required POSIX attributes using LUM Linux/UNIX Config Object, GID!=UID</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-src-attr name="uidNumber" op="not-available" />
+											<if-global-variable name="ModifyUsers" op="equal">true</if-global-variable>
+											<if-global-variable name="UseLUMForUIDGID" op="equal">true</if-global-variable>
+										</and>
+										
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable name="ReplaceValues" op="equal">true</if-global-variable>
+											<if-global-variable name="ModifyUsers" op="equal">true</if-global-variable>
+											<if-global-variable name="UseLUMForUIDGID" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="searchBase">
+											<arg-string>
+												<token-global-variable name="UIDInUseSearchSubtree" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="DriverDN">
+											<arg-string>
+												<token-global-variable name="DriverDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="UnixConfigObject">
+											<arg-string>
+												<token-global-variable name="LUMUnixConfig" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="driverShimInstance">
+											<arg-object>
+												<token-xpath expression="NxSettingsInstance:getInstance($DriverDN)" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-set-local-variable name="uid">
+											<arg-string>
+												<token-xpath expression="driverShim:getNextIDFromUnixConfig($driverShimInstance,$UnixConfigObject, &quot;uid&quot;, $searchBase)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-src-attr-value name="uidNumber">
+											<arg-value type="string">
+												<token-local-variable name="uid" />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-set-src-attr-value name="gidNumber">
+											<arg-value type="string">
+												<token-global-variable name="gidNumber" />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-set-src-attr-value name="homeDirectory">
+											<arg-value type="string">
+												<token-global-variable name="HomeDirectory" />
+												<token-src-name />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-add-src-attr-value name="Object Class">
+											<arg-value type="string">
+												<token-text xml:space="preserve">posixAccount</token-text>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-src-attr-value name="Object Class">
+											<arg-value type="string">
+												<token-text xml:space="preserve">uamPosixUser</token-text>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-association>
+											<arg-association>
+												<token-src-attr name="GUID" />
+											</arg-association>
+										</do-add-association>
+									</actions>
+								</rule>
+							

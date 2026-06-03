@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Status Operation - Add required properties to current doc for future use</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">status</if-operation>
+											<if-op-property name="AccountTracking-Operation" op="available" />
+											<if-op-property name="AccountTracking-association" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-property name="AccountTracking-$current-node$" op="not-available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-for-each>
+															<arg-node-set>
+																<token-query class-name="~drv.acctTrk.objectClass~" datastore="src" scope="entry">
+																	<arg-association>
+																		<token-op-property name="AccountTracking-association" />
+																	</arg-association>
+																	<arg-string>
+																		<token-text xml:space="preserve">$current-node$</token-text>
+																	</arg-string>
+																</token-query>
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="var-acctIdentifierValue" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$current-node/attr[last()]/value/text()" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-for-each>
+														<do-set-op-property name="AccountTracking-$current-node$">
+															<arg-string>
+																<token-local-variable name="var-acctIdentifierValue" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

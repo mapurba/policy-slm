@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add SrcDn to data collection queries</description>
+									<comment xml:space="preserve">Data Collection queries does not have SrnDn in the response. This is required for proper mapping</comment>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+											<if-xpath op="not-true">@src-dn</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="username" scope="policy">
+											<arg-string>
+												<token-xpath expression="./attr[@attr-name='Username']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="srcDn" scope="policy">
+											<arg-string>
+												<token-global-variable name="ConnectedSystemName" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="." name="src-dn">
+											<arg-string>
+												<token-text xml:space="preserve">\</token-text>
+												<token-local-variable name="srcDn" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-local-variable name="username" />
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Matching Rule</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="NGW: GroupWise ID" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.entitlement.gwDistLists" op="equal">true</if-global-variable>
+													<if-entitlement name="gwDistLists" op="changing" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+											<arg-actions>
+												<do-implement-entitlement>
+													<arg-node-set>
+														<token-entitlement name="gwAccount" />
+													</arg-node-set>
+													<arg-actions>
+														<do-find-matching-object scope="entry">
+															<arg-dn>
+																<token-src-attr class-name="User" name="NGW: GroupWise ID" />
+															</arg-dn>
+															<arg-match-attr name="58004">
+																<arg-value>
+																	<token-src-dn convert="false" />
+																</arg-value>
+															</arg-match-attr>
+														</do-find-matching-object>
+													</arg-actions>
+												</do-implement-entitlement>
+												<do-break />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

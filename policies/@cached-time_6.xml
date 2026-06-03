@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>@cached-time</description>
+									<conditions>
+										<and>
+											<if-xpath op="not-true">@cached-time</if-xpath>
+											<if-operation op="not-equal">query</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-property name="cached-time" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="." name="cached-time">
+													<arg-string>
+														<token-op-property name="cached-time" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-clear-op-property name="cached-time" />
+											</arg-actions>
+											<arg-actions>
+												<do-set-xml-attr expression="." name="cached-time">
+													<arg-string>
+														<token-time format="yyyyMMddHHmmss" tz="UTC" />
+														<token-text xml:space="preserve">.000Z</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-status level="warning">
+													<arg-string>
+														<token-text xml:space="preserve">Recovered from unexpected condition: @cached-time no available</token-text>
+													</arg-string>
+												</do-status>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

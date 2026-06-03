@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Get Encrypted Attributes From Filter</description>
+									<comment xml:space="preserve">Get encrypted attributes from filter</comment>
+									<conditions />
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">count(.//*[@name='objectclass']) &gt;0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="class-name" scope="policy">
+													<arg-string>
+														<token-xpath expression=".//*[@name='objectclass']" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="encryptedAttrs" scope="driver">
+											<arg-string>
+												<token-xpath expression="ss:getEncryptedAttrList($class-name)" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

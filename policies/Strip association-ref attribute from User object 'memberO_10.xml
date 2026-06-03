@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip association-ref attribute from User object 'memberOf' values</description>
+									<comment xml:space="preserve">To reconcile User permissions, Group objects may not be imported into the IDV so the association-ref of the group which comes from the driver shim must be stripped off.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="regex" op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount.onboard" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="*[@attr-name=&quot;memberOf&quot;]/descendant::value/@*" />
+									</actions>
+								</rule>
+								

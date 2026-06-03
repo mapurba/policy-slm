@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Roles Entitlement Grant and revoke</description>
+									<comment name="author" xml:space="preserve">Abhinav Kumar</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable name="drv.entitlement.Role" op="equal">true</if-global-variable>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="ROLES" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="ROLES" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">@from-merge='true'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="roleName">
+															<arg-string>
+																<token-xpath expression="es:getEntParamField($current-node,'ID2')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-remove-dest-attr-value name="ROLE_NAME">
+															<arg-value type="string">
+																<token-local-variable name="roleName" />
+															</arg-value>
+														</do-remove-dest-attr-value>
+														<do-append-xml-element expression="driver-operation-data" name="SAP-EntitlementRef" />
+														<do-append-xml-text expression="driver-operation-data/SAP-EntitlementRef">
+															<arg-string>
+																<token-text xml:space="preserve">ROLES</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="ROLES" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">@from-merge='true'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="roleName">
+															<arg-string>
+																<token-xpath expression="es:getEntParamField($current-node,'ID2')" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-add-dest-attr-value name="ROLE_NAME">
+															<arg-value type="string">
+																<token-local-variable name="roleName" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-append-xml-element expression="driver-operation-data" name="SAP-EntitlementRef" />
+														<do-append-xml-text expression="driver-operation-data/SAP-EntitlementRef">
+															<arg-string>
+																<token-text xml:space="preserve">ROLES</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

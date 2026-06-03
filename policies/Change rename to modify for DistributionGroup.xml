@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Change rename to modify for DistributionGroup</description>
+									<comment xml:space="preserve">Creates modify document instead of rename for DistributionGroup with attribute psexecute containing powershell command to rename this group</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">rename</if-operation>
+											<if-class-name mode="nocase" op="equal">group</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="queryResponse" scope="policy">
+											<arg-node-set>
+												<token-query class-name="group" scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-AADObjectType</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">RecipientTypeDetails</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="GroupType" scope="policy">
+											<arg-string>
+												<token-xpath expression="$queryResponse//attr[@attr-name=&quot;DirXML-AADObjectType&quot;]/value[1]/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="GroupRecipientTypeDetails" scope="policy">
+											<arg-string>
+												<token-xpath expression="$queryResponse//attr[@attr-name=&quot;RecipientTypeDetails&quot;]/value[1]/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="GroupType" op="equal">Universal</if-local-variable>
+													<if-local-variable mode="nocase" name="GroupRecipientTypeDetails" op="equal">MailUniversalDistributionGroup</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="psexecute" when="after">
+													<arg-value type="string">
+														<token-text xml:space="preserve">Set-DistributionGroup -Identity </token-text>
+														<token-association />
+														<token-text xml:space="preserve"> -DisplayName "</token-text>
+														<token-xpath expression="new-name/text()" />
+														<token-text xml:space="preserve">"</token-text>
+													</arg-value>
+												</do-add-dest-attr-value>
+												<do-strip-xpath expression="." />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

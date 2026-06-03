@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Generate 'definition' XML document for FanOut instances configuration</description>
+									<comment xml:space="preserve">If this 'definition [@name='msysinfo.drv.ms.logicalInstances'] element is present then it will be stripped-off</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="insTemplate" scope="policy">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-text xml:space="preserve">vnd.nds.stream:/</token-text>
+														<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+															<token-global-variable name="dirxml.auto.driverdn" />
+														</token-parse-dn>
+														<token-text xml:space="preserve">/NETQJFOMNSIS-InstanceConfigTemplate#DirXML-Data</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="mSysInfoDN" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</token-parse-dn>
+												<token-text xml:space="preserve">/MSysInfo</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="mSysInfoXML" scope="policy">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-text xml:space="preserve">vnd.nds.stream:/</token-text>
+														<token-local-variable name="mSysInfoDN" />
+														<token-text xml:space="preserve">#DirXML-ConfigValues</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="insDefDoc" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;definition display-name="Logical Instances" instance-separator=" " name="msysinfo.drv.ms.logicalInstances" type="structured" value-separator=";"&gt;&lt;description&gt;Managed System Service related required details of each JDBC FanOut instances.&lt;/description&gt;&lt;/definition&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="$insDefDoc/definition" src-expression="$insTemplate/node()" />
+										<do-append-xml-element expression="$insDefDoc/definition" name="value" />
+										<do-strip-xpath expression="$mSysInfoXML//definition[@name='msysinfo.drv.ms.logicalInstances']" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">$mSysInfoXML//header[@display-name='JDBC FanOut Instances Information']</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element expression="$mSysInfoXML/configuration-values/definitions" name="header" />
+												<do-set-xml-attr expression="$mSysInfoXML//header[last()]" name="display-name">
+													<arg-string>
+														<token-text xml:space="preserve">JDBC FanOut Instances Information</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

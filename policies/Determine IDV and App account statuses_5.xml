@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Determine IDV and App account statuses</description>
+									<conditions>
+										<and>
+											<if-op-property name="AccountTracking-IdvAccountStatus" op="available" />
+											<if-op-property name="AccountTracking-AppAccountStatus" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="idvAccStatus" scope="policy">
+											<arg-string>
+												<token-op-property name="AccountTracking-IdvAccountStatus" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="appAccStatus" scope="policy">
+											<arg-string>
+												<token-op-property name="AccountTracking-AppAccountStatus" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">count($relevantAccounts)&gt;0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="tmpVal" scope="policy">
+													<arg-node-set>
+														<token-split delimiter="#">
+															<token-xpath expression="$relevantAccounts[last()]" />
+														</token-split>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="idvAccStatus" op="equal">-</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="idvAccStatus" scope="policy">
+															<arg-string>
+																<token-xpath expression="$tmpVal[last()-2]" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="appAccStatus" op="equal">-</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="appAccStatus" scope="policy">
+															<arg-string>
+																<token-xpath expression="$tmpVal[last()-1]" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

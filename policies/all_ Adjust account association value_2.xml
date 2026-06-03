@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>all: Adjust account association value</description>
+									<comment xml:space="preserve">Adjust the association value for account operations since this driver configuration keeps extra information as a prefix to the association value returned from the shim.</comment>
+									<conditions>
+										<and>
+											<if-xpath op="true">contains(association,'@account/')</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="association-value" scope="policy">
+											<arg-string>
+												<token-xpath expression="association" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="association-prefix" scope="policy">
+											<arg-string>
+												<token-xpath expression="jstring:substring($association-value, 0, jstring:lastIndexOf($association-value, '@'))" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="association-suffix" scope="policy">
+											<arg-string>
+												<token-xpath expression="jstring:substring($association-value, jstring:lastIndexOf($association-value, '@') + 1)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-property name="association-prefix">
+											<arg-string>
+												<token-local-variable name="association-prefix" />
+											</arg-string>
+										</do-set-op-property>
+										<do-strip-xpath expression="association/text()" />
+										<do-append-xml-text expression="association">
+											<arg-string>
+												<token-local-variable name="association-suffix" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

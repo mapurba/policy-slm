@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Entitlements</description>
+									<comment xml:space="preserve">Add new DirXML-Entitlement objects as needed to represent the native entitlement names identified in the 'PermissionNameToFile' mapping table</comment>
+									<conditions>
+										<or />
+									</conditions>
+									<actions>
+										
+										<do-set-local-variable name="xml" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;entitlement conflict-resolution="union"&gt;&lt;values&gt;&lt;query-app&gt;&lt;query-xml&gt;&lt;nds dtdversion="2.0"&gt;&lt;input&gt;&lt;query class-name="Entitlement"  scope="subtree"&gt;&lt;search-class/&gt;&lt;read-attr attr-name="DisplayName"/&gt;&lt;read-attr attr-name="Description"/&gt;&lt;/query&gt;&lt;/input&gt;&lt;/nds&gt;&lt;/query-xml&gt;&lt;result-set&gt;&lt;display-name&gt;&lt;token-attr attr-name="DisplayName"/&gt;&lt;/display-name&gt;&lt;description&gt;&lt;token-attr attr-name="Description"/&gt;&lt;/description&gt;&lt;ent-value&gt;&lt;token-association/&gt;&lt;/ent-value&gt;&lt;/result-set&gt;&lt;/query-app&gt;&lt;/values&gt;&lt;/entitlement&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="values-xml" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;values&gt;&lt;/values&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="nameToFileMap" scope="driver">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\PermissionNameToFile</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="entitlements" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$nameToFileMap/mapping-table/row/col[1]/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="driverObj" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Driver" datastore="src" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">CN</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="driverCN" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$driverObj/attr[@attr-name='CN']/value[1]/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="driverQualifiedDn" scope="policy">
+											<arg-string>
+												<token-xpath expression="$driverObj/@qualified-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="entitlements" />
+											</arg-node-set>
+											<arg-actions>
+												
+												<do-set-local-variable name="entObj" scope="policy">
+													<arg-node-set>
+														<token-query class-name="DirXML-Entitlement" datastore="src" scope="entry">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">string-length($entObj/@src-dn)&gt;0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Creating new Entitlement object</token-text>
+															</arg-string>
+														</do-trace-message>
+														
+														<do-set-local-variable name="multivalued" scope="policy">
+															<arg-string>
+																<token-map dest="multivalued" src="entitlementName" table="PermissionNameToFile">
+																	<token-local-variable name="current-node" />
+																</token-map>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-xml-attr expression="$xml/entitlement" name="display-name">
+															<arg-string>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve"> Entitlement</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-local-variable name="entDescription" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">The </token-text>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve"> Entitlement is used to synchronize permission values assigned via the '</token-text>
+																<token-map dest="assignmentAttribute" src="entitlementName" table="PermissionNameToFile">
+																	<token-local-variable name="current-node" />
+																</token-map>
+																<token-text xml:space="preserve">' application attribute. Values for this entitlement are obtained from the '</token-text>
+																<token-map dest="csvFile" src="entitlementName" table="PermissionNameToFile">
+																	<token-local-variable name="current-node" />
+																</token-map>
+																<token-text xml:space="preserve">' file in the IDM host file system. The entitlement is </token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-xml-attr expression="$xml/entitlement/values" name="multi-valued">
+															<arg-string>
+																<token-local-variable name="multivalued" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="multivalued" op="equal">true</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-xml-attr expression="$xml/entitlement" name="description">
+																	<arg-string>
+																		<token-local-variable name="entDescription" />
+																		<token-text xml:space="preserve">multi-valued.</token-text>
+																	</arg-string>
+																</do-set-xml-attr>
+															</arg-actions>
+															<arg-actions>
+																<do-set-xml-attr expression="$xml/entitlement" name="description">
+																	<arg-string>
+																		<token-local-variable name="entDescription" />
+																		<token-text xml:space="preserve">single-valued.</token-text>
+																	</arg-string>
+																</do-set-xml-attr>
+															</arg-actions>
+														</do-if>
+														
+														<do-set-xml-attr expression="$xml/entitlement/values/query-app/query-xml/nds/input/query/search-class" name="class-name">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-xml-attr>
+														
+														<do-add-src-object class-name="DirXML-Entitlement" direct="true">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+														</do-add-src-object>
+														
+														<do-add-src-attr-value class-name="DirXML-Entitlement" direct="true" name="XmlData">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+															<arg-value type="octet">
+																<token-base64-encode>
+																	<token-xml-serialize>
+																		<token-local-variable name="xml" />
+																	</token-xml-serialize>
+																</token-base64-encode>
+															</arg-value>
+														</do-add-src-attr-value>
+														
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Creating new Permission Value resource</token-text>
+															</arg-string>
+														</do-trace-message>
+														
+														
+														<do-add-src-object class-name="DirXML-Resource" direct="true">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">_Values</token-text>
+															</arg-dn>
+														</do-add-src-object>
+														
+														<do-add-src-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-Data">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">_Values</token-text>
+															</arg-dn>
+															<arg-value type="octet">
+																<token-base64-encode>
+																	<token-xml-serialize>
+																		<token-local-variable name="values-xml" />
+																	</token-xml-serialize>
+																</token-base64-encode>
+															</arg-value>
+														</do-add-src-attr-value>
+														
+														<do-set-src-attr-value class-name="DirXML-Entitlement" name="ACL">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="$current-node$" />
+															</arg-dn>
+															<arg-value type="structured">
+																<arg-component name="protectedName">
+																	<token-text xml:space="preserve">[Entry Rights]</token-text>
+																</arg-component>
+																<arg-component name="trustee">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																	<token-text xml:space="preserve">\PermissionOnboarding</token-text>
+																</arg-component>
+																<arg-component name="privileges">
+																	<token-text xml:space="preserve">1</token-text>
+																</arg-component>
+															</arg-value>
+														</do-set-src-attr-value>
+														<do-add-src-attr-value class-name="DirXML-Entitlement" name="ACL">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+															<arg-value type="structured">
+																<arg-component name="protectedName">
+																	<token-text xml:space="preserve">[All Attributes Rights]</token-text>
+																</arg-component>
+																<arg-component name="trustee">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																	<token-text xml:space="preserve">\PermissionOnboarding</token-text>
+																</arg-component>
+																<arg-component name="privileges">
+																	<token-text xml:space="preserve">39</token-text>
+																</arg-component>
+															</arg-value>
+														</do-add-src-attr-value>
+														<do-set-src-attr-value class-name="DirXML-Resource" direct="true" name="ACL">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">_Values</token-text>
+															</arg-dn>
+															<arg-value type="structured">
+																<arg-component name="protectedName">
+																	<token-text xml:space="preserve">[Entry Rights]</token-text>
+																</arg-component>
+																<arg-component name="trustee">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																	<token-text xml:space="preserve">\PermissionOnboarding</token-text>
+																</arg-component>
+																<arg-component name="privileges">
+																	<token-text xml:space="preserve">1</token-text>
+																</arg-component>
+															</arg-value>
+														</do-set-src-attr-value>
+														<do-add-src-attr-value class-name="DirXML-Resource" direct="true" name="ACL">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">_Values</token-text>
+															</arg-dn>
+															<arg-value type="structured">
+																<arg-component name="protectedName">
+																	<token-text xml:space="preserve">[All Attributes Rights]</token-text>
+																</arg-component>
+																<arg-component name="trustee">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																	<token-text xml:space="preserve">\PermissionOnboarding</token-text>
+																</arg-component>
+																<arg-component name="privileges">
+																	<token-text xml:space="preserve">39</token-text>
+																</arg-component>
+															</arg-value>
+														</do-add-src-attr-value>
+														<do-set-src-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-ContentType">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\</token-text>
+																<token-local-variable name="current-node" />
+																<token-text xml:space="preserve">_Values</token-text>
+															</arg-dn>
+															<arg-value type="string">
+																<token-text xml:space="preserve">text/vnd.novell.idm.entitlementValues+xml</token-text>
+															</arg-value>
+														</do-set-src-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>&gt;
+		</actions>
+								</rule>
+								

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Build 'Default Template' payload from resource parameters</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="lv-hasNeededData" op="equal">true</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lv-entitlement-name" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">DefaultTemplate</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="$lv-entitlement-name$" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="lv-current-ID" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField_String($current-node, &quot;ID&quot;)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$lv-AssignedResources" />
+													</arg-node-set>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<or>
+																	<if-xpath op="true">$current-node/component[@name="nameSpace"]/text() = '1'</if-xpath>
+																	<if-xpath op="true">$current-node/component[@name="nameSpace"]/text() = '2'</if-xpath>
+																</or>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="lv-current-component-path-node" scope="policy">
+																	<arg-node-set>
+																		<token-xml-parse>
+																			<token-replace-all regex="&lt;\?xml.*?\?&gt;" replace-with="">
+																				<token-replace-all regex="&amp;lt;|&amp;amp;lt;" replace-with="&lt;">
+																					<token-xpath expression="$current-node/component[@name=&quot;path&quot;]/text()" />
+																				</token-replace-all>
+																			</token-replace-all>
+																		</token-xml-parse>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-local-variable name="lv-current-resource-entitlement-dn" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$lv-current-component-path-node/assignment/ent-dn/text()" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="lv-current-resource-entitlement-name" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:getSuffix($lv-current-resource-entitlement-dn, '=')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="lv-current-resource-entitlement-param" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$lv-current-component-path-node/assignment/parameter/value[@parm-key=&quot;EntitlementParamKey&quot;]/text()" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="lv-current-resource-entitlement-ID" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:getEntParamField_String($lv-current-resource-entitlement-param, &quot;ID&quot;)" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="case" name="lv-current-resource-entitlement-name" op="equal">$lv-entitlement-name$</if-local-variable>
+																			<if-local-variable mode="nocase" name="lv-current-ID" op="equal">$lv-current-resource-entitlement-ID$</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="lv-current-ID" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="es:getEntParamField_String($lv-current-resource-entitlement-param, &quot;ID&quot;)" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="lv-current-IDType" scope="policy">
+																			<arg-string>
+																				<token-xpath expression="$lv-current-component-path-node/assignment/parameter/value[@parm-key=&quot;IDType&quot;]/text()" />
+																			</arg-string>
+																		</do-set-local-variable>
+																		<do-set-local-variable name="lo-LinkedTemplatesConfig" scope="policy">
+																			<arg-object>
+																				<token-xpath expression="es:LinkedTemplatesConfig_setDefaultTemplate($lo-LinkedTemplatesConfig, $lv-current-ID, $lv-current-IDType)" />
+																			</arg-object>
+																		</do-set-local-variable>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

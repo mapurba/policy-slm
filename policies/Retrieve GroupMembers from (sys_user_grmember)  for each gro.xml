@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Retrieve GroupMembers from (sys_user_grmember)  for each group instance after group query</description>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="query-grp-members" op="equal">true</if-op-property>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="../instance" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="groupAssoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/association/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="instanceRef" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$current-node" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="groupMemberObj" scope="policy">
+													<arg-node-set>
+														<token-query class-name="sys_user_grmember" datastore="src">
+															<arg-match-attr name="group">
+																<arg-value type="string">
+																	<token-local-variable name="groupAssoc" />
+																</arg-value>
+															</arg-match-attr>
+															<arg-string>
+																<token-text xml:space="preserve">user</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-append-xml-element before="$instanceRef/operation-data" expression="$instanceRef" name="attr" />
+												<do-set-xml-attr expression="$instanceRef/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">Member</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="groupMemberObj" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="userAssoc" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/attr[@attr-name='user']/value/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-append-xml-element expression="$instanceRef/attr[@attr-name='Member']" name="value" />
+														<do-append-xml-text expression="$instanceRef/attr[@attr-name='Member']/value[last()]">
+															<arg-string>
+																<token-local-variable name="userAssoc" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

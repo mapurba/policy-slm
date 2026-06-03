@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>move or rename validation</description>
+									<comment>The driver shim cannot tell the difference between a move and a rename in Active Directory so publishes both. The last known object DN is cached in the ILM Vault and then used to decide whether a given move or rename operation is real. This rule will veto moves and renames that are already reflected in the cached value.</comment>
+									<conditions>
+										<and>
+											<if-local-variable mode="regex" name="cached-object-value" op="equal">.*</if-local-variable>
+											<if-local-variable mode="nocase" name="cached-object-value" op="equal">$current-object-value$</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-veto />
+									</actions>
+								</rule>
+								

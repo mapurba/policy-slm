@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Modify: Required Attributes</description>
+									<comment xml:space="preserve">Epic requires modification of SER records include some specific attributes</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<conditions>
+										<or>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="45" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-referralSrcType" scope="policy">
+													<arg-string>
+														<token-attr name="45" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="lv-referralSrcType" op="equal">.+</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="45">
+															<arg-value type="string">
+																<token-local-variable name="$lv-referralSrcType$" />
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-set-dest-attr-value name="45">
+															<arg-value type="string">
+																<token-text xml:space="preserve">1</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="1" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-serID" scope="policy">
+													<arg-string>
+														<token-src-attr name="~pdsepicsdcfg.serid.attribute.map~" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="lv-serID" op="equal">.+</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="1">
+															<arg-value type="string">
+																<token-local-variable name="lv-serID" />
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-veto />
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

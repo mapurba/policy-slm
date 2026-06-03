@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>placement for all objects</description>
+									<comment>All objects are placed in the subtree rooted in the given container. By default the Active Directory scoping container and the subscriber placement container are the same. You can change this value if you want to place objects in a different hierarchy than the one used for scoping. Note especially that if you add multiple scoping containers to the matching rule, you will likely need to consider multiple base containers in this rule. If you change the scoping rules in the matching rules of either the publisher or subscriber channel, you should also review and change this rule as needed.</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="drv.subPlacementType" op="equal">flat</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-dest-dn>
+													<arg-dn>
+														<token-src-dn convert="true" length="1" start="-1" />
+														<token-text xml:space="preserve">,</token-text>
+														<token-op-property name="drv.user.container" />
+													</arg-dn>
+												</do-set-op-dest-dn>
+											</arg-actions>
+											<arg-actions>
+												<do-set-op-dest-dn>
+													<arg-dn>
+														<token-op-property name="unmatched-src-dn" />
+														<token-text xml:space="preserve">,</token-text>
+														<token-op-property name="drv.user.container" />
+													</arg-dn>
+												</do-set-op-dest-dn>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

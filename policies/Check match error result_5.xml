@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check match error result</description>
+									<comment xml:space="preserve">Set the same state that the engine does if  we found multiple matching objects (mimic engine behavior).
+
+Note that we only do this if we have GCV-specified matching attrs. If we don't do this, the engine suffers a NullPointerException later on.</comment>
+									<conditions>
+										<and>
+											<if-xpath op="true">count(association) &gt; 1</if-xpath>
+											<if-xpath op="true">$drv.matching_attrs</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="error.do-find-matching-object" scope="driver">
+											<arg-node-set>
+												<token-xpath expression="$query-results/@src-dn" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-op-property name="error.do-find-matching-object">
+											<arg-string>
+												<token-local-variable name="error.do-find-matching-object" />
+											</arg-string>
+										</do-set-op-property>
+									</actions>
+								</rule>
+								

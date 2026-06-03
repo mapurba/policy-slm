@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Merge and Migrate Operations</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.acctTrk.enable" op="equal">true</if-global-variable>
+											<if-class-name mode="nocase" op="equal">~drv.acctTrk.objectClass~</if-class-name>
+											<if-xpath op="true">@from-merge = 'true'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="var-DirxmlFilterXML" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-replace-all regex="&amp;lt;" replace-with="&lt;">
+														<token-base64-decode>
+															<token-query class-name="DirXML-DriverFilter" datastore="src" scope="entry">
+																<arg-dn>
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</arg-dn>
+																<arg-string>
+																	<token-text>DirXML-DriverFilter</token-text>
+																</arg-string>
+															</token-query>
+														</token-base64-decode>
+													</token-replace-all>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($var-DirxmlFilterXML//filter/filter-class[@class-name='User']/filter-attr[@attr-name='Login Disabled']/@merge-authority) &gt; 0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="var-LoginDisabledMergeAuth" scope="policy">
+													<arg-string>
+														<token-xpath expression="$var-DirxmlFilterXML//filter/filter-class[@class-name='User']/filter-attr[@attr-name='Login Disabled']/@merge-authority" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="var-LoginDisabledMergeAuth" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">default</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-op-property name="AccountTracking-MergeAuthority">
+											<arg-string>
+												<token-local-variable name="var-LoginDisabledMergeAuth" />
+											</arg-string>
+										</do-set-op-property>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="var-LoginDisabledMergeAuth" op="equal">app</if-local-variable>
+												</and>
+												<and>
+													<if-local-variable mode="nocase" name="var-LoginDisabledMergeAuth" op="not-equal">app</if-local-variable>
+													<if-global-variable name="drv.entitlement.subAllowLoginDisabled" op="available" />
+													<if-global-variable mode="nocase" name="drv.entitlement.subAllowLoginDisabled" op="equal">false</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Group Member attribute mapping for Data Collection Query support</description>
+									<comment xml:space="preserve">Maps 'uniqueMember' attribute of iPlanet | SunOne | OID to the group member attribute under Entitlement Extension for group w.r.t to the selected LDAP directory system.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+											<if-global-variable mode="nocase" name="drv.acctTrk.statusAttr" op="equal">nsaccountlock</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/@attr-name="uniqueMember"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="$current-node/@attr-name" />
+														<do-set-xml-attr expression="$current-node" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">member</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

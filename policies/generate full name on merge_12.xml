@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>generate full name on merge</description>
+									<comment xml:space="preserve">Full name policy: This policy option requires a Full Name in the ILM Vault to be used as the object name in Active Directory. If one is not present during a merge operation, generate it by concatenating urn:ietf:params:scim:schemas:core:2.0:User:name.givenName (if present) with Surname.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="FullNameMap" op="equal">true</if-global-variable>
+											<if-xpath op="true">.[@from-merge='true']</if-xpath>
+											<if-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="gen-full-name">
+											<arg-string>
+												<token-escape-for-dest-dn>
+													<token-src-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.givenName" />
+													<token-text xml:space="preserve"> </token-text>
+													<token-src-attr name="urn:ietf:params:scim:schemas:core:2.0:User:name.familyName" />
+												</token-escape-for-dest-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="gen-full-name-normalized">
+											<arg-string>
+												<token-xpath expression="normalize-space($gen-full-name)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-add-src-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted">
+											<arg-value type="string">
+												<token-local-variable name="gen-full-name-normalized" />
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-set-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:name.formatted">
+											<arg-value type="string">
+												<token-local-variable name="gen-full-name-normalized" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+								

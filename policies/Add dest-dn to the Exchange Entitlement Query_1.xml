@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add dest-dn to the Exchange Entitlement Query</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">query|query-ex</if-operation>
+											<if-class-name mode="case" op="equal">msExchPrivateMDB</if-class-name>
+											<if-xml-attr name="dest-dn" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-op-dest-dn>
+											<arg-dn>
+												<token-text xml:space="preserve">CN=Configuration,DC=</token-text>
+												<token-replace-all regex="\." replace-with=",DC=">
+													<token-global-variable name="drv.domain.dns.name" />
+												</token-replace-all>
+											</arg-dn>
+										</do-set-op-dest-dn>
+									</actions>
+								</rule>
+							

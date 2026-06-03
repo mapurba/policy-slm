@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Re-Enabled</description>
+									<comment xml:space="preserve">After a user account has been deleted and is now being re-enabled, set the IsActive and IsBlocked attributes.</comment>
+									<comment name="author" xml:space="preserve">Converge</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-op-property mode="nocase" name="fromUserAdd" op="equal">true</if-op-property>
+											<if-op-property mode="nocase" name="from-merge" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="IsBlocked">
+											<arg-value type="string">
+												<token-text xml:space="preserve">false</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="Login Disabled" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-dest-attr-value name="Login Disabled">
+													<arg-value type="string">
+														<token-text xml:space="preserve">FALSE</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

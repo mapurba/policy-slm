@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: Single Provider Address</description>
+									<comment xml:space="preserve">Setup the update when the driver is configured for a single address for providers</comment>
+									<conditions>
+										<or>
+											<if-global-variable mode="nocase" name="pdsepicsdcfg.address.type" op="equal">Single</if-global-variable>
+										</or>
+										<or>
+											<if-xpath op="true">@from-merge='true'</if-xpath>
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.st1~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.st2~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.st3~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.city~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.state~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.zip~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.country~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.phone~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.fax~" op="changing" />
+											<if-op-attr name="~pdsepicsdcfg.address.single.attr.email~" op="changing" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="addressID" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">IDM-1</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="isPrimary" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">1</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="active" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">1</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="addr1" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.st1~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="addr2" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.st2~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="addr3" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.st3~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="city" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.city~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="st" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.state~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="zip" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.zip~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="country" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.country~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="phone" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.phone~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="pdsepicsdcfg.address.single.attr.fax" op="equal">Facsimile Telephone Number</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="faxNumber" scope="policy">
+													<arg-node-set>
+														<token-src-attr name="Facsimile Telephone Number" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="fax" scope="policy">
+													<arg-string>
+														<token-xpath expression="$faxNumber/component[@name=&quot;faxNumber&quot;]/text()" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="fax" scope="policy">
+													<arg-string>
+														<token-src-attr name="~pdsepicsdcfg.address.single.attr.fax~" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="email" scope="policy">
+											<arg-string>
+												<token-src-attr name="~pdsepicsdcfg.address.single.attr.email~" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lv-providerAddress" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="es:createEpicAddr($addressID,$isPrimary,$active,$addr1,$addr2,$addr3,$city,$st,$zip,$country,$phone,$fax,$email)" />
+											</arg-node-set>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

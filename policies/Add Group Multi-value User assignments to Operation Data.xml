@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add Group Multi-value User assignments to Operation Data</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify</if-operation>
+											<if-op-attr name="Member" op="changing" />
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group.onboard" op="equal">true</if-global-variable>
+											<if-local-variable name="reconcileDone" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">operation-data</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element expression="." name="operation-data" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-append-xml-element expression="operation-data" name="entitlement-assignments" />
+										<do-set-local-variable name="groupDN" scope="policy">
+											<arg-string>
+												<token-src-dn />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="entitlementObj" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-Entitlement" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\Group</token-text>
+													</arg-dn>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										
+										<do-set-local-variable name="entitlementQualifiedDn" scope="policy">
+											<arg-string>
+												<token-xpath expression="$entitlementObj/@qualified-src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="entitlement">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-local-variable name="entitlementQualifiedDn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="value">
+											<arg-string>
+												<token-text xml:space="preserve">{"ID":"</token-text>
+												<token-association />
+												<token-text xml:space="preserve">","ID2":"</token-text>
+												<token-src-dn />
+												<token-text xml:space="preserve">"}</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="fieldId">
+											<arg-string>
+												<token-text xml:space="preserve">ID2</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-local-variable name="staticMappedResource" scope="policy">
+											<arg-string>
+												<token-map dest="staticResource" src="entitlementValue" table="..\StaticValueEntitlementMap">
+													<token-src-dn />
+												</token-map>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="staticMappedResource" op="not-equal" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="resource">
+													<arg-string>
+														<token-local-variable name="staticMappedResource" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="dynamic">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="_llid_" scope="policy">
+													<arg-string>
+														<token-xpath expression="$xml/entitlement-configuration/connections/connection[contains($groupDN,query-attr/text()) and translate(concat(&quot;DC=&quot;,substring-after($groupDN,&quot;DC=&quot;)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = translate(query-attr/text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')]/@name" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="resource">
+													<arg-string>
+														<token-map dest="resourceDN" src="entitlementName" table="..\EntitlementLLIDMapping" type="AND">
+															<token-text xml:space="preserve">Group</token-text>
+															<token-map-source-col name="LLID">
+																<token-local-variable name="_llid_" />
+															</token-map-source-col>
+														</token-map>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="dynamic">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="Member" op="changing" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<or>
+															<if-xpath op="true">../modify[@from-merge='true']</if-xpath>
+															<if-xpath op="true">../modify/modify-attr[@attr-name='Member']/remove-all-values</if-xpath>
+														</or>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="memberList" scope="policy">
+															<arg-node-set>
+																<token-src-attr name="Member" />
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="memberList" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="holderObj" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="DirXML-Entitlement" scope="entry">
+																			<arg-dn>
+																				<token-local-variable name="current-node" />
+																			</arg-dn>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-local-variable name="holderQualifiedDn" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$holderObj/@qualified-src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-append-xml-element expression="operation-data/entitlement-assignments[last()]" name="holder" />
+																<do-append-xml-text expression="operation-data/entitlement-assignments[last()]/holder[last()]">
+																	<arg-string>
+																		<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+																			<token-local-variable name="holderQualifiedDn" />
+																		</token-parse-dn>
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+														</do-for-each>
+														<do-strip-op-attr disabled="true" name="Member" />
+													</arg-actions>
+													<arg-actions>
+														<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]" name="reconcileAllPermissions">
+															<arg-string>
+																<token-text xml:space="preserve">false</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-operation mode="regex" op="equal">add</if-operation>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="addmemberList" scope="policy">
+																	<arg-node-set>
+																		<token-xpath expression="add-attr[@attr-name='Member']/value/text()" />
+																	</arg-node-set>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-set-local-variable name="addmemberList" scope="policy">
+															<arg-node-set>
+																<token-xpath expression="modify-attr[@attr-name='Member']/add-value/value/text()" />
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-set-local-variable name="removememberList" scope="policy">
+															<arg-node-set>
+																<token-xpath expression="modify-attr[@attr-name='Member']/remove-value/value/text()" />
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="addmemberList" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="holderObj" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="DirXML-Entitlement" scope="entry">
+																			<arg-dn>
+																				<token-local-variable name="current-node" />
+																			</arg-dn>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-local-variable name="holderQualifiedDn" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$holderObj/@qualified-src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-append-xml-element expression="operation-data/entitlement-assignments[last()]" name="holder" />
+																<do-append-xml-text expression="operation-data/entitlement-assignments[last()]/holder[last()]">
+																	<arg-string>
+																		<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+																			<token-local-variable name="holderQualifiedDn" />
+																		</token-parse-dn>
+																	</arg-string>
+																</do-append-xml-text>
+																<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]/holder[last()]" name="entitlement-action">
+																	<arg-string>
+																		<token-text xml:space="preserve">assign</token-text>
+																	</arg-string>
+																</do-set-xml-attr>
+															</arg-actions>
+														</do-for-each>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="removememberList" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="holderObj" scope="policy">
+																	<arg-node-set>
+																		<token-query class-name="DirXML-Entitlement" scope="entry">
+																			<arg-dn>
+																				<token-local-variable name="current-node" />
+																			</arg-dn>
+																		</token-query>
+																	</arg-node-set>
+																</do-set-local-variable>
+																<do-set-local-variable name="holderQualifiedDn" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="$holderObj/@qualified-src-dn" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-append-xml-element expression="operation-data/entitlement-assignments[last()]" name="holder" />
+																<do-append-xml-text expression="operation-data/entitlement-assignments[last()]/holder[last()]">
+																	<arg-string>
+																		<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+																			<token-local-variable name="holderQualifiedDn" />
+																		</token-parse-dn>
+																	</arg-string>
+																</do-append-xml-text>
+																<do-set-xml-attr expression="operation-data/entitlement-assignments[last()]/holder[last()]" name="entitlement-action">
+																	<arg-string>
+																		<token-text xml:space="preserve">revoke</token-text>
+																	</arg-string>
+																</do-set-xml-attr>
+															</arg-actions>
+														</do-for-each>
+														<do-strip-op-attr disabled="true" name="Member" />
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>match everything else</description>
+									<comment xml:space="preserve">Match objects in target eDirectory based on the object name and relative position in the hierarchy.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="case" op="not-equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.subPlacementType" op="equal">flat</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-find-matching-object scope="entry">
+													<arg-dn>
+														<token-src-dn convert="true" length="1" start="-1" />
+														<token-local-variable name="edirBaseContainer" />
+													</arg-dn>
+												</do-find-matching-object>
+											</arg-actions>
+											<arg-actions>
+												<do-find-matching-object scope="entry">
+													<arg-dn>
+														<token-op-property name="unmatched-src-dn" />
+														<token-local-variable name="edirBaseContainer" />
+													</arg-dn>
+												</do-find-matching-object>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

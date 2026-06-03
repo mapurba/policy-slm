@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule disabled="true">
+									<description>Reformat User's attribute THLastHireDateStr</description>
+									<comment xml:space="preserve">Reformat user's attribute  as per IDV attribute format :THLastHireDateStr</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="THLastHireDateStr" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvOPAttribute" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">THLastHireDateStr</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="nocase" op="equal">add</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-reformat-op-attr name="$lvOPAttribute$">
+													<arg-value type="string">
+														<token-replace-all regex="-" replace-with="">
+															<token-replace-all regex=":" replace-with="00">
+																<token-op-attr name="$lvOPAttribute$" />
+															</token-replace-all>
+														</token-replace-all>
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-operation mode="nocase" op="equal">modify</if-operation>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvOPAttributeOld" scope="policy">
+													<arg-string>
+														<token-xpath expression="modify-attr[@attr-name=&quot;$lvOPAttribute$&quot;]/remove-value/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvOPAttributeNew" scope="policy">
+													<arg-string>
+														<token-xpath expression="modify-attr[@attr-name=&quot;$lvOPAttribute$&quot;]/add-value/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="lvOPAttributeNewF" scope="policy">
+													<arg-string>
+														<token-replace-all regex="-" replace-with="">
+															<token-replace-all regex=":" replace-with="00">
+																<token-local-variable name="lvOPAttributeNew" />
+															</token-replace-all>
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="lvOPAttributeNewF" op="equal">$lvOPAttributeOld$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-op-attr name="$lvOPAttribute$" />
+													</arg-actions>
+													<arg-actions>
+														<do-strip-xpath expression="modify-attr[@attr-name=&quot;$lvOPAttribute$&quot;]/add-value/value/text()" />
+														<do-append-xml-text expression="modify-attr[@attr-name=&quot;$lvOPAttribute$&quot;]/add-value/value">
+															<arg-string>
+																<token-local-variable name="$lvOPAttributeNewF$" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

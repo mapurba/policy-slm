@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle modifies of CN attribute</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">modify</if-operation>
+											<if-op-attr name="CN" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="CNattrValue" scope="policy">
+											<arg-node-set>
+												<token-op-attr name="CN" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-op-attr name="CN" />
+										<do-set-dest-attr-value name="CN">
+											<arg-value>
+												<token-xpath expression="$CNattrValue[1]" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

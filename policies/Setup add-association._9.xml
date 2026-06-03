@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Setup add-association.</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">status</if-operation>
+											<if-xpath op="true">@level='success'</if-xpath>
+											<if-op-property name="op-type" op="equal">add</if-op-property>
+											<if-op-property name="dn" op="available" />
+											<if-op-property name="dn" op="not-equal" />
+											<if-op-property name="association" op="available" />
+											<if-op-property name="association" op="not-equal" />
+										</and>
+									</conditions>
+									<actions>
+										<do-append-xml-element expression=".." name="add-association" />
+										<do-set-xml-attr expression="../add-association" name="dest-dn">
+											<arg-string>
+												<token-op-property name="dn" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-text expression="../add-association">
+											<arg-string>
+												<token-op-property name="association" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="operation-data" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set CN if not already set</description>
+									<comment xml:space="preserve">CN should have already been set by the Event Transformation policy and will be the value of LoginName in SharePoint. However, if CN has not been set yet for some reason, since we need it for an add event we will use Full Name (which is mapped from Name in SharePoint in the default schema map).</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="CN" op="not-available" />
+											<if-op-attr name="Full Name" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value name="CN">
+											<arg-value type="string">
+												<token-op-attr name="Full Name" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+								

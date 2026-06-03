@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto User delete if using ScriptingAccount entitlement</description>
+									<comment xml:space="preserve">By this point, all procession of the ScriptingAccount entitlement is complete. veto the User Delete event</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.ScriptingAccount" op="equal">true</if-global-variable>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-remove-association when="after">
+											<arg-association>
+												<token-association />
+											</arg-association>
+										</do-remove-association>
+										<do-veto />
+									</actions>
+								</rule>
+							

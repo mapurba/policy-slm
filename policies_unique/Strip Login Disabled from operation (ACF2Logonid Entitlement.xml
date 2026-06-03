@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip Login Disabled from operation (ACF2Logonid Entitlement but NO Onboarding)</description>
+									<comment xml:space="preserve">If entitlements control whether the account in the application is enabled or disabled (as in the Disable Option), we'll disregard changes to Login Disabled.
+If ACF2Logonid onboarding is allowed we will strip the attribute in the pub-ctp-PermissionAttributesCaching policy</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.ACF2Logonid" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="Login Disabled" op="available" />
+											<if-global-variable mode="nocase" name="drv.entitlement.ACF2Logonid.onboard" op="not-equal">true</if-global-variable>
+										</and>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.ACF2Logonid" op="equal">true</if-global-variable>
+											<if-global-variable name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-attr name="Login Disabled" op="available" />
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="not-equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="Login Disabled" />
+									</actions>
+								</rule>
+							

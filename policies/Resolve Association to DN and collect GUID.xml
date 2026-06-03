@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Resolve Association to DN and collect GUID</description>
+									<conditions>
+										<and>
+											<if-op-property name="ig-account-collection-query" op="equal">true</if-op-property>
+											<if-operation op="equal">instance</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="assoc">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="assoc" op="equal">\\.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="ldapAssoc" scope="policy">
+													<arg-string>
+														<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash" start="0">
+															<token-local-variable name="assoc" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="idvAssoc" scope="policy">
+													<arg-string>
+														<token-split delimiter=",">
+															<token-local-variable name="ldapAssoc" />
+														</token-split>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="qsrc" scope="policy">
+													<arg-node-set>
+														<token-query scope="entry">
+															<arg-association>
+																<token-local-variable name="idvAssoc" />
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">GUID</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">$qsrc/attr[@attr-name='GUID']</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="qsrc" scope="policy">
+															<arg-node-set>
+																<token-query scope="entry">
+																	<arg-association>
+																		<token-local-variable name="assoc" />
+																	</arg-association>
+																	<arg-string>
+																		<token-text xml:space="preserve">GUID</token-text>
+																	</arg-string>
+																</token-query>
+															</arg-node-set>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="qsrc">
+													<arg-node-set>
+														<token-query scope="entry">
+															<arg-association>
+																<token-local-variable name="assoc" />
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">GUID</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="ldapdn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="$qsrc/@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-dest-dn>
+											<arg-dn>
+												<token-local-variable name="ldapdn" />
+											</arg-dn>
+										</do-set-op-dest-dn>
+										<do-clone-xpath dest-expression="." src-expression="$qsrc/attr[@attr-name='GUID']" />
+									</actions>
+								</rule>
+							

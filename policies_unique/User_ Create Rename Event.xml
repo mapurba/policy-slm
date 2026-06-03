@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: Create Rename Event</description>
+									<comment xml:space="preserve">If the naming attribute specified by a GCV is changing, process the current event and then send a rename afterward.</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-global-variable mode="regex" name="gvUserNameMappingAttr" op="equal">.+</if-global-variable>
+											<if-op-attr name="~gvUserNameMappingAttr~" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-rename-dest-object class-name="User" when="after">
+											<arg-string>
+												<token-attr name="~gvUserNameMappingAttr~" />
+											</arg-string>
+										</do-rename-dest-object>
+									</actions>
+								</rule>
+								

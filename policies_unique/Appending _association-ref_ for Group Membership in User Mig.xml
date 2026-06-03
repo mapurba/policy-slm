@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Appending &lt;association-ref&gt; for Group Membership in User Migration</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">urn:ietf:params:scim:schemas:core:2.0:User</if-class-name>
+											<if-xpath op="true">./attr[@attr-name='groups:value']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ValueNode" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="./attr[@attr-name='groups:value']/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="ValueNode" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="current-node" op="not-equal" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-global-variable name="drv.SAPCloud" op="equal">true</if-global-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="groupId">
+																	<arg-string>
+																		<token-query>
+																			<arg-match-attr name="CN">
+																				<arg-value>
+																					<token-local-variable name="current-node" />
+																				</arg-value>
+																			</arg-match-attr>
+																		</token-query>
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions>
+																<do-set-local-variable name="groupId">
+																	<arg-string>
+																		<token-local-variable name="current-node" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+														</do-if>
+														<do-set-xml-attr expression="$current-node" name="association-ref">
+															<arg-string>
+																<token-local-variable name="groupId" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$current-node" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">dn</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

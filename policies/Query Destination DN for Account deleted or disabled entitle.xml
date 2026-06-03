@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Query Destination DN for Account deleted or disabled entitlement operations</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-op-property mode="regex" name="accountAction" op="equal">accountDeleteByEntitlementRevoke|accountDisableByEntitlementRevoke</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="association_value" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="association_value" op="not-equal" />
+													<if-op-property name="dest-dn" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="appUserQueryResponse" scope="policy">
+													<arg-node-set>
+														<token-query class-name="User" datastore="dest">
+															<arg-association>
+																<token-local-variable name="association_value" />
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">CN</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-op-property name="dest-dn">
+													<arg-string>
+														<token-xpath expression="$appUserQueryResponse/@src-dn" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

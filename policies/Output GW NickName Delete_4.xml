@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Output GW NickName Delete</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">rename</if-operation>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable mode="nocase" name="driver.gw.deleteNickname" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="oldSrcDn" scope="policy">
+											<arg-string>
+												<token-parse-dn length="1" src-dn-format="slash" start="-1">
+													<token-xpath expression="./@old-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="gw-nickname" scope="policy">
+											<arg-node-set>
+												<token-query class-name="GroupWise Nickname">
+													<arg-association>
+														<token-association />
+													</arg-association>
+													<arg-match-attr name="50070">
+														<arg-value>
+															<token-local-variable name="oldSrcDn" />
+														</arg-value>
+													</arg-match-attr>
+													<arg-string>
+														<token-text xml:space="preserve">50035</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">50062</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">50073</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="domainName" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$gw-nickname//attr[@attr-name=&quot;50035&quot;]/value/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="postOffice" scope="policy">
+											<arg-string>
+												<token-xpath expression="$gw-nickname//attr[@attr-name=&quot;50062&quot;]/value/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="gw-nickname" />
+											</arg-node-set>
+											<arg-actions>
+												<do-delete-dest-object class-name="GroupWise Nickname">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</do-delete-dest-object>
+												<do-append-xml-element expression="../delete[last()]" name="add-attr" />
+												<do-set-xml-attr expression="../delete[last()]/add-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">50035</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="../delete[last()]/add-attr[last()]" name="value" />
+												<do-append-xml-text expression="../delete[last()]/add-attr[last()]/value[last()]">
+													<arg-string>
+														<token-local-variable name="domainName" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="../delete[last()]" name="add-attr" />
+												<do-set-xml-attr expression="../delete[last()]/add-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">50062</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="../delete[last()]/add-attr[last()]" name="value" />
+												<do-append-xml-text expression="../delete[last()]/add-attr[last()]/value[last()]">
+													<arg-string>
+														<token-local-variable name="postOffice" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-set-local-variable name="objectName" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$current-node/attr[@attr-name=&quot;50073&quot;]/value/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-append-xml-element expression="../delete[last()]" name="add-attr" />
+												<do-set-xml-attr expression="../delete[last()]/add-attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">50073</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="../delete[last()]/add-attr[last()]" name="value" />
+												<do-append-xml-text expression="../delete[last()]/add-attr[last()]/value[last()]">
+													<arg-string>
+														<token-local-variable name="objectName" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="../delete/association" />
+									</actions>
+								</rule>
+							

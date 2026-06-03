@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Do not process Account Tracking policies if previously modified</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="prevDirxmlAccounts" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" datastore="src" scope="entry">
+													<arg-dn>
+														<token-src-dn />
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-Accounts</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="prevDirxmlAccounts" scope="policy">
+											<arg-string>
+												<token-xpath expression="contains($prevDirxmlAccounts/attr/value/text(),$dirxml.auto.driverguid)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="prevDirxmlAccounts" op="equal">true</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-break />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

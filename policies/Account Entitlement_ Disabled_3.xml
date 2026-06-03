@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Entitlement: Disabled</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable name="driver.gw.ent.account.add" op="equal">disable</if-global-variable>
+											<if-entitlement name="gwAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="User" name="Login Disabled">
+											<arg-value type="state">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="regex" name="driver.gw.ent.account.remove" op="equal">expire|dispire</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-clear-dest-attr-value class-name="User" name="Login Expiration Time" />
+												<do-set-op-property disabled="true" name="expire-account">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

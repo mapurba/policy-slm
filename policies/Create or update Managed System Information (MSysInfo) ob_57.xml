@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create or update Managed System Information (MSysInfo) object</description>
+									<conditions />
+									<actions>
+										<do-set-local-variable name="msysInfoObj" scope="policy">
+											<arg-node-set>
+												<token-query class-name="DirXML-GlobalConfigDef" datastore="src" scope="entry">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\MSysInfo</token-text>
+													</arg-dn>
+													<arg-string>
+														<token-text xml:space="preserve">DirXML-ConfigValues</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($msysInfoObj/@src-dn)&gt;0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="currentXmlStr" scope="policy">
+													<arg-string>
+														<token-replace-all regex="\s" replace-with="">
+															<token-base64-decode>
+																<token-xpath expression="$msysInfoObj/attr[@attr-name='DirXML-ConfigValues']/value/text()" />
+															</token-base64-decode>
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="xmlStr" scope="policy">
+													<arg-string>
+														<token-replace-all regex="\s" replace-with="">
+															<token-xml-serialize>
+																<token-xpath expression="$xml" />
+															</token-xml-serialize>
+														</token-replace-all>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="case" name="currentXmlStr" op="equal">$xmlStr$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">MSysInfo object still up-to-date. No update necessary.</token-text>
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Update existing MSysInfo object</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-set-src-attr-value class-name="DirXML-GlobalConfigDef" name="DirXML-ConfigValues">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\MSysInfo</token-text>
+															</arg-dn>
+															<arg-value type="octet">
+																<token-base64-encode>
+																	<token-xml-serialize>
+																		<token-local-variable name="xml" />
+																	</token-xml-serialize>
+																</token-base64-encode>
+															</arg-value>
+														</do-set-src-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Creating new MSysInfo object</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-add-src-object class-name="DirXML-GlobalConfigDef">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\MSysInfo</token-text>
+													</arg-dn>
+												</do-add-src-object>
+												<do-add-src-attr-value class-name="DirXML-GlobalConfigDef" name="DirXML-ConfigValues">
+													<arg-dn>
+														<token-global-variable name="dirxml.auto.driverdn" />
+														<token-text xml:space="preserve">\MSysInfo</token-text>
+													</arg-dn>
+													<arg-value type="octet">
+														<token-base64-encode>
+															<token-xml-serialize>
+																<token-local-variable name="xml" />
+															</token-xml-serialize>
+														</token-base64-encode>
+													</arg-value>
+												</do-add-src-attr-value>
+											</arg-actions>
+										</do-if>
+										<do-trace-message>
+											<arg-string>
+												<token-xml-serialize>
+													<token-local-variable name="xml" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+							

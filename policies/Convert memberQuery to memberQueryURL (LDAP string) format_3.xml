@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert memberQuery to memberQueryURL (LDAP string) format</description>
+									<conditions>
+										<and>
+											<if-op-attr name="memberQueryURL" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-op-attr name="memberQueryURL" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="dcs-user-password" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="dcs-user-password" scope="driver">
+													<arg-string>
+														<token-named-password name="dcs-user-password" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="dcs-driver-ldap-protocol" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="dcs-driver-ldap-protocol" scope="driver">
+													<arg-string>
+														<token-global-variable name="use-ldap-protocol" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="dcs-driver-ldap-protocol" op="equal">ldaps</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="protocol" scope="driver">
+													<arg-string>
+														<token-text xml:space="preserve">ldaps</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-local-variable name="dcs-driver-ldap-ip" op="not-available" />
+													<if-local-variable name="dcs-driver-ldap-port" op="not-available" />
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="ncpServer" scope="policy">
+													<arg-node-set>
+														<token-query class-name="NCP Server" datastore="src" scope="entry">
+															<arg-dn>
+																<token-parse-dn dest-dn-format="slash" src-dn-format="ldap">
+																	<token-global-variable name="dirxml.auto.localserverdn" />
+																</token-parse-dn>
+															</arg-dn>
+															<arg-string>
+																<token-text xml:space="preserve">Network Address</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="URLs" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="$ncpServer/attr[@attr-name='Network Address']/value[component[@name='netAddrType']/text()=13]/component[@name='netAddr']/text()" />
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="URLs" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="url" scope="policy">
+															<arg-string>
+																<token-base64-decode charset="UTF-16LE">
+																	<token-local-variable name="current-node" />
+																</token-base64-decode>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="protocol" scope="policy">
+															<arg-string>
+																<token-upper-case>
+																	<token-xpath expression="es:getProtocolFromURL($url)" />
+																</token-upper-case>
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">url=$url$</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="protocol" op="equal">ldap</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="dcs-driver-ldap-ip" scope="driver">
+																	<arg-string>
+																		<token-xpath expression="es:getIPFromURL($url)" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="dcs-driver-ldap-port" scope="driver">
+																	<arg-string>
+																		<token-xpath expression="es:getPortFromURL($url)" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="protocol" op="equal">ldaps</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-set-local-variable name="dcs-driver-ldap-ip" scope="driver">
+																	<arg-string>
+																		<token-xpath expression="es:getIPFromURL($url)" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-set-local-variable name="dcs-driver-ldap-port" scope="driver">
+																	<arg-string>
+																		<token-xpath expression="es:getPortFromURL($url)" />
+																	</arg-string>
+																</do-set-local-variable>
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="base" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">ldap host: </token-text>
+												<token-local-variable name="dcs-driver-ldap-ip" />
+												<token-text xml:space="preserve">, ldap port: </token-text>
+												<token-local-variable name="dcs-driver-ldap-port" />
+												<token-text xml:space="preserve">, user ldap dn: </token-text>
+												<token-global-variable name="dcs-user-dn" />
+												<token-text xml:space="preserve">, user password: ***</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="dcs-driver-ldap-protocol" op="equal">ldaps</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable name="cert-path" op="not-available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="cert-path" scope="driver">
+															<arg-string>
+																<token-global-variable name="ldaps-keystore-path" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-set-local-variable name="dynGroup" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="es:ldapSearchWithTLS($dcs-driver-ldap-ip, $dcs-driver-ldap-port, '~dcs-user-dn~', $dcs-user-password, $base, 'base', 'objectClass=*', 'memberQueryURL',$cert-path)" />
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="dynGroup" scope="policy">
+													<arg-node-set>
+														<token-xpath expression="es:ldapSearch($dcs-driver-ldap-ip, $dcs-driver-ldap-port, '~dcs-user-dn~', $dcs-user-password, $base, 'base', 'objectClass=*', 'memberQueryURL')" />
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="memberQueryURL" scope="policy">
+											<arg-string>
+												<token-xpath expression="$dynGroup/attr[@attr-name='memberQueryURL']/value/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">memberQueryURL=$memberQueryURL$</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="memberQueryURL" op="equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-dest-attr-value name="memberQueryURL">
+													<arg-value type="string">
+														<token-local-variable name="memberQueryURL" />
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-clear-dest-attr-value name="memberQueryURL" />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

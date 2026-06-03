@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add status attribute name to operation data</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">add</if-operation>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="not-true">operation-data</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-append-xml-element expression="." name="operation-data" />
+											</arg-actions>
+										</do-if>
+										<do-append-xml-element expression="operation-data" name="logindisabledattrName" />
+										<do-set-local-variable name="lv-StatusAttrName" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">~jfoactrk.StatusAttr~</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-text expression="operation-data/logindisabledattrName">
+											<arg-string>
+												<token-local-variable name="lv-StatusAttrName" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

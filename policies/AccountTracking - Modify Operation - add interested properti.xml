@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - Modify Operation - add interested properties to current doc for future use.</description>
+									<comment xml:space="preserve">The policy adds the required attrbutes to the operation data. These values will be used by the itp write accounts policy.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">modify</if-operation>
+											<if-global-variable mode="nocase" name="drv.acctTrk.enable" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.acctTrk.mode" op="not-equal">fanout</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr name="$current-node$" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-$current-node$">
+															<arg-string>
+																<token-op-attr name="$current-node$" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-$current-node$">
+															<arg-string>
+																<token-src-attr name="$current-node$" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

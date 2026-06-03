@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Ran once, set flag so we don't run again</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="reqID" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="reqID" op="equal">$msysCacheInitialized$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="msysCacheInitialized" scope="driver">
+															<arg-string>
+																<token-text xml:space="preserve">true</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">MSys Cache: Detected another cache refresh request '</token-text>
+																<token-local-variable name="msysCacheInitialized" />
+																<token-text xml:space="preserve">' while current refresh '</token-text>
+																<token-local-variable name="reqID" />
+																<token-text xml:space="preserve">' was running. Going to refresh again...</token-text>
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="msysCacheInitialized" scope="driver">
+													<arg-string>
+														<token-text xml:space="preserve">true</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>remember relative position in hierarchy</description>
+									<comment xml:space="preserve">This rule marks events in the given containers for processing by adding the unmached-src-dn and attempt-to-match operation properties. You can add subtrees in the Identity Vault for inclusion by adding if-src-dn conditionals here. If you are using mirrored placement, the unmatched-src-dn is used later in the placement rule. The attempt-to-match property determines whether the matching policies following this initializing policy should try to match the object or whether its out of scope.</comment>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="attempt-to-match" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="drv.domain.container" scope="policy">
+											<arg-string>
+												<token-op-property name="drv.domain.container.name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-src-dn op="in-subtree">$drv.domain.container$</if-src-dn>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-clear-op-property name="unmatched-src-dn" />
+												<do-set-op-property name="unmatched-src-dn">
+													<arg-string>
+														<token-unmatched-src-dn convert="true" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

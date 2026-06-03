@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add IDM naming operation-data after User Add Match</description>
+									<conditions>
+										<or>
+											<if-operation mode="case" op="equal">status</if-operation>
+										</or>
+										<or>
+											<if-xml-attr mode="nocase" name="level" op="equal">success</if-xml-attr>
+										</or>
+										<or>
+											<if-xpath op="true">./object-dn</if-xpath>
+										</or>
+										<or>
+											<if-xpath op="not-true">operation-data/ldap-dn</if-xpath>
+										</or>
+										<or>
+											<if-xpath op="true">operation-data/match</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										
+										<do-set-local-variable name="objId">
+											<arg-string>
+												<token-xpath expression="object-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="assocValue">
+											<arg-string>
+												<token-substring length="32">
+													<token-local-variable name="objId" />
+												</token-substring>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="userObj" scope="policy">
+											<arg-node-set>
+												<token-query datastore="src" scope="entry">
+													<arg-association>
+														<token-local-variable name="assocValue" />
+													</arg-association>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										
+										<do-set-local-variable name="userQualifiedLDAPDn" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="ldap" src-dn-format="qualified-slash">
+													<token-xpath expression="$userObj/@qualified-src-dn" />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-element expression="operation-data" name="ldap-dn" />
+										
+										
+										<do-append-xml-text expression="operation-data/ldap-dn">
+											<arg-string>
+												<token-local-variable name="userQualifiedLDAPDn" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="operation-data" name="user-id" />
+										<do-append-xml-text expression="operation-data/user-id">
+											<arg-string>
+												<token-local-variable name="assocValue" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="operation-data" name="tree-name" />
+										<do-append-xml-text expression="operation-data/tree-name">
+											<arg-string>
+												<token-global-variable name="dirxml.auto.treename" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-strip-xpath expression="operation-data/match" />
+									</actions>
+								</rule>
+							

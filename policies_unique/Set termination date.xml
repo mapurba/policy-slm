@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set termination date</description>
+									<conditions>
+										<and>
+											<if-local-variable name="terminationDateStr" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="terminationDateStr" op="not-equal">99991231</if-local-variable>
+													<if-local-variable mode="regex" name="terminationDateStr" op="equal">.{8}</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lvTmp" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getSeconds($terminationDateStr, 'yyyyMMdd')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-src-attr-value name="DirXML-TerminationDate">
+													<arg-value type="string">
+														<token-local-variable name="lvTmp" />
+													</arg-value>
+												</do-set-src-attr-value>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lvFile" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),'Set DirXML-TerminationDate = ',$lvTmp))" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions>
+												<do-clear-src-attr-value name="DirXML-TerminationDate" />
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="drv.proclog.enabled" op="equal">true</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lvFile" scope="policy">
+															<arg-string>
+																<token-xpath expression="es:writeLog($lvLogfile,concat(es:fixLength(' ',14),'Clear DirXML-TerminationDate'))" />
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

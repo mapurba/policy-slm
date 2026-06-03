@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Generate CEF Audit Event</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="auditLogEventType" op="equal">2</if-local-variable>
+											<if-operation mode="regex" op="equal">status|add-association</if-operation>
+											<if-local-variable name="auditEventID" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="version" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">1</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="association" scope="policy">
+											<arg-string>
+												<token-op-property name="association" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">@level</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="operation_status" scope="policy">
+													<arg-string>
+														<token-xpath expression="@level" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="operation_status" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">success</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-set-local-variable name="subTarget" scope="policy">
+											<arg-string>
+												<token-op-property name="accountAction" />
+												<token-text xml:space="preserve">_</token-text>
+												<token-local-variable name="auditEventID" />
+												<token-text xml:space="preserve">_</token-text>
+												<token-local-variable name="operation_status" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="status" scope="policy">
+											<arg-string>
+												<token-replace-all regex="success" replace-with="0">
+													<token-replace-all regex="retry" replace-with="1">
+														<token-replace-all regex="warning" replace-with="2">
+															<token-replace-all regex="error" replace-with="3">
+																<token-replace-all regex="fatal" replace-with="4">
+																	<token-local-variable name="operation_status" />
+																</token-replace-all>
+															</token-replace-all>
+														</token-replace-all>
+													</token-replace-all>
+												</token-replace-all>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="idmEventID" scope="policy">
+											<arg-string>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="identity" scope="policy">
+											<arg-string>
+												<token-op-property name="guid" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="identity" scope="policy">
+											<arg-string>
+												<token-xpath expression="es:octet2AsciiHex($identity)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="dest_dn" scope="policy">
+											<arg-string>
+												<token-op-property name="dest-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="target" scope="policy">
+											<arg-string>
+												<token-op-property name="sourceDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-generate-event id="$auditEventID$" level="log-info">
+											<arg-string name="event_name">
+												<token-local-variable name="eventName" />
+											</arg-string>
+											<arg-string name="msg">
+												<token-local-variable name="eventMessage" />
+											</arg-string>
+											<arg-string name="duser">
+												<token-local-variable name="dest_dn" />
+											</arg-string>
+											<arg-string name="suser">
+												<token-local-variable name="target" />
+											</arg-string>
+											<arg-string name="cs2">
+												<token-local-variable name="association" />
+											</arg-string>
+											<arg-string name="cs2Label">
+												<token-text xml:space="preserve">Association</token-text>
+											</arg-string>
+											<arg-string name="act">
+												<token-local-variable name="subTarget" />
+											</arg-string>
+											<arg-string name="outcome">
+												<token-local-variable name="status" />
+											</arg-string>
+											<arg-string name="externalId">
+												<token-local-variable name="idmEventID" />
+											</arg-string>
+											<arg-string name="cs1">
+												<token-local-variable name="identity" />
+											</arg-string>
+											<arg-string name="cs1Label">
+												<token-text xml:space="preserve">GUID</token-text>
+											</arg-string>
+											<arg-string name="cs6">
+												<token-text xml:space="preserve">IDM eventID: </token-text>
+												<token-local-variable name="idmEventID" />
+												<token-text xml:space="preserve"> level: </token-text>
+												<token-local-variable name="operation_status" />
+											</arg-string>
+											<arg-string name="cs6Label">
+												<token-text xml:space="preserve">Data</token-text>
+											</arg-string>
+											<arg-string name="fileType">
+												<token-op-property name="objectClass" />
+											</arg-string>
+										</do-generate-event>
+										<do-break />
+									</actions>
+								</rule>
+								

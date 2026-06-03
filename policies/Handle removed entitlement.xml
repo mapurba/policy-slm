@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle removed entitlement</description>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="BBObjectType" op="equal">DirXML-BB-Person</if-op-property>
+											<if-global-variable mode="nocase" name="use_entitlements" op="equal">true</if-global-variable>
+											<if-entitlement name="bbAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="bbAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="bbAccount_action" op="equal">disable_user</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="DirXML-BB-p-row-status">
+															<arg-value>
+																<token-text xml:space="preserve">DISABLED</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-delete-dest-object />
+														<do-remove-association direct="true">
+															<arg-association>
+																<token-association />
+															</arg-association>
+														</do-remove-association>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="bbAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="bbAccount_action" op="equal">disable_user</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-dest-attr-value name="DirXML-BB-p-row-status">
+															<arg-value>
+																<token-text xml:space="preserve">ENABLED</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

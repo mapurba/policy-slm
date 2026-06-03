@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule disabled="true">
+									<description>Email on non success status</description>
+									<comment xml:space="preserve">If the status level does not equal
+ SUCCESS, send an email alert to IDMAdmin team.</comment>
+									<comment name="author" xml:space="preserve">Jeff Johnson and Mark
+ Lamont</comment>
+									<comment name="version" xml:space="preserve">1.1</comment>
+									<comment name="lastchanged" xml:space="preserve">01-05-08</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">status</if-operation>
+											<if-xpath op="true">@level!='success'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-send-email server="acme.com" type="text">
+											<arg-string name="from">
+												<token-text xml:space="preserve">CREATOR</token-text>
+											</arg-string>
+											<arg-string name="to">
+												<token-text xml:space="preserve">alert@acme.com</token-text>
+											</arg-string>
+											<arg-string name="subject">
+												<token-text xml:space="preserve">IDM ALERT - Error on
+ </token-text>
+												<token-global-variable name="ConnectedSystemName" />
+											</arg-string>
+											<arg-string name="message">
+												<token-text xml:space="preserve">alert level - "</token-text>
+												<token-xpath expression="@level" />
+												<token-text xml:space="preserve">" has occurred on object
+ "</token-text>
+												<token-xpath expression="object-dn" />
+												<token-text xml:space="preserve">"
+ at time: </token-text>
+												<token-time format="dd.MM.yy,HH:mm:ss" lang="en-GB" />
+												<token-text xml:space="preserve">
+ Error information;
+ </token-text>
+												<token-text xml:space="preserve">event-id </token-text>
+												<token-xpath expression="@event-id" />
+												<token-text xml:space="preserve">
+ Event message "</token-text>
+												<token-xpath expression="text()" />
+												<token-text xml:space="preserve">"
+ on the </token-text>
+												<token-xpath expression="component" />
+												<token-text xml:space="preserve"> channel.</token-text>
+											</arg-string>
+										</do-send-email>
+									</actions>
+								</rule>
+							

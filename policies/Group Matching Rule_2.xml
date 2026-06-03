@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Group Matching Rule</description>
+									<comment xml:space="preserve">eDirectory Group object GUID is matched against the LDAPID (50422) of GroupWise Group object.</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">Group</if-class-name>
+											<if-global-variable name="driver.gw.Groups" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-find-matching-object scope="subtree">
+											<arg-match-attr name="50422">
+												<arg-value type="string">
+													<token-local-variable name="lvAsciGuid" />
+												</arg-value>
+											</arg-match-attr>
+										</do-find-matching-object>
+										<do-find-matching-object scope="subtree">
+											<arg-match-attr name="CN" />
+										</do-find-matching-object>
+									</actions>
+								</rule>
+							

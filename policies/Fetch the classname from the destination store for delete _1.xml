@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Fetch the classname from the destination store for delete events</description>
+									<comment xml:space="preserve">Query the destination store to fetch the classname in the case of delete event to make a sensible judgement for PCRS</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">delete</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lvObjClass" scope="policy">
+											<arg-node-set>
+												<token-query scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="lvCTemp" scope="policy">
+											<arg-string>
+												<token-xpath expression="$lvObjClass/@class-name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="lvCTemp" op="not-equal" />
+													<if-local-variable mode="nocase" name="lvCTemp" op="equal">User</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="lv-className" scope="policy">
+													<arg-string>
+														<token-local-variable name="lvCTemp" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

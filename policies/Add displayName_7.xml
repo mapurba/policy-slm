@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add displayName</description>
+									<comment xml:space="preserve">Adding displayName if connected system is SAP Cloud</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-global-variable mode="nocase" name="drv.SAPCloud" op="equal">true</if-global-variable>
+											<if-op-attr name="displayName" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="vi-scim-firstname">
+											<arg-string>
+												<token-src-attr class-name="User" name="Given Name" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="vi-scim-familyname">
+											<arg-string>
+												<token-src-attr class-name="User" name="Surname" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="vi-scim-fullName" scope="policy">
+											<arg-string>
+												<token-local-variable name="vi-scim-firstname" />
+												<token-text xml:space="preserve"> </token-text>
+												<token-local-variable name="vi-scim-familyname" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value class-name="User" name="displayName">
+											<arg-value type="string">
+												<token-local-variable name="vi-scim-fullName" />
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

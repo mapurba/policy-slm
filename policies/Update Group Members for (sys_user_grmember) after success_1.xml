@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Update Group Members for (sys_user_grmember) after successful group add</description>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="add-grp-members" op="equal">true</if-op-property>
+											<if-operation mode="nocase" op="equal">add-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="groupAssoc" scope="policy">
+											<arg-string>
+												<token-xpath expression="./text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./operation-data/add-attr[@attr-name='urn:ietf:params:scim:schemas:core:2.0:Group:members.value']/value[@association-ref]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="userAssoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@association-ref" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="dest-dn" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">/</token-text>
+														<token-local-variable name="groupAssoc" />
+														<token-text xml:space="preserve">$</token-text>
+														<token-local-variable name="userAssoc" />
+														<token-text xml:space="preserve">/RELATION</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-src-object class-name="sys_user_grmember">
+													<arg-dn>
+														<token-local-variable name="dest-dn" />
+													</arg-dn>
+												</do-add-src-object>
+												<do-add-src-attr-value class-name="sys_user_grmember" name="group">
+													<arg-dn>
+														<token-local-variable name="dest-dn" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-local-variable name="groupAssoc" />
+													</arg-value>
+												</do-add-src-attr-value>
+												<do-add-src-attr-value class-name="sys_user_grmember" name="user">
+													<arg-dn>
+														<token-local-variable name="dest-dn" />
+													</arg-dn>
+													<arg-value type="string">
+														<token-local-variable name="userAssoc" />
+													</arg-value>
+												</do-add-src-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

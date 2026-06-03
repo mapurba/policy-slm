@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Entitlement: Expire account</description>
+									<conditions>
+										<and>
+											<if-global-variable name="driver.gw.ent.account.remove" op="equal">expire</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation op="equal">modify</if-operation>
+											<if-entitlement name="gwAccount" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="Login Disabled">
+											<arg-value type="state">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-op-property name="accountDisableByEntitlementRevoke">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-set-dest-attr-value name="NGW: Mailbox Expiration Time">
+											<arg-value>
+												
+												<token-xpath expression="int:new(date:getTime(date:new()) div 1000)" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-op-property name="expire-account">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-op-property>
+										<do-remove-association when="after">
+											<arg-association>
+												<token-association />
+											</arg-association>
+										</do-remove-association>
+										<do-break />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check target of add-association for license membership entitlements</description>
+									<comment xml:space="preserve">License membership entitlements assigned to users being created in Office365 cannot be removed until the user is successfully restored. The add-association signals that an object has been created by the driver in Office365. If the object is also tagged for role entitlement processing, do the work now.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.License" op="equal">true</if-global-variable>
+											<if-operation op="equal">add-association</if-operation>
+											<if-op-property mode="nocase" name="check-license-entitlements" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="License" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-remove-src-attr-value class-name="User" name="assignLicense">
+													<arg-association>
+														<token-xpath expression="$current-op/text()" />
+													</arg-association>
+													<arg-value type="string">
+														<token-local-variable name="assoc" />
+													</arg-value>
+												</do-remove-src-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

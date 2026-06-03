@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert 50045 attribute from string to structured format</description>
+									<comment xml:space="preserve">The GroupWise REST interface requires this attribute to be in a structured format.</comment>
+									<conditions>
+										<and>
+											<if-op-attr name="50045" op="changing" />
+											<if-xpath op="true">node()[@attr-name='50045']//value/@type='string'</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="node()[@attr-name='50045']//remove-value" />
+										<do-reformat-op-attr name="50045">
+											<arg-value type="structured">
+												<arg-component name="inherited">
+													<token-text xml:space="preserve">true</token-text>
+												</arg-component>
+												<arg-component name="value">
+													<token-local-variable name="current-value" />
+												</arg-component>
+												<arg-component name="exclusive">
+													<token-text xml:space="preserve">false</token-text>
+												</arg-component>
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+							

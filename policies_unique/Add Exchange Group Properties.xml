@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add Exchange Group Properties</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+											<if-op-attr name="DirXML-AADObjectType" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value class-name="Group" name="Name">
+											<arg-value type="string">
+												<token-op-attr name="CN" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value class-name="Group" name="Alias">
+											<arg-value type="string">
+												<token-join>
+													<token-split delimiter=" ">
+														<token-op-attr name="CN" />
+													</token-split>
+												</token-join>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value name="Type">
+											<arg-value type="string">
+												<token-op-attr name="DirXML-AADObjectType" />
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+								

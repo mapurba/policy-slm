@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Synchronize workday urn:ietf:params:scim:schemas:ilm:static:1.0:User:mobile number - if different for modify event</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:mobile" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="LV-IDV-MobileNumber" scope="policy">
+											<arg-string>
+												<token-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:mobile" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">contains($LV-IDV-MobileNumber, '+')</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-IDV-MobileNumber-ISDCodeTemp" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-after($LV-IDV-MobileNumber, '+')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-IDV-MobileNumber-ISDCode" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before($LV-IDV-MobileNumber-ISDCodeTemp,' (')" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">contains($LV-IDV-MobileNumber, ' (')</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-IDV-MobileNumber-AreaCodeTemp" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-after($LV-IDV-MobileNumber, ' (')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-IDV-MobileNumber-AreaCode" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before($LV-IDV-MobileNumber-AreaCodeTemp,')')" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">contains($LV-IDV-MobileNumber, ' x')</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="LV-IDV-MobileNumber-PhoneTemp" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-after($LV-IDV-MobileNumber,') ')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-IDV-MobileNumber-Phone" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before($LV-IDv-MobileNumber-PhoneTemp,' x')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="LV-IDV-MobileNumber-Ext" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-after($LV-IDV-MobileNumber-PhoneTemp,' x')" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions>
+												<do-set-local-variable name="LV-IDV-MobileNumber-Phone" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-after($LV-IDV-MobileNumber,') ')" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($LV-IDV-MobileNumber) &gt; 1</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="LV-IDV-MobileNumber" op="not-equal">^\+[0-9]+\s.*$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="LV-IDV-MobileNumber" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">+1 </token-text>
+																<token-local-variable name="LV-IDV-MobileNumber" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="LV-IDV-MobileNumber-ISDCode" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">1</token-text>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="not-true">contains($LV-IDV-MobileNumber, ' (')</if-xpath>
+															<if-local-variable mode="regex" name="LV-IDV-MobileNumber" op="equal">^\+[0-9]+\s[0-9]{3}-[0-9]{3}-[0-9]{4}.*$</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="LV-IDV-MobileNumber-AreaCode" scope="policy">
+															<arg-string>
+																<token-replace-all regex="^(\+[0-9]+\s)([0-9]{3})-([0-9]{3}-[0-9]{4}).*$" replace-with="$2">
+																	<token-local-variable name="LV-IDV-MobileNumber" />
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="LV-IDV-MobileNumber" scope="policy">
+															<arg-string>
+																<token-replace-all regex="^(\+[0-9]+\s)([0-9]{3})-([0-9]{3}-[0-9]{4}.*)$" replace-with="$1($2) $3">
+																	<token-local-variable name="LV-IDV-MobileNumber" />
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+												<do-reformat-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:mobile">
+													<arg-value>
+														<token-local-variable name="LV-IDV-MobileNumber" />
+													</arg-value>
+												</do-reformat-op-attr>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

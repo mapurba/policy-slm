@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>ToLowerCase_groupUsers</description>
+									<comment xml:space="preserve">Supports Data Collection by converting the MS_MEMBER attribute to lower case in the entitlements/assignments/ms query.</comment>
+									<conditions>
+										<and>
+											<if-operation op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+											<if-xpath op="true">attr/@attr-name="uniqueMember"</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./attr/value[@association]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="assoc" scope="policy">
+													<arg-string>
+														<token-lower-case>
+															<token-xpath expression="$current-node/@association" />
+														</token-lower-case>
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="$current-node/text()" />
+												<do-append-xml-text expression="$current-node">
+													<arg-string>
+														<token-local-variable name="assoc" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

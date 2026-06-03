@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Verify identity reference is available</description>
+									<comment xml:space="preserve">Validate that we have a value with which to link the Sentinel Account to a Sentinel Identity.
+
+We can get this value either from the current add or from the result of a previous Identity add command that has already happened during the processing of this eDir transaction (see input transformation).</comment>
+									<conditions>
+										<or>
+											<if-op-attr name="Identity-GUID" op="not-available" />
+										</or>
+										<or>
+											<if-local-variable name="drv.identity.map" op="not-available" />
+											<if-xpath op="not-true">jmap:containsKey($drv.identity.map, jstring:new($op-entry-id))</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-veto />
+									</actions>
+								</rule>
+								

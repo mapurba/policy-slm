@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set urn:ietf:params:scim:schemas:ilm:static:1.0:User:uniqueID if unavailable</description>
+									<comment xml:space="preserve">This rule will set urn:ietf:params:scim:schemas:ilm:static:1.0:User:uniqueID with urn:ietf:params:scim:schemas:core:2.0:User:userName if urn:ietf:params:scim:schemas:ilm:static:1.0:User:uniqueID is not available</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="nocase" op="equal">add</if-operation>
+											<if-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:uniqueID" op="not-available" />
+											<if-attr name="urn:ietf:params:scim:schemas:core:2.0:User:userName" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-clone-op-attr dest-name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:uniqueID" src-name="urn:ietf:params:scim:schemas:core:2.0:User:userName" />
+									</actions>
+								</rule>
+							

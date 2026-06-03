@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Initialize 'LinkedTemplatesConfig' object if a template is changing and requisite data is available</description>
+									<comment xml:space="preserve">Applied Template is supported, but is not recommened due to the potential interference with active Epic user sessions.</comment>
+									<conditions>
+										<or>
+											<if-class-name op="equal">User</if-class-name>
+										</or>
+										<or>
+											<if-global-variable mode="nocase" name="drv.entitlement.AvailableTemplate" op="equal">true</if-global-variable>
+										</or>
+										<or>
+											<if-global-variable mode="nocase" name="drv.entitlement.DefaultTemplate" op="equal">true</if-global-variable>
+										</or>
+										<or disabled="true">
+											<if-global-variable disabled="true" mode="nocase" name="drv.entitlement.AppliedTemplate" op="equal">true</if-global-variable>
+										</or>
+										<or>
+											<if-entitlement name="AvailableTemplate" op="changing" />
+											<if-entitlement name="DefaultTemplate" op="changing" />
+											<if-entitlement disabled="true" name="AppliedTemplate" op="changing" />
+										</or>
+										<or>
+											<if-entitlement name="AvailableTemplate" op="available" />
+										</or>
+										<or disabled="true">
+											<if-entitlement disabled="true" name="AppliedTemplate" op="available" />
+										</or>
+										<or>
+											<if-entitlement name="DefaultTemplate" op="available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lo-LinkedTemplatesConfig" scope="policy">
+											<arg-object>
+												<token-xpath expression="es:LinkedTemplatesConfig()" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-set-local-variable name="lv-hasNeededData" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

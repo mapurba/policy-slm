@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking-Update DirXML-Account values</description>
+									<conditions />
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-global-variable name="drv.acctTrk.identifiers" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="searchKey" scope="policy">
+													<arg-string>
+														<token-join delimiter="#">
+															<token-local-variable name="driverGUID" />
+															<token-local-variable name="current-node" />
+														</token-join>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="storedAccValue" scope="policy">
+													<arg-string>
+														<token-xpath expression="$relevantAccounts[starts-with(.,$searchKey)]" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-property name="AccountTracking-$current-node$" op="available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="newAccValue" scope="policy">
+															<arg-string>
+																<token-join delimiter="#">
+																	<token-local-variable name="searchKey" />
+																	<token-op-property name="AccountTracking-$current-node$" />
+																	<token-local-variable name="idvAccStatus" />
+																	<token-local-variable name="appAccStatus" />
+																	<token-local-variable name="realm" />
+																</token-join>
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-xpath op="true">string-length($storedAccValue)!=0</if-xpath>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-xpath op="true">$storedAccValue=$newAccValue</if-xpath>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">Account Tracking information '$storedAccValue$' is already current for $objectDN$. No update is necessary.</token-text>
+																			</arg-string>
+																		</do-trace-message>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">AccountTracking- Removing account tracking entry $storedAccValue$ from $objectDN$.</token-text>
+																			</arg-string>
+																		</do-trace-message>
+																		<do-remove-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts">
+																			<arg-dn>
+																				<token-local-variable name="objectDN" />
+																			</arg-dn>
+																			<arg-value type="string">
+																				<token-local-variable name="storedAccValue" />
+																			</arg-value>
+																		</do-remove-src-attr-value>
+																		<do-trace-message>
+																			<arg-string>
+																				<token-text xml:space="preserve">AccountTracking- Adding new account tracking entry $newAccValue$ to $objectDN$.</token-text>
+																			</arg-string>
+																		</do-trace-message>
+																		<do-add-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts">
+																			<arg-dn>
+																				<token-local-variable name="objectDN" />
+																			</arg-dn>
+																			<arg-value type="string">
+																				<token-local-variable name="newAccValue" />
+																			</arg-value>
+																		</do-add-src-attr-value>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">AccountTracking- Adding new account tracking entry $newAccValue$ to $objectDN$.</token-text>
+																	</arg-string>
+																</do-trace-message>
+																<do-add-src-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXMLAccounts">
+																	<arg-dn>
+																		<token-local-variable name="objectDN" />
+																	</arg-dn>
+																	<arg-value type="string">
+																		<token-local-variable name="newAccValue" />
+																	</arg-value>
+																</do-add-src-attr-value>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="operation-data/@*[starts-with(name(),&quot;AccountTracking&quot;)]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-strip-xpath expression="$current-node" />
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

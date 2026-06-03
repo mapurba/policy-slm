@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - remove Dirxml-Account values on regular delete operation</description>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="equal">delete|remove-association</if-operation>
+											<if-op-property name="AccountTracking-ObjectDN" op="available" />
+										</and>
+										<and>
+											<if-op-property name="accountDisableByEntitlementRevoke" op="available" />
+											<if-op-property name="AccountTracking-ObjectDN" op="available" />
+										</and>
+										<and>
+											<if-operation mode="nocase" op="equal">status</if-operation>
+											<if-op-property name="AccountTracking-ObjectDN" op="available" />
+											<if-op-property mode="nocase" name="AccountTracking-Operation" op="equal">delete</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.acctTrk.mode" op="equal">121</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="realm" scope="policy">
+													<arg-string>
+														<token-global-variable name="drv.acctTrk.realm" />
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Account Tracking - Operation for realm "$realm$"</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$AccountIdentifiers[starts-with(.,$dirxml.auto.driverguid) and contains(concat(.,'#'),concat('#',$realm,'#'))]" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Account Tracking - Removing account tracking entry "$current-node$" from </token-text>
+														<token-op-property name="AccountTracking-ObjectDN" />
+													</arg-string>
+												</do-trace-message>
+												<do-remove-dest-attr-value direct="true" name="DirXML-Accounts">
+													<arg-dn>
+														<token-op-property name="AccountTracking-ObjectDN" />
+													</arg-dn>
+													<arg-value>
+														<token-local-variable name="current-node" />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

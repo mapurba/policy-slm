@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>modify remove-association event </description>
+									<comment xml:space="preserve">After running account-tracking policies on a remove-association event,strip the operation data and attach the associaition.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">remove-association</if-operation>
+											<if-op-property name="AccountTracking-association" op="available" />
+											<if-local-variable mode="nocase" name="delete-event" op="equal">true</if-local-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="delete-event" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="operation-data" />
+										<do-append-xml-text expression=".">
+											<arg-string>
+												<token-local-variable name="association" />
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+							

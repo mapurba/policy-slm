@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Entitlement change (Disable Option)</description>
+									<comment xml:space="preserve">The User Account Entitlement grants the user an enabled account in the connected system. Revoking the entitlement will disable or delete the user account depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the disable option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name mode="regex" op="equal">user|sapuser</if-class-name>
+											<if-operation mode="regex" op="equal">add|modify|delete|status</if-operation>
+											<if-entitlement name="UserAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="accountAction">
+													<arg-string>
+														<token-text xml:space="preserve">accountDisableByEntitlementRevoke</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="sourceDN">
+													<arg-string>
+														<token-src-dn />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="association">
+													<arg-string>
+														<token-association />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="guid">
+													<arg-string>
+														<token-src-attr name="GUID" />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="objectClass">
+													<arg-string>
+														<token-text xml:space="preserve">User</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-op-property name="accountAction">
+													<arg-string>
+														<token-text xml:space="preserve">accountEnableByEntitlementGrant</token-text>
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="sourceDN">
+													<arg-string>
+														<token-src-dn />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="association">
+													<arg-string>
+														<token-association />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="guid">
+													<arg-string>
+														<token-src-attr name="GUID" />
+													</arg-string>
+												</do-set-op-property>
+												<do-set-op-property name="objectClass">
+													<arg-string>
+														<token-text xml:space="preserve">User</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

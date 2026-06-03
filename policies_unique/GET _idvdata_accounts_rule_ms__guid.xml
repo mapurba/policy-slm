@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>GET /idvdata/accounts/rule/ms/&lt;guid&gt;</description>
+									<conditions />
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Dispatching rules query:</token-text>
+												<token-xml-serialize>
+													<token-xpath expression="." />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="api-name" scope="policy">
+											<arg-string>
+												<token-class-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-property name="api-name">
+											<arg-string>
+												<token-local-variable name="api-name" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-local-variable name="guid" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="association" />
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Response from rule cache: </token-text>
+												<token-xml-serialize>
+													<token-xpath expression="$RULE__CACHE/cache/instance[@class-name=$api-name][association=$guid]" />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+										<do-clone-xpath dest-expression="operation-data" src-expression="$RULE__CACHE/cache/instance[@class-name=$api-name][association=$guid]" />
+									</actions>
+								</rule>
+								

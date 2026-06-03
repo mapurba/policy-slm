@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto Loopback Events</description>
+									<comment xml:space="preserve">Veto Loopback Events</comment>
+									<conditions>
+										<or>
+											<if-xpath op="true">./@event-id</if-xpath>
+										</or>
+										<or>
+											<if-operation op="equal">add</if-operation>
+											<if-operation op="equal">modify</if-operation>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="eventId" scope="policy">
+											<arg-string>
+												<token-xpath expression="./@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="eventId" op="equal">.*__Scim.*</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

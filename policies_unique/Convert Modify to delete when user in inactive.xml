@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert Modify to delete when user in inactive</description>
+									<comment xml:space="preserve">Convert modify operation to delete when user becomes inactive in salesforce</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-xpath op="true">modify-attr[@attr-name='IsActive']/add-value/value[text()='false']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="../modify[last()]/@class-name" />
+										<do-strip-xpath expression="../modify[last()]/modify-attr" />
+										<do-set-local-variable name="src-dn" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/@src-dn" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="event-id" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="association" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/association/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="AccountTracking-AccountStatusChanged" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/operation-data/@AccountTracking-AccountStatusChanged" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="AccountTracking-AppAccountStatus" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/operation-data/@AccountTracking-AppAccountStatus" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="AccountTracking-IdvAccountStatus" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/operation-data/@AccountTracking-IdvAccountStatus" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="AccountTracking-ObjectDN" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/operation-data/@AccountTracking-ObjectDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="AccountTracking-Username" scope="policy">
+											<arg-string>
+												<token-xpath expression="../modify[last()]/operation-data/@AccountTracking-Username" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="." />
+										<do-append-xml-element expression="/nds/input[last()]" name="delete" />
+										<do-set-xml-attr expression="/nds/input/delete[last()]" name="event-id">
+											<arg-string>
+												<token-local-variable name="event-id" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="/nds/input/delete[last()]" name="src-dn">
+											<arg-string>
+												<token-local-variable name="src-dn" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="/nds/input/delete[last()]" name="association" />
+										<do-append-xml-text expression="/nds/input/delete[last()]/association[last()]">
+											<arg-string>
+												<token-local-variable name="association" />
+											</arg-string>
+										</do-append-xml-text>
+										<do-append-xml-element expression="/nds/input/delete[last()]" name="operation-data" />
+										<do-set-xml-attr expression="/nds/input/delete/operation-data[last()]" name="AccountTracking-AccountStatusChanged">
+											<arg-string>
+												<token-local-variable name="AccountTracking-AccountStatusChanged" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="/nds/input/delete/operation-data[last()]" name="AccountTracking-AppAccountStatus">
+											<arg-string>
+												<token-local-variable name="AccountTracking-AppAccountStatus" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="/nds/input/delete/operation-data[last()]" name="AccountTracking-IdvAccountStatus">
+											<arg-string>
+												<token-local-variable name="AccountTracking-IdvAccountStatus" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="/nds/input/delete/operation-data[last()]" name="AccountTracking-ObjectDN">
+											<arg-string>
+												<token-local-variable name="AccountTracking-ObjectDN" />
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="/nds/input/delete/operation-data[last()]" name="AccountTracking-Username">
+											<arg-string>
+												<token-local-variable name="AccountTracking-Username" />
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+							

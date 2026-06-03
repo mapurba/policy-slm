@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Fix association on publisher events</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="fromNds" op="equal">false</if-local-variable>
+											<if-association op="available" />
+											<if-association mode="regex" op="not-equal">\\.+</if-association>
+											<if-global-variable name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Detected publisher event with old-style association. Fixing association.</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="assoc" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="association" />
+										<do-set-op-association>
+											<arg-association>
+												<token-text xml:space="preserve">\</token-text>
+												<token-local-variable name="primLogicalSystemName" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-local-variable name="assoc" />
+											</arg-association>
+										</do-set-op-association>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Legacy association: $assoc$. Fixed-up association: </token-text>
+												<token-association />
+											</arg-string>
+										</do-trace-message>
+									</actions>
+								</rule>
+								

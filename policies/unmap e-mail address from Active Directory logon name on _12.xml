@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>unmap e-mail address from Active Directory logon name on merge</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="UpnMap" op="equal">edir-mail-auth</if-global-variable>
+											<if-xpath op="true">.[@from-merge='true']</if-xpath>
+											<if-op-attr name="urn:ietf:params:scim:schemas:core:2.0:User:emails.value" op="not-available" />
+											<if-src-attr name="urn:ietf:params:scim:schemas:core:2.0:User:emails.value" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-clear-dest-attr-value name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-ADAliasName" />
+									</actions>
+								</rule>
+								

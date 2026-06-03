@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept ExternalIdentifier (tagged identity query) query status</description>
+									<conditions>
+										<and>
+											<if-xpath op="true">../status[@event-id='query-driver-ident']/operation-data/@ExternalIdentifierEntitlementQuery</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ExtIDMap" scope="policy">
+											<arg-node-set>
+												<token-xml-parse notrace="true">
+													<token-base64-decode notrace="true">
+														<token-dest-attr name="DirXML-Data" notrace="true">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\PDSEMPENTL-ExternalIdentifiers-MAP</token-text>
+															</arg-dn>
+														</token-dest-attr>
+													</token-base64-decode>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$ExtIDMap//row" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-xpath expression="$current-node/col[1]" />
+													</arg-string>
+												</do-trace-message>
+												<do-append-xml-element expression=".." name="instance" />
+												<do-set-xml-attr expression="../instance[last()]" name="class-name">
+													<arg-string>
+														<token-text xml:space="preserve">ExternalIdentifier</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr expression="../instance[last()]" name="src-dn">
+													<arg-string>
+														<token-xpath expression="$current-node/col[1]" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="../instance[last()]" name="association" />
+												<do-append-xml-text expression="../instance[last()]/association[last()]">
+													<arg-string>
+														<token-xpath expression="$current-node/col[2]" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="../instance[last()]" name="attr" />
+												<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">ExternalID</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+												<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+													<arg-string>
+														<token-xpath expression="$current-node/col[1]" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length($current-node/col[1]) &gt; 0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-element expression="../instance[last()]" name="attr" />
+														<do-set-xml-attr expression="../instance[last()]/attr[last()]" name="attr-name">
+															<arg-string>
+																<token-text xml:space="preserve">Description</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-append-xml-element expression="../instance[last()]/attr[last()]" name="value" />
+														<do-append-xml-text expression="../instance[last()]/attr[last()]/value[last()]">
+															<arg-string>
+																<token-xpath expression="$current-node/col[1]" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

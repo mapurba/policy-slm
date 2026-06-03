@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>accountExpires: Convert to Active Directory form</description>
+									<conditions>
+										<and>
+											<if-op-attr name="accountExpires" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-op-attr mode="nocase" name="accountExpires" op="equal">-1</if-op-attr>
+													<if-op-attr mode="nocase" name="accountExpires" op="equal">-2</if-op-attr>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-dest-attr-value name="accountExpires">
+													<arg-value type="int">
+														<token-text xml:space="preserve">0</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-op-attr mode="regex" name="accountExpires" op="changing-to">.+</if-op-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-reformat-op-attr name="accountExpires">
+															<arg-value type="octet">
+																<token-xpath expression="jadutil:translateEpoch2FileTime($current-value)" />
+															</arg-value>
+														</do-reformat-op-attr>
+													</arg-actions>
+													<arg-actions>
+														<do-set-dest-attr-value name="accountExpires">
+															<arg-value>
+																<token-text xml:space="preserve">0</token-text>
+															</arg-value>
+														</do-set-dest-attr-value>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

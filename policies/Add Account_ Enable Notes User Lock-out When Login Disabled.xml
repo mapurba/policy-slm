@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description> Add Account: Enable Notes User Lock-out When Login Disabled</description>
+									<conditions>
+										<and>
+											<if-attr mode="nocase" name="Login Disabled" op="equal">true</if-attr>
+											<if-global-variable mode="nocase" name="account.cert.pwdchksetting" op="not-equal">PWD_CHK_LOCKOUT</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-xml-attr expression="../add[@class-name='User']" name="notes-password-check-setting">
+											<arg-string>
+												<token-text xml:space="preserve">PWD_CHK_LOCKOUT</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../add[@class-name='User']" name="notes-password-grace-period">
+											<arg-string>
+												<token-text xml:space="preserve">0</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-set-xml-attr expression="../add[@class-name='User']" name="allow-adminp-support">
+											<arg-string>
+												<token-text>true</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+									</actions>
+								</rule>
+								

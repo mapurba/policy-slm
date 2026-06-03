@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept groupMembership query response</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group.onboard" op="equal">true</if-global-variable>
+											<if-local-variable mode="nocase" name="groupMembershipQuery" op="equal">true</if-local-variable>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-class-name mode="nocase" op="equal">inetOrgPerson</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="groupMembershipQuery" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and />
+												<and>
+													<if-op-attr name="groupMembership" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="staticGroups">
+													<arg-node-set>
+														<token-map dest="entitlementValue" src="entitlementName" table="StaticValueEntitlementMap">
+															<token-text xml:space="preserve">Group</token-text>
+														</token-map>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-local-variable name="staticGroups" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="staticGroupName">
+															<arg-string>
+																<token-local-variable name="current-node" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="groupReply" scope="policy">
+															<arg-node-set>
+																<token-query class-name="groupOfUniqueNames" datastore="src" scope="entry">
+																	<arg-association>
+																		<token-local-variable name="staticGroupName" />
+																	</arg-association>
+																	<arg-match-attr name="uniqueMember">
+																		<arg-value type="string">
+																			<token-association />
+																		</arg-value>
+																	</arg-match-attr>
+																</token-query>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="groupReply" />
+															</arg-node-set>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-op-attr name="Group Membership" op="not-available" />
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-element expression=".[last()]" name="attr" />
+																		<do-set-xml-attr expression="./attr[last()]" name="attr-name">
+																			<arg-string>
+																				<token-text xml:space="preserve">Group Membership</token-text>
+																			</arg-string>
+																		</do-set-xml-attr>
+																	</arg-actions>
+																</do-if>
+																<do-append-xml-element expression="./attr[@attr-name='Group Membership']" name="value" />
+																<do-append-xml-text expression="./attr[@attr-name='Group Membership']/value[last()]">
+																	<arg-string>
+																		<token-local-variable name="staticGroupName" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

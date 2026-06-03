@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check mandatory attributes for PAM AccountDomain object creation.</description>
+									<comment xml:space="preserve">For the creation of the AccountDomain object, it's type, host name/IP, port number and the profile are mandatory attributes. The type can be either SSH, LDAP, APPL or DB. SSH is for UNIX/Linux server, LDAP is for Windows servers, APPL is for application type and DB is for database type. The hostname and port are the IP address details on which the services are listening. The profile is the specific type, for Oracle DB the profile is 1001.</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="nocase" op="equal">DirXML-PUMAccountDomain</if-class-name>
+										</or>
+										<or>
+											<if-attr name="DirXML-pumAccDomType" op="not-available" />
+											<if-attr name="DirXML-pumHost" op="not-available" />
+											<if-attr name="DirXML-pumPort" op="not-available" />
+											<if-attr name="DirXML-pumAccDomProfile" op="not-available" />
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="missingParam" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">no</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr name="DirXML-pumAccDomType" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Missing mandatory attribute, type.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="missingParam" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">yes</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr name="DirXML-pumHost" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Missing mandatory attribute, host.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="missingParam" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">yes</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr mode="nocase" name="DirXML-pumAccDomType" op="equal">db</if-attr>
+													<if-attr name="DirXML-pumAccDomProfile" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Missing mandatory attribute, profile.</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-set-local-variable name="missingParam" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">yes</token-text>
+													</arg-string>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-attr name="DirXML-pumPort" op="not-available" />
+													<if-attr mode="nocase" name="DirXML-pumAccDomType" op="not-equal">ssh</if-attr>
+													<if-attr mode="nocase" name="DirXML-pumAccDomType" op="not-equal">ldap</if-attr>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-attr mode="nocase" name="DirXML-pumAccDomType" op="equal">db</if-attr>
+															<if-attr mode="numeric" name="DirXML-pumAccDomProfile" op="equal">1001</if-attr>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-default-attr-value name="DirXML-pumPort" write-back="true">
+															<arg-value type="int">
+																<token-text xml:space="preserve">1521</token-text>
+															</arg-value>
+														</do-set-default-attr-value>
+													</arg-actions>
+													<arg-actions>
+														<do-set-local-variable name="missingParam" scope="policy">
+															<arg-string>
+																<token-text xml:space="preserve">yes</token-text>
+															</arg-string>
+														</do-set-local-variable>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Missing mandatory attribute, port.</token-text>
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="missingParam" op="equal">yes</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-veto />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

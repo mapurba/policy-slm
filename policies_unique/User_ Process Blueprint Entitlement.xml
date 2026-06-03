@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: Process Blueprint Entitlement</description>
+									<comment xml:space="preserve">Output blueprint assignment from entitlement reference.</comment>
+									<comment name="author" xml:space="preserve">PDS</comment>
+									<comment name="version" xml:space="preserve">1.0</comment>
+									<comment name="lastchanged" xml:space="preserve">06-22-20</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-entitlement name="Blueprint" op="changing" />
+											<if-global-variable mode="nocase" name="drv.entitlement.Blueprint" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="Blueprint" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-dest-attr-value name="33">
+													<arg-value type="string">
+														<token-parse-dn dest-dn-format="slash" length="1" src-dn-format="ldap" start="-1">
+															<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+														</token-parse-dn>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

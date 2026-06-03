@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Have a copy of filter attributes of class "User" and  Entitlement Configuration</description>
+									<comment xml:space="preserve">This nodeset will be used to determine the proper connection-dn for the given instance/connection  name</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="entConfig" scope="driver">
+											<arg-node-set>
+												<token-xpath expression="$entConfigXML//connections" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="filter" scope="policy">
+											<arg-node-set>
+												<token-document>
+													<arg-string>
+														<token-text xml:space="preserve">vnd.nds.stream:/</token-text>
+														<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+															<token-global-variable name="dirxml.auto.driverdn" />
+														</token-parse-dn>
+														<token-text xml:space="preserve">#DirXML-DriverFilter</token-text>
+													</arg-string>
+												</token-document>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="filterAttr" scope="driver">
+											<arg-node-set>
+												<token-xpath expression="$filter//filter-class[@class-name='User']/filter-attr[@subscriber='sync' or @subscriber='notify']/@attr-name" />
+											</arg-node-set>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

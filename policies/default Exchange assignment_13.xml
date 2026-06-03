@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>default Exchange assignment</description>
+									<comment>Provision Exchange mailbox</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.exchMailboxMethod" op="equal">policy</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="homeMDB">
+											<arg-value type="string">
+												<token-global-variable name="drv.exchDefaultMDB" />
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-set-local-variable name="srcName" scope="policy">
+											<arg-string>
+												<token-substring length="20">
+													<token-replace-all regex="[^a-zA-Z0-9\x21\x23-\x27\x2a\x2b\x2d\x2e\x3d\x3f\x5e-\x60\x7b-\x7d\xa1-\xff]|^[\x2e]+|[\x2e]+$" replace-with="">
+														<token-src-name />
+													</token-replace-all>
+												</token-substring>
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-dest-attr-value name="mailNickname">
+											<arg-value type="string">
+												<token-substring length="20">
+													<token-replace-all regex="[\x2e][\x2e]+" replace-with=".">
+														<token-local-variable name="srcName" />
+													</token-replace-all>
+												</token-substring>
+											</arg-value>
+										</do-set-dest-attr-value>
+									</actions>
+								</rule>
+							

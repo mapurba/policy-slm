@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Rename event to Modify of CN and DN</description>
+									<conditions>
+										<and>
+											<if-operation op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-add-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:userName" when="after">
+											<arg-value type="string">
+												<token-xpath expression="new-name/text()" />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-add-dest-attr-value name="DISTINGUISHED_NAME" when="after">
+											<arg-value type="string">
+												<token-src-dn />
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-veto />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Commit entitlement values data</description>
+									<comment xml:space="preserve">Commit the entitlement key-to-value mapping info to Group_Values object. This rule preserves the group values added as part of earlier domain queries.</comment>
+									<conditions>
+										<and>
+											<if-op-property mode="nocase" name="getInstances" op="equal">true</if-op-property>
+											<if-local-variable mode="nocase" name="domain_val" op="not-equal" />
+										</and>
+									</conditions>
+									<actions>
+										
+										<do-set-local-variable name="prev-xml" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-base64-decode>
+														<token-query class-name="DirXML-Resource" scope="entry">
+															<arg-dn>
+																<token-global-variable name="dirxml.auto.driverdn" />
+																<token-text xml:space="preserve">\Group_Values</token-text>
+															</arg-dn>
+															<arg-string>
+																<token-text xml:space="preserve">DirXML-Data</token-text>
+															</arg-string>
+														</token-query>
+													</token-base64-decode>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-xpath expression="$prev-xml/mapping-table/row[contains(col[1]/text(),$domain_val) and translate(concat(&quot;DC=&quot;,substring-after(col[1]/text(),&quot;DC=&quot;)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = translate($domain_val,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')]" />
+										<do-clone-xpath dest-expression="$prev-xml/mapping-table" src-expression="$values-xml/mapping-table/row" />
+										<do-add-dest-attr-value class-name="DirXML-Resource" direct="true" name="DirXML-Data">
+											<arg-dn>
+												<token-global-variable name="dirxml.auto.driverdn" />
+												<token-text xml:space="preserve">\Group_Values</token-text>
+											</arg-dn>
+											<arg-value type="octet">
+												<token-base64-encode>
+													<token-xml-serialize>
+														<token-local-variable name="prev-xml" />
+													</token-xml-serialize>
+												</token-base64-encode>
+											</arg-value>
+										</do-add-dest-attr-value>
+									</actions>
+								</rule>
+							

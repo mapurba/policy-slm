@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform PeopleSoft 'Manager' value from boolean 'true/false' to 'Y/N'</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ManagerValues">
+											<arg-node-set>
+												<token-op-attr name="MANAGER" />
+												<token-removed-attr name="MANAGER" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$ManagerValues/self::value[.='true']" />
+											</arg-node-set>
+											<arg-actions>
+												<do-strip-xpath expression="$current-node/text()" />
+												<do-append-xml-text expression="$current-node">
+													<arg-string>
+														<token-text xml:space="preserve">Y</token-text>
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$ManagerValues/self::value[.='false']" />
+											</arg-node-set>
+											<arg-actions>
+												<do-strip-xpath expression="$current-node/text()" />
+												<do-append-xml-text expression="$current-node">
+													<arg-string>
+														<token-text xml:space="preserve">N</token-text>
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>ToLowerCase</description>
+									<comment xml:space="preserve">Support for Data Collection by converting 'src-dn' value to lowercase (to convert MS_ACCT_GLOBAL_IDENTIFIER to lowercase) so that values returned by Data Collection are case exact.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="Query-name" scope="policy">
+											<arg-string>
+												<token-xpath expression="operation-data/msgw-data-collection/@end-point-url" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($Query-name)&gt;20</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="url-stripped" scope="policy">
+													<arg-string>
+														<token-substring length="21">
+															<token-local-variable name="Query-name" />
+														</token-substring>
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="nocase" name="url-stripped" op="equal">/idvdata/accounts/ms/</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="mod-dn" scope="policy">
+															<arg-string>
+																<token-lower-case>
+																	<token-xpath expression="./@src-dn" />
+																</token-lower-case>
+															</arg-string>
+														</do-set-local-variable>
+														<do-strip-xpath expression="./@src-dn" />
+														<do-set-xml-attr expression="." name="src-dn">
+															<arg-string>
+																<token-local-variable name="mod-dn" />
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

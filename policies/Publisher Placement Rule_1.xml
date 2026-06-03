@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Publisher Placement Rule</description>
+									<comment xml:space="preserve">Publisher placement based on driver's Publisher GCV 'flat' or 'mirrored'</comment>
+									<conditions>
+										<or>
+											<if-class-name mode="regex" op="equal">User|organizationalPerson|inetOrgPerson|Person</if-class-name>
+											<if-class-name mode="nocase" op="equal">Organizational Unit</if-class-name>
+											<if-class-name mode="nocase" op="equal">Group</if-class-name>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-op-dest-dn>
+											<arg-dn>
+												<token-global-variable name="idv.dit.data.users" />
+												<token-text xml:space="preserve">\</token-text>
+												<token-op-property name="unmatched-src-dn" />
+											</arg-dn>
+										</do-set-op-dest-dn>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="drv.pubPlacementType" op="equal">flat</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-dest-dn>
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+														<token-text xml:space="preserve">\</token-text>
+														<token-src-name />
+													</arg-dn>
+												</do-set-op-dest-dn>
+											</arg-actions>
+											<arg-actions>
+												<do-set-op-dest-dn>
+													<arg-dn>
+														<token-global-variable name="idv.dit.data.users" />
+														<token-text xml:space="preserve">\</token-text>
+														<token-op-property name="unmatched-src-dn" />
+													</arg-dn>
+												</do-set-op-dest-dn>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle attribute conversion for CN on Modify events</description>
+									<comment xml:space="preserve">Due to schema differences between eDirectory and Office365, this rule will get only the 1st value of cn attribute being removed from eDirectory when sending it to office365.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-xpath op="true">./modify-attr[@attr-name="CN"]/remove-value</if-xpath>
+										</and>
+										<and>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-xpath op="true">./modify-attr[@attr-name="CN"]/add-value</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="valueCN" scope="policy">
+											<arg-string>
+												<token-parse-dn dest-dn-format="dest-dn" length="1" start="-1">
+													<token-src-dn />
+												</token-parse-dn>
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="./modify-attr[@attr-name=&quot;CN&quot;]" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-class-name mode="nocase" op="equal">User</if-class-name>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="CN">
+													<arg-value type="string">
+														<token-local-variable name="valueCN" />
+														<token-text xml:space="preserve">@</token-text>
+														<token-global-variable name="drv.domain.name" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-class-name mode="nocase" op="equal">Group</if-class-name>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-add-dest-attr-value name="CN">
+															<arg-value type="string">
+																<token-local-variable name="valueCN" />
+															</arg-value>
+														</do-add-dest-attr-value>
+														<do-append-xml-element expression="./modify-attr[@attr-name=&quot;CN&quot;]" name="remove-all-values" />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+								

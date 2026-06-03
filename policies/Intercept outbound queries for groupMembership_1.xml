@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept outbound queries for groupMembership</description>
+									<conditions>
+										<or>
+											<if-global-variable mode="nocase" name="drv.entitlement.onboarding" op="equal">true</if-global-variable>
+										</or>
+										<or>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group.onboard" op="equal">true</if-global-variable>
+										</or>
+										<or>
+											<if-operation mode="case" op="equal">query</if-operation>
+										</or>
+										<or>
+											<if-class-name mode="nocase" op="equal">inetOrgPerson</if-class-name>
+										</or>
+										<or>
+											<if-xpath op="true">read-attr[@attr-name='Group Membership']</if-xpath>
+											<if-xpath op="true">read-attr[@attr-name='groupMembership']</if-xpath>
+										</or>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="groupMembershipQuery" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">true</token-text>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

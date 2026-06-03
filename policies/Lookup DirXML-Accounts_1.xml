@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Lookup DirXML-Accounts</description>
+									<conditions />
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">Dispatching accounts query:</token-text>
+												<token-xml-serialize>
+													<token-xpath expression="." />
+												</token-xml-serialize>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="api-name" scope="policy">
+											<arg-string>
+												<token-class-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-property name="api-name">
+											<arg-string>
+												<token-local-variable name="api-name" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-local-variable name="accountAssociation" scope="policy">
+											<arg-string>
+												<token-association />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="drvDn" scope="policy">
+											<arg-string>
+												<token-dest-dn />
+											</arg-string>
+										</do-set-local-variable>
+										<do-strip-xpath expression="association" />
+										<do-set-local-variable name="accInfo" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User">
+													<arg-match-attr name="DirXML-Associations">
+														<arg-value type="structured">
+															<arg-component name="nameSpace">
+																<token-text xml:space="preserve">1</token-text>
+															</arg-component>
+															<arg-component name="volume">
+																<token-local-variable name="drvDn" />
+															</arg-component>
+															<arg-component name="path">
+																<token-local-variable name="accountAssociation" />
+															</arg-component>
+														</arg-value>
+													</arg-match-attr>
+													<arg-string>
+														<token-text xml:space="preserve">GUID</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">Dirxml-Accounts</token-text>
+													</arg-string>
+													<arg-string>
+														<token-text xml:space="preserve">Login Disabled</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="accInfo" />
+											</arg-node-set>
+											<arg-actions>
+												<do-append-xml-element expression="./operation-data" name="instance" />
+												<do-set-local-variable name="dn" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/@qualified-src-dn" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-xml-attr expression="./operation-data/instance[last()]" name="class-name">
+													<arg-string>
+														<token-local-variable name="api-name" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-set-xml-attr expression="./operation-data/instance[last()]" name="src-dn">
+													<arg-string>
+														<token-local-variable name="dn" />
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="./operation-data/instance[@class-name=$api-name][last()]" name="attr" />
+												<do-set-xml-attr expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">idv.account.guid</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]" name="value" />
+												<do-set-xml-attr expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]/value[last()]" name="type">
+													<arg-string>
+														<token-text xml:space="preserve">string</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-text expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]/value[last()]">
+													<arg-string>
+														<token-xpath expression="es:guid2string($current-node/attr[@attr-name=&quot;GUID&quot;]/value/text())" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-append-xml-element expression="./operation-data/instance[@class-name=$api-name][last()]" name="attr" />
+												<do-set-xml-attr expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">idv.dirxml.account</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$current-node/attr[@attr-name=&quot;DirXML-Accounts&quot;]/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-append-xml-element expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]" name="value" />
+														<do-set-xml-attr expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]/value[last()]" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">structured</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-local-variable name="tval" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/text()" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="tokens" scope="policy">
+															<arg-node-set>
+																<token-split delimiter="#">
+																	<token-local-variable name="tval" />
+																</token-split>
+															</arg-node-set>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-local-variable name="tokens" />
+															</arg-node-set>
+															<arg-actions>
+																<do-append-xml-element expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]/value[last()]" name="component" />
+																<do-append-xml-text expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]/value[last()]/component[last()]">
+																	<arg-string>
+																		<token-xpath expression="$current-node" />
+																	</arg-string>
+																</do-append-xml-text>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+												</do-for-each>
+												<do-append-xml-element expression="./operation-data/instance[@class-name=$api-name][last()]" name="attr" />
+												<do-set-xml-attr expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">idv.account.status</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-append-xml-element expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]" name="value" />
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/attr[@attr-name='Login Disabled']/value/text()='true'</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-append-xml-text expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]/value[last()]">
+															<arg-string>
+																<token-text xml:space="preserve">I</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+													<arg-actions>
+														<do-append-xml-text expression="./operation-data/instance[@class-name=$api-name][last()]/attr[last()]/value[last()]">
+															<arg-string>
+																<token-text xml:space="preserve">A</token-text>
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

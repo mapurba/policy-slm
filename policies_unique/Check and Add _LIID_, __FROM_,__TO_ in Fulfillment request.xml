@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check and Add "LIID", "_FROM","_TO" in Fulfillment request</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-association op="available" />
+											<if-op-attr name="DirXML-EntitlementRef" op="changing" />
+											<if-entitlement name="UserAccount" op="not-changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="src" scope="policy">
+											<arg-string>
+												<token-xpath expression="*//value/component[@name='path.xml']/ref/src" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="nocase" name="src" op="equal">IDM Entitlement Fulfiller</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="paramValue" scope="policy">
+													<arg-string>
+														<token-xpath expression="*//value/component[@name='path.xml']/ref/param" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="idValue" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before(substring-after($paramValue,':'),'}')" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="liidValue" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">, "LIID" : "</token-text>
+														<token-local-variable name="primLogicalSystemName" />
+														<token-text xml:space="preserve">"</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="fromValue" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">, "_FROM" : "</token-text>
+														<token-time format="yyyyMMdd" tz="UTC" />
+														<token-text xml:space="preserve">"</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="toValue" scope="policy">
+													<arg-string>
+														<token-text xml:space="preserve">, "_TO" : "</token-text>
+														<token-time format="yyyyMMdd" tz="UTC" />
+														<token-text xml:space="preserve">"</token-text>
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="*//value/component[@name='path.xml']/ref/param" />
+												<do-append-xml-element expression="*//value/component[@name='path.xml']/ref" name="param" />
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="paramValue" op="not-equal">.*LIID.*</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="regex" name="paramValue" op="not-equal">.*_FROM.*</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="regex" name="paramValue" op="not-equal">.*_TO.*</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-local-variable name="liidValue" />
+																				<token-local-variable name="fromValue" />
+																				<token-local-variable name="toValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-local-variable name="liidValue" />
+																				<token-local-variable name="fromValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="regex" name="paramValue" op="not-equal">.*_TO.*</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-local-variable name="liidValue" />
+																				<token-local-variable name="toValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-local-variable name="liidValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+													<arg-actions>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="regex" name="paramValue" op="not-equal">.*_FROM.*</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="regex" name="paramValue" op="not-equal">.*_TO.*</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-local-variable name="fromValue" />
+																				<token-local-variable name="toValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-local-variable name="fromValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="regex" name="paramValue" op="not-equal">.*_TO.*</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-local-variable name="toValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-append-xml-text expression="*//value/component[@name='path.xml']/ref/param">
+																			<arg-string>
+																				<token-text xml:space="preserve">{"ID" : </token-text>
+																				<token-local-variable name="idValue" />
+																				<token-text xml:space="preserve">}</token-text>
+																			</arg-string>
+																		</do-append-xml-text>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-if>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

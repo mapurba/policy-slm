@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Strip unsupported user attributes query for Non CUA </description>
+									<comment xml:space="preserve">Strip unsupported user attributes LOCACTIVITYGROUPS and LOCPROFILES for Non CUA, since the BAPI Read operations for these attributes are supported only in CUA landscape.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">query</if-operation>
+											<if-class-name mode="nocase" op="equal">US</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="DestName" scope="policy">
+											<arg-string>
+												<token-dest-dn convert="false" start="0" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="VarTemp1" scope="policy">
+											<arg-node-set>
+												<token-split delimiter="\\">
+													<token-local-variable name="DestName" />
+												</token-split>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="DestName" scope="policy">
+											<arg-string>
+												<token-xpath expression="$VarTemp1[2]" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="shimConfigInfo" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="shimConfigInfo" scope="driver">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-ShimConfigInfo</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="logicalSystemName" scope="policy">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/definition[@name='nsap-ls-name']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="logicalSystemType" scope="policy">
+											<arg-string>
+												<token-xpath expression="$shimConfigInfo/driver-config/driver-options/configuration-values/definitions/group/definition[@name='nsap-client-type']/value" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="case" name="DestName" op="equal">$logicalSystemName$</if-local-variable>
+													<if-local-variable mode="nocase" name="logicalSystemType" op="equal">non-cua</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Strip user attributes LOCACTIVITYGROUPS and LOCPROFILES for Non CUA - </token-text>
+														<token-local-variable name="logicalSystemName" />
+														<token-text xml:space="preserve">:</token-text>
+														<token-local-variable name="logicalSystemType" />
+													</arg-string>
+												</do-trace-message>
+												<do-strip-op-attr name="LOCACTIVITYGROUPS" />
+												<do-strip-op-attr name="LOCPROFILES" />
+												<do-break />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="$shimConfigInfo/driver-config/subscriber-options/configuration-values/definitions/definition[@name='nsap-alt-conn-info']/value/instance" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="logicalSystemName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node//definition[@name='logicalSystemName']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="logicalSystemType" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node//definition[@name='clientType']/value" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="case" name="DestName" op="equal">$logicalSystemName$</if-local-variable>
+															<if-local-variable mode="nocase" name="logicalSystemType" op="equal">non-cua</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Strip user attributes LOCACTIVITYGROUPS and LOCPROFILES for Non CUA - </token-text>
+																<token-local-variable name="logicalSystemName" />
+																<token-text xml:space="preserve">:</token-text>
+																<token-local-variable name="logicalSystemType" />
+															</arg-string>
+														</do-trace-message>
+														<do-strip-op-attr name="LOCACTIVITYGROUPS" />
+														<do-strip-op-attr name="LOCPROFILES" />
+														<do-break />
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

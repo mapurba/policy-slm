@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle Delete events by renaming object before it is deleted in Google</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-op-property name="newUserID">
+											<arg-string>
+												<token-src-name />
+												<token-time format="!CTIME" tz="UTC" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-local-variable name="lv-old-name" scope="policy">
+											<arg-string>
+												<token-src-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="lv-new-name" scope="policy">
+											<arg-string>
+												<token-op-property name="newUserID" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-rename-dest-object when="before">
+											<arg-string>
+												<token-op-property name="newUserID" />
+											</arg-string>
+										</do-rename-dest-object>
+										<do-set-op-association>
+											<arg-association>
+												<token-replace-all regex="$lv-old-name$" replace-with="$lv-new-name$">
+													<token-association />
+												</token-replace-all>
+											</arg-association>
+										</do-set-op-association>
+									</actions>
+								</rule>
+							

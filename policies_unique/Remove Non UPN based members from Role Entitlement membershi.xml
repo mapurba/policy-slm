@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove Non UPN based members from Role Entitlement membership query</description>
+									<comment xml:space="preserve">Removes non upn based members from Role Entiltlement membership query. Uses email format  {'abc@rst.uvw'} for identification.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-class-name mode="case" op="equal">DirectoryRole</if-class-name>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+											<if-op-attr name="members" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-op-attr name="members" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="objectName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$current-node/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-local-variable mode="regex" name="objectName" op="not-equal">.+[@].+[.].+</if-local-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-strip-xpath expression="$current-node" />
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Removing non user member </token-text>
+																<token-local-variable name="objectName" />
+															</arg-string>
+														</do-trace-message>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

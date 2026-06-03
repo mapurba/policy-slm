@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Add dest-fn for query opperation</description>
+									<conditions>
+										<and>
+											<if-op-property name="publisher-type" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-operation op="equal">query-ex</if-operation>
+													<if-operation op="equal">query</if-operation>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-class-name op="equal">User</if-class-name>
+															<if-association op="not-available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-dest-dn>
+															<arg-dn>
+																<token-global-variable name="idv.dit.data.users" />
+															</arg-dn>
+														</do-set-op-dest-dn>
+														<do-set-xml-attr expression="." name="scope">
+															<arg-string>
+																<token-text xml:space="preserve">subtree</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+												</do-if>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-class-name op="equal">Group</if-class-name>
+															<if-association op="not-available" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-dest-dn>
+															<arg-dn>
+																<token-global-variable name="idv.dit.data.groups" />
+															</arg-dn>
+														</do-set-op-dest-dn>
+														<do-set-xml-attr expression="." name="scope">
+															<arg-string>
+																<token-text xml:space="preserve">subtree</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

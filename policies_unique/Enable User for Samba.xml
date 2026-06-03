@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Enable User for Samba</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-src-attr name="sambaSID" op="not-available" />
+											<if-src-attr name="sambaPrimaryGroupSID" op="not-available" />
+											<if-global-variable name="EnableSamba" op="equal">true</if-global-variable>
+											<if-global-variable name="ModifyUsers" op="equal">true</if-global-variable>
+										</and>
+										
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable name="ReplaceValues" op="equal">true</if-global-variable>
+											<if-global-variable name="EnableSamba" op="equal">true</if-global-variable>
+											<if-global-variable name="ModifyUsers" op="equal">true</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="DriverDN">
+											<arg-string>
+												<token-global-variable name="DriverDN" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="driverShimInstance">
+											<arg-object>
+												<token-xpath expression="NxSettingsInstance:getInstance($DriverDN)" />
+											</arg-object>
+										</do-set-local-variable>
+										<do-set-local-variable name="UserDN">
+											<arg-string>
+												<token-src-dn />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="sambaDomainSID">
+											<arg-string>
+												<token-xpath expression="driverShim:getSambaSID($driverShimInstance,$UserDN)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-src-attr-value name="sambaSID">
+											<arg-value type="string">
+												<token-local-variable name="sambaDomainSID" />
+												<token-text xml:space="preserve">-</token-text>
+												<token-src-attr name="uidNumber" />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-set-src-attr-value name="sambaPrimaryGroupSID">
+											<arg-value type="string">
+												<token-local-variable name="sambaDomainSID" />
+												<token-text xml:space="preserve">-</token-text>
+												<token-src-attr name="gidNumber" />
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-set-src-attr-value name="acctFlags">
+											<arg-value>
+												<token-text xml:space="preserve">[UX         ]</token-text>
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-set-src-attr-value name="sambaAcctFlags">
+											<arg-value>
+												<token-text xml:space="preserve">[UX         ]</token-text>
+											</arg-value>
+										</do-set-src-attr-value>
+										<do-add-src-attr-value name="Object Class">
+											<arg-value type="string">
+												<token-text xml:space="preserve">sambaSamAccount</token-text>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-src-attr-value name="Object Class">
+											<arg-value type="string">
+												<token-text xml:space="preserve">sambaAccount</token-text>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-src-attr-value name="ACL">
+											<arg-value type="structured">
+												<arg-component name="protectedName">
+													<token-text xml:space="preserve">sambaLMPassword</token-text>
+												</arg-component>
+												<arg-component name="trustee">
+													<token-src-dn />
+												</arg-component>
+												<arg-component name="privileges">
+													<token-text xml:space="preserve">7</token-text>
+												</arg-component>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-src-attr-value name="ACL">
+											<arg-value type="structured">
+												<arg-component name="protectedName">
+													<token-text xml:space="preserve">sambaNTPassword</token-text>
+												</arg-component>
+												<arg-component name="trustee">
+													<token-src-dn />
+												</arg-component>
+												<arg-component name="privileges">
+													<token-text xml:space="preserve">7</token-text>
+												</arg-component>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-src-attr-value name="ACL">
+											<arg-value type="structured">
+												<arg-component name="protectedName">
+													<token-text xml:space="preserve">lmPassword</token-text>
+												</arg-component>
+												<arg-component name="trustee">
+													<token-src-dn />
+												</arg-component>
+												<arg-component name="privileges">
+													<token-text xml:space="preserve">7</token-text>
+												</arg-component>
+											</arg-value>
+										</do-add-src-attr-value>
+										<do-add-src-attr-value name="ACL">
+											<arg-value type="structured">
+												<arg-component name="protectedName">
+													<token-text xml:space="preserve">ntPassword</token-text>
+												</arg-component>
+												<arg-component name="trustee">
+													<token-src-dn />
+												</arg-component>
+												<arg-component name="privileges">
+													<token-text xml:space="preserve">7</token-text>
+												</arg-component>
+											</arg-value>
+										</do-add-src-attr-value>
+									</actions>
+								</rule>
+							

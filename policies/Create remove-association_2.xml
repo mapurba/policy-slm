@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Create remove-association</description>
+									<comment xml:space="preserve">Create a remove-association command if the operation data calls for it.
+
+This is designed for use in support of the synthetic account objects we use for synchronizing account information.
+
+The subscriber channel event transformation specifies that an association is to be removed if the modification of an account status to "Deleted" succeeds.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-op-property mode="nocase" name="operation" op="equal">need-remove-association</if-op-property>
+											<if-xml-attr mode="nocase" name="level" op="equal">success</if-xml-attr>
+										</and>
+									</conditions>
+									<actions>
+										<do-remove-association when="after">
+											<arg-association>
+												<token-op-property name="association" />
+											</arg-association>
+										</do-remove-association>
+									</actions>
+								</rule>
+							

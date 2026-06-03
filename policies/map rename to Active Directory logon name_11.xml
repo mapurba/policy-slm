@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>map rename to Active Directory logon name</description>
+									<comment xml:space="preserve">Active Directory logon name  (userPrincipalName) policy: keep destination userPrincipalName in sync with source object name.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="case" name="UpnMap" op="equal">edir-name-auth</if-global-variable>
+											<if-operation op="equal">rename</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-dest-attr-value name="DirXML-MDADAliasName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-local-variable name="object-name" />
+													<token-text xml:space="preserve">@</token-text>
+													<token-local-variable name="drv.domain.dns.name" />
+												</arg-component>
+											</arg-value>
+										</do-set-dest-attr-value>
+										<do-for-each>
+											<arg-node-set>
+												<token-src-attr name="DirXML-MDADAliasName" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/component[@name='volume']="~dirxml.auto.driverdn~"</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-remove-src-attr-value name="DirXML-MDADAliasName">
+															<arg-value type="structured">
+																<arg-component name="nameSpace">
+																	<token-xpath expression="$current-node/component[@name=&quot;nameSpace&quot;]" />
+																</arg-component>
+																<arg-component name="volume">
+																	<token-xpath expression="$current-node/component[@name=&quot;volume&quot;]" />
+																</arg-component>
+																<arg-component name="path">
+																	<token-xpath expression="$current-node/component[@name=&quot;path&quot;]" />
+																</arg-component>
+															</arg-value>
+														</do-remove-src-attr-value>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-add-src-attr-value name="DirXML-MDADAliasName">
+											<arg-value type="structured">
+												<arg-component name="nameSpace">
+													<token-time format="!CTIME" tz="UTC" />
+												</arg-component>
+												<arg-component name="volume">
+													<token-global-variable name="dirxml.auto.driverdn" />
+												</arg-component>
+												<arg-component name="path">
+													<token-local-variable name="object-name" />
+													<token-text xml:space="preserve">@</token-text>
+													<token-local-variable name="drv.domain.dns.name" />
+												</arg-component>
+											</arg-value>
+										</do-add-src-attr-value>
+									</actions>
+								</rule>
+								

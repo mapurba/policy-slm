@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Account Entitlement: Disabled</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-global-variable name="driver.gw.ent.account.add" op="equal">disable</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="gwDistLists" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="dlDn" scope="policy">
+													<arg-string>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-add-dest-attr-value class-name="User" name="Distribution List DN">
+													<arg-value type="string">
+														<token-local-variable name="dlDn" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-add-dest-attr-value class-name="User" name="Login Disabled">
+											<arg-value type="state">
+												<token-text xml:space="preserve">true</token-text>
+											</arg-value>
+										</do-add-dest-attr-value>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="regex" name="driver.gw.ent.account.remove" op="equal">expire|dispire</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-clear-dest-attr-value class-name="User" name="NGW: Mailbox Expiration Time" />
+												<do-set-op-property disabled="true" name="expire-account">
+													<arg-string>
+														<token-text xml:space="preserve">false</token-text>
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-break />
+									</actions>
+								</rule>
+								

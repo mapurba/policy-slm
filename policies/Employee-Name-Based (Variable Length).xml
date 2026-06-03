@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Employee-Name-Based (Variable Length)</description>
+									<comment xml:space="preserve">First character of Given Name + Surname
+First character of Given Name + first character of Initials + Surname
+First two characters of Given Name + Surname
+First three characters of Given Name + Surname
+First character of Given Name + Surname + digit starting with 1 incremented until name is unique within eDirectory</comment>
+									<conditions>
+										<and>
+											<if-global-variable name="drv.new.user.naming.option" op="equal">1</if-global-variable>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="obj-name" scope="policy">
+											<arg-string>
+												<token-unique-name counter-digits="3" counter-pad="false" name="CN" scope="subtree">
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="1">
+																<token-attr name="Given Name" />
+															</token-substring>
+															<token-attr name="Surname" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="1">
+																<token-attr name="Given Name" />
+															</token-substring>
+															<token-substring length="1">
+																<token-attr name="Initials" />
+															</token-substring>
+															<token-attr name="Surname" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="2">
+																<token-attr name="Given Name" />
+															</token-substring>
+															<token-attr name="Surname" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="3">
+																<token-attr name="Given Name" />
+															</token-substring>
+															<token-attr name="Surname" />
+														</token-lower-case>
+													</arg-string>
+													<arg-string>
+														<token-lower-case>
+															<token-substring length="1">
+																<token-attr name="Given Name" />
+															</token-substring>
+															<token-attr name="Surname" />
+														</token-lower-case>
+													</arg-string>
+												</token-unique-name>
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+								

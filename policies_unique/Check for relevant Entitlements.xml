@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check for relevant Entitlements</description>
+									<conditions>
+										<or>
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirXMLEntitlementRef" op="available" />
+											<if-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirXMLEntitlementRef" op="changing" />
+										</or>
+									</conditions>
+									<actions>
+										<do-strip-xpath expression="*//value[./component[@name='volume' and not(contains(./text(),concat($dirxml.auto.driverdn,'\')))]]" />
+										<do-strip-xpath expression="./*[./@attr-name='urn:ietf:params:scim:schemas:ilm:static:1.0:User:dirXMLEntitlementRef' and string-length(./*/node())=0]" />
+									</actions>
+								</rule>
+								

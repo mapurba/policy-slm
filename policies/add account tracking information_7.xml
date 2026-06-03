@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>add account tracking information</description>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">msoluser</if-class-name>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-op-attr name="UserPrincipalName" op="changing" />
+											<if-op-property name="AccountTracking-ObjectDN" op="not-available" />
+											<if-op-property name="AccountTracking-Operation" op="not-available" />
+											<if-association op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ObjectDN" scope="policy">
+											<arg-node-set>
+												<token-query scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">string-length($ObjectDN) &gt; 0</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-op-property name="AccountTracking-ObjectDN">
+													<arg-string>
+														<token-xpath expression="$ObjectDN/@src-dn" />
+													</arg-string>
+												</do-set-op-property>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

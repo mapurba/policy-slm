@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Check User modify for Entitlements being granted or revoked</description>
+									<comment xml:space="preserve">Policy intercepts the entitlements grant and revoke events from the User Application side.
+For every added or revoked entitlement  a modify attribute command is written back to the IDV.</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-xpath op="true">self::modify[modify-attr//src='UA']</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="allEnts" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$perm-map-xml/mapping-table/row/col[1]/text()" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="allEnts" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="perm-ent" scope="policy">
+													<arg-string>
+														<token-local-variable name="current-node" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-entitlement name="$perm-ent$" op="changing" />
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="perm-attr-name" scope="policy">
+															<arg-string>
+																<token-map dest="assignmentAttribute" src="entitlementName" table="..\PermissionEntMapping">
+																	<token-local-variable name="perm-ent" />
+																</token-map>
+															</arg-string>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-added-entitlement name="$perm-ent$" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="entValueDN" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-add-src-attr-value class-name="User" name="$perm-attr-name$">
+																	<arg-value type="string">
+																		<token-local-variable name="entValueDN" />
+																	</arg-value>
+																</do-add-src-attr-value>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="case" name="perm-ent" op="equal">Group</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-add-src-attr-value class-name="User" name="Security Equals">
+																			<arg-value type="string">
+																				<token-local-variable name="entValueDN" />
+																			</arg-value>
+																		</do-add-src-attr-value>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+														<do-for-each>
+															<arg-node-set>
+																<token-removed-entitlement name="$perm-ent$" />
+															</arg-node-set>
+															<arg-actions>
+																<do-set-local-variable name="entValueDN" scope="policy">
+																	<arg-string>
+																		<token-xpath expression="es:getEntParamField($current-node,'ID')&#10;" />
+																	</arg-string>
+																</do-set-local-variable>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-local-variable mode="case" name="perm-ent" op="equal">Group</if-local-variable>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-set-local-variable name="queryDoc" notrace="true" scope="policy">
+																			<arg-node-set>
+																				<token-query datastore="src">
+																					<arg-dn>
+																						<token-local-variable name="entValueDN" />
+																					</arg-dn>
+																				</token-query>
+																			</arg-node-set>
+																		</do-set-local-variable>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-xpath notrace="true" op="not-true">string-length($queryDoc/@src-dn)&gt;0</if-xpath>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-veto />
+																			</arg-actions>
+																			<arg-actions>
+																				<do-remove-src-attr-value class-name="User" name="Group Membership">
+																					<arg-value type="string">
+																						<token-local-variable name="entValueDN" />
+																					</arg-value>
+																				</do-remove-src-attr-value>
+																				<do-remove-src-attr-value class-name="User" name="Security Equals">
+																					<arg-value type="string">
+																						<token-local-variable name="entValueDN" />
+																					</arg-value>
+																				</do-remove-src-attr-value>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																	<arg-actions>
+																		<do-remove-src-attr-value class-name="User" name="$perm-attr-name$">
+																			<arg-value type="string">
+																				<token-local-variable name="entValueDN" />
+																			</arg-value>
+																		</do-remove-src-attr-value>
+																	</arg-actions>
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+										<do-strip-xpath expression="$current-op" />
+									</actions>
+								</rule>
+							

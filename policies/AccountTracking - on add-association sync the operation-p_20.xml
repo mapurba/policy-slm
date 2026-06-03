@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>AccountTracking - on add-association sync the operation-properties to status operations</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">add-association</if-operation>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-property name="AccountTracking-idu" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="var-idu" scope="policy">
+													<arg-node-set>
+														<token-query class-name="~drv.acctTrk.objectClass~" datastore="src" scope="entry">
+															<arg-association>
+																<token-xpath expression="./text()" />
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">idu</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length($var-idu) &gt; 0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-idu">
+															<arg-string>
+																<token-xpath expression="$var-idu/attr[last()]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-property name="AccountTracking-pk_idu" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="var-idu" scope="policy">
+													<arg-node-set>
+														<token-query class-name="~drv.acctTrk.objectClass~" datastore="src" scope="entry">
+															<arg-association>
+																<token-xpath expression="./text()" />
+															</arg-association>
+															<arg-string>
+																<token-text xml:space="preserve">pk_idu</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">string-length($var-idu) &gt; 0</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-op-property name="AccountTracking-pk_idu">
+															<arg-string>
+																<token-xpath expression="$var-idu/attr[last()]/value/text()" />
+															</arg-string>
+														</do-set-op-property>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-op-property name="AccountTracking-association">
+											<arg-string>
+												<token-xpath expression="text()" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-op-property name="AccountTracking-ObjectDN">
+											<arg-string>
+												<token-xpath expression="@dest-dn" />
+											</arg-string>
+										</do-set-op-property>
+										<do-set-local-variable name="eventId" scope="policy">
+											<arg-string>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-clone-xpath dest-expression="//status[@event-id=$eventId]/operation-data" src-expression="operation-data/@AccountTracking-association" />
+										<do-clone-xpath dest-expression="//status[@event-id=$eventId]/operation-data" src-expression="operation-data/@AccountTracking-idu" />
+										<do-clone-xpath dest-expression="//status[@event-id=$eventId]/operation-data" src-expression="operation-data/@AccountTracking-pk_idu" />
+										<do-clone-xpath dest-expression="//status[@event-id=$eventId]/operation-data" src-expression="operation-data/@AccountTracking-ObjectDN" />
+									</actions>
+								</rule>
+								

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Append 'groupMember' query results to 'members' results</description>
+									<comment xml:space="preserve">Addition of 'groupMember' results in order to handle nested group cases.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-xpath op="true">./attr[@attr-name='groupMember']/value</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-xpath op="true">./attr[@attr-name='member']/value</if-xpath>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-clone-xpath dest-expression="./attr[@attr-name='member']" src-expression="./attr[@attr-name='groupMember']/value" />
+											</arg-actions>
+											<arg-actions>
+												<do-append-xml-element expression="." name="attr" />
+												<do-set-xml-attr expression="./attr[last()]" name="attr-name">
+													<arg-string>
+														<token-text xml:space="preserve">member</token-text>
+													</arg-string>
+												</do-set-xml-attr>
+												<do-clone-xpath dest-expression="./attr[@attr-name='member']" src-expression="./attr[@attr-name='groupMember']/value" />
+											</arg-actions>
+										</do-if>
+									</actions>
+								</rule>
+							

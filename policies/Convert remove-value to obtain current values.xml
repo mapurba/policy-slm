@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Convert remove-value to obtain current values</description>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">modify</if-operation>
+											<if-xpath op="true">./modify-attr/remove-value</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-xpath expression="./modify-attr" />
+											</arg-node-set>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-xpath op="true">$current-node/remove-value</if-xpath>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="curr-attr-name" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/@attr-name" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-set-local-variable name="curr-attr-type" scope="policy">
+															<arg-string>
+																<token-xpath expression="$current-node/remove-value/value/@type" />
+															</arg-string>
+														</do-set-local-variable>
+														<do-for-each>
+															<arg-node-set>
+																<token-src-attr name="$curr-attr-name$" />
+															</arg-node-set>
+															<arg-actions>
+																<do-if>
+																	<arg-conditions>
+																		<and>
+																			<if-op-attr mode="nocase" name="$curr-attr-name$" op="not-equal">$current-node$</if-op-attr>
+																		</and>
+																	</arg-conditions>
+																	<arg-actions>
+																		<do-if>
+																			<arg-conditions>
+																				<and>
+																					<if-local-variable mode="nocase" name="curr-attr-type" op="equal">dn</if-local-variable>
+																				</and>
+																			</arg-conditions>
+																			<arg-actions>
+																				<do-add-dest-attr-value name="$curr-attr-name$">
+																					<arg-value type="dn">
+																						<token-local-variable name="current-node" />
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																			</arg-actions>
+																			<arg-actions>
+																				<do-add-dest-attr-value name="$curr-attr-name$">
+																					<arg-value type="string">
+																						<token-local-variable name="current-node" />
+																					</arg-value>
+																				</do-add-dest-attr-value>
+																			</arg-actions>
+																		</do-if>
+																	</arg-actions>
+																	<arg-actions />
+																</do-if>
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+													<arg-actions />
+												</do-if>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

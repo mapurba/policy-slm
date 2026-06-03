@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Veto Loop-Back Retry Events</description>
+									<comment xml:space="preserve">Trace a message when a retry was successful.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="regex" op="not-equal">sync|status</if-operation>
+											<if-xpath op="true">contains(@event-id, '#retry-1')</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">DCS Ret Code Handler: </token-text>
+												<token-text xml:space="preserve">Vetoing retry loop-back event with id: </token-text>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-trace-message>
+										<do-status level="success">
+											<arg-string>
+												<token-text xml:space="preserve">DCS Ret Code Handler: </token-text>
+												<token-text xml:space="preserve">Vetoing retry loop-back event with id: </token-text>
+												<token-xpath expression="@event-id" />
+											</arg-string>
+										</do-status>
+										<do-veto />
+									</actions>
+								</rule>
+							

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Match User count greater than 1 Notify Error condition IDMADMIN</description>
+									<comment xml:space="preserve">This rule will handle error condition for match user</comment>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+											<if-local-variable mode="nocase" name="lvUserStopSearch" op="equal">true</if-local-variable>
+											<if-local-variable mode="nocase" name="lvUserStopSearchIDMAdminNotify" op="equal">true</if-local-variable>
+											<if-global-variable mode="nocase" name="gvMatchErrorEmailNotify" op="equal">Yes</if-global-variable>
+											<if-xpath op="true">string-length($gvIDMAdminEmail)  &gt; 5</if-xpath>
+											<if-xpath op="true">string-length($lvMatchingCritera)  &gt; 10</if-xpath>
+										</and>
+									</conditions>
+									<actions>
+										<do-send-email-from-template notification-dn="Security\Default Notification Collection" template-dn="Security\Default Notification Collection\WD_User_MatchingErrorNotification">
+											<arg-string name="to">
+												<token-global-variable name="gvIDMAdminEmail" />
+											</arg-string>
+											<arg-string name="FirstName">
+												<token-local-variable name="lvUserFirstName" />
+											</arg-string>
+											<arg-string name="LastName">
+												<token-local-variable name="lvUserLastName" />
+											</arg-string>
+											<arg-string name="wfid">
+												<token-local-variable name="lvWorkforceID" />
+											</arg-string>
+											<arg-string name="MatchingCritera">
+												<token-local-variable name="lvMatchingCritera" />
+											</arg-string>
+											<arg-string name="IDVUserIDList">
+												<token-local-variable name="lvIDVUserIDListWithMultipleMatch" />
+											</arg-string>
+											<arg-string name="encoding">
+												<token-text xml:space="preserve">UTF-8</token-text>
+											</arg-string>
+										</do-send-email-from-template>
+										<do-set-local-variable name="lvMatchingCritera" scope="policy">
+											<arg-string />
+										</do-set-local-variable>
+										<do-set-local-variable name="lvCountUnAssociatedUserMatch" scope="policy">
+											<arg-string>
+												<token-text xml:space="preserve">0</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-veto />
+									</actions>
+								</rule>
+							

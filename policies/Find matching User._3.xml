@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule disabled="true">
+									<description>Find matching User.</description>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="dn">
+											<arg-string>
+												<token-src-dn />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="index">
+											<arg-string>
+												<token-xpath expression="jstring:lastIndexOf($dn, '\')" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-find-matching-object scope="subordinates">
+											<arg-dn>
+												<token-xpath expression="jstring:substring($dn, 0, $index)" />
+											</arg-dn>
+											<arg-match-attr name="Given Name" />
+											<arg-match-attr name="Surname" />
+										</do-find-matching-object>
+									</actions>
+								</rule>
+							

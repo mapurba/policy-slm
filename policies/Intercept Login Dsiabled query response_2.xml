@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Intercept Login Dsiabled query response</description>
+									<conditions>
+										<and>
+											<if-local-variable mode="nocase" name="LoginDisabledQuery" op="equal">true</if-local-variable>
+											<if-operation mode="case" op="equal">instance</if-operation>
+											<if-class-name mode="nocase" op="equal">inetOrgPerson</if-class-name>
+											<if-op-attr name="~drv.acctTrk.statusAttr~" op="not-available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="LoginDisabledQuery" scope="driver">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-set-local-variable>
+										<do-append-xml-element expression=".[last()]" name="attr" />
+										<do-set-xml-attr expression="./attr[last()]" name="attr-name">
+											<arg-string>
+												<token-text xml:space="preserve">~drv.acctTrk.statusAttr~</token-text>
+											</arg-string>
+										</do-set-xml-attr>
+										<do-append-xml-element expression="./attr[@attr-name='~drv.acctTrk.statusAttr~']" name="value" />
+										<do-append-xml-text expression="./attr[@attr-name='~drv.acctTrk.statusAttr~']/value">
+											<arg-string>
+												<token-text xml:space="preserve">false</token-text>
+											</arg-string>
+										</do-append-xml-text>
+									</actions>
+								</rule>
+								

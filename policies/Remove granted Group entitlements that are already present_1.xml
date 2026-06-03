@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Remove granted Group entitlements that are already present</description>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group" op="equal">true</if-global-variable>
+											<if-association op="available" />
+											<if-entitlement name="Group" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="grpMbrQuery" scope="policy">
+											<arg-node-set>
+												<token-query class-name="User" scope="entry">
+													<arg-association>
+														<token-association />
+													</arg-association>
+													<arg-string>
+														<token-text xml:space="preserve">Group Membership</token-text>
+													</arg-string>
+												</token-query>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="grpMbrExisting" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$grpMbrQuery/attr[@attr-name='Group Membership']/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="grpMbrExisting" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="mbrGrpID" scope="policy">
+													<arg-string>
+														<token-xpath expression="substring-before(substring-after($current-node/text(),&quot;IDG=&quot;),&quot;,&quot;)" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-for-each>
+													<arg-node-set>
+														<token-added-entitlement name="Group" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-local-variable name="entGrpID" scope="policy">
+															<arg-string>
+																<token-replace-all regex="&quot;" replace-with="">
+																	<token-xpath expression="substring-after(substring-before($current-node/text(),&quot;,&quot;),&quot;-&quot;)" />
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+														<do-if>
+															<arg-conditions>
+																<and>
+																	<if-local-variable mode="nocase" name="entGrpID" op="equal">$mbrGrpID$</if-local-variable>
+																</and>
+															</arg-conditions>
+															<arg-actions>
+																<do-strip-xpath expression="modify-attr[@attr-name='DirXML-EntitlementRef']/add-value/value[.//param/text()=$current-node/text()]" />
+															</arg-actions>
+															<arg-actions />
+														</do-if>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								

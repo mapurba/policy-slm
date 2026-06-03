@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Modify member values in required format</description>
+									<comment xml:space="preserve">This conversion is necessary to update the idmrpt_ms_ent_trust table with proper values. Ideally the member value should match the src-dn of the user. In JDBC, src-dn and association vlaues are same.</comment>
+									<conditions>
+										<and>
+											<if-operation mode="nocase" op="equal">instance</if-operation>
+											<if-class-name mode="regex" op="equal">direct.view_grp|indirect.grp</if-class-name>
+											<if-op-property mode="nocase" name="data-collection-query" op="equal">true</if-op-property>
+										</and>
+									</conditions>
+									<actions>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="fk_mbr" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="attr[@attr-name='fk_mbr']/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-xml-attr expression="$current-node" name="association">
+															<arg-string>
+																<token-xpath expression="$current-node/@association-ref" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$current-node" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">string</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-strip-xpath expression="$current-node/@association-ref" />
+														<do-strip-xpath expression="$current-node/text()" />
+														<do-append-xml-text expression="$current-node">
+															<arg-string>
+																<token-xpath expression="$current-node/@association" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-op-attr name="grp_member.idu" op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="attr[@attr-name='grp_member.idu']/value" />
+													</arg-node-set>
+													<arg-actions>
+														<do-set-xml-attr expression="$current-node" name="association">
+															<arg-string>
+																<token-xpath expression="$current-node/@association-ref" />
+															</arg-string>
+														</do-set-xml-attr>
+														<do-set-xml-attr expression="$current-node" name="type">
+															<arg-string>
+																<token-text xml:space="preserve">string</token-text>
+															</arg-string>
+														</do-set-xml-attr>
+														<do-strip-xpath expression="$current-node/@association-ref" />
+														<do-strip-xpath expression="$current-node/text()" />
+														<do-append-xml-text expression="$current-node">
+															<arg-string>
+																<token-xpath expression="$current-node/@association" />
+															</arg-string>
+														</do-append-xml-text>
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+							

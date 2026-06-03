@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Return response</description>
+									<conditions>
+										<and>
+											<if-operation mode="case" op="equal">status</if-operation>
+											<if-op-property name="api-name" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-clone-xpath dest-expression=".." src-expression="./operation-data/instance[@class-name=../@api-name]" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-global-variable mode="nocase" name="add-ep-req-data" op="equal">true</if-global-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="../instance" />
+													</arg-node-set>
+													<arg-actions>
+														<do-append-xml-element expression="$current-node" name="operation-data" />
+														<do-clone-xpath dest-expression="$current-node/operation-data" src-expression="./operation-data/~ep-req-data-node~" />
+													</arg-actions>
+												</do-for-each>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">MSGW Cache: Returning </token-text>
+												<token-xpath expression="count(./operation-data/instance[@class-name=../@api-name])" />
+												<token-text xml:space="preserve"> results for '</token-text>
+												<token-op-property name="api-name" />
+												<token-text xml:space="preserve">' query.</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-strip-xpath expression="." />
+									</actions>
+								</rule>
+							

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Set proper IDU Value to Entitlement-IDU operation property</description>
+									<comment xml:space="preserve">cloning of association is mandatory for group entitlement operations. FanOut Agent will use this association to determine the instance to forward the command document.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.Group" op="equal">true</if-global-variable>
+											<if-op-property name="Entitlement-IDU" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="ent-idu" scope="policy">
+											<arg-string>
+												<token-xpath expression="operation-data/@Entitlement-IDU" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-op-property name="Entitlement-IDU">
+											<arg-string>
+												<token-xpath expression="substring-after(substring-before($ent-idu,&quot;|&quot;),&quot;IDU=&quot;)" />
+											</arg-string>
+										</do-set-op-property>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-association op="available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-clone-xpath dest-expression=".." src-expression="association" />
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

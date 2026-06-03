@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Sanitize Username</description>
+									<comment xml:space="preserve">This rule cleans usernames of invalid characters or blocks the user from being created, depending on the GCV gcv.NOVLGGLEUSER.UsernameSanitizeMethod value.</comment>
+									<conditions>
+										<and />
+									</conditions>
+									<actions>
+										<do-set-local-variable name="lv-username" scope="policy">
+											<arg-string>
+												<token-src-name />
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<or>
+													<if-local-variable mode="regex" name="lv-username" op="equal">.*\.{2,}.*</if-local-variable>
+													<if-local-variable mode="regex" name="lv-username" op="equal">.*[^a-zA-Z0-9\-\_\'\.].*</if-local-variable>
+												</or>
+											</arg-conditions>
+											<arg-actions>
+												<do-if>
+													<arg-conditions>
+														<and>
+															<if-global-variable mode="nocase" name="gcv.NOVLGGLEUSER.UsernameSanitizeMethod" op="equal">strip</if-global-variable>
+														</and>
+													</arg-conditions>
+													<arg-actions>
+														<do-set-local-variable name="lv-username" scope="policy">
+															<arg-string>
+																<token-replace-all regex="[^a-zA-Z0-9\-\_\'\.]" replace-with="">
+																	<token-replace-all regex="\.{2,}" replace-with=".">
+																		<token-local-variable name="lv-username" />
+																	</token-replace-all>
+																</token-replace-all>
+															</arg-string>
+														</do-set-local-variable>
+													</arg-actions>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">Username has invalid characters. Vetoing event.</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-veto />
+													</arg-actions>
+												</do-if>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

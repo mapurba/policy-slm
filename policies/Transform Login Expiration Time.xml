@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Transform Login Expiration Time</description>
+									<conditions>
+										<and>
+											<if-op-attr name="Login Expiration Time" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="loginExpirationTime">
+											<arg-string>
+												<token-op-attr name="Login Expiration Time" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="untilTime">
+											<arg-string>
+												<token-xpath expression="tss:edirToTSSDate($loginExpirationTime)" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-reformat-op-attr name="Login Expiration Time">
+											<arg-value>
+												<token-local-variable name="untilTime" />
+											</arg-value>
+										</do-reformat-op-attr>
+									</actions>
+								</rule>
+								

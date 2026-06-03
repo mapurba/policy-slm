@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User: add urn:ietf:params:scim:schemas:core:2.0:User:title (a position's long name)</description>
+									<conditions>
+										<and>
+											<if-class-name op="equal">User</if-class-name>
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="title">
+											<arg-string>
+												<token-dest-attr class-name="DirXMLsapS" name="urn:ietf:params:scim:schemas:ilm:core:1.0:DirXMLsapS:DirXML-sapSLongName">
+													<arg-association>
+														<token-text xml:space="preserve">S</token-text>
+														<token-op-attr name="urn:ietf:params:scim:schemas:ilm:static:1.0:User:DirXML-sapP-A-S" />
+													</arg-association>
+												</token-dest-attr>
+											</arg-string>
+										</do-set-local-variable>
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable mode="regex" name="title" op="equal">.+</if-local-variable>
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-add-dest-attr-value name="urn:ietf:params:scim:schemas:core:2.0:User:title">
+													<arg-value type="string">
+														<token-local-variable name="title" />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+									</actions>
+								</rule>
+								

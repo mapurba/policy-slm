@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>User Account Entitlement change (Disable Option)</description>
+									<comment xml:space="preserve">The User Account Entitlement grants the user an enabled account EMP in Epic. Revoking the entitlement will disable, block, or delete the EMP depending on the value you select for the 'When account entitlement revoked' global variable. This rule executes when the entitlement is changing and you have selected the disable option.</comment>
+									<conditions>
+										<and>
+											<if-global-variable mode="nocase" name="drv.entitlement.UserAccount" op="equal">true</if-global-variable>
+											<if-global-variable mode="nocase" name="drv.entitlement.remove" op="equal">disable</if-global-variable>
+											<if-class-name op="equal">User</if-class-name>
+											<if-operation mode="regex" op="equal">modify|add</if-operation>
+											<if-entitlement name="UserAccount" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-dest-attr-value name="IsActive">
+													<arg-value type="string">
+														<token-text xml:space="preserve">False</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-added-entitlement name="UserAccount" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-dest-attr-value name="IsActive">
+													<arg-value type="string">
+														<token-text xml:space="preserve">True</token-text>
+													</arg-value>
+												</do-set-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

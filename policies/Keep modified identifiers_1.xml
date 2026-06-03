@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Keep modified identifiers</description>
+									<comment xml:space="preserve">If account tracking identifiers are modified, keep the new value and the corresponding association</comment>
+									<conditions>
+										<and>
+											<if-class-name mode="nocase" op="equal">User</if-class-name>
+											<if-operation mode="case" op="equal">modify</if-operation>
+											<if-op-attr name="Email" op="changing" />
+											<if-op-property name="AccountTracking-Operation" op="available" />
+											<if-op-property name="AccountTracking-IdvAccountStatus" op="available" />
+											<if-op-property name="AccountTracking-AppAccountStatus" op="available" />
+										</and>
+									</conditions>
+									<actions>
+										<do-set-local-variable name="modifiedAccountTrackingId" scope="driver">
+											<arg-string>
+												<token-xpath expression="./modify-attr/add-value/value/text()" />
+											</arg-string>
+										</do-set-local-variable>
+										<do-set-local-variable name="emailEvtAssociation" scope="driver">
+											<arg-string>
+												<token-xpath expression="./association/text()" />
+											</arg-string>
+										</do-set-local-variable>
+									</actions>
+								</rule>
+							

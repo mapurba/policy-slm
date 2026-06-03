@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Handle users entitlement to group changes</description>
+									<conditions>
+										<and>
+											<if-entitlement name="NOVLGGLEUSER-GroupMembership" op="changing" />
+										</and>
+									</conditions>
+									<actions>
+										<do-for-each>
+											<arg-node-set>
+												<token-entitlement name="NOVLGGLEUSER-GroupMembership" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Adding </token-text>
+														<token-src-name />
+														<token-text xml:space="preserve"> to the following group: </token-text>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-trace-message>
+												<do-add-dest-attr-value class-name="Group" name="Member">
+													<arg-association>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-association>
+													<arg-value type="dn">
+														<token-src-dn />
+													</arg-value>
+												</do-add-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+										<do-for-each>
+											<arg-node-set>
+												<token-removed-entitlement name="NOVLGGLEUSER-GroupMembership" />
+											</arg-node-set>
+											<arg-actions>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">Removing </token-text>
+														<token-src-name />
+														<token-text xml:space="preserve"> from the following group: </token-text>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-string>
+												</do-trace-message>
+												<do-remove-dest-attr-value class-name="Group" name="Member">
+													<arg-association>
+														<token-xpath expression="es:getEntParamField($current-node,'ID')" />
+													</arg-association>
+													<arg-value type="dn">
+														<token-src-dn />
+													</arg-value>
+												</do-remove-dest-attr-value>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+							

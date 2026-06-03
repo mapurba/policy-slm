@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rule>
+									<description>Logical Systems Information</description>
+									<conditions />
+									<actions>
+										<do-trace-message>
+											<arg-string>
+												<token-text xml:space="preserve">MSysInfo Init: </token-text>
+												<token-text xml:space="preserve">Registering logical systems...</token-text>
+											</arg-string>
+										</do-trace-message>
+										<do-set-local-variable name="lst" scope="policy">
+											<arg-node-set>
+												<token-xml-parse>
+													<token-text xml:space="preserve">			&lt;template&gt;
+				&lt;header display-name="General Information"/&gt;
+				&lt;definition display-name="Name" name="name" type="string"&gt;
+					&lt;description&gt;Specify a descriptive name for the managed system.&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;definition display-name="Description" multi-line="true" name="description" type="string"&gt;
+					&lt;description&gt;Specify a brief description of the managed system&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;definition display-name="Location" name="location" type="string"&gt;
+					&lt;description&gt;Specify the location of the managed system.&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;definition display-name="Vendor" name="vendor" type="enum"&gt;
+					&lt;description&gt;Specify the vendor of the managed system.&lt;/description&gt;
+					&lt;value&gt;Microsoft&lt;/value&gt;
+					&lt;enum-choice display-name="Microsoft"&gt;Microsoft&lt;/enum-choice&gt;
+				&lt;/definition&gt;
+				&lt;definition display-name="Version" name="version" type="string"&gt;
+					&lt;description&gt;Specify the version of the managed system.&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;header display-name="System Ownership"/&gt;
+				&lt;definition display-name="Business Owner" dn-space="dirxml" dn-type="ldap" name="businessOwner" type="dn"&gt;
+					&lt;description&gt;Specify the business owner of the managed system. Select a user object (not a role, group, or container).&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;definition display-name="Application Owner" dn-space="dirxml" dn-type="ldap" name="applicationOwner" type="dn"&gt;
+					&lt;description&gt;Specify the application owner of the managed system. Select a user object (not a role, group, or container).&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;header display-name="System Classification"/&gt;
+				&lt;definition display-name="Classification" name="classification" type="string"&gt;
+					&lt;description&gt;Specify the classification of the managed system.&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;definition display-name="Environment" name="environment" type="string"&gt;
+					&lt;description&gt;Specify the type of environment the managed system provides.&lt;/description&gt;
+					&lt;value/&gt;
+				&lt;/definition&gt;
+				&lt;header display-name="Connection And Miscellaneous Information (auto-generated, do not change!)"/&gt;
+				&lt;group&gt;
+					&lt;definition display-name="Connection and miscellaneous information" name="auto.generated.info.show" type="enum"&gt;
+						&lt;description&gt;Show auto-generated information&lt;/description&gt;
+						&lt;enum-choice display-name="show"&gt;true&lt;/enum-choice&gt;
+						&lt;enum-choice display-name="hide"&gt;false&lt;/enum-choice&gt;
+						&lt;value&gt;false&lt;/value&gt;
+					&lt;/definition&gt;
+					&lt;subordinates active-value="true"&gt;
+						&lt;definition display-name="ID" name="id" type="string"&gt;
+							&lt;description&gt;Uniquely identifies the managed system.&lt;/description&gt;
+							&lt;value/&gt;
+						&lt;/definition&gt;
+						&lt;definition display-name="Type" name="type" type="string"&gt;
+							&lt;description&gt;Type of the managed system.&lt;/description&gt;
+							&lt;value/&gt;
+						&lt;/definition&gt;
+						&lt;definition display-name="Authentication IP Address" name="auth.ip" type="string"&gt;
+							&lt;description&gt;IP address used to authenticate to the managed system.&lt;/description&gt;
+							&lt;value/&gt;
+						&lt;/definition&gt;
+						&lt;definition display-name="Authentication Port" name="auth.port" type="string"&gt;
+							&lt;description&gt;Port used to authenticate to the managed system.&lt;/description&gt;
+							&lt;value/&gt;
+						&lt;/definition&gt;
+						&lt;definition display-name="Authentication ID" name="auth.id" type="string"&gt;
+							&lt;description&gt;User ID used to authenticate to managed system.&lt;/description&gt;
+							&lt;value/&gt;
+						&lt;/definition&gt;
+					&lt;/subordinates&gt;
+				&lt;/group&gt;
+			&lt;/template&gt;</token-text>
+												</token-xml-parse>
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-set-local-variable name="els" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance" />
+										<do-if>
+											<arg-conditions>
+												<and>
+													<if-local-variable name="shimConfigInfo" op="not-available" />
+												</and>
+											</arg-conditions>
+											<arg-actions>
+												<do-set-local-variable name="shimConfigInfo" scope="driver">
+													<arg-node-set>
+														<token-document>
+															<arg-string>
+																<token-text xml:space="preserve">vnd.nds.stream:</token-text>
+																<token-text xml:space="preserve">/</token-text>
+																<token-parse-dn dest-dn-delims="00,/+=*\" dest-dn-format="custom" src-dn-format="slash">
+																	<token-global-variable name="dirxml.auto.driverdn" />
+																</token-parse-dn>
+																<token-text xml:space="preserve">#</token-text>
+																<token-text xml:space="preserve">DirXML-ShimConfigInfo</token-text>
+															</arg-string>
+														</token-document>
+													</arg-node-set>
+												</do-set-local-variable>
+											</arg-actions>
+											<arg-actions />
+										</do-if>
+										<do-set-local-variable name="domainConn" scope="policy">
+											<arg-node-set>
+												<token-xpath expression="$shimConfigInfo/driver-config/subscriber-options/configuration-values/definitions/group/subordinates/definition/value/instance/definition[@name='drv.connection.dn']/value" />
+											</arg-node-set>
+										</do-set-local-variable>
+										<do-for-each>
+											<arg-node-set>
+												<token-local-variable name="domainConn" />
+											</arg-node-set>
+											<arg-actions>
+												<do-set-local-variable name="domainConnection" scope="policy">
+													<arg-node-set>
+														<token-query class-name="DirXML-Resource" datastore="dest" scope="entry">
+															<arg-dn>
+																<token-local-variable name="current-node" />
+															</arg-dn>
+															<arg-string>
+																<token-text xml:space="preserve">DirXML-Data</token-text>
+															</arg-string>
+														</token-query>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable disabled="true" name="conName" scope="driver">
+													<arg-string>
+														<token-parse-dn length="1" start="-1">
+															<token-local-variable name="current-node" />
+														</token-parse-dn>
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="connXML" scope="driver">
+													<arg-node-set>
+														<token-xml-parse>
+															<token-base64-decode>
+																<token-xpath expression="$domainConnection/attr/value" />
+															</token-base64-decode>
+														</token-xml-parse>
+													</arg-node-set>
+												</do-set-local-variable>
+												<do-set-local-variable name="domainName" scope="policy">
+													<arg-string>
+														<token-xpath expression="$connXML/connection/authentication-info/domain/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-set-local-variable name="logicalSystemName" scope="policy">
+													<arg-string>
+														<token-replace-first regex="dc=" replace-with="">
+															<token-parse-dn dest-dn-format="ldap" length="1" src-dn-format="ldap" start="-1">
+																<token-local-variable name="domainName" />
+															</token-parse-dn>
+														</token-replace-first>
+													</arg-string>
+												</do-set-local-variable>
+												<do-trace-message>
+													<arg-string>
+														<token-text xml:space="preserve">MSysInfo Init: </token-text>
+														<token-text xml:space="preserve">- </token-text>
+														<token-text xml:space="preserve">Registering logical system '</token-text>
+														<token-local-variable name="logicalSystemName" />
+														<token-text xml:space="preserve">'...</token-text>
+													</arg-string>
+												</do-trace-message>
+												<do-append-xml-element expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value" name="instance" />
+												<do-clone-xpath dest-expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]" src-expression="$lst//template/node()" />
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='name']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='name']/value">
+													<arg-string>
+														<token-local-variable name="logicalSystemName" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='description']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='description']/value">
+													<arg-string>
+														<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.description']/value/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='location']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='location']/value">
+													<arg-string>
+														<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.location']/value/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='businessOwner']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='businessOwner']/value">
+													<arg-string>
+														<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.businessOwner']/value/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='applicationOwner']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='applicationOwner']/value">
+													<arg-string>
+														<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.applicationOwner']/value/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='classification']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='classification']/value">
+													<arg-string>
+														<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.classification']/value/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='environment']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='environment']/value">
+													<arg-string>
+														<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.environment']/value/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='version']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='version']/value">
+													<arg-string>
+														<token-xpath expression="$xml//definition[@name='msysinfo.drv.ms.version']/value/text()" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-for-each>
+													<arg-node-set>
+														<token-xpath expression="$els[.//definition[@name='id' and value/text()=$logicalSystemName]]" />
+													</arg-node-set>
+													<arg-actions>
+														<do-trace-message>
+															<arg-string>
+																<token-text xml:space="preserve">MSysInfo Init: </token-text>
+																<token-text xml:space="preserve">-- Found matching existing logical system $logicalSystemName$. Copying existing values...</token-text>
+															</arg-string>
+														</do-trace-message>
+														<do-for-each>
+															<arg-node-set>
+																<token-xpath expression="$current-node//definition[@name!='id' and @name!='type' and @name!='auth.id' and @name!='auth.ip' and @name!='auth.port']" />
+															</arg-node-set>
+															<arg-actions>
+																<do-trace-message>
+																	<arg-string>
+																		<token-text xml:space="preserve">MSysInfo Init: </token-text>
+																		<token-text xml:space="preserve">--- Copying </token-text>
+																		<token-xpath expression="$current-node/@name" />
+																		<token-text xml:space="preserve">=</token-text>
+																		<token-xpath expression="$current-node/value/text()" />
+																	</arg-string>
+																</do-trace-message>
+																<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name=$current-node/@name]/value/text()" />
+																<do-clone-xpath dest-expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name=$current-node/@name]/value" src-expression="$current-node/value/text()" />
+															</arg-actions>
+														</do-for-each>
+													</arg-actions>
+												</do-for-each>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='id']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='id']/value">
+													<arg-string>
+														<token-local-variable name="logicalSystemName" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='type']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='type']/value">
+													<arg-string>
+														<token-text xml:space="preserve">MDAD</token-text>
+													</arg-string>
+												</do-append-xml-text>
+												<do-set-local-variable name="connString" scope="policy">
+													<arg-string>
+														<token-xpath expression="$connXML/connection/authentication-info/domain-controller[@primary='true']/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.ip']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.ip']/value">
+													<arg-string>
+														<token-local-variable name="connString" />
+													</arg-string>
+												</do-append-xml-text>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.port']/value/text()" />
+												<do-set-local-variable name="logonID" scope="policy">
+													<arg-string>
+														<token-xpath expression="$connXML/connection/authentication-info/user/text()" />
+													</arg-string>
+												</do-set-local-variable>
+												<do-strip-xpath expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.id']/value/text()" />
+												<do-append-xml-text expression="$xml//definition[@name='msysinfo.drv.ms.logicalInstances']/value/instance[last()]//definition[@name='auth.id']/value">
+													<arg-string>
+														<token-local-variable name="logonID" />
+													</arg-string>
+												</do-append-xml-text>
+											</arg-actions>
+										</do-for-each>
+									</actions>
+								</rule>
+								
