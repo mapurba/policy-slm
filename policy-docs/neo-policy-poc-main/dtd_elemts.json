@@ -1,0 +1,878 @@
+{
+  "DirXMLScript_DTD_Elements": {
+    "description": "Defines the structure for policies, rules, conditions, actions, arguments, and tokens used in processing XDS documents.",
+    "children": [
+      {
+        "policy": {
+          "description": "Top-level container for an ordered set of rules, used to examine and modify an XDS document.",
+          "parent_elements": [],
+          "content": "description?, (rule | include)*",
+          "children": [
+            {
+              "description": {
+                "description": "Description of a <policy> or a <rule>",
+                "parent_elements": ["policy", "rule"]
+              }
+            },
+            {
+              "include": {
+                "description": "Include rules from another policy",
+                "parent_elements": ["policy"]
+              }
+            },
+            {
+              "rule": {
+                "description": "A fundamental building block specifying a set of conditions and actions.",
+                "parent_elements": ["policy"],
+                "content": "description?, comment*, conditions, actions",
+                "children": [
+                  {
+                    "comment": {
+                      "description": "Long description of a <rule>",
+                      "parent_elements": ["rule"]
+                    }
+                  },
+                  {
+                    "conditions": "Defines criteria (CNF or DNF) that must be met for actions to be performed.",
+                    "parent_elements": ["rule"],
+                    "content": "(and* | or*)",
+                    "children": [
+                      {
+                        "and": "Logical conjunction (AND) of tests.",
+                        "parent_elements": ["conditions", "arg-conditions"],
+                        "content": "(if-association | if-attr | ... | if-xpath)*",
+                        "children": [
+                          {
+                            "if-association": {
+                              "description": "Test association value.",
+                              "parent_elements": ["and", "or"],
+                              "attributes": {
+                                "op": "(associated | available | equal | lt | gt | not-associated | not-available | not-equal | not-lt | not-gt)",
+                                "mode": "(%SCALARMODES;) case",
+                                "disabled": "(%BOOLEAN;) false",
+                                "notrace": "(%BOOLEAN;) false"
+                              }
+                            }
+                          },
+                          {
+                            "if-attr": {
+                              "description": "Test attribute in operation or source datastore (two-phase check).",
+                              "parent_elements": ["and", "or"],
+                              "children": ["component"],
+                              "attributes": {
+                                "op": "(available | equal | lt | gt | not-available | not-equal | not-lt | not-gt)",
+                                "mode": "(%MODES;) nocase",
+                                "name": "CDATA",
+                                "disabled": "(%BOOLEAN;) false",
+                                "notrace": "(%BOOLEAN;) false"
+                              }
+                            }
+                          },
+                          {
+                            "if-class-name": {
+                              "description": "Test the object class of the current operation.",
+                              "parent_elements": ["and", "or"],
+                              "attributes": {
+                                "op": "(available | equal | lt | gt | not-available | not-equal | not-lt | not-gt)",
+                                "mode": "(%SCALARMODES;) nocase",
+                                "disabled": "(%BOOLEAN;) false",
+                                "notrace": "(%BOOLEAN;) false"
+                              }
+                            }
+                          },
+                          {
+                            "if-dest-attr": {
+                              "description": "Test attribute in the destination datastore.",
+                              "parent_elements": ["and", "or"],
+                              "children": [
+                                "component",
+                                "arg-dn",
+                                "arg-association",
+                                "value"
+                              ],
+                              "attributes": {
+                                "op": "(available | equal | lt | gt | not-available | not-equal | not-lt | not-gt)",
+                                "mode": "(%MODES;) nocase",
+                                "name": "CDATA",
+                                "disabled": "(%BOOLEAN;) false",
+                                "notrace": "(%BOOLEAN;) false",
+                                "class-name": "CDATA"
+                              }
+                            }
+                          },
+                          {
+                            "if-dest-dn": {
+                              "description": "Test the destination DN.",
+                              "parent_elements": ["and", "or"],
+                              "attributes": {
+                                "op": "(available | equal | in-container | in-subtree | not-available | not-equal | not-in-container | not-in-subtree)",
+                                "disabled": "(%BOOLEAN;) false",
+                                "notrace": "(%BOOLEAN;) false"
+                              }
+                            }
+                          },
+                          {
+                            "if-entitlement": "Test entitlements in operation or eDirectory.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-global-variable": "Test a global variable (GCV).",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-local-variable": "Test a local variable.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-named-password": "Test a named password (EMPTY content).",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-op-attr": "Test attribute values only in the current operation.",
+                            "parent_elements": ["and", "or"],
+                            "children": [
+                              {
+                                "component": "Value component."
+                              }
+                            ]
+                          },
+                          {
+                            "if-op-entitlement": "Test entitlements only in the current operation.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-op-property": "Test an operation property.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-operation": "Test the name of the current operation.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-password": "Test the password in the current operation.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-src-attr": "Test attribute values in the source datastore.",
+                            "parent_elements": ["and", "or"],
+                            "children": [
+                              {
+                                "arg-dn": "DN argument (used optionally for targeting)."
+                              },
+                              {
+                                "arg-association": "Association argument (used optionally for targeting)."
+                              },
+                              {
+                                "value": "Attribute value."
+                              },
+                              {
+                                "component": "Value component."
+                              }
+                            ]
+                          },
+                          {
+                            "if-src-dn": "Test the source DN.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-xml-attr": "Test an XML attribute of the current operation.",
+                            "parent_elements": ["and", "or"]
+                          },
+                          {
+                            "if-xpath": "Test an XPATH expression.",
+                            "parent_elements": ["and", "or"]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "actions": {
+                      "description": "The operations (<do-*>) performed when conditions are met.",
+                      "parent_elements": ["rule"],
+                      "content": "(do-add-association | do-add-dest-attr-value | ... | do-while)*",
+                      "children": [
+                        {
+                          "do-add-association": {
+                            "description": "Adds an association to the current object.",
+                            "parent_elements": ["actions"],
+                            "children": ["arg-association", "arg-dn"],
+                            "attributes": {
+                              "direct": "(%BOOLEAN;) false",
+                              "when": "(%WHEN_OPTIONS;) auto",
+                              "disabled": "(%BOOLEAN;) false",
+                              "notrace": "(%BOOLEAN;) false"
+                            }
+                          }
+                        },
+                        {
+                          "do-add-dest-attr-value": {
+                            "description": "Adds a value to a destination attribute.",
+                            "parent_elements": ["actions"],
+                            "children": [
+                              "arg-dn",
+                              "arg-association",
+                              "arg-value"
+                            ],
+                            "attributes": {
+                              "name": "CDATA #REQUIRED",
+                              "class-name": "CDATA #IMPLIED",
+                              "direct": "(%BOOLEAN;) false",
+                              "when": "(%WHEN_OPTIONS;) auto",
+                              "disabled": "(%BOOLEAN;) false",
+                              "notrace": "(%BOOLEAN;) false"
+                            }
+                          }
+                        },
+                        {
+                          "do-add-dest-object": {
+                            "description": "Creates a new object in the destination datastore.",
+                            "parent_elements": ["actions"],
+                            "children": ["arg-dn"],
+                            "attributes": {
+                              "class-name": "CDATA #REQUIRED",
+                              "direct": "(%BOOLEAN;) false",
+                              "when": "(%WHEN_OPTIONS;) auto",
+                              "disabled": "(%BOOLEAN;) false",
+                              "notrace": "(%BOOLEAN;) false"
+                            }
+                          }
+                        },
+                        {
+                          "do-add-role": {
+                            "description": "Assigns a role to the current object.",
+                            "parent_elements": ["rule"],
+                            "children": [
+                              "arg-password",
+                              "arg-dn",
+                              "arg-association",
+                              "arg-string"
+                            ],
+                            "attributes": {
+                              "role-id": "CDATA #REQUIRED",
+                              "id": "CDATA #REQUIRED",
+                              "url": "CDATA #REQUIRED",
+                              "disabled": "(%BOOLEAN;) false",
+                              "notrace": "(%BOOLEAN;) false",
+                              "time-out": "CDATA 0"
+                            }
+                          }
+                        },
+                        {
+                          "do-add-resource": {
+                            "description": "Adds a resource to the current object.",
+                            "parent_elements": ["rule"],
+                            "children": [
+                              "arg-password",
+                              "arg-dn",
+                              "arg-association",
+                              "arg-string"
+                            ],
+                            "attributes": {
+                              "resource-id": "CDATA #REQUIRED",
+                              "id": "CDATA #REQUIRED",
+                              "url": "CDATA #REQUIRED",
+                              "disabled": "(%BOOLEAN;) false",
+                              "notrace": "(%BOOLEAN;) false",
+                              "time-out": "CDATA 0"
+                            }
+                          }
+                        },
+                        {
+                          "do-append-xml-element": "Appends an XML element to the current object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-xml"]
+                        },
+                        {
+                          "do-append-xml-text": "Appends text to an XML element.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-string"]
+                        },
+                        {
+                          "do-break": "Terminates the current loop or operation.",
+                          "parent_elements": ["rule"]
+                        },
+                        {
+                          "do-clear-dest-attr-value": "Clears a value from a destination attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-value"]
+                        },
+                        {
+                          "do-clear-op-property": "Clears an operation property.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-property"]
+                        },
+                        {
+                          "do-clear-src-attr-value": "Clears a value from a source attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-value"]
+                        },
+                        {
+                          "do-clear-sso-credential": "Clears an SSO credential.",
+                          "parent_elements": ["rule"]
+                        },
+                        {
+                          "do-clone-op-attr": "Clones an operation attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-attr"]
+                        },
+                        {
+                          "do-clone-xpath": "Clones an XPATH expression.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-xpath"]
+                        },
+                        {
+                          "do-create-resource": "Creates a new resource.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-resource"]
+                        },
+                        {
+                          "do-create-role": "Creates a new role.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-role"]
+                        },
+                        {
+                          "do-delete-dest-object": "Deletes an object in the destination datastore.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-delete-src-object": "Deletes an object in the source datastore.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-delete-resource": "Deletes a resource from the current object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-resource"]
+                        },
+                        {
+                          "do-delete-role": "Removes a role from the current object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-role"]
+                        },
+                        {
+                          "do-find-matching-object": "Finds an object matching specific criteria.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-query-condition"]
+                        },
+                        {
+                          "do-for-each": "Iterates over a set of nodes.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-node-set"]
+                        },
+                        {
+                          "do-generate-event": "Generates an event.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-event"]
+                        },
+                        {
+                          "do-generate-xdas-event": "Generates an XDAS event.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-xdas-event"]
+                        },
+                        {
+                          "do-if": "Executes actions conditionally.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-conditions", "arg-actions"]
+                        },
+                        {
+                          "do-implement-entitlement": "Implements an entitlement.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-entitlement"]
+                        },
+                        {
+                          "do-invoke-rest-endpoint": "Invokes a REST endpoint.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-rest"]
+                        },
+                        {
+                          "do-modify-resource": "Modifies a resource.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-resource"]
+                        },
+                        {
+                          "do-modify-role": "Modifies a role.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-role"]
+                        },
+                        {
+                          "do-move-dest-object": "Moves an object in the destination datastore.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-move-src-object": "Moves an object in the source datastore.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-reformat-op-attr": "Reformats an operation attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-attr"]
+                        },
+                        {
+                          "do-remove-association": "Removes an association from the current object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-association"]
+                        },
+                        {
+                          "do-remove-dest-attr-value": "Removes a value from a destination attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-value"]
+                        },
+                        {
+                          "do-remove-named-password": "Removes a named password.",
+                          "parent_elements": ["rule"]
+                        },
+                        {
+                          "do-remove-resource": "Removes a resource from the current object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-resource"]
+                        },
+                        {
+                          "do-remove-role": "Removes a role from the current object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-role"]
+                        },
+                        {
+                          "do-remove-src-attr-value": "Removes a value from a source attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-value"]
+                        },
+                        {
+                          "do-rename-dest-object": "Renames an object in the destination datastore.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-rename-op-attr": "Renames an operation attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-attr"]
+                        },
+                        {
+                          "do-rename-src-object": "Renames an object in the source datastore.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-send-email": "Sends an email.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-email"]
+                        },
+                        {
+                          "do-send-email-from-template": "Sends an email using a template.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-template"]
+                        },
+                        {
+                          "do-set-default-attr-value": "Sets a default value for an attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-value"]
+                        },
+                        {
+                          "do-set-dest-attr-value": "Sets a value for a destination attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-value"]
+                        },
+                        {
+                          "do-set-dest-password": "Sets the password for a destination object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-password"]
+                        },
+                        {
+                          "do-set-local-variable": "Sets a local variable.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-variable"]
+                        },
+                        {
+                          "do-set-named-password": "Sets a named password.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-password"]
+                        },
+                        {
+                          "do-set-op-association": "Sets an operation association.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-association"]
+                        },
+                        {
+                          "do-set-op-class-name": "Sets the class name for an operation.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-class"]
+                        },
+                        {
+                          "do-set-op-dest-dn": "Sets the destination DN for an operation.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-set-op-property": "Sets an operation property.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-property"]
+                        },
+                        {
+                          "do-set-op-src-dn": "Sets the source DN for an operation.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-set-op-template-dn": "Sets the template DN for an operation.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-dn"]
+                        },
+                        {
+                          "do-set-src-attr-value": "Sets a value for a source attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-value"]
+                        },
+                        {
+                          "do-set-src-password": "Sets the password for a source object.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-password"]
+                        },
+                        {
+                          "do-set-sso-credential": "Sets an SSO credential.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-credential"]
+                        },
+                        {
+                          "do-set-sso-passphrase": "Sets an SSO passphrase.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-passphrase"]
+                        },
+                        {
+                          "do-set-xml-attr": "Sets an XML attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-xml"]
+                        },
+                        {
+                          "do-start-workflow": "Starts a workflow.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-workflow"]
+                        },
+                        {
+                          "do-status": "Sets the status of an operation.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-status"]
+                        },
+                        {
+                          "do-strip-op-attr": "Strips an operation attribute.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-attr"]
+                        },
+                        {
+                          "do-strip-xpath": "Strips an XPATH expression.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-xpath"]
+                        },
+                        {
+                          "do-trace-message": "Logs a trace message.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-message"]
+                        },
+                        {
+                          "do-veto": "Vetoes an operation.",
+                          "parent_elements": ["rule"]
+                        },
+                        {
+                          "do-veto-if-op-attr-not-available": "Vetoes an operation if an attribute is not available.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-attr"]
+                        },
+                        {
+                          "do-while": "Executes actions in a loop while conditions are met.",
+                          "parent_elements": ["rule"],
+                          "children": ["arg-conditions", "arg-actions"]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "Argument_Elements": {
+          "description": "Elements defining dynamic input data for Actions.",
+          "children": [
+            {
+              "arg-actions": "Specifies actions associated with the enclosing action (e.g., do-if, do-while). Contains <do-*> elements.",
+              "parent_elements": [
+                "do-for-each",
+                "do-if",
+                "do-implement-entitlement",
+                "do-while"
+              ]
+            },
+            {
+              "arg-conditions": "Specifies conditions associated with the enclosing action (e.g., do-if, do-while). Contains <and> or <or> elements.",
+              "parent_elements": ["do-if", "do-while"]
+            },
+            {
+              "arg-association": "Association argument.",
+              "parent_elements": [
+                "do-add-association",
+                "do-add-dest-attr-value",
+                "do-add-resource",
+                "do-add-role",
+                "if-dest-attr",
+                "if-src-attr"
+              ]
+            },
+            {
+              "arg-component": "Component argument (used for structured attributes).",
+              "parent_elements": ["arg-value"]
+            },
+            {
+              "arg-dn": "DN argument. Concatenates enclosed tokens to form a DN value.",
+              "parent_elements": [
+                "do-add-association",
+                "do-add-dest-attr-value",
+                "do-add-dest-object",
+                "do-add-resource",
+                "do-add-role",
+                "do-add-src-attr-value",
+                "do-add-src-object",
+                "if-dest-attr",
+                "if-src-attr",
+                "token-dest-attr",
+                "token-query",
+                "token-resolve",
+                "token-src-attr",
+                "token-unique-name"
+              ],
+              "content": "(token-added-entitlement | ... | token-xpath)*"
+            },
+            {
+              "arg-match-attr": "Match attribute argument.",
+              "parent_elements": ["arg-query-condition"]
+            },
+            {
+              "arg-node-set": "Node set argument. Specifies an XPATH 1.0 node-set.",
+              "parent_elements": [
+                "do-for-each",
+                "do-implement-entitlement",
+                "do-set-local-variable"
+              ],
+              "content": "(token-added-entitlement | ... | token-xpath)*"
+            },
+            {
+              "arg-object": "Java Object argument.",
+              "parent_elements": ["do-set-local-variable"]
+            },
+            {
+              "arg-password": "Password argument.",
+              "parent_elements": ["do-add-resource", "do-add-role"]
+            },
+            {
+              "arg-query-condition": "Query condition argument. Specifies a logical conditional search expression.",
+              "is_recursively_defined": true,
+              "parent_elements": [
+                "arg-query-condition",
+                "do-find-matching-object",
+                "token-query"
+              ],
+              "content": "(arg-match-attr | arg-query-condition)+"
+            },
+            {
+              "arg-string": "String argument. Concatenates enclosed tokens to form a string value.",
+              "parent_elements": [
+                "do-add-resource",
+                "do-add-role",
+                "do-append-xml-text",
+                "do-set-local-variable",
+                "do-send-email",
+                "do-trace-message",
+                "token-query",
+                "..."
+              ],
+              "content": "(token-added-entitlement | ... | token-xpath)*"
+            },
+            {
+              "arg-value": "Value argument. Specifies an attribute value.",
+              "parent_elements": [
+                "do-add-dest-attr-value",
+                "do-add-src-attr-value",
+                "do-reformat-op-attr",
+                "do-remove-dest-attr-value",
+                "do-remove-src-attr-value",
+                "do-set-default-attr-value",
+                "do-set-dest-attr-value",
+                "do-set-src-attr-value",
+                "arg-match-attr"
+              ],
+              "content": "(arg-component+ | (token-added-entitlement | ... | token-xpath)*)"
+            }
+          ]
+        }
+      },
+      {
+        "Token_Elements": {
+          "description": "Dynamic values expanded at run-time (45 types listed).",
+          "children": [
+            {
+              "token-added-entitlement": "Granted entitlement value(s) in the current operation."
+            },
+            {
+              "token-association": "Association value from the current operation."
+            },
+            {
+              "token-attr": "Attribute value(s) in the current operation or source datastore (union of op-attr and src-attr)."
+            },
+            {
+              "token-base64-decode": "Decode base64 data into a string."
+            },
+            {
+              "token-base64-encode": "Encode a string into base64 data."
+            },
+            {
+              "token-char": "A unicode character."
+            },
+            {
+              "token-class-name": "Object class name from the current operation."
+            },
+            {
+              "token-convert-time": "Convert a date/time from one format to another."
+            },
+            {
+              "token-dest-attr": "Attribute value(s) of current object in the destination datastore."
+            },
+            {
+              "token-dest-dn": "Value derived from the destination DN."
+            },
+            {
+              "token-dest-name": "Unqualified RDN derived from destination DN."
+            },
+            {
+              "token-document": "Read an XML document."
+            },
+            {
+              "token-entitlement": "Value(s) of a granted entitlement of the current object."
+            },
+            {
+              "token-escape-for-dest-dn": "Convert a string for use in a destination DN."
+            },
+            {
+              "token-escape-for-src-dn": "Convert a string for use in a source DN."
+            },
+            {
+              "token-generate-password": "Generate a random password."
+            },
+            {
+              "token-global-variable": "Value of a global variable (GCV)."
+            },
+            {
+              "token-join": "Join a node-set into a string."
+            },
+            {
+              "token-json-array": "Constructs a JSON array."
+            },
+            {
+              "token-json-object": "Constructs a JSON string."
+            },
+            {
+              "token-local-variable": "Value of a local variable."
+            },
+            {
+              "token-lower-case": "Convert a string to lower case."
+            },
+            {
+              "token-map": "Map a string through a mapping table."
+            },
+            {
+              "token-map-source-col": "Used in token-map to have multiple source columns."
+            },
+            {
+              "token-named-password": "Value of the named password."
+            },
+            {
+              "token-op-attr": "Value(s) of an attribute only in the current operation."
+            },
+            {
+              "token-op-property": "Value of an operation property."
+            },
+            {
+              "token-operation": "Name of the current operation."
+            },
+            {
+              "token-parse-dn": "Parse and/or convert a DN."
+            },
+            {
+              "token-password": "Value of the password in current operation."
+            },
+            {
+              "token-query": "Query the source or destination datastore.",
+              "parent_elements": [
+                "arg-dn",
+                "arg-node-set",
+                "arg-string",
+                "arg-value",
+                "..."
+              ]
+            },
+            {
+              "token-removed-attr": "Value(s) of an attribute removed in the current operation."
+            },
+            {
+              "token-removed-entitlement": "Value(s) of an entitlement revoked in the current operation."
+            },
+            {
+              "token-replace-all": "Replace all instances of a substring within a string."
+            },
+            {
+              "token-replace-first": "Replace a single instance of a substring within a string."
+            },
+            {
+              "token-resolve": "Resolve a DN to an association key or vice versa."
+            },
+            {
+              "token-split": "Split a string into a node-set."
+            },
+            {
+              "token-src-attr": "Value(s) of an attribute only in the source datastore."
+            },
+            {
+              "token-src-dn": "Value derived from the source DN."
+            },
+            {
+              "token-src-name": "Unqualified RDN derived from source DN."
+            },
+            {
+              "token-substring": "Substring of a string."
+            },
+            {
+              "token-text": "Constant text."
+            },
+            {
+              "token-time": "Current date/time."
+            },
+            {
+              "token-unique-name": "A generated unique name."
+            },
+            {
+              "token-unmatched-src-dn": "A DN relative to the one matched by if-src-dn."
+            },
+            {
+              "token-upper-case": "Convert a string to upper case."
+            },
+            {
+              "token-xml-parse": "Parse XML. Returns a document node in a node-set.",
+              "is_recursively_defined": true,
+              "content": "token-added-entitlement | ... | token-xpath (1 or more)"
+            },
+            {
+              "token-xml-serialize": "Serialize a node-set result as XML.",
+              "is_recursively_defined": true,
+              "content": "token-added-entitlement | ... | token-xpath (1 or more)"
+            },
+            {
+              "token-xpath": "Result of evaluating an XPATH 1.0 expression."
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

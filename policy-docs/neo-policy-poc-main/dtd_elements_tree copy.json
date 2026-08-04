@@ -1,0 +1,1190 @@
+{
+  "DirXMLScript_DTD_Elements": {
+    "description": "Defines the structure for policies, rules, conditions, actions, arguments, and tokens used in processing XDS documents.",
+    "children": [
+      {
+        "policy": {
+          "description": "Top-level container for an ordered set of rules, used to examine and modify an XDS document.",
+          "parent_elements": [],
+          "content": "description?, (rule | include)*",
+          "children": [
+            {
+              "description": {
+                "description": "Description of a <policy> or a <rule>",
+                "parent_elements": [
+                  "policy",
+                  "rule"
+                ],
+                "content": "#PCDATA"
+              }
+            },
+            {
+              "include": {
+                "description": "Include rules from another policy",
+                "parent_elements": [
+                  "policy"
+                ],
+                "content": "EMPTY"
+              }
+            },
+            {
+              "rule": {
+                "description": "A fundamental building block specifying a set of conditions and actions.",
+                "parent_elements": [
+                  "policy"
+                ],
+                "content": "description?, comment*, conditions, actions",
+                "children": [
+                  {
+                    "comment": {
+                      "description": "Long description of a <rule>",
+                      "parent_elements": [
+                        "rule"
+                      ],
+                      "content": "#PCDATA"
+                    }
+                  },
+                  {
+                    "conditions": {
+                      "description": "Defines criteria (CNF or DNF) that must be met for actions to be performed.",
+                      "parent_elements": [
+                        "rule"
+                      ],
+                      "content": "(and* | or*)",
+                      "children": [
+                        {
+                          "and": {
+                            "description": "Logical conjunction (AND) of tests.",
+                            "parent_elements": [
+                              "conditions",
+                              "arg-conditions"
+                            ],
+                            "content": "(%CONDITIONS;)*",
+                            "children": []
+                          }
+                        },
+                        {
+                          "or": {
+                            "description": "Logical disjunction (OR) of tests.",
+                            "parent_elements": [
+                              "conditions",
+                              "arg-conditions"
+                            ],
+                            "content": "(%CONDITIONS;)*",
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "actions": {
+                      "description": "The operations (<do-*>) performed when conditions are met.",
+                      "parent_elements": [
+                        "rule"
+                      ],
+                      "content": "(%ACTIONS;)*",
+                      "children": [
+                        {
+                          "do-add-association": {
+                            "description": "Add an association to the current object.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-dn?, arg-association",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-add-association"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-add-association"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-add-dest-attr-value": {
+                            "description": "Add a value to a destination attribute.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "(arg-dn | arg-association)?, arg-value",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-add-dest-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-add-dest-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-value": {
+                                  "description": "Value argument.",
+                                  "parent_elements": [
+                                    "do-add-dest-attr-value"
+                                  ],
+                                  "content": "(arg-component+ | (%TOKENS;)*)"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-add-dest-object": {
+                            "description": "Add a destination object.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-dn",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-add-dest-object"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-add-role": {
+                            "description": "Add a role.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-password, (arg-dn | arg-association)?, arg-string*",
+                            "children": [
+                              {
+                                "arg-password": {
+                                  "description": "Password argument.",
+                                  "parent_elements": [
+                                    "do-add-role"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-add-role"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-add-role"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-string": {
+                                  "description": "String argument.",
+                                  "parent_elements": [
+                                    "do-add-role"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-add-resource": {
+                            "description": "Add a resource.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-password, (arg-dn | arg-association)?, arg-string*",
+                            "children": [
+                              {
+                                "arg-password": {
+                                  "description": "Password argument.",
+                                  "parent_elements": [
+                                    "do-add-resource"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-add-resource"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-add-resource"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-string": {
+                                  "description": "String argument.",
+                                  "parent_elements": [
+                                    "do-add-resource"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-add-src-attr-value": {
+                            "description": "Add a value to a source attribute.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "(arg-dn | arg-association)?, arg-value",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-add-src-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-add-src-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-value": {
+                                  "description": "Value argument.",
+                                  "parent_elements": [
+                                    "do-add-src-attr-value"
+                                  ],
+                                  "content": "(arg-component+ | (%TOKENS;)*)"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-add-src-object": {
+                            "description": "Add a source object.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-dn",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-add-src-object"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-append-xml-element": {
+                            "description": "Append an XML element.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "EMPTY"
+                          }
+                        },
+                        {
+                          "do-append-xml-text": {
+                            "description": "Append XML text.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-string",
+                            "children": [
+                              {
+                                "arg-string": {
+                                  "description": "String argument.",
+                                  "parent_elements": [
+                                    "do-append-xml-text"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-break": {
+                            "description": "Break out of the current loop or action.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "EMPTY"
+                          }
+                        },
+                        {
+                          "do-clear-dest-attr-value": {
+                            "description": "Clear a destination attribute value.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "(arg-dn | arg-association)?",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-clear-dest-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-clear-dest-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-clear-op-property": {
+                            "description": "Clear an operation property.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "EMPTY"
+                          }
+                        },
+                        {
+                          "do-clear-src-attr-value": {
+                            "description": "Clear a source attribute value.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "(arg-dn | arg-association)?",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-clear-src-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-clear-src-attr-value"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-clone-op-attr": {
+                            "description": "Clone an operation attribute.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "EMPTY"
+                          }
+                        },
+                        {
+                          "do-clone-xpath": {
+                            "description": "Clone an XPath expression.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "EMPTY"
+                          }
+                        },
+                        {
+                          "do-create-resource": {
+                            "description": "Create a resource.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-password, arg-string*",
+                            "children": [
+                              {
+                                "arg-password": {
+                                  "description": "Password argument.",
+                                  "parent_elements": [
+                                    "do-create-resource"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-string": {
+                                  "description": "String argument.",
+                                  "parent_elements": [
+                                    "do-create-resource"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-create-role": {
+                            "description": "Create a role.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-password, arg-string*",
+                            "children": [
+                              {
+                                "arg-password": {
+                                  "description": "Password argument.",
+                                  "parent_elements": [
+                                    "do-create-role"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-string": {
+                                  "description": "String argument.",
+                                  "parent_elements": [
+                                    "do-create-role"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-delete-dest-object": {
+                            "description": "Delete a destination object.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "(arg-dn | arg-association)?",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-delete-dest-object"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-delete-dest-object"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-delete-src-object": {
+                            "description": "Delete a source object.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "(arg-dn | arg-association)?",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-delete-src-object"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-association": {
+                                  "description": "Association argument.",
+                                  "parent_elements": [
+                                    "do-delete-src-object"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-find-matching-object": {
+                            "description": "Find a matching object.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "(arg-dn?, (arg-match-attr | arg-query-condition)+) | (arg-dn, (arg-match-attr | arg-query-condition)*)",
+                            "children": [
+                              {
+                                "arg-dn": {
+                                  "description": "DN argument.",
+                                  "parent_elements": [
+                                    "do-find-matching-object"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-match-attr": {
+                                  "description": "Match attribute argument.",
+                                  "parent_elements": [
+                                    "do-find-matching-object",
+                                    "arg-query-condition"
+                                  ],
+                                  "content": "arg-value?"
+                                }
+                              },
+                              {
+                                "arg-query-condition": {
+                                  "description": "Query condition argument.",
+                                  "parent_elements": [
+                                    "do-find-matching-object",
+                                    "arg-query-condition"
+                                  ],
+                                  "content": "(arg-match-attr | arg-query-condition)+"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-for-each": {
+                            "description": "For-each loop over a node set.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-node-set, arg-actions",
+                            "children": [
+                              {
+                                "arg-node-set": {
+                                  "description": "Node set argument.",
+                                  "parent_elements": [
+                                    "do-for-each"
+                                  ],
+                                  "content": "(%TOKENS;)*"
+                                }
+                              },
+                              {
+                                "arg-actions": {
+                                  "description": "Actions argument.",
+                                  "parent_elements": [
+                                    "do-for-each"
+                                  ],
+                                  "content": "(%ACTIONS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-if": {
+                            "description": "Conditional execution.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-conditions, arg-actions, arg-actions?",
+                            "children": [
+                              {
+                                "arg-conditions": {
+                                  "description": "Conditions argument.",
+                                  "parent_elements": [
+                                    "do-if"
+                                  ],
+                                  "content": "(and* | or*)"
+                                }
+                              },
+                              {
+                                "arg-actions": {
+                                  "description": "Actions argument.",
+                                  "parent_elements": [
+                                    "do-if"
+                                  ],
+                                  "content": "(%ACTIONS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "do-while": {
+                            "description": "While loop.",
+                            "parent_elements": [
+                              "actions",
+                              "arg-actions"
+                            ],
+                            "content": "arg-conditions, arg-actions",
+                            "children": [
+                              {
+                                "arg-conditions": {
+                                  "description": "Conditions argument.",
+                                  "parent_elements": [
+                                    "do-while"
+                                  ],
+                                  "content": "(and* | or*)"
+                                }
+                              },
+                              {
+                                "arg-actions": {
+                                  "description": "Actions argument.",
+                                  "parent_elements": [
+                                    "do-while"
+                                  ],
+                                  "content": "(%ACTIONS;)*"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "Argument_Elements": {
+          "description": "Elements defining dynamic input data for Actions.",
+          "children": [
+            {
+              "arg-actions": {
+                "description": "Specifies actions associated with the enclosing action (e.g., do-if, do-while). Contains <do-*> elements.",
+                "parent_elements": [
+                  "do-for-each",
+                  "do-if",
+                  "do-implement-entitlement",
+                  "do-while"
+                ],
+                "content": "(%ACTIONS;)*"
+              }
+            },
+            {
+              "arg-conditions": {
+                "description": "Specifies conditions associated with the enclosing action (e.g., do-if, do-while). Contains <and> or <or> elements.",
+                "parent_elements": [
+                  "do-if",
+                  "do-while"
+                ],
+                "content": "(and* | or*)"
+              }
+            },
+            {
+              "arg-association": {
+                "description": "Association argument.",
+                "parent_elements": [
+                  "do-add-association",
+                  "do-add-dest-attr-value",
+                  "do-add-resource",
+                  "do-add-role",
+                  "if-dest-attr",
+                  "if-src-attr"
+                ],
+                "content": "(%TOKENS;)*"
+              }
+            },
+            {
+              "arg-component": {
+                "description": "Component argument (used for structured attributes).",
+                "parent_elements": [
+                  "arg-value"
+                ],
+                "content": "(%TOKENS;)*"
+              }
+            },
+            {
+              "arg-dn": {
+                "description": "DN argument. Concatenates enclosed tokens to form a DN value.",
+                "parent_elements": [
+                  "do-add-association",
+                  "do-add-dest-attr-value",
+                  "do-add-dest-object",
+                  "do-add-resource",
+                  "do-add-role",
+                  "do-add-src-attr-value",
+                  "do-add-src-object",
+                  "if-dest-attr",
+                  "if-src-attr",
+                  "token-dest-attr",
+                  "token-query",
+                  "token-resolve",
+                  "token-src-attr",
+                  "token-unique-name"
+                ],
+                "content": "(%TOKENS;)*"
+              }
+            },
+            {
+              "arg-match-attr": {
+                "description": "Match attribute argument.",
+                "parent_elements": [
+                  "arg-query-condition",
+                  "do-find-matching-object"
+                ],
+                "content": "arg-value?"
+              }
+            },
+            {
+              "arg-node-set": {
+                "description": "Node set argument. Specifies an XPATH 1.0 node-set.",
+                "parent_elements": [
+                  "do-for-each",
+                  "do-implement-entitlement",
+                  "do-set-local-variable"
+                ],
+                "content": "(%TOKENS;)*"
+              }
+            },
+            {
+              "arg-object": {
+                "description": "Java Object argument.",
+                "parent_elements": [
+                  "do-set-local-variable"
+                ],
+                "content": "token-local-variable | token-xpath"
+              }
+            },
+            {
+              "arg-password": {
+                "description": "Password argument.",
+                "parent_elements": [
+                  "do-add-resource",
+                  "do-add-role"
+                ],
+                "content": "(%TOKENS;)*"
+              }
+            },
+            {
+              "arg-query-condition": {
+                "description": "Query condition argument. Specifies a logical conditional search expression.",
+                "is_recursively_defined": true,
+                "parent_elements": [
+                  "arg-query-condition",
+                  "do-find-matching-object",
+                  "token-query"
+                ],
+                "content": "(arg-match-attr | arg-query-condition)+"
+              }
+            },
+            {
+              "arg-string": {
+                "description": "String argument. Concatenates enclosed tokens to form a string value.",
+                "parent_elements": [
+                  "do-add-resource",
+                  "do-add-role",
+                  "do-append-xml-text",
+                  "do-set-local-variable",
+                  "do-send-email",
+                  "do-trace-message",
+                  "token-query",
+                  "token-json-object",
+                  "token-json-array"
+                ],
+                "content": "(%TOKENS;)*"
+              }
+            },
+            {
+              "arg-value": {
+                "description": "Value argument. Specifies an attribute value.",
+                "parent_elements": [
+                  "do-add-dest-attr-value",
+                  "do-add-src-attr-value",
+                  "do-reformat-op-attr",
+                  "do-remove-dest-attr-value",
+                  "do-remove-src-attr-value",
+                  "do-set-default-attr-value",
+                  "do-set-dest-attr-value",
+                  "do-set-src-attr-value",
+                  "arg-match-attr"
+                ],
+                "content": "(arg-component+ | (%TOKENS;)*)"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "Token_Elements": {
+          "description": "Dynamic values expanded at run-time (45+ types listed).",
+          "children": [
+            {
+              "token-added-entitlement": {
+                "description": "Granted entitlement value(s) in the current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-association": {
+                "description": "Association value from the current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-attr": {
+                "description": "Attribute value(s) in the current operation or source datastore (union of op-attr and src-attr).",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-base64-decode": {
+                "description": "Decode base64 data into a string.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-base64-encode": {
+                "description": "Encode a string into base64 data.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-char": {
+                "description": "A unicode character.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-class-name": {
+                "description": "Object class name from the current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-convert-time": {
+                "description": "Convert a date/time from one format to another.",
+                "content": "(%TOKENS;)*"
+              }
+            },
+            {
+              "token-dest-attr": {
+                "description": "Attribute value(s) of current object in the destination datastore.",
+                "content": "(arg-dn | arg-association)?"
+              }
+            },
+            {
+              "token-dest-dn": {
+                "description": "Value derived from the destination DN.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-dest-name": {
+                "description": "Unqualified RDN derived from destination DN.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-document": {
+                "description": "Read an XML document.",
+                "content": "arg-string"
+              }
+            },
+            {
+              "token-entitlement": {
+                "description": "Value(s) of a granted entitlement of the current object.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-escape-for-dest-dn": {
+                "description": "Convert a string for use in a destination DN.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-escape-for-src-dn": {
+                "description": "Convert a string for use in a source DN.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-generate-password": {
+                "description": "Generate a random password.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-global-variable": {
+                "description": "Value of a global variable (GCV).",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-join": {
+                "description": "Join a node-set into a string.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-json-array": {
+                "description": "Constructs a JSON array.",
+                "content": "arg-string*"
+              }
+            },
+            {
+              "token-json-object": {
+                "description": "Constructs a JSON string.",
+                "content": "arg-string*"
+              }
+            },
+            {
+              "token-local-variable": {
+                "description": "Value of a local variable.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-lower-case": {
+                "description": "Convert a string to lower case.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-map": {
+                "description": "Map a string through a mapping table.",
+                "content": "token-map-source-col+ | (%TOKENS;)*"
+              }
+            },
+            {
+              "token-map-source-col": {
+                "description": "Used in token-map to have multiple source columns.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-named-password": {
+                "description": "Value of the named password.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-op-attr": {
+                "description": "Value(s) of an attribute only in the current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-op-property": {
+                "description": "Value of an operation property.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-operation": {
+                "description": "Name of the current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-parse-dn": {
+                "description": "Parse and/or convert a DN.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-password": {
+                "description": "Value of the password in current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-query": {
+                "description": "Query the source or destination datastore.",
+                "content": "(arg-dn | arg-association)?, (arg-match-attr | arg-query-condition)*, arg-string*"
+              }
+            },
+            {
+              "token-removed-attr": {
+                "description": "Value(s) of an attribute removed in the current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-removed-entitlement": {
+                "description": "Value(s) of an entitlement revoked in the current operation.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-replace-all": {
+                "description": "Replace all instances of a substring within a string.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-replace-first": {
+                "description": "Replace a single instance of a substring within a string.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-resolve": {
+                "description": "Resolve a DN to an association key or vice versa.",
+                "content": "arg-dn | arg-association"
+              }
+            },
+            {
+              "token-split": {
+                "description": "Split a string into a node-set.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-src-attr": {
+                "description": "Value(s) of an attribute only in the source datastore.",
+                "content": "(arg-dn | arg-association)?"
+              }
+            },
+            {
+              "token-src-dn": {
+                "description": "Value derived from the source DN.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-src-name": {
+                "description": "Unqualified RDN derived from source DN.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-substring": {
+                "description": "Substring of a string.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-text": {
+                "description": "Constant text.",
+                "content": "#PCDATA"
+              }
+            },
+            {
+              "token-time": {
+                "description": "Current date/time.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-unique-name": {
+                "description": "A generated unique name.",
+                "content": "(arg-dn | arg-association)?, arg-string+"
+              }
+            },
+            {
+              "token-unmatched-src-dn": {
+                "description": "A DN relative to the one matched by if-src-dn.",
+                "content": "EMPTY"
+              }
+            },
+            {
+              "token-upper-case": {
+                "description": "Convert a string to upper case.",
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-xml-parse": {
+                "description": "Parse XML. Returns a document node in a node-set.",
+                "is_recursively_defined": true,
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-xml-serialize": {
+                "description": "Serialize a node-set result as XML.",
+                "is_recursively_defined": true,
+                "content": "(%TOKENS;)+"
+              }
+            },
+            {
+              "token-xpath": {
+                "description": "Result of evaluating an XPATH 1.0 expression.",
+                "content": "EMPTY"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

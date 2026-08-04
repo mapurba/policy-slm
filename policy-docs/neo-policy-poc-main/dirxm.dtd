@@ -1,0 +1,1192 @@
+<!-- *********************************************************************** -->
+<!-- DirXMLScript DTD                                                        -->
+<!-- Novell Inc.                                                             -->
+<!-- 1800 South Novell Place                                                 -->
+<!-- Provo, UT 84606-6194                                                    -->
+<!-- Version=1.1.0                                                           -->
+<!-- Copyright 2003-2006 Novell, Inc.  All rights reserved                   -->
+<!-- *********************************************************************** -->
+<!ENTITY % CONDITIONS	"if-association |
+						if-attr |
+						if-class-name |
+						if-dest-attr |
+						if-dest-dn |
+						if-entitlement |
+						if-op-entitlement |
+						if-global-variable |
+						if-local-variable |
+						if-named-password |
+						if-op-attr |
+						if-op-property |
+						if-operation |
+						if-password |
+						if-src-attr |
+						if-src-dn |
+						if-xml-attr |
+						if-xpath">
+<!ENTITY % SCALARMODES	"case |
+						nocase |
+						regex |
+						src-dn |
+						dest-dn |
+						numeric |
+						octet">
+<!ENTITY % MODES 		"case |
+						nocase |
+						regex |
+						src-dn |
+						dest-dn |
+						numeric |
+						octet |
+						structured">
+<!ENTITY % ACTIONS		"do-add-association |
+						do-add-dest-attr-value |
+						do-add-dest-object |
+						do-add-src-attr-value |
+						do-add-src-object |
+						do-add-role |
+						do-add-resource |
+						do-append-xml-element |
+						do-append-xml-text |
+						do-break |
+						do-clear-dest-attr-value |
+						do-clear-op-property |
+						do-clear-src-attr-value |
+						do-clear-sso-credential |
+						do-clone-op-attr |
+						do-clone-xpath |
+						do-create-resource |
+						do-create-role |
+						do-delete-dest-object |
+						do-delete-src-object |
+						do-delete-resource |
+						do-delete-role |
+						do-find-matching-object |
+						do-for-each |
+						do-generate-event |
+						do-generate-xdas-event |
+						do-if |
+						do-implement-entitlement |
+						do-invoke-rest-endpoint |
+						do-modify-resource |
+						do-modify-role |
+						do-move-dest-object |
+						do-move-src-object |
+						do-reformat-op-attr |
+						do-remove-association |
+						do-remove-dest-attr-value |
+						do-remove-named-password |
+						do-remove-role |
+						do-remove-resource |
+						do-remove-src-attr-value |
+						do-rename-dest-object |
+						do-rename-op-attr |
+						do-rename-src-object |
+						do-send-email |
+						do-send-email-from-template |
+						do-set-default-attr-value |
+						do-set-dest-attr-value |
+						do-set-dest-password |
+						do-set-local-variable |
+						do-set-named-password |
+						do-set-op-association |
+						do-set-op-class-name |
+						do-set-op-dest-dn |
+						do-set-op-property |
+						do-set-op-src-dn |
+						do-set-op-template-dn |
+						do-set-src-attr-value |
+						do-set-src-password |
+						do-set-sso-credential |
+						do-set-sso-passphrase |
+						do-set-xml-attr |
+						do-start-workflow |
+						do-status |
+						do-strip-op-attr |
+						do-strip-xpath |
+						do-trace-message |
+						do-veto |
+						do-veto-if-op-attr-not-available |
+						do-while">
+
+
+<!ENTITY % TOKENS		"token-added-entitlement |
+						token-association |
+						token-attr |
+						token-base64-decode |
+						token-base64-encode |
+						token-char |
+						token-class-name |
+						token-convert-time |
+						token-dest-attr |
+						token-dest-dn |
+						token-dest-name |
+						token-document |
+						token-entitlement |
+						token-escape-for-dest-dn |
+						token-escape-for-src-dn |
+						token-generate-password |
+						token-global-variable |
+						token-join |
+						token-json-object |
+						token-json-array |
+						token-local-variable |
+						token-lower-case |
+						token-named-password |
+						token-map |
+						token-op-attr |
+						token-op-property |
+						token-operation |
+						token-parse-dn |
+						token-password |
+						token-query |
+						token-removed-attr |
+						token-removed-entitlement |
+						token-replace-all |
+						token-replace-first |
+						token-resolve |
+						token-split |
+						token-src-attr |
+						token-src-dn |
+						token-src-name |
+						token-substring |
+						token-text |
+						token-time |
+						token-unique-name |
+						token-unmatched-src-dn |
+						token-upper-case |
+						token-xml-parse |
+						token-xml-serialize |
+						token-xpath">
+<!ENTITY % TOKEN_MAP_SOURCE_COL 		"token-map-source-col">
+						<!ENTITY % BOOLEAN 		"true |
+						false">
+<!ENTITY % SEVERITY 	"log-emergency |
+						log-alert |
+						log-critical |
+						log-error |
+						log-warning |
+						log-notice |
+						log-info |
+						log-debug">
+<!ENTITY % MSG_TYPE 	"text |
+						html">
+<!ENTITY % DN_FORMATS 	"src-dn |
+						dest-dn |
+						dot |
+						qualified-dot |
+						slash |
+						qualified-slash |
+						ldap |
+						custom">
+<!ENTITY % COLORS 		"black |
+						blue |
+						green |
+						cyan |
+						red |
+						purple |
+						brown |
+						grey |
+						drgrey |
+						brblue |
+						brgreen |
+						brcyan |
+						brred |
+						brpurple |
+						yellow |
+						white">
+<!ENTITY % WHEN_OPTIONS	"auto |
+						before |
+						after |
+						direct">
+<!ENTITY % OFFSET-UNITS	"second |
+						minute |
+						hour |
+						day |
+						week |
+						month |						
+						year">
+<!ENTITY % TOKEN_MAP_TYPE 	"AND |
+						OR">
+<!ELEMENT policy (description?, (rule | include)*)>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT rule (description?, comment*, conditions, actions)>
+<!ATTLIST rule
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT include EMPTY>
+<!ATTLIST include
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+>
+<!ELEMENT comment (#PCDATA)>
+<!ATTLIST comment
+	name CDATA #IMPLIED
+>
+<!ELEMENT conditions (and* | or*)>
+<!ELEMENT and (%CONDITIONS;)*>
+<!ATTLIST and
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT or (%CONDITIONS;)*>
+<!ATTLIST or
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-association (#PCDATA)>
+<!ATTLIST if-association
+	op (associated | available | equal | lt | gt | not-associated | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "case"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-attr (#PCDATA | component)*>
+<!ATTLIST if-attr
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%MODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT component (#PCDATA)>
+<!ATTLIST component
+	name CDATA #REQUIRED
+>
+
+<!ELEMENT value (#PCDATA)>
+
+<!ELEMENT if-class-name (#PCDATA)>
+<!ATTLIST if-class-name
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "nocase"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-dest-attr (#PCDATA | component | arg-dn | arg-association | value)*>
+<!ATTLIST if-dest-attr
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%MODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	class-name CDATA #IMPLIED
+>
+<!ELEMENT if-dest-dn (#PCDATA)>
+<!ATTLIST if-dest-dn
+	op (available | equal | in-container | in-subtree | not-available | not-equal | not-in-container | not-in-subtree) #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-entitlement (#PCDATA)>
+<!ATTLIST if-entitlement
+	op (available | changing | changing-from | changing-to | equal | lt | gt | not-available | not-changing | not-changing-from | not-changing-to | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-op-entitlement (#PCDATA)>
+<!ATTLIST if-op-entitlement
+	op (available | changing | changing-from | changing-to | equal | lt | gt | not-available | not-changing | not-changing-from | not-changing-to | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-global-variable (#PCDATA)>
+<!ATTLIST if-global-variable
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-local-variable (#PCDATA)>
+<!ATTLIST if-local-variable
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-named-password EMPTY>
+<!ATTLIST if-named-password
+	op (available | not-available) #REQUIRED
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-op-attr (#PCDATA | component)*>
+<!ATTLIST if-op-attr
+	op (available | changing | changing-from | changing-to | equal | lt | gt | not-available | not-changing | not-changing-from | not-changing-to | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%MODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-op-property (#PCDATA)>
+<!ATTLIST if-op-property
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-operation (#PCDATA)>
+<!ATTLIST if-operation
+	op (equal | lt | gt | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "case"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-password (#PCDATA)>
+<!ATTLIST if-password
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "case"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+
+<!ELEMENT if-src-attr  (#PCDATA | component | arg-dn | arg-association | value)*>
+<!ATTLIST if-src-attr
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%MODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	class-name CDATA #IMPLIED
+>
+<!ELEMENT if-src-dn (#PCDATA)>
+<!ATTLIST if-src-dn
+	op (available | equal | in-container | in-subtree | not-available | not-equal | not-in-container | not-in-subtree) #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-xml-attr (#PCDATA)>
+<!ATTLIST if-xml-attr
+	op (available | equal | lt | gt | not-available | not-equal | not-lt | not-gt) #REQUIRED
+	mode (%SCALARMODES;) "nocase"
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT if-xpath (#PCDATA)>
+<!ATTLIST if-xpath
+	op (true | not-true) #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT actions (%ACTIONS;)*>
+<!ELEMENT do-add-association (arg-dn?, arg-association)>
+<!ATTLIST do-add-association
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-add-dest-attr-value ((arg-dn | arg-association)?, arg-value)>
+<!ATTLIST do-add-dest-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-add-dest-object (arg-dn)>
+<!ATTLIST do-add-dest-object
+	class-name CDATA #REQUIRED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-add-role (arg-password, (arg-dn | arg-association)?, arg-string*)>
+<!ATTLIST do-add-role
+	role-id			CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	url 		CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out                CDATA   "0"
+>
+<!ELEMENT do-add-resource (arg-password, (arg-dn | arg-association)?, arg-string*)>
+<!ATTLIST do-add-resource
+	resource-id		CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	url 			CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out		CDATA	"0"
+>
+<!ELEMENT do-add-src-attr-value ((arg-dn | arg-association)?, arg-value)>
+<!ATTLIST do-add-src-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-add-src-object (arg-dn)>
+<!ATTLIST do-add-src-object
+	class-name CDATA #REQUIRED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-append-xml-element EMPTY>
+<!ATTLIST do-append-xml-element
+	name CDATA #REQUIRED
+	expression CDATA #REQUIRED
+	before CDATA #IMPLIED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-append-xml-text (arg-string)>
+<!ATTLIST do-append-xml-text
+	expression CDATA #REQUIRED
+	before CDATA #IMPLIED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-break EMPTY>
+<!ATTLIST do-break
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-clear-dest-attr-value (arg-dn | arg-association)?>
+<!ATTLIST do-clear-dest-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-clear-op-property EMPTY>
+<!ATTLIST do-clear-op-property
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-clear-src-attr-value (arg-dn | arg-association)?>
+<!ATTLIST do-clear-src-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-clear-sso-credential (arg-dn, arg-string*)>
+<!ATTLIST do-clear-sso-credential
+	store-def-dn  CDATA		#REQUIRED
+	app-def-dn  CDATA	#IMPLIED
+	app-id CDATA		#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-clone-op-attr EMPTY>
+<!ATTLIST do-clone-op-attr
+	src-name CDATA #REQUIRED
+	dest-name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-clone-xpath EMPTY>
+<!ATTLIST do-clone-xpath
+	src-expression CDATA #REQUIRED
+	dest-expression CDATA #REQUIRED
+	before CDATA #IMPLIED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-create-resource (arg-password, arg-string*)>
+<!ATTLIST do-create-resource
+	resource-name		CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	url 		CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	use-rest (%BOOLEAN;) "false"
+	osp-clientid	CDATA	""
+	time-out                CDATA   "0"
+>
+<!ELEMENT do-create-role (arg-password, arg-string*)>
+<!ATTLIST do-create-role
+	role-name		CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	url 			CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out		CDATA	"0"
+>
+<!ELEMENT do-delete-dest-object ((arg-dn | arg-association)?)>
+<!ATTLIST do-delete-dest-object
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-delete-src-object ((arg-dn | arg-association)?)>
+<!ATTLIST do-delete-src-object
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-delete-resource (arg-password, arg-string*)>
+<!ATTLIST do-delete-resource
+	id			CDATA	#REQUIRED
+	osp-clientid	CDATA	#REQUIRED
+	url 		CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out                CDATA   "0"
+>
+<!ELEMENT do-delete-role (arg-password, arg-string*)>
+<!ATTLIST do-delete-role
+	id			CDATA	#REQUIRED
+	osp-clientid	CDATA	#REQUIRED
+	url 			CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out		CDATA	"0"
+>
+<!ELEMENT do-find-matching-object ((arg-dn?, (arg-match-attr | arg-query-condition)+) | (arg-dn, (arg-match-attr | arg-query-condition)*))>
+<!ATTLIST do-find-matching-object
+	scope (entry | subordinates | subtree) "subtree"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	return-on-first-match (%BOOLEAN;) "false"
+>
+<!ELEMENT do-for-each (arg-node-set, arg-actions)>
+<!ATTLIST do-for-each
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-generate-event (arg-string*)>
+<!ATTLIST do-generate-event
+	id CDATA #REQUIRED
+	level (%SEVERITY;) "log-info"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-generate-xdas-event (arg-string*)>
+<!ATTLIST do-generate-xdas-event
+	name CDATA #REQUIRED
+	level (%SEVERITY;) "log-info"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-if (arg-conditions, arg-actions, arg-actions?)>
+<!ATTLIST do-if
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-implement-entitlement (arg-node-set, arg-actions)>
+<!ATTLIST do-implement-entitlement
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-invoke-rest-endpoint (arg-password, arg-string*)>
+<!ATTLIST do-invoke-rest-endpoint
+	auth-method		CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	url 		CDATA 	#REQUIRED
+	type 		CDATA 	#REQUIRED
+	auth-url	CDATA	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out                CDATA   "0"
+>
+<!ELEMENT do-modify-resource (arg-password, arg-string*)>
+<!ATTLIST do-modify-resource
+	resource-name		CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	osp-clientid	CDATA	#REQUIRED
+	url 		CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out                CDATA   "0"
+>
+<!ELEMENT do-modify-role (arg-password, arg-string*)>
+<!ATTLIST do-modify-role
+	dn		CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	osp-clientid	CDATA	#REQUIRED
+	url 			CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out		CDATA	"0"
+>
+<!ELEMENT do-move-dest-object ((arg-dn | arg-association)?, (arg-dn | arg-association))>
+<!ATTLIST do-move-dest-object
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-move-src-object ((arg-dn | arg-association)?, (arg-dn | arg-association))>
+<!ATTLIST do-move-src-object
+	class-name CDATA #IMPLIED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-reformat-op-attr (arg-value)>
+<!ATTLIST do-reformat-op-attr
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-remove-association (arg-association)>
+<!ATTLIST do-remove-association
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-rename-dest-object ((arg-dn | arg-association)?, arg-string)>
+<!ATTLIST do-rename-dest-object
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-remove-dest-attr-value ((arg-dn | arg-association)?, arg-value)>
+<!ATTLIST do-remove-dest-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-remove-role (arg-password, (arg-dn | arg-association)?, arg-string*)>
+<!ATTLIST do-remove-role
+	role-id			CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	url 		CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out                CDATA   "0"
+>
+<!ELEMENT do-remove-resource (arg-password, (arg-dn | arg-association)?, arg-string*)>
+<!ATTLIST do-remove-resource
+	resource-id		CDATA	#REQUIRED
+	id			CDATA	#REQUIRED
+	instance-guid		CDATA   "null"
+	url 			CDATA 	#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out		CDATA	"0"
+>
+<!ELEMENT do-remove-src-attr-value ((arg-dn | arg-association)?, arg-value)>
+<!ATTLIST do-remove-src-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-remove-named-password (arg-dn, arg-string)>
+<!ATTLIST do-remove-named-password
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-rename-op-attr EMPTY>
+<!ATTLIST do-rename-op-attr
+	src-name CDATA #REQUIRED
+	dest-name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-rename-src-object ((arg-dn | arg-association)?, arg-string)>
+<!ATTLIST do-rename-src-object
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-send-email (arg-password?, arg-string*)>
+<!ATTLIST do-send-email
+	server CDATA #REQUIRED
+	id CDATA #IMPLIED
+	password CDATA #IMPLIED
+	type (%MSG_TYPE;) "text"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-send-email-from-template (arg-password?, arg-string*)>
+<!ATTLIST do-send-email-from-template
+	notification-dn CDATA #REQUIRED
+	template-dn CDATA #REQUIRED
+	password CDATA #IMPLIED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-op-association (arg-association)>
+<!ATTLIST do-set-op-association
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-op-class-name (arg-string)>
+<!ATTLIST do-set-op-class-name
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-default-attr-value (arg-value+)>
+<!ATTLIST do-set-default-attr-value
+	name CDATA #REQUIRED
+	write-back (%BOOLEAN;) "false"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-dest-attr-value ((arg-dn | arg-association)?, arg-value)>
+<!ATTLIST do-set-dest-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-op-dest-dn (arg-dn)>
+<!ATTLIST do-set-op-dest-dn
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-local-variable (arg-string | arg-node-set | arg-object)>
+<!ATTLIST do-set-local-variable
+	name CDATA #REQUIRED
+	scope (policy | driver) "policy"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-dest-password ((arg-dn | arg-association)?, arg-string, arg-string?)>
+<!ATTLIST do-set-dest-password
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-src-password ((arg-dn | arg-association)?, arg-string, arg-string?)>
+<!ATTLIST do-set-src-password
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-src-attr-value ((arg-dn | arg-association)?, arg-value)>
+<!ATTLIST do-set-src-attr-value
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	direct (%BOOLEAN;) "false"
+	when (%WHEN_OPTIONS;) "auto"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-sso-credential (arg-dn, arg-string*)>
+<!ATTLIST do-set-sso-credential
+	store-def-dn  CDATA		#REQUIRED
+	app-def-dn  CDATA	#IMPLIED
+	app-id CDATA		#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-sso-passphrase (arg-dn, arg-string, arg-string)>
+<!ATTLIST do-set-sso-passphrase
+	store-def-dn  CDATA		#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-op-property (arg-string)>
+<!ATTLIST do-set-op-property
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-op-src-dn (arg-dn)>
+<!ATTLIST do-set-op-src-dn
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-op-template-dn (arg-dn)>
+<!ATTLIST do-set-op-template-dn
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-xml-attr (arg-string)>
+<!ATTLIST do-set-xml-attr
+	name CDATA #REQUIRED
+	expression CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-set-named-password (arg-dn,arg-password, arg-string)>
+<!ATTLIST do-set-named-password
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-start-workflow (arg-password, arg-dn, arg-string*)>
+<!ATTLIST do-start-workflow
+	url	  		CDATA		#REQUIRED
+	id	  		CDATA		#REQUIRED
+	workflow-id	CDATA		#REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+	time-out		CDATA	"0"
+>
+<!ELEMENT do-status (arg-string)>
+<!ATTLIST do-status
+	level CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-strip-op-attr EMPTY>
+<!ATTLIST do-strip-op-attr
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-strip-xpath EMPTY>
+<!ATTLIST do-strip-xpath
+	expression CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-trace-message (arg-string)>
+<!ATTLIST do-trace-message
+	level CDATA "0"
+	color (%COLORS;) "brpurple"
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-veto EMPTY>
+<!ATTLIST do-veto
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-veto-if-op-attr-not-available EMPTY>
+<!ATTLIST do-veto-if-op-attr-not-available
+	name CDATA #REQUIRED
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT do-while (arg-conditions, arg-actions)>
+<!ATTLIST do-while
+	disabled (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT arg-actions (%ACTIONS;)*>
+<!ELEMENT arg-association (%TOKENS;)*>
+<!ELEMENT arg-component (%TOKENS;)*>
+<!ATTLIST arg-component
+	name CDATA #REQUIRED
+>
+<!ELEMENT arg-conditions (and* | or*)>
+<!ELEMENT arg-dn (%TOKENS;)*>
+<!ELEMENT arg-match-attr (arg-value?)>
+<!ATTLIST arg-match-attr
+	name CDATA #REQUIRED
+	search-criteria-id CDATA #IMPLIED
+>
+<!ELEMENT arg-query-condition ((arg-match-attr | arg-query-condition)+)>
+<!ATTLIST arg-query-condition 
+	name (and | or | not) "and"
+	search-criteria-id CDATA #IMPLIED
+>
+<!ELEMENT arg-node-set (%TOKENS;)*>
+<!ELEMENT arg-string (%TOKENS;)*>
+<!ATTLIST arg-string
+	name CDATA #IMPLIED
+>
+<!ELEMENT arg-value (arg-component+ | (%TOKENS;)*)>
+<!ATTLIST arg-value
+	type CDATA "string"
+>
+<!ELEMENT arg-object (token-local-variable | token-xpath)>
+<!ELEMENT token-association EMPTY>
+<!ATTLIST token-association
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT arg-password (%TOKENS;)*>
+<!ELEMENT token-attr EMPTY>
+<!ATTLIST token-attr
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-added-entitlement EMPTY>
+<!ATTLIST token-added-entitlement
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-base64-decode (%TOKENS;)+>
+<!ATTLIST token-base64-decode
+	charset CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-base64-encode (%TOKENS;)+>
+<!ATTLIST token-base64-encode
+	charset CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-char EMPTY>
+<!ATTLIST token-char
+	value CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-class-name EMPTY>
+<!ATTLIST token-class-name
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-convert-time (%TOKENS;)>
+<!ATTLIST token-convert-time
+	src-format  CDATA #REQUIRED
+	src-lang CDATA #IMPLIED
+	src-tz  CDATA #IMPLIED
+	dest-format CDATA #REQUIRED
+	dest-lang CDATA #IMPLIED
+	dest-tz  CDATA #IMPLIED
+	offset  CDATA #IMPLIED
+	offset-unit (%OFFSET-UNITS;) "day"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-dest-attr (arg-dn | arg-association)?>
+<!ATTLIST token-dest-attr
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-dest-dn EMPTY>
+<!ATTLIST token-dest-dn
+	start CDATA "0"
+	length CDATA "-1"
+	convert (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-dest-name EMPTY>
+<!ATTLIST token-dest-name
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-document  (arg-string)>
+<!ATTLIST token-document
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-entitlement EMPTY>
+<!ATTLIST token-entitlement
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-escape-for-dest-dn (%TOKENS;)+>
+<!ATTLIST token-escape-for-dest-dn
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-escape-for-src-dn (%TOKENS;)+>
+<!ATTLIST token-escape-for-src-dn
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-global-variable EMPTY>
+<!ATTLIST token-global-variable
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-generate-password EMPTY>
+<!ATTLIST token-generate-password
+	policy-dn CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-join (%TOKENS;)+>
+<!ATTLIST token-join
+	delimiter CDATA #IMPLIED
+	csv	(%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-json-object (arg-string*)>
+<!ATTLIST token-json-object
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-json-array (arg-string*)>
+<!ATTLIST token-json-array
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-local-variable EMPTY>
+<!ATTLIST token-local-variable
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-lower-case (%TOKENS;)+>
+<!ATTLIST token-lower-case
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-op-attr EMPTY>
+<!ATTLIST token-op-attr
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-map (token-map-source-col+ | (%TOKENS;)*)>
+<!ATTLIST token-map
+	table CDATA #REQUIRED
+	source CDATA #REQUIRED
+	dest CDATA #REQUIRED
+	default-value CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+	type (%TOKEN_MAP_TYPE;) "AND"
+>
+<!ELEMENT token-map-source-col (%TOKENS;)+>
+<!ATTLIST token-map-source-col
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-named-password EMPTY>
+<!ATTLIST token-named-password
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-removed-attr EMPTY>
+<!ATTLIST token-removed-attr
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-op-property EMPTY>
+<!ATTLIST token-op-property
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-operation EMPTY>
+<!ATTLIST token-operation
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-parse-dn (%TOKENS;)+>
+<!ATTLIST token-parse-dn
+	start CDATA "0"
+	length CDATA "-1"
+	src-dn-format (%DN_FORMATS;) "src-dn"
+	dest-dn-format (%DN_FORMATS;) "dest-dn"
+	src-dn-delims CDATA #IMPLIED
+	dest-dn-delims CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-password EMPTY>
+<!ATTLIST token-password
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-query ((arg-dn | arg-association)?, (arg-match-attr | arg-query-condition)*, arg-string*)>
+<!ATTLIST token-query
+	datastore (src | dest) "dest"
+	scope (entry | subordinates | subtree) "subtree"
+	class-name CDATA #IMPLIED
+	max-result-count CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+	get-token (%BOOLEAN;) "true"
+>
+<!ELEMENT token-removed-entitlement EMPTY>
+<!ATTLIST token-removed-entitlement
+	name CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-replace-first (%TOKENS;)+>
+<!ATTLIST token-replace-first
+	regex CDATA #REQUIRED
+	replace-with CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-replace-all (%TOKENS;)+>
+<!ATTLIST token-replace-all
+	regex CDATA #REQUIRED
+	replace-with CDATA #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-resolve (arg-dn | arg-association)>
+<!ATTLIST token-resolve
+	datastore (src | dest) #REQUIRED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-split (%TOKENS;)+>
+<!ATTLIST token-split
+	delimiter CDATA #REQUIRED
+	csv	(%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-src-attr (arg-dn | arg-association)?>
+<!ATTLIST token-src-attr
+	name CDATA #REQUIRED
+	class-name CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-src-dn EMPTY>
+<!ATTLIST token-src-dn
+	start CDATA "0"
+	length CDATA "-1"
+	convert (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-src-name EMPTY>
+<!ATTLIST token-src-name
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-substring (%TOKENS;)+>
+<!ATTLIST token-substring
+	start CDATA "0"
+	length CDATA "-1"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-text (#PCDATA)>
+<!ATTLIST token-text
+	notrace (%BOOLEAN;) "false" 
+	xml:space (default|preserve) 'preserve' 
+>
+<!ELEMENT token-time EMPTY>
+<!ATTLIST token-time
+	format CDATA #REQUIRED
+	lang CDATA #IMPLIED
+	tz CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-unique-name ((arg-dn | arg-association)?, arg-string+)>
+<!ATTLIST token-unique-name
+	scope (subordinates | subtree) "subtree"
+	name CDATA #IMPLIED
+	counter-digits CDATA #IMPLIED
+	counter-start CDATA "1"
+	counter-pad (%BOOLEAN;) "true"
+	counter-use (always | never | fallback) "fallback"
+	counter-pattern (first | last | all) "last"
+	on-unavailable (ignore | warning | error | fatal) "error"
+	notrace (%BOOLEAN;) "false"
+	test-all-objects (%BOOLEAN;) "false"
+>
+<!ELEMENT token-unmatched-src-dn EMPTY>
+<!ATTLIST token-unmatched-src-dn
+	convert (%BOOLEAN;) "false"
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-upper-case (%TOKENS;)+>
+<!ATTLIST token-upper-case
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-xpath EMPTY>
+<!ATTLIST token-xpath
+	expression CDATA #IMPLIED
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-xml-parse (%TOKENS;)+>
+<!ATTLIST token-xml-parse
+	notrace (%BOOLEAN;) "false"
+>
+<!ELEMENT token-xml-serialize (%TOKENS;)+>
+<!ATTLIST token-xml-serialize
+	notrace (%BOOLEAN;) "false"
+>

@@ -1,0 +1,140 @@
+DirXMLScript DTD: do-modify-role element
+
+
+
+# do-modify-role
+
+The **<do-modify-role>** action initiates a request to the Roles Based Provisioning Module (RBPM)
+to modify the Role specified by *dn*. The request is made to the RBPM enabled User
+Application server specified by *url* using credentials specified by *id* and the first
+[<arg-password>](arg-password.html). This action uses IDM REST api
+which in turn uses the OAuth2 protocol for authentication. The OSP client id needed for this
+authentication should be specified by *osp-clientid*. And the client password should be
+specified by the second [<arg-password>](arg-password.html).
+Additional optional arguments to the Role modification request may be specified by named
+[<arg-string>](arg-string.html)'s.
+
+> | Name | Description |
+> | --- | --- |
+> | category-key | The Role Category from one of *system*, *default* or both. |
+> | owner | The owner of the Role in LDAP format.  *Multiple owners are allowed.* |
+> | grant-approver | Role assignment approver in LDAP format.  *Multiple approvers are allowed.* |
+> | grant-quorum | Grant Qourum is the minimum % of approvals required. |
+> | resource-association | Resource association for this role. It should have resource name, resource association description   and the entitlement value separated by semi colon(;) as mentioned below.  *Resource Name in LDAP format;Resource association description;Entitlement Value.*  For Static resource, entitlement value is not needed.  Multiple resource-association elements can be added to associate multiple resources with this role. |
+> | role-association | Role assignment for this role. It should have role name, role assignment description   and the Role relationship separated by semi colon(;) as mentioned below.  *Role Name in LDAP format;Role assignment description;Relationship.*  Relationship can be one of *child* or *parent*.  Multiple role-association elements can be added to assign multiple roles to this role. |
+> | revoke-required | Is approval needed for revocation. |
+
+There will be one of these two local variables available to the enclosing policy
+depending on the success or failure of this request.  
+
+* *success.do-modify-role* : This local variable will be available only if the
+  role is modified successfully. And it contains the DN of the modified role.
+* *error.do-modify-role* : This local variable will be available only if any
+  type of error occurs while creating the role. And it contains the error string.
+
+### Example
+
+> ```
+>
+> <do-modify-role
+> 	id="CN=UAAdmin,OU=Sa,O=Data"
+> 	url="http://localhost:8080/IDMProv"
+> 	osp-clientid="rbpm"
+> 	dn="cn=PrinterAdmin,cn=level30,cn=roledefs,cn=roleconfig,cn=appconfig,cn=user application driver,cn=driverset1,o=system"
+> 	time-out="30000">
+>   <arg-password>
+>     <token-named-password name="role-admin"/>
+>   </arg-password>
+>   <arg-password>
+>     <token-named-password name="osp-client-secret"/>
+>   </arg-password>
+>   <arg-string name="category-key">
+>     <token-text>system</token-text>
+>   </arg-string>
+>     <arg-string name="category-key">
+>     <token-text>default</token-text>
+>   </arg-string>
+>   <arg-string name="owner">
+>     <token-text xml:space="preserve">cn=Contractors,ou=Groups,o=Data</token-text>
+>   </arg-string>
+>   <arg-string name="grant-approver">
+>     <token-text xml:space="preserve">cn=manager,ou=Users,o=Data</token-text>
+>   </arg-string>
+>   <arg-string name="grant-approver">
+>     <token-text xml:space="preserve">cn=Director,ou=Users,o=Data</token-text>
+>   </arg-string>
+>   <arg-string name="grant-quorum">
+>     <token-text>50</token-text>
+>   </arg-string>
+>   <arg-string name="revoke-required">
+>     <token-text>true</token-text>
+>   </arg-string>
+>   <arg-string name="resource-association">
+>     <token-text xml:space="preserve">cn=Group,cn=ResourceDefs,cn=RoleConfig,cn=AppConfig,cn=User Application Driver,cn=driverset1,o=system;Test Description;{"ID":"25713f856ecfb24986ebc35bcd581906","ID2":"CN=Administrators,CN=Builtin,DC=idmseup2,DC=org"}</token-text>
+>   </arg-string>
+>   <arg-string name="role-association">
+>     <token-text xml:space="preserve">cn=Auditor,cn=Level20,cn=RoleDefs,cn=RoleConfig,cn=AppConfig,cn=User Application Driver,cn=driverset1,o=system;Test Description;child</token-text>
+>   </arg-string>
+> </do-modify-role>
+>
+> ```
+
+<details>
+<summary><strong>Click to expand allowed content</strong></summary>
+
+## 1. Allowed Content
+
+> [**arg-password**](arg-password.html)
+> :   password argument
+>
+> [**arg-string**](arg-string.html)
+> :   string argument
+>
+> ---
+
+## 2. Attributes
+
+> | Attribute | Value(s) | Default Value |
+> | --- | --- | --- |
+> | **disabled** | true   |  false   *true* if this element is disabled | false |
+> | **dn** | **CDATA**   {description of dn} | #REQUIRED |
+> | **id** | **CDATA**   the LDAP format DN of a user authorized to make the request *supports variable expansion* | #REQUIRED |
+> | **notrace** | true   |  false   *true*if this element should not be traced during execution of policy | false |
+> | **osp-clientid** | **CDATA**   the client id to authenticate to osp.  *supports variable expansion* | #REQUIRED |
+> | **time-out** | **CDATA**   the number of milliseconds to wait to establish a connection to the User Application server before timing out.  *supports variable expansion* | 0 |
+> | **url** | **CDATA**   the URL of the User Application server hosting RBPM  *supports variable expansion* | #REQUIRED |
+>
+> ---
+
+## 3. Content Rule
+
+> ( [arg-password](arg-password.html) , [arg-string](arg-string.html) \* ) 
+>
+> ---
+
+
+<details>
+<summary>## 4. <strong>Parent Elements</strong></summary>
+
+## 4. <strong>Parent Elements</strong>
+
+> [**actions**](actions.html)
+> :   actions that are performed by a <rule>
+>
+> [**arg-actions**](arg-actions.html)
+> :   actions argument
+
+---
+
+[**Top Elements**](TOP-ELEM.html) ||
+[**All Elements**](ALL-ELEM.html)
+|| [**Tree**](DTD-TREE.html#do-modify-role)
+
+---
+
+[DirXMLScript DTD](index.html)
+
+</details>
+
+
+</details>
