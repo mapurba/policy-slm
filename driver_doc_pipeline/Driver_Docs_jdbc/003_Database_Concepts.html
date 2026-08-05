@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="database-of-jdbc-driver-identity-manager,introduction-to-identity-manager-jdbc-driver,data-sync-components-for-identity-manager-jdbc-driver,how-jdbc-driver-works,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Database Concepts - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="database-of-jdbc-driver-identity-manager">
+
+<h1 class="title h1"><span class="number">1.2</span> Database Concepts</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#bw592r9" class="xref">Structured Query Language</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#af88atp" class="xref">Data Manipulation Language</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#af88axv" class="xref">Data Definition Language</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#bvle5hd" class="xref">View</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#aigh647" class="xref">Identity Columns/Sequences</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#af88eo5" class="xref">Transaction</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#aieg1wp" class="xref">Stored Procedures or Functions</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#af88b0z" class="xref">Trigger</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="database-of-jdbc-driver-identity-manager.html#bvleh38" class="xref">Instead-Of-Trigger</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bw592r9">
+
+<h2 class="title h2"><span class="number">1.2.1</span> Structured Query Language</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Structured Query Language (SQL) is the language used to query and manipulate data in relational databases.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="af88atp">
+
+<h2 class="title h2"><span class="number">1.2.2</span> Data Manipulation Language</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Data Manipulation Language (DML) statements are highly standardized SQL statements that manipulate database data.</p>
+<p class="para">DML statements are essentially the same, regardless of the database that you use. The JDBC driver is DML-based. It maps Identity Manager events expressed as XDS XML to standardized DML statements.</p>
+<p class="para">The following example shows several DML statements:</p><pre class="screen">SELECT * FROM usr;
+INSERT INTO usr(lname) VALUES('Doe');
+UPDATE usr SET fname = 'John' WHERE idu = 1;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="af88axv">
+
+<h2 class="title h2"><span class="number">1.2.3</span> Data Definition Language</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Data Definition Language (DDL) statements manipulate database objects such as tables, indexes, and user accounts.</p>
+<p class="para">DDL statements are proprietary and differ substantially between databases. Even though the JDBC driver is DML-based, you can embed DDL statements in XDS events. For additional information, refer to <a href="embed-sql-statements-in-xds-events-for-jdbc-driver.html" class="xref">Section 12.0, Embedded SQL Statements in XDS Events</a>,</p>
+<p class="para">The following examples show several DDL statements:</p><pre class="screen">CREATE TABLE usr
+(
+    idu   INTEGER,
+    fname VARCHAR2(64),
+    lname VARCHAR2(64)
+);
+
+CREATE USER idm IDENTIFIED BY novell;</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Examples used throughout this guide are for the Oracle database.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bvle5hd">
+
+<h2 class="title h2"><span class="number">1.2.4</span> View</h2>
+
+<div class="content_wrapper">
+
+<p class="para">A view is a logical table.</p>
+<p class="para">When queried by using a <span class="literal">SELECT</span> statement, the view is created by executing the SQL query supplied when the view was defined. Views are a useful abstraction mechanism for representing multiple tables of arbitrary structure as a single table or logical database class.</p><pre class="screen">CREATE VIEW view_usr
+(
+    pk_idu,
+    fname,
+    lname
+)
+AS
+SELECT idu, fname, lname from usr;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="aigh647">
+
+<h2 class="title h2"><span class="number">1.2.5</span> Identity Columns/Sequences</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Identity columns and sequences are used to generate unique primary key values. Identity Manager can associate with these values, among other things.</p>
+<p class="para">An identity column is a self-incrementing column used to uniquely identify a row in a table. Identity column values are automatically filled in when a row is inserted into a table.</p>
+<p class="para">A sequence object is a counter that can be used to uniquely identify a row in a table. Unlike an identity column, a sequence object is not bound to a single table. However, if it is used by a single table, a sequence object can be used to achieve an equivalent result.</p>
+<p class="para">The following is an example of a sequence object:</p><pre class="screen">CREATE SEQUENCE seq_idu
+    START WITH 1
+    INCREMENT BY 1
+    NOMINVALUE
+    NOMAXVALUE
+    ORDER;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="af88eo5">
+
+<h2 class="title h2"><span class="number">1.2.6</span> Transaction</h2>
+
+<div class="content_wrapper">
+
+<p class="para">A transaction is an atomic database operation that consists of one or more statements.</p>
+<p class="para">When a transaction is complete, all statements in the transaction are committed. When a transaction is interrupted or one of the statements in the transaction has an error, the transaction is said to roll back. When a transaction is rolled back, the database is left in the same state it was before the transaction began.</p>
+<p class="para">Transactions are either manual (user-defined) or automatic. Manual transactions can consist of one or more statements and must be explicitly committed. Automatic transactions consist of a single statement and are implicitly committed after each statement is executed.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="database-of-jdbc-driver-identity-manager.html#bgyky4i" class="xref">Manual (User-Defined) Transactions</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="database-of-jdbc-driver-identity-manager.html#bgykyar" class="xref">Automatic Transactions</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bgyky4i">
+
+<h3 class="title h3">Manual (User-Defined) Transactions</h3>
+
+<p class="para">Manual transactions usually contain more than one statement. DDL statements typically cannot be grouped with DML statements in a manual transaction.</p>
+<p class="para">The following example illustrates a manual transaction:</p><pre class="screen">SET AUTOCOMMIT OFF
+INSERT INTO usr(lname) VALUES('Doe');
+UPDATE usr SET fname = 'John' WHERE idu = 1;
+COMMIT; -- explicit commit</pre>
+</div>
+
+<div class="container sect3" id="bgykyar">
+
+<h3 class="title h3">Automatic Transactions</h3>
+
+<p class="para">Automatic transactions consist of only one statement. They are often referred to as auto-committed statements because changes are implicitly committed after each statement. An auto-committed statement is autonomous of any other statement.</p>
+<p class="para">The following example illustrates an automatic transaction:</p><pre class="screen">SET AUTOCOMMIT ON
+INSERT INTO emp(lname) VALUES('Doe');
+-- implicit commit</pre>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="aieg1wp">
+
+<h2 class="title h2"><span class="number">1.2.7</span> Stored Procedures or Functions</h2>
+
+<div class="content_wrapper">
+
+<p class="para">A stored procedure or function is programmatic logic stored in a database. Stored procedures or functions can be invoked from almost any context.</p>
+<p class="para">The Subscriber channel can use stored procedures or functions to retrieve primary key values from rows inserted into tables, to create associations. Stored procedures or functions can also be invoked from within embedded SQL statements or triggers.</p>
+<p class="para">The distinction between stored procedures and functions varies by database. Typically, both can return output, but they differ in how they do it. Stored procedures usually return values through parameters. Functions usually return values through a scalar return value or result set.</p>
+<p class="para">The following example illustrates a stored procedure definition that returns the next value of a sequence object:</p><pre class="screen">CREATE SEQUENCE seq_idu
+    START WITH 1
+    INCREMENT BY 1
+    NOMINVALUE
+    NOMAXVALUE
+    ORDER;</pre><pre class="screen">CREATE
+PROCEDURE sp_idu(    io_idu IN OUT INTEGER)
+IS
+BEGIN
+    IF (io_idu IS NULL) THEN
+      SELECT seq_idu.nextval INTO io_idu FROM DUAL;
+END IF;
+END sp_idu;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="af88b0z">
+
+<h2 class="title h2"><span class="number">1.2.8</span> Trigger</h2>
+
+<div class="content_wrapper">
+
+<p class="para">A database trigger is programmatic logic associated with a table, which executes under certain conditions. A trigger is said to fire when its execution criteria are met.</p>
+<p class="para">Triggers are often useful for creating side effects in a database. In the context of the JDBC driver, triggers are useful to capture event publications. The following is an example of a database trigger on the <span class="literal">usr</span> table.</p><pre class="screen">CREATE TABLE usr
+(
+    idu   INTEGER,
+    fname VARCHAR2(64),
+    lname VARCHAR2(64)
+);</pre><pre class="screen">-- t = trigger; i = insert
+CREATE TRIGGER t_usr_i
+    AFTER INSERT ON usr
+    FOR EACH ROW
+
+BEGIN
+    UPDATE usr SET fname = 'John';
+END;</pre>
+<p class="para">When a statement is executed against a table with triggers, a trigger fires if the statement satisfies the conditions specified in the trigger. For example, using the above table, suppose the following insert statement is executed:</p><pre class="screen">INSERT INTO usr(lname) VALUES('Doe')</pre>
+<p class="para">Trigger <span class="literal">t_emp_i</span> fires after the insert statement is executed, and the following update statement is also executed:</p><pre class="screen">UPDATE usr SET fname = 'John'</pre>
+<p class="para">A trigger can typically be fired before or after the statement that triggered it. Statements that are executed as part of a database trigger are typically included in the same transaction as the triggering statement. In the above example, both the <span class="literal">INSERT</span> and <span class="literal">UPDATE</span> statements are committed or rolled back together.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bvleh38">
+
+<h2 class="title h2"><span class="number">1.2.9</span> Instead-Of-Trigger</h2>
+
+<div class="content_wrapper">
+
+<p class="para">An instead-of-trigger is programmatic logic associated with a view, which executes under certain conditions.</p>
+<p class="para">Instead-of-triggers are useful for making views writable or subscribeable. They are often used to define what it means to <span class="literal">INSERT</span>, <span class="literal">UPDATE</span>, and <span class="literal">DELETE</span> from a view. The following is an example of an instead-of-trigger on the <span class="literal">usr</span> table.</p><pre class="screen">CREATE TABLE usr
+(
+    idu   INTEGER,
+    fname VARCHAR2(64),
+    lname VARCHAR2(64)
+);</pre><pre class="screen">CREATE VIEW view_usr
+(
+    pk_idu,
+    fname,
+    lname
+)
+AS
+SELECT idu, fname, lname from usr;
+-- t = trigger; i = insert
+CREATE TRIGGER t_view_usr_i
+    INSTEAD OF INSERT ON usr
+BEGIN
+    INSERT INTO usr(idu, fname, lname)
+      VALUES(:NEW.pk_idu, :NEW.fname, :NEW.lname);
+END;</pre>
+<p class="para">When a statement is executed against a view with instead-of-triggers, an instead-of-trigger executes if the statement satisfies the conditions specified in the trigger. Unlike triggers, instead-of-triggers always execute before the triggering statement. Also, unlike regular triggers, instead-of-triggers are executed instead of, not in addition to, the triggering statement.</p>
+<p class="para">For example, using the above view, suppose the following insert statement is executed instead of the original insert statement:</p><pre class="screen">INSERT INTO view_usr(pk_idu, fname, lname)
+    VALUES(1, âJohn', âDoe')</pre>
+<p class="para">Rather than executing the original statement, instead-of-trigger <span class="literal">t_view_usr_i</span> fires and executes the following statement:</p><pre class="screen">INSERT INTO usr(idu, fname, lname)
+    VALUES(:NEW.pk_idu, :NEW.fname, :NEW.lname);</pre>
+<p class="para">In this example, the statements happen to be equivalent.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

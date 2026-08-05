@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="driver_concepts,overview,overview,support_for_standard_driver_features,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Concepts - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="driver_concepts">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Concepts</h1>
+
+<div class="content_wrapper">
+
+</div>
+
+<div class="container sect2 expanding expanded" id="data_transfer_between_systems">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Data Transfer Between Systems</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Identity Manager drivers support two data transfer channels between the Identity Vault and the connected system, called the Publisher and Subscriber channels. The Publisher channel handles data and events from the connected system into the Identity Vault. The Subscriber channel handles data and events from the Identity Vault into the connected system.</p>
+<p class="para">The GÂ Suite Driver only supports data transfers from the Identity Vault into Google Apps. Communication is one-way only. Communication channels are discussed in the following sections:</p>
+<div class="container sect3" id="bookmark4">
+
+<h3 class="title h3">The Publisher Channel</h3>
+
+<p class="para">The Publisher Channel is not currently supported by this driver.</p>
+</div>
+
+<div class="container sect3" id="bookmark5">
+
+<h3 class="title h3">The Subscriber Channel</h3>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Monitors the Identity Vault for new objects and changes to existing objects.</p></li>
+<li class="listitem">
+<p class="listitem">Any relevant changes are sent to the shim to be executed in the Google Apps system.</p></li></ul></div>
+
+<p class="para" id="how_the_driver_works">Through the use of filters and policies, the driver can be configured to control and manage what changes are detected and sent to Google Apps.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g45hsxv">
+
+<h2 class="title h2"><span class="number">1.1.2</span> How the Driver Works</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following diagram illustrates the data flow between Identity Manager and Google Apps APIâs:</p>
+<div class="figure" id="t4cbmh9g2rdf"><p class="title"><em class="num">Figure 1-1 </em>G Suite Driver Data Flow</p>
+              <img src="../graphics/figure01.png" alt="" />
+            </div>
+
+<p class="para">The Identity Manager engine uses XDS, a specialized form of XML, to represent events in the Identity Vault. Identity Manager passes the XDS to the driver policy, which can consist of basic policies, DirXML Script, and XSLT style sheets.</p>
+<p class="para">After driver policy has been applied, the driver shim communicates securely over https to the Google Apps API's for your domain. The results are then communicated back to the driver. The driver then processes that information converting it into an appropriate XDS that is reported back to the Identity Manager engine.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="understanding_the_google_api_s">
+
+<h2 class="title h2"><span class="number">1.1.3</span> Understanding the Google APIs</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Google has many different APIs available for managing data into and out of the many different Google applications. API Access must be turned on in the GÂ Suite Admin Console. The driver supports the following APIs:</p>
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Directory API</dt>
+<dd class="listitem">
+<p class="listitem">â The Directory API is responsible for creating users and group objects. ItÂ isÂ required to turn this API on inside the GÂ Suite Admin Console.</p></dd>
+
+          
+<dt class="term">Contact API *</dt>
+<dd class="listitem">
+<p class="listitem">â The Contacts API creates a Domain Contact inside of the Address Book (Contacts).</p></dd>
+
+          
+<dt class="term">Groups Settings API</dt>
+<dd class="listitem">
+<p class="listitem">â The Groups Settings API provides enhanced control of permissions and other group attributes.</p></dd>
+
+          
+<dt class="term">GMAIL API</dt>
+<dd class="listitem">
+<p class="listitem">â Gmail user account settings, labels, forwarding, send as, and delegation</p></dd>
+
+        </dl></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The Contact API Add events may not show in the GÂ Suite Admin Console and Address Book (Contacts) for up to 24 hours even though they are usable objects right away. Modify events will show immediately.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

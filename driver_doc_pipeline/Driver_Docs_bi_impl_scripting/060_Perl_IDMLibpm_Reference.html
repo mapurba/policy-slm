@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b8nqjm3,b8npkix,b8npkdf,bf1m36m,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Perl (IDMLib.pm) Reference - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b8nqjm3">
+
+<h1 class="title h1"><span class="number">C.2</span> Perl (IDMLib.pm) Reference</h1>
+
+<div class="content_wrapper">
+
+<p class="para">These scripts are written for the Linux and UNIX Perl interpreter. They are located in the scripts folder below the folder where the driver was installed (<span class="filename">/opt/novell/usdrv/</span> by default).</p>
+<p class="para">Subscriber events are submitted to <span class="filename">subscriber.pl,</span> which then calls the script for the event. Modify the Perl script file corresponding to the event type: <span class="filename">add.pl</span>, <span class="filename">modify.pl</span>, <span class="filename">modify-password.pl, delete.pl, move.pl, rename.pl.</span> Queries of the external system should be handled in <span class="filename">query.pl</span>.</p>
+<p class="para">The Publisher calls <span class="filename">poll.pl</span> periodically. The frequency of the poll is determined by the Polling Interval driver parameter (60 seconds by default). Edit <span class="filename">poll.pl</span> to allow the driver to respond to events in the external account management system.</p>
+<p class="para">The Publisher calls <span class="filename">heartbeat.pl</span> periodically to determine whether the external account management system is responding correctly.</p>
+<p class="para">The built-in functions below are defined in <span class="filename">IDMLib.pm</span>.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nqjm4">
+
+<h2 class="title h2"><span class="number">C.2.1</span> General Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjm5" class="xref">idmgetvar($ParamName)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjm6" class="xref">idmtrace($Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjm7" class="xref">exec($Command)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjm8" class="xref">status($Level, $Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjm9" class="xref">status_success($Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjma" class="xref">status_warning($Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmb" class="xref">status_retry($Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmc" class="xref">status_error($Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmd" class="xref">status_fatal($Message)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b8nqjm5">
+
+<h3 class="title h3">idmgetvar($ParamName)</h3>
+
+<p class="para">Returns the string value for the Driver parameter specified by the string ParamName.</p>
+</div>
+
+<div class="container sect3" id="b8nqjm6">
+
+<h3 class="title h3">idmtrace($Message)</h3>
+
+<p class="para">Appends the specified message to the user-defined trace file.</p>
+</div>
+
+<div class="container sect3" id="b8nqjm7">
+
+<h3 class="title h3">exec($Command)</h3>
+
+<p class="para">Executes an external program using the specified command line, and returns its numerical exit code on completion.</p>
+</div>
+
+<div class="container sect3" id="b8nqjm8">
+
+<h3 class="title h3">status($Level, $Message)</h3>
+
+<p class="para">Sends a status document with given level and message to return to the Identity Manager engine when the script completes.</p>
+<p class="para">The status document as seen by the engine looks like the following:</p><pre class="screen">  &lt;status level="success"&gt;This is a message&lt;/status&gt;</pre>
+</div>
+
+<div class="container sect3" id="b8nqjm9">
+
+<h3 class="title h3">status_success($Message)</h3>
+
+<p class="para">Sends a status document with a success level and message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="b8nqjma">
+
+<h3 class="title h3">status_warning($Message)</h3>
+
+<p class="para">Sends a status document with a warning level and message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="b8nqjmb">
+
+<h3 class="title h3">status_retry($Message)</h3>
+
+<p class="para">Sends a status document with a retry level and message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="b8nqjmc">
+
+<h3 class="title h3">status_error($Message)</h3>
+
+<p class="para">Sends a status document with a error level and message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="b8nqjmd">
+
+<h3 class="title h3">status_fatal($Message)</h3>
+
+<p class="para">Sends a status document with a fatal level and message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nqjme">
+
+<h2 class="title h2"><span class="number">C.2.2</span> Subscriber Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmf" class="xref">idmgetsubvar($ParamName)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmg" class="xref">idmgetvar($Name)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmh" class="xref">idmsetvar($Name, $Value)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b8nqjmf">
+
+<h3 class="title h3">idmgetsubvar($ParamName)</h3>
+
+<p class="para">Returns the string value for the Subscriber parameter specified by the string ParamName.</p>
+</div>
+
+<div class="container sect3" id="b8nqjmg">
+
+<h3 class="title h3">idmgetvar($Name)</h3>
+
+<p class="para">Returns a string value for the item specified by Name through standard output. If no values exist, Empty is returned. If the value is multi-valued, each value is separated by a newline character.</p>
+</div>
+
+<div class="container sect3" id="b8nqjmh">
+
+<h3 class="title h3">idmsetvar($Name, $Value)</h3>
+
+<p class="para">Sets a single string value for the item specified by Name to be returned to the driver engine.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nqjmi">
+
+<h2 class="title h2"><span class="number">C.2.3</span> Publisher Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmj" class="xref">idmgetpubvar($ParamName)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b8nqjmj">
+
+<h3 class="title h3">idmgetpubvar($ParamName)</h3>
+
+<p class="para">Returns the string value for the Publisher parameter specified by the string ParamName.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nqjmk">
+
+<h2 class="title h2"><span class="number">C.2.4</span> Query Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjml" class="xref">idmquery($ClassName, $Association, $ReadAttrs)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmm" class="xref">idmgetqva($ParamName)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b8nqjml">
+
+<h3 class="title h3">idmquery($ClassName, $Association, $ReadAttrs)</h3>
+
+<p class="para">Performs a query to the engine with the given ClassName, Association and ReadAttrs.</p>
+</div>
+
+<div class="container sect3" id="b8nqjmm">
+
+<h3 class="title h3">idmgetqva($ParamName)</h3>
+
+<p class="para">Retrieves a string value for the query result item, specified by ParamName, through standard output. If no values exist, Empty is returned. If the value is multi-valued, each value is separated by a newline character.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nqjmn">
+
+<h2 class="title h2"><span class="number">C.2.5</span> Heartbeat Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmo" class="xref">heartbeat_success($Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmp" class="xref">heartbeat_error($Message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8nqjm3.html#b8nqjmq" class="xref">heartbeat_warning($Message)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b8nqjmo">
+
+<h3 class="title h3">heartbeat_success($Message)</h3>
+
+<p class="para">Use these functions in the <span class="filename">heartbeat.sh</span> script to indicate the status of the external application. Heartbeat documents are sent to the engine in following format:</p><pre class="screen">  &lt;status level="success" type="heartbeat"&gt;This is a heartbeat message&lt;/status&gt;</pre>
+</div>
+
+<div class="container sect3" id="b8nqjmp">
+
+<h3 class="title h3">heartbeat_error($Message)</h3>
+
+<p class="para">Use these functions in the <span class="filename">heartbeat.sh</span> script to indicate the status of the external application. Heartbeat documents are sent to the engine in following format:</p><pre class="screen">  &lt;status level="success" type="heartbeat"&gt;This is a heartbeat message&lt;/status&gt;</pre>
+</div>
+
+<div class="container sect3" id="b8nqjmq">
+
+<h3 class="title h3">heartbeat_warning($Message)</h3>
+
+<p class="para">Use these functions in the <span class="filename">heartbeat.sh</span> script to indicate the status of the external application. Heartbeat documents are sent to the engine in following format:</p><pre class="screen">  &lt;status level="success" type="heartbeat"&gt;This is a heartbeat message&lt;/status&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

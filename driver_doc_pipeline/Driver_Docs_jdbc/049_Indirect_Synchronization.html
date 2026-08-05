@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="indirect-synchronization,schema-mapping,logical-database-classes,direct-synchronization,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Indirect Synchronization - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="indirect-synchronization">
+
+<h1 class="title h1"><span class="number">9.3</span> Indirect Synchronization</h1>
+
+<div class="content_wrapper">
+
+<p class="para">In an indirect synchronization model, the driver maps the following:</p>
+<div class="table" id="b87s0ak"><p class="title"><em class="num">Table 9-2 </em>Mappings in Indirect Synchronization</p>
+<table class="topbot" width="95%"><col width="28%" /><col width="72%" />
+            
+<tr class="headerrow" id="b87s0al"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Object</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Database Object</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s0am"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Classes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Tables</p></td>
+</tr>
+<tr class="evenrow" id="b87s0an"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Attributes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Columns</p></td>
+</tr>
+<tr class="oddrow" id="b87s0ao"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1 Class</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1 parent table</p>
+<p class="para">and</p>
+<p class="para">0 or more child tables</p></td>
+</tr>
+<tr class="evenrow" id="b87s0ap"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Single-value attribute</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Parent table column</p></td>
+</tr>
+<tr class="oddrow" id="b87s0aq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Multivalue attribute</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Parent table column (holding delimited values)</p>
+<p class="para">or</p>
+<p class="para">Child table column (preferred)</p></td>
+</tr></table>
+</div>
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="indirect-synchronization.html#b87s0ar" class="xref">Mapping eDirectory Classes to Logical Database Classes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="indirect-synchronization.html#b87s0as" class="xref">Parent Tables</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="indirect-synchronization.html#b87s0av" class="xref">Parent Table Columns</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="indirect-synchronization.html#b87s0aw" class="xref">Child Tables</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="indirect-synchronization.html#b87s0b1" class="xref">Referential Attributes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="indirect-synchronization.html#b87s0b2" class="xref">Single-Value Referential Attributes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="indirect-synchronization.html#b87s0b3" class="xref">Multivalue Referential Attributes</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0ar">
+
+<h2 class="title h2"><span class="number">9.3.1</span> Mapping eDirectory Classes to Logical Database Classes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">In the following example, the logical database class <span class="literal">usr</span> consists of the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">One parent table <span class="literal">usr</span></p></li>
+<li class="listitem">
+<p class="listitem">Two child tables: <span class="literal">usr_phone</span> and <span class="literal">usr_faxno</span>.</p></li></ul></div>
+
+<p class="para">Logical class <span class="literal">usr</span> is mapped to the eDirectory class User.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+    idu         INTEGER  NOT NULL,
+    fname       VARCHAR2(64),
+    lname       CHAR(64),
+    pwdminlen   NUMBER(4),
+    pwdexptime  DATE,
+    disabled    NUMBER(1),
+    username    VARCHAR2(64),
+    loginame    VARCHAR2(64),
+    photo       LONG RAW,
+    manager     INTEGER,
+    CONSTRAINT pk_usr_idu     PRIMARY KEY (idu),
+    CONSTRAINT fk_usr_manager FOREIGN KEY (manager)
+Â Â Â Â Â Â Â Â REFERENCES indirect.usr(idu) 
+)</pre><pre class="screen">CREATE TABLE indirect.usr_phone
+(
+    idu      INTEGER       NOT NULL,
+    phoneno  VARCHAR2(64)  NOT NULL,
+    CONSTRAINT fk_phone_idu FOREIGN KEY (idu)
+Â Â Â Â Â Â Â Â REFERENCES indirect.usr(idu)
+)</pre><pre class="screen">CREATE TABLE indirect.usr_fax
+(
+    idu    INTEGER       NOT NULL,
+    faxno  VARCHAR2(64)  NOT NULL,
+    CONSTRAINT fk_fax_idu FOREIGN KEY (idu)
+Â Â Â Â Â Â Â Â REFERENCES indirect.usr(idu)            
+)</pre><pre class="screen">&lt;rule name="Schema Mapping Rule"&gt;
+    &lt;attr-name-map&gt;
+        &lt;class-name&gt;
+            &lt;nds-name&gt;User&lt;/nds-name&gt;
+            &lt;app-name&gt;indirect.usr&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Given Name&lt;/nds-name&gt;
+            &lt;app-name&gt;fname&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Surname&lt;/nds-name&gt;
+            &lt;app-name&gt;lname&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Password Expiration Time&lt;/nds-name&gt;
+            &lt;app-name&gt;pwdexptime&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;jpegPhoto&lt;/nds-name&gt;
+            &lt;app-name&gt;photo&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;manager&lt;/nds-name&gt;
+            &lt;app-name&gt;manager&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Password Minimum Length&lt;/nds-name&gt;
+            &lt;app-name&gt;pwdminlen&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Facsimile Telephone Number&lt;/nds-name&gt;
+            &lt;app-name&gt;usr_fax.faxno&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Telephone Number&lt;/nds-name&gt;
+            &lt;app-name&gt;usr_phone.phoneno&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Login Disabled&lt;/nds-name&gt;
+            &lt;app-name&gt;disabled&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+    &lt;/attr-name-map&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0as">
+
+<h2 class="title h2"><span class="number">9.3.2</span> Parent Tables</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Parent tables are tables with an explicit primary key constraint that contains one or more columns. In a parent table, an explicit primary key constraint is required so that the driver knows which fields to include in an association value.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+    idu  INTEGER  NOT NULL,
+    -- ...
+    <span class="command">CONSTRAINT pk_usr_idu PRIMARY KEY (idu)</span>
+)</pre>
+<p class="para">The following table contains sample data for table <span class="literal">indirect.usr</span>.</p>
+<div class="informaltable">
+<table class="topbot" width="95%"><col width="31%" /><col width="34%" /><col width="34%" />
+              
+<tr class="headerrow" id="b87s0at"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">idu</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">fname</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">lname</p></th>
+</tr>
+            
+<tr class="oddrow" id="b87s0au"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">John</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Doe</p></td>
+</tr></table>
+</div>
+
+<p class="para">The resulting association for this row is</p>
+<p class="para">
+          <span class="literal">idu=1,table=usr,schema=indirect</span>
+        </p>
+<p class="para">The case of database identifiers in association values is determined dynamically from database metadata at runtime.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0av">
+
+<h2 class="title h2"><span class="number">9.3.3</span> Parent Table Columns</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Parent table columns can contain only one value. As such, they are ideal for mapping single-value eDirectory attributes, such as mapping the single-value eDirectory attribute Password Minimum Length to the single-value parent table column <span class="literal">pwdminlen</span>.</p>
+<p class="para">Parent table columns are implicitly prefixed with the schema name and name of the parent table. It is not necessary to explicitly table-prefix parent table columns. For example, <span class="literal">indirect.usr.fname</span> is equivalent to <span class="literal">fname</span> for schema mapping purposes.</p><pre class="screen">&lt;rule name="Schema Mapping Rule"&gt;
+    &lt;attr-name-map&gt;
+        &lt;class-name&gt;
+            &lt;nds-name&gt;User&lt;/nds-name&gt;
+            &lt;app-name&gt;indirect.usr&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Given Name&lt;/nds-name&gt;
+            &lt;app-name&gt;fname&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+    &lt;/attr-name-map&gt;
+&lt;/rule&gt;</pre>
+<p class="para">Large binary and string data types should usually be mapped to parent table columns. To map to a child table column, data types must be comparable in SQL statements. Large data types usually cannot be compared in SQL statements.</p>
+<p class="para">Large binary and string data types can be mapped to child table columns if the following occur:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Each <span class="literal">&lt;remove-value&gt;</span> event on these types is transformed in a policy into a <span class="literal">&lt;remove-all-values&gt;</span>element</p></li>
+<li class="listitem">
+<p class="listitem">An <span class="literal">&lt;add-value&gt;</span> element follows each <span class="literal">&lt;remove-value&gt;</span> event</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0aw">
+
+<h2 class="title h2"><span class="number">9.3.4</span> Child Tables</h2>
+
+<div class="content_wrapper">
+
+<p class="para">A child table is a table that has a foreign key constraint on its parent tableâs primary key, linking the two tables together. The columns that comprise the child tableâs foreign key can have different names than the columns in the parent tableâs primary key.</p>
+<p class="para">The following example shows the relationship between parent table <span class="literal">usr</span> and child tables <span class="literal">usr_phone</span> and <span class="literal">usr_faxno</span>:</p><pre class="screen">CREATE TABLE indirect.usr
+(
+Â Â Â Â idu  INTEGER  NOT NULL,
+    -- ...
+    CONSTRAINT pk_usr_idu  PRIMARY KEY (idu) 
+)</pre><pre class="screen">CREATE TABLE indirect.usr_phone
+(
+    idu      INTEGER       NOT NULL,
+    phoneno  VARCHAR2(64)  NOT NULL,
+    <span class="command">CONSTRAINT fk_phone_idu FOREIGN KEY (idu) Â Â Â Â Â Â Â Â REFERENCES indirect.usr(idu)</span>
+)</pre><pre class="screen">CREATE TABLE indirect.usr_fax
+(
+    idu    INTEGER       NOT NULL,
+    faxno  VARCHAR2(64)  NOT NULL,
+  <span class="command">  CONSTRAINT fk_fax_idu FOREIGN KEY (idu) Â Â Â Â Â Â Â Â REFERENCES indirect.usr(idu)            </span>
+)</pre>
+<p class="para">In a child table, constrain all columns NOT NULL.</p>
+<p class="para">The first constrained column in a child table identifies the parent table. In the above example, the constrained column in child table <span class="literal">usr_phone</span> is <span class="literal">idu</span>. The only purpose of this column is to relate tables <span class="literal">usr_phone</span> and <span class="literal">usr</span>. Because constrained columns do not contain any useful information, omit them from publication triggers and Schema Mapping policies.</p>
+<p class="para">The unconstrained column is the column of interest. It represents a single, multivalue attribute. In the above example, the unconstrained columns are <span class="literal">phoneno</span> and <span class="literal">faxno</span>. Because unconstrained columns can hold multiple values, they are ideal for mapping multivalue eDirectory attributes (for example, mapping the multivalue eDirectory attribute Telephone Number to <span class="literal">usrphone.phoneno</span>).</p>
+<p class="para">The following table contains sample data for <span class="literal">indirect.usr_phone</span>.</p>
+<div class="table" id="b87s0ax"><p class="title"><em class="num">Table 9-3 </em>Sample Data</p>
+<table class="topbot" width="95%"><col width="29%" /><col width="71%" />
+              
+<tr class="headerrow" id="b87s0ay"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">idu</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">phoneno</p></th>
+</tr>
+            
+<tr class="oddrow" id="b87s0az"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">111-1111</p></td>
+</tr>
+<tr class="evenrow" id="b87s0b0"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">222-2222</p></td>
+</tr></table>
+</div>
+
+<p class="para">Like parent table columns, child table columns are implicitly schema-prefixed. Unlike parent table columns, however, a child table column name must be explicitly prefixed with the child table name (for example, <span class="literal">usr_phone.phoneno</span>). Otherwise, the driver implicitly interprets column <span class="literal">phoneno</span> (the parent table column) as <span class="literal">usr.phoneno</span>, not the child table column <span class="literal">usr_phone.phoneno</span>.</p><pre class="screen">&lt;rule name="Schema Mapping Rule"&gt;
+    &lt;attr-name-map&gt;
+        &lt;class-name&gt;
+            &lt;nds-name&gt;User&lt;/nds-name&gt;
+            &lt;app-name&gt;indirect.usr&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Facsimile Telephone Number&lt;/nds-name&gt;
+            &lt;app-name&gt;<span class="command">usr_fax.faxno</span>&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Telephone Number&lt;/nds-name&gt;
+            &lt;app-name&gt;u<span class="command">sr_phone.phoneno</span>&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+      &lt;/attr-name-map&gt;
+&lt;/rule&gt;</pre>
+<p class="para">Map each multivalue eDirectory attribute to a different child table.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0b1">
+
+<h2 class="title h2"><span class="number">9.3.5</span> Referential Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can represent referential containment in the database by using foreign key constraints. Referential attributes are columns within a logical database class that refer to the primary key columns of parent tables in the same logical database class or those of other logical database classes.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0b2">
+
+<h2 class="title h2"><span class="number">9.3.6</span> Single-Value Referential Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can relate two parent tables through a single-value parent table column. This column must have a foreign key constraint pointing to the other parent tableâs primary key. The following example relates a single parent table <span class="literal">usr</span> to itself:</p><pre class="screen">CREATE TABLE indirect.usr
+(
+    idu      INTEGER  NOT NULL,
+    -- ...
+    manager  INTEGER,
+    CONSTRAINT pk_usr_idu     PRIMARY KEY (idu),
+    <span class="command">CONSTRAINT fk_usr_manager FOREIGN KEY (manager) Â Â Â Â Â Â Â Â REFERENCES indirect.usr(idu)</span> 
+)</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Single-valued referential columns should be nullable.</p></div>
+<pre class="screen">&lt;rule name="Schema Mapping Rule"&gt;
+    &lt;attr-name-map&gt;
+        &lt;class-name&gt;
+            &lt;nds-name&gt;User&lt;/nds-name&gt;
+            &lt;app-name&gt;indirect.usr&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;manager&lt;/nds-name&gt;
+            &lt;app-name&gt;manager&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+    &lt;/attr-name-map&gt;
+&lt;/rule&gt;</pre>
+<p class="para">In the above example, each user can have only one manager who himself is a user.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0b3">
+
+<h2 class="title h2"><span class="number">9.3.7</span> Multivalue Referential Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can relate two parent tables through a common child table. This child table must have a column constrained by a foreign key pointing to the other parent tableâs primary key. The following example relates two parent tables <span class="literal">usr</span> and <span class="literal">grp</span> through a common child table <span class="literal">member</span>.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+    idu  INTEGER  NOT NULL,
+    -- ...
+    CONSTRAINT pk_usr_idu PRIMARY KEY (idu)
+)</pre><pre class="screen">CREATE TABLE indirect.grp
+(
+    idg  INTEGER  NOT NULL,
+    -- ...
+    CONSTRAINT pk_grp_idg PRIMARY KEY (idg)
+)</pre><pre class="screen">CREATE TABLE indirect.grp_member
+(
+    idg  INTEGER  NOT NULL,
+    idu  INTEGER  NOT NULL,
+    <span class="command">CONSTRAINT fk_member_idg FOREIGN KEY (idg)      REFERENCES indirect.grp(idg),    CONSTRAINT fk_member_idu FOREIGN KEY (idu)      REFERENCES indirect.usr(idu)</span>
+)</pre>
+<p class="para">Constrain all columns in a child table <span class="literal">NOT NULL</span>.</p><pre class="screen">&lt;rule name="Schema Mapping Rule"&gt;
+    &lt;attr-name-map&gt;
+        &lt;class-name&gt;
+             &lt;nds-name&gt;Group&lt;/nds-name&gt;
+             &lt;app-name&gt;indirect.grp&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;class-name&gt;
+            &lt;nds-name&gt;User&lt;/nds-name&gt;
+            &lt;app-name&gt;indirect.usr&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;attr-name class-name="Group"&gt;
+            &lt;nds-name&gt;Member&lt;/nds-name&gt;
+            &lt;app-name&gt;grp_member.idu&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+    &lt;/attr-name-map&gt;
+&lt;/rule&gt;</pre>
+<p class="para">The first constrained column in a child table determines which logical database class the child table <span class="literal">grp_member</span> belongs to. In the above example, <span class="literal">grp_member</span> is considered to be part of logical database class <span class="literal">grp</span>. <span class="literal">grp_member</span> is said to be a proper child of <span class="literal">grp</span>. The second constrained column in a child table is the multivalue referential attribute.</p>
+<p class="para">In the following example, the order of the constrained columns has been reversed so <span class="literal">that grp_member</span> is part of class <span class="literal">usr</span>. To more accurately reflect the relationship, table <span class="literal">grp_member</span> has been renamed to <span class="literal">usr_mbr_of</span>.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+    idu  INTEGER  NOT NULL,
+    -- ...
+    CONSTRAINT pk_usr_idu PRIMARY KEY (idu)
+)</pre><pre class="screen">CREATE TABLE indirect.grp
+(
+    idg  INTEGER  NOT NULL,
+    -- ...
+    CONSTRAINT pk_grp_idg PRIMARY KEY (idg)
+)</pre><pre class="screen">CREATE TABLE indirect.usr_mbr_of
+(
+    idu  INTEGER  NOT NULL,
+    idg  INTEGER  NOT NULL,
+    <span class="command">CONSTRAINT fk_mbr_of_idu FOREIGN KEY (idu) Â Â Â Â Â Â Â Â REFERENCES indirect.usr(idu) ON DELETE CASCADE,</span>
+Â Â Â Â CONSTRAINT fk_mbr_of_idg FOREIGN KEY (idg)
+Â Â Â Â Â Â Â Â REFERENCES indirect.grp(idg) ON DELETE CASCADE
+)</pre><pre class="screen">&lt;rule name="Schema Mapping Rule"&gt;
+    &lt;attr-name-map&gt;
+        &lt;class-name&gt;
+             &lt;nds-name&gt;Group&lt;/nds-name&gt;
+             &lt;app-name&gt;indirect.grp&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;class-name&gt;
+            &lt;nds-name&gt;User&lt;/nds-name&gt;
+            &lt;app-name&gt;indirect.usr&lt;/app-name&gt;
+        &lt;/class-name&gt;
+        &lt;attr-name class-name="User"&gt;
+            &lt;nds-name&gt;Group Membership&lt;/nds-name&gt;
+            &lt;app-name&gt;usr_mbr_of.idg&lt;/app-name&gt;
+        &lt;/attr-name&gt;
+    &lt;/attr-name-map&gt;
+&lt;/rule&gt;</pre>
+<p class="para">In databases that have no awareness of column position (such as DB2/AS400), order is determined by sorting column names by string or hexadecimal value. For additional information, see <a href="configure-jdbc-driver-specific-parameters.html#b1pu3oi" class="xref">Sort Column Names By</a>.</p>
+<p class="para">In general, it is necessary to synchronize only bidirectional, multivalue, referential attributes as part of one class or the other, not both. If you want to synchronize referential attributes for both classes, construct two child tables, one for each class. For example, if you want to synchronize eDirectory attributes Group Membership and Member, you need two child tables.</p>
+<p class="para">In practice, when you synchronize User and Group classes, we recommend that you synchronize the Group Membership attribute of class User instead of the Member attribute of class Group. Synchronizing the group memberships of a user is usually more efficient than synchronizing all members of a group.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

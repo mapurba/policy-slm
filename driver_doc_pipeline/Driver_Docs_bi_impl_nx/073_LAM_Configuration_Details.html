@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3yj64d,b3r8ulu,b3yj5z9,b3wxlbx,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>LAM Configuration Details - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3yj64d">
+
+<h1 class="title h1"><span class="number">C.5</span> LAM Configuration Details</h1>
+
+<div class="content_wrapper">
+
+<p class="para">PAM is supported by AIX beginning with AIX 5.3, but earlier versions use the IBM Loadable Authentication Module (LAM) technology instead of PAM. The Linux and UNIX driver LAM module implements password publishing in the LAM environment for files mode only. The LAM module is not supported for NIS or NIS+ on AIX.</p>
+<p class="para">You can install and optionally configure the LAM module at any time using the installation program. For details, see <a href="b3xfnmq.html" class="xref">Installing the PAM or LAM Module</a>.</p>
+<p class="para">After it is installed, you can configure the LAM module with the <span class="command">nxdrv-config</span> command. For details, see <a href="b4339kg.html" class="xref">Using the nxdrv-config Command</a>.</p>
+<p class="para">The installation script installs the LAM module <span class="filename">NXDRV</span> into the <span class="filename">/usr/lib/security</span> directory of the connected AIX system. If you respond to the prompt to configure the LAM module, the installation script adds an NXDRV stanza to <span class="filename">/usr/lib/security/methods.cfg</span>. The <span class="command">nxdrv-config</span> command also adds this stanza.</p>
+<p class="para">You can edit your <span class="filename">/usr/lib/security/methods.cfg</span> file manually. The following example shows the driver LAM stanza:</p><pre class="screen">NXDRV:
+   program = /usr/lib/security/NXDRV
+   options = db=BUILTIN</pre>
+<p class="para">If the LAM module is installed, the default AIX files-mode scripts cause AIX users to be associated with the LAM module via individual user stanzas in <span class="filename">/etc/security/user</span>. Alternatively, you can change the global stanza in <span class="filename">/etc/security/user</span> to use the LAM module by default, and change the scripts so that they donât assign NXDRV SYSTEM and registry attributes to files-mode users. More fine-tuned configurations are also possible and are referenced in the <span class="filename">add-user.sh</span> script file.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

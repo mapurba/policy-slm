@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="beyzsyq,understanding-delimited-text-driver,understanding-delimited-text-driver,bpbe0bu,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>How the Delimited Text Driver Works - NetIQ Identity Manager Driver for Delimited Text Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="beyzsyq">
+
+<h1 class="title h1"><span class="number">1.1</span> How the Delimited Text Driver Works</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Delimited Text driver uses the Publisher channel, the Subscriber channel, and policies to control data flow between the Identity Vault and the delimited text files, as explained in the following sections:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="beyzsyq.html#b94b9il" class="xref">Publisher and Subscriber Channels</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="beyzsyq.html#b94b9in" class="xref">Policies</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="beyzsyq.html#bez0eol" class="xref">Supported File Types</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b94b9il">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Publisher and Subscriber Channels</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Delimited Text driver provides data flow along the Publisher and Subscriber channels as shown in <a href="beyzsyq.html#b94b9im" class="xref">Figure 1-1</a>.</p>
+<div class="figure" id="b94b9im"><p class="title"><em class="num">Figure 1-1 </em>Data Flow</p>
+              <img src="../graphics/es004_a.png" alt="Delimited Text Driver data flow" title="Delimited Text Driver data flow" />
+            </div>
+
+<p class="para">The example configuration that ships with this driver includes both Subscriber and Publisher channels. However, in many configurations, only one-way data flow is required. In those configurations, only a Publisher or Subscriber channel is used. The other channel is disabled. For more information, see <a href="delimited-one-way-synchronization.html" class="xref">Section 5.0, Setting Up One-Way Synchronization</a>.</p>
+<div class="container sect3" id="beyzrx3">
+
+<h3 class="title h3">Publisher Channel</h3>
+
+<p class="para">The Publisher channel reads information from input text files on your local file system and submits that information to the Identity Vault via the Identity Manager engine.</p>
+<p class="para">By default, the Publisher channel does the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Checks the input directory every 10 seconds.</p></li>
+<li class="listitem">
+<p class="listitem">Processes any files that have a .<span class="filename">csv</span> extension.</p></li>
+<li class="listitem">
+<p class="listitem">Changes .<span class="filename">csv</span> extensions of processed files to .<span class="filename">bak</span>.</p></li>
+<li class="listitem">
+<p class="listitem">Cycles through this process until you stop the driver.</p></li></ul></div>
+
+</div>
+
+<div class="container sect3" id="beyzsc7">
+
+<h3 class="title h3">Subscriber Channel</h3>
+
+<p class="para">The Subscriber channel watches for additions and modifications to Identity Vault objects and creates output files on your local file system that reflect those changes.</p>
+<p class="para">By default, the Subscriber channel keeps an output file open until either 200 transactions have been logged or 30 seconds have elapsed. When either of these thresholds is reached, the output file is saved with a <span class="filename"><span class="replaceable">number</span>.csv</span> filename and a new output file is opened.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b94b9in">
+
+<h2 class="title h2"><span class="number">1.1.2</span> Policies</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Policies control data synchronization between the driver and the Identity Vault. The following table provides information on the set of pre-configured policies that come with the Delimited Text driver. For information about modifying policies, see <span class="citetitle"><a href="../../../identity-manager-48/policy_designer/data/using-designer-to-create-policies.html#using-designer-to-create-policies" class="ulink">NetIQ Identity Manager - Using Designer to Create Policies</a></span>.</p>
+<div class="table" id="b94b9io"><p class="title"><em class="num">Table 1-1 </em>Preconfigured Policies</p>
+<table class="topbot" width="93%"><col width="24%" /><col width="76%" />
+              
+<tr class="headerrow" id="b94b9ip"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Policy</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+            
+<tr class="oddrow" id="b94b9iq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Schema Map</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Configured on the driver object.</p>
+<p class="para">Maps Identity Vault User properties to application attributes as follows:</p><ul class="simplelist">
+                    <li class="member">Surname &gt; LastName</li>
+                    <li class="member">Given Name &gt; FirstName</li>
+                    <li class="member">Title &gt; Title</li>
+                    <li class="member">Internet EMail Address &gt; Email</li>
+                    <li class="member">Telephone Number &gt; WorkPhone</li>
+                    <li class="member">Facsimile Telephone Number &gt; Fax</li>
+                    <li class="member">mobile &gt; WirelessPhone</li>
+                    <li class="member">Description &gt; Description</li>
+                  </ul>
+<p class="para">The application attributes correspond to the sequence of values in the file or, if present, to the attributes associated with unnamed Â XDS &lt;<span class="literal">field</span>&gt; elements.</p></td>
+</tr>
+<tr class="evenrow" id="b94b9ir"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Input Transform</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Configured on the driver object.</p>
+<p class="para">If the input document is an XML document, no transformations are made. If the document is a delimited text file, each record is transformed into an XDS Add element for User objects with attributes defined by the schema map.</p>
+<p class="para">Associations are defined by the value of user's e-mail attribute.</p></td>
+</tr>
+<tr class="oddrow" id="b94b9is"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Output Transform</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Configured on the driver object.</p>
+<p class="para">Specifies that a comma is used as the delimiter character for output files and that the file format is comma-separated value (CSV) format. It transforms the XDS document into CSV format and submits it to the driver shim.</p></td>
+</tr>
+<tr class="evenrow" id="b94b9it"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Create</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Configured on the Publisher channel.</p>
+<p class="para">Specifies that in order for a User to be created in an Identity Vault, the Given Name and Internet EMail Address attributes must be defined.</p>
+<p class="para">The user CN is formed by concatenating the values of first name and last name.</p></td>
+</tr>
+<tr class="oddrow" id="b94b9iu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Matching</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Configured on the Publisher channel.</p>
+<p class="para">Specifies that a user in an Identity Vault is the same user specified in the input file when the value of Internet Email Address is the same in both places.</p>
+<p class="para">If there is a match, only changed attributes are updated in the Identity Vault.</p></td>
+</tr>
+<tr class="evenrow" id="b94b9iv"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Placement</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Configured on the Publisher channel.</p>
+<p class="para">Specifies that a new user is placed in the Users or Active container and named with the CN created by the Input Transform rule.</p>
+<p class="para">You need to create a Users\Active container at the root of your tree before you start the driver.</p></td>
+</tr>
+<tr class="oddrow" id="b94b9iw"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Event Transform</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Configured on the Subscriber channel.</p>
+<p class="para">If an Identity Vault reports a Modify or Sync event, those events are changed to an instance element that can be used to create a complete output record.</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bez0eol">
+
+<h2 class="title h2"><span class="number">1.1.3</span> Supported File Types</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver currently supports two types of files:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="beyzsyq.html#bez0eom" class="xref">Comma-Separated Values Files</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="beyzsyq.html#bez0eon" class="xref">XML Files in XDS Format</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bez0eom">
+
+<h3 class="title h3">Comma-Separated Values Files</h3>
+
+<p class="para">Comma-separated value (CSV) files are text files that contain data divided into fields and records. Fields are delimited by commas, and records are delimited by a hard return.</p>
+<p class="para">If you need a comma or hard return within the value of a particular field, the entire field value should be enclosed in quotes.</p>
+<p class="para">Because the meaning of each field in a CSV file is derived from its position, each record in a CSV file should have the same number of fields. Field values can be left blank, but each record should have the same number of delimiter characters.</p>
+</div>
+
+<div class="container sect3" id="bez0eon">
+
+<h3 class="title h3">XML Files in XDS Format</h3>
+
+<p class="para">The XDS format is the defined NetIQ subset of possible XML formats. This is the initial format for data coming from an Identity Vault. By modifying default rules and changing the style sheets, the Delimited Text driver can be configured to work with any XML format.</p>
+<p class="para">For detailed information on the XDS format, refer to <a href="http://developer.novell.com/ndk/doc/dirxml/index.html?dirxmlbk/data/a5323rs.html" class="ulink">NDS DTD Commands and Events</a>.</p>
+<p class="para">For information on configuring the driver to use XML files in the XDS format, see <a href="delimited-configure-xds-xml-file.html" class="xref">Section 6.0, Configuring for XDS XML Files</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

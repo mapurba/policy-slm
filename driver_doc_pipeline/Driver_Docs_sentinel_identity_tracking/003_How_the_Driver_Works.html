@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 06 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-the-driver-works,introduction,components-for-identity-tracking,data-transfer-between-systems,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>How the Driver Works - Identity Manager Driver for Sentinel Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-the-driver-works">
+
+<h1 class="title h1"><span class="number">1.2</span> How the Driver Works</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Sentinel receives information from various Identity Collectors and then stores the data in the database. If the same user has multiple identifiers for a single account in an application, Sentinel treats each identifier as a unique account.</p>
+<p class="para">The driver enables you to track all account identifiers for each user and to track the status of those accounts, so you have a complete picture of user activities. <a href="how-the-driver-works.html#b10ewhxl" class="xref">Figure 1-1</a> illustrates how the driver works to capture this information.</p>
+<div class="figure" id="b10ewhxl"><p class="title"><em class="num">Figure 1-1 </em>Synchronizing Account Data</p>
+            <img src="../graphics/sent_idm_integration_a.png" alt="" />
+          </div>
+
+<div class="orderedlist">
+        
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">The Active Directory driver creates an account for John Smith in Active Directory and synchronizes the information to the Identity Vault.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Identity Vault, which contains the DirXML-Accounts attribute, creates an account for John Smith. The DirXML-Accounts attribute stores the different account identifiers from Active Directory.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The driver detects that the DirXML-Accounts attribute is added and sends this information to the Sentinel REST Interface.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The LDAP driver detects the new account created in the Identity Vault, then synchronizes this information to the LDAP database.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The LDAP driver creates a new account for John Smith in the LDAP database as follows:</p><pre class="screen">cn=jsmith,cn=users,dc=company,dc=com</pre></li>
+        
+<li class="listitem">
+<p class="listitem">The LDAP driver synchronizes the new account information back to the Identity Vault. The Identity Vault adds a new entry to the DirXML-Accounts attribute.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Sentinel driver detects the change to the DirXML-Accounts attribute, then sends this information to the Sentinel REST Interface.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Sentinel REST Interface stores the account data in the USR_IDENTITY table in the Sentinel database.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Sentinel correlation engine uses the information in the USR_IDENTITY table to generate reports of account activity per identity across all the systems provisioned by Identity Manager.</p></li>
+      </ol></div>
+
+<p class="para">The second half of this solution allows other Sentinel Collectors to use the account information to track whether your organization enforces business policies. <a href="how-the-driver-works.html#b10f088d" class="xref">Figure 1-2</a> shows how Sentinel uses the custom events and the events from other Collectors to provide a complete record of John Smithâs accounts.</p>
+<div class="figure" id="b10f088d"><p class="title"><em class="num">Figure 1-2 </em>Synchronizing Events</p>
+            <img src="../graphics/sent_idm_custom_a.png" alt="" />
+          </div>
+
+<div class="orderedlist">
+        
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">The Active Directory driver creates an account for John Smith in the Identity Vault.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Sentinel driver detects this new account and sends the account information to the Sentinel REST Interface, which stores the information in the USR_IDENTITY table.</p></li>
+        
+<li class="listitem">
+<p class="listitem">John Smith logs in to Active Directory, and that information is sent to Sentinel through the Active Directory Collector.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Active Directory Collector receives the login event directly from Windows without going through the Identity Vault. Sentinel records this information in the USR_ACCOUNT table indicating that <span class="command">cn=John Smith,cn=users,dc=company,dc=com</span> logged in at a specific time.</p></li>
+        
+<li class="listitem">
+<p class="listitem">If John Smithâs CN in Active Directory is renamed to John D. Smith, the Active Directory driver synchronizes the information to the Identity Vault.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The DirXML-Accounts attribute is updated with the new information, and the Sentinel driver detects this change.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Sentinel driver synchronizes the new account information to the Sentinel REST interface.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The Sentinel REST interface reads the new account information and writes it to the USR_IDENTITY table.</p></li>
+        
+<li class="listitem">
+<p class="listitem">When John Smith logs in again to Active Directory, the Active Directory Collector records the login information.</p></li>
+        
+<li class="listitem">
+<p class="listitem">Sentinel performs a lookup on the USR_IDENTITY table and detects that John Smith and John D. Smith are the same user account. Sentinel can keep a complete record of user actions.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The driver policies define and add custom audit events to each Identity Manager driver. The policies add a layer of intelligence to Identity Manager and Sentinel by defining the business logic. These policies are part of each driver that ships with Identity Manager.</p></li>
+        
+<li class="listitem">
+<p class="listitem">You can generate useful reports about user accounts from Sentinel.</p></li>
+      </ol></div>
+
+<p class="para">The Sentinel Identity Tracking driver provides the infrastructure to allow Sentinel to track each user account. This awareness allows you to enforce business policies.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

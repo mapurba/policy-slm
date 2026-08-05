@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="chdibedb,bfqsgwj,bfqsgwj,b105xae3,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>PAM Configuration Notes - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="chdibedb">
+
+<h1 class="title h1"><span class="number">B.1</span> PAM Configuration Notes</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Identity Manager Fan-Out Driver platforms for most Linux/UNIX implementations make use of the Pluggable Authentication Modules (PAM) framework for system-entry services, such as <span class="command">login</span>. PAM is defined by OSF RFC 86.0.</p>
+<p class="para">When a service (<span class="command">login</span>, <span class="command">ftp</span>, user written application, etc.) makes a call to the PAM API, the request is forwarded to the appropriate authentication module based on the specifications you have made in the PAM configuration file, normally <span class="filename">/etc/pam.conf</span>. (Most Linux implementations separate the PAM parameters for various services into files in the <span class="filename">/etc/pam.d/</span> directory.) A sample <span class="filename">pam.conf</span> file for Platform Services is included in each Linux/UNIX platform distribution.</p>
+<p class="para">Topics in this section include:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="chdibedb.html#bk44mt1" class="xref">Using the Sample PAM Configuration Files</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="chdibedb.html#bk45pwp" class="xref">Beyond Default Configuration for PAM</a>
+            </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bk44mt1">
+
+<h2 class="title h2"><span class="number">B.1.1</span> Using the Sample PAM Configuration Files</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The simple presence of Platform Services on a Linux or UNIX system is not enough to make PAM work with Identity Manager. This functionality must be activated by adding the appropriate line-entries to your PAM configuration file(s).In most cases, you can determine the necessary line entries by using a set of sample PAM configuration file templates that are part of the Platform Services installation. Using these templates will enable the default PAM support for Platform Services, which is to redirect three of the most common sign-on applications to Identity Manager: <span class="command">ssh</span>, <span class="command">passwd</span>, and <span class="command">su</span>. These templates are located as follows:</p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="25%" /><col width="75%" />
+                
+<tr class="headerrow" id="bk459ze"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Operating System</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">PAM Configuration File Templates Location</p></th>
+</tr>
+              
+<tr class="oddrow" id="bk459zf"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AIX</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">/usr/local/ASAM/bin/PlatformServices/pam.conf.sample</span>
+                    </p></td>
+</tr>
+<tr class="evenrow" id="bk59j4e"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">FreeBSD</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">/usr/local/ASAM/bin/PlatformServices/pam.d</span>
+                    </p></td>
+</tr>
+<tr class="oddrow" id="bk459zg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">HP-UX</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">/usr/local/ASAM/bin/PlatformServices/pam.conf.sample</span>
+                    </p></td>
+</tr>
+<tr class="evenrow" id="bk459zh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Linux</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">/usr/local/ASAM/bin/PlatformServices/pam.d</span>
+                    </p></td>
+</tr>
+<tr class="oddrow" id="bk459zi"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Solaris</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">/usr/local/ASAM/bin/PlatformServices/pam.conf.sample</span>
+                    </p></td>
+</tr></table>
+</div>
+
+<p class="para">There are two basic methods for using the templates to update PAM on each of your systems based on your current setup, as summarized in the following table.</p>
+<div class="table" id="bk45ekn"><p class="title"><em class="num">Table B-1 </em>Two methods for using the sample PAM configuration files.</p>
+<table class="topbot" width="100%"><col width="16%" /><col width="28%" /><col width="37%" /><col width="19%" />
+                
+<tr class="headerrow" id="bk45eko"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">When to use this method</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Applications redirected to Identity Manager</p></th>
+</tr>
+              
+<tr class="oddrow" id="bk45ekp"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Replace current configuration file(s) with provided sample(s).</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Select from the pre-configured sample files supplied with Platform Services for your version of Linux or UNIX. Use it/them in place of your current PAM configuration file(s).</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">If you have never modified the default PAM configuration file(s) that came with your implementation of Linux or UNIX, then this easiest method should work for you.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="command">ssh</span>, <span class="command">passwd</span>, <span class="command">su</span></p>
+<p class="para">(default configuration)</p></td>
+</tr>
+<tr class="evenrow" id="bk45ekq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Use sample(s) as a guide.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Manually modify your current PAM configuration files, using the supplied sample(s) as a guide.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">When it is not appropriate to replace your current PAM configuration file(s) with one or more of the supplied samples.</p>
+<p class="para"><span class="strong">Examples</span>: You have already modified your PAM configuration from the vendor default, or you have an OS version that does not match the samples.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Any you choose.</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bk45pwp">
+
+<h2 class="title h2"><span class="number">B.1.2</span> Beyond Default Configuration for PAM</h2>
+
+<div class="content_wrapper">
+
+<p class="para">If you want Identity Manager to work with more system-entry applications than those included in the sample file templates included with Platform Services, then you will need to be more familiar with how PAM works. The remainder of this section offers information and examples to use when your needs for PAM surpass the Platform Services default configuration.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="chdibedb.html#bk45sl4" class="xref">Stacking Multiple Schemes</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="chdibedb.html#bk45std" class="xref">Where to Find More Detailed Information about PAM</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="chdibedb.html#bk45szs" class="xref">Overview of pam.conf</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="chdibedb.html#bk45tfg" class="xref">Example pam.conf File Fragment</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="chdibedb.html#bk45tr8" class="xref">Examples</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="chdibedb.html#bk46632" class="xref">Using Options with the Platform Services PAM Module</a>
+              </p></li></ul></div>
+
+<div class="container sect3" id="bk45sl4">
+
+<h3 class="title h3">Stacking Multiple Schemes</h3>
+
+<p class="para">The PAM architecture enables authentication by multiple authentication services through stacking. Stacking service modules can force users to authenticate to several authentication services, possibly using different passwords, or it can allow users the opportunity to authenticate using any one of several methods or some combination of methods.</p>
+<p class="para">It is very important to understand certain return codes returned by services in the stack, because these return codes are used in conjunction with the control flag to determine the behavior of the authentication flow within the stack.</p>
+<p class="para">Always test the logical flow of your configuration. <span class="emphasis">Some configurations could allow users to log in without passwords, while others could prevent login by anyone, including root</span>. Many service modules, including the Platform Services service module, treat root differently from other users.</p>
+</div>
+
+<div class="container sect3" id="bk45std">
+
+<h3 class="title h3">Where to Find More Detailed Information about PAM</h3>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">For detailed information about PAM, see RFC 86.0, included in each Linux/UNIX Platform Services distribution package.</p></li>
+<li class="listitem">
+<p class="listitem">For PAM configuration file information specific to your Linux/UNIX implementation, see the man pages, typically <span class="filename">man pam.conf</span>.</p></li>
+<li class="listitem">
+<p class="listitem">For Linux-PAM documentation on the Web, see the <a href="http://www.kernel.org/pub" class="ulink">Linux Kernel site</a>.</p></li></ul></div>
+
+</div>
+
+<div class="container sect3" id="bk45szs">
+
+<h3 class="title h3">Overview of pam.conf</h3>
+
+<p class="para">An entry in <span class="filename">pam.conf</span> has the form:</p><pre class="screen">service   module-type   control-flag   module-path   option</pre>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="brh4vj2">
+                  <p class="title"><em class="title"> <span class="literal">service</span> </em>
+                  The name of a service, such as login and ftp. The specification <span class="emphasis">other</span> indicates the module to be used by all other applications not specified in the file.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brh4vj3">
+                  <p class="title"><em class="title"> <span class="filename">module-type</span> </em>
+                  The type of PAM function.</p>
+                </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="brhlphh">
+                      <p class="title"><em class="title"> <span class="literal">auth</span> </em>
+                      User authentication</p>
+                    </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brhlqpu">
+                      <p class="title"><em class="title"> <span class="literal">account</span> </em>
+                      Account access, such as expiration and time of day restrictions</p>
+                    </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brhlqpv">
+                      <p class="title"><em class="title"> <span class="literal">session</span> </em>
+                      Session management accounting</p>
+                    </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brhlqpw">
+                      <p class="title"><em class="title"> <span class="literal">password</span> </em>
+                      Password change</p>
+                    </div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brh4vj4">
+                  <p class="title"><em class="title"> <span class="literal">control-flag</span> </em>
+                  Determines continuation or failure behavior of the module. This is especially important if stacking is used.</p>
+                </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="brh4vj5">
+                      <p class="title"><em class="title"> <span class="literal">required</span> </em>
+                      This module must return success in order to have the overall result be successful. If this module fails, stack processing continues.</p>
+                    </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brh4vj6">
+                      <p class="title"><em class="title"> <span class="literal">requisite</span> </em>
+                      Like required, except stack processing fails immediately if this module fails. Requisite is not used in all versions of PAM.</p>
+                    </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brh4vj7">
+                      <p class="title"><em class="title"> <span class="literal">sufficient</span> </em>
+                      If this module is successful, skip the remaining modules in the stack, even if their control flags indicate they are required. If this module fails, the overall result might be determined by other modules in this stack.</p>
+                    </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brh4vj8">
+                      <p class="title"><em class="title"> <span class="literal">optional</span> </em>
+                      If this module fails, the overall result can be successful if another module in this stack returns success. If this module succeeds, the overall result might be determined by other modules in this stack. If no other modules are required, then a success by an optional module causes success for the stack.</p>
+                    </div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brh4vj9">
+                  <p class="title"><em class="title"> <span class="literal">module-path</span> </em>
+                  The pathname of the module to be invoked for the function. The PAM service module for Platform Services, <span class="filename">pam_ascauth</span>, checks the user ID to see if it is in the Exclude list or is the user ID root (unless the root_nds PAM parameter is specified). If either condition is met, then <span class="filename">pam_ascauth</span> returns <span class="literal">PAM_IGNORE</span>, which has the same effect as the Platform Services authentication service not being included in the stack.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="brh4vja">
+                  <p class="title"><em class="title"> <span class="literal">option</span> </em>
+                  Command line parameters to be passed to the module. The developer of a module can use these any way desired, but the PAM framework recommends that several parameters always be supported. Among these are <span class="literal">use_first_pass</span> (use the same password as that used by the first module that asked for one) and <span class="literal">try_first_pass</span> (like use_first_pass, but prompt if it is not valid).</p>
+                </div>
+
+<p class="listitem">The Platform Services PAM module supports several other parameters. For details about these parameters, see <a href="chdibedb.html#bk46632" class="xref">Using Options with the Platform Services PAM Module</a>.</p></li></ul></div>
+
+</div>
+
+<div class="container sect3" id="bk45tfg">
+
+<h3 class="title h3">Example pam.conf File Fragment</h3>
+
+<p class="para">The following is a fragment from the sample <span class="filename">pam.conf</span> file that is provided with Platform Services for Solaris 8.</p><pre class="screen">login auth sufficient /usr/lib/security/pam_ascauth.so.1 stats
+login auth required   /usr/lib/security/pam_unix.so.1 try_first_pass</pre>
+<p class="para">This fragment deals with authenticating users of the login service.</p>
+<p class="para">The first line specifies the Platform Services PAM module, pam_ascauth.so.1, passing it a parameter of stats, which causes it to write additional statistics records about its processing to syslog. If <span class="filename">pam_ascauth.so.1</span> returns success, the user is granted access to the system. If <span class="filename">pam_ascauth.so.1</span> returns failure, the next module is called.</p>
+<p class="para">The second line calls the native Solaris PAM module. It is invoked only if the Platform Services PAM module returns failure. This module first tries the password that was entered by the user and rejected by the driver. If the password is not valid, the user is prompted for the local Linux or UNIX system password. If that password is rejected, the user is not granted access to the system. Even if this module returns success, the next module in the stack, if any, is called.</p>
+<div class="warning">
+<p class="para"><em class="title">WARNING:</em>You must be familiar with PAM configuration for your particular Linux/UNIX implementation before attempting to create your own PAM configuration files. Take extreme care in configuring PAM on your systems. Mistakes here can result in major security exposures.</p></div>
+
+</div>
+
+<div class="container sect3" id="bk45tr8">
+
+<h3 class="title h3">Examples</h3>
+
+<p class="para">The examples in the following sections demonstrate possible PAM configurations.</p>
+<p class="para">The first section in the <a href="chdibedb.html#bk45ua3" class="xref">Solaris 2.9 Example PAM Configuration File Fragment</a> represents the <span class="literal">auth</span> configuration for service-name <span class="literal">OTHER</span> in a generic Solaris 2.10 <span class="filename">/etc/pam.conf</span> file. The first module (<span class="filename">pam_authtok_get</span>) prompts for a user ID and password. The second module (<span class="filename">pam_dhkeys</span>) does a keylogin (if needed). The third module (<span class="filename">pam_unix_cred</span>) establishes credentials for Solaris projects (see the <span class="citetitle">project</span> man page). Finally, <span class="filename">pam_unix_auth</span> is called to do an authentication based on the default repository as listed in <span class="filename">nsswitch.conf</span>.</p>
+<p class="para">The second section in this example, which would replace the first section, authenticates using the Identity Manager Fan-Out Driver. If the driver authentication fails, an attempt is made to authenticate the user against the local repository, using the password from the driver prompt. Note that <span class="filename">pam_unix_cred</span> is placed before <span class="filename">pam_ascauth</span>, in case project credentials are needed. There are no known negative side effects to placing the <span class="filename">pam_unix_cred</span> before <span class="filename">pam_ascauth</span>, even in environments where Solaris projects are not used.</p>
+<div class="container sect4" id="bk45ua3">
+
+<h4 class="title h4">Solaris 2.9 Example PAM Configuration File Fragment</h4>
+<pre class="screen">#vendor supplied
+OTHER  auth requisite    pam_authtok_get.so.1
+OTHER  auth required     pam_dhkeys.so.1
+OTHER  auth required     pam_unix_cred.so.1
+OTHER  auth required     pam_unix_auth.so.1
+
+#Identity Manager Fan-Out Driver variation
+OTHER  auth required     pam_unix_cred.so.1
+OTHER  auth sufficient   pam_ascauth.so.1 stats
+OTHER  auth requisite    pam_unix_authtok_get.so.1
+OTHER  auth required     pam_dhkeys.so.1
+OTHER  auth required     pam_unix_auth.so.1</pre>
+</div>
+
+<div class="container sect4" id="bk45ume">
+
+<h4 class="title h4">FreeBSD 5.5 Example PAM Configuration File Fragment</h4>
+
+<p class="para">The following example represents a possible <span class="literal">auth</span> configuration for service-name <span class="literal">sshd</span> on a FreeBSD<sup class="superscript">*</sup> 5.5 platform. FreeBSD 5.5 uses <span class="filename">/etc/pam.d</span>, so this exampleâs <span class="literal">auth</span> fragment comes from <span class="filename">/etc/pam.d/sshd</span> and the service-name is reflected in the file name, not the first column in the file.</p><pre class="screen"># vendor supplied
+auth   required        pam_nologin.so       no_warn
+auth   sufficient      pam_opie.so          no_warn no_fake_prompts
+auth   requisite       pam_opieaccess.so    no_warn allow_local
+#auth   sufficient      pam_krb5.so          no_warn try_first_pass
+#auth   sufficient      pam_ssh.so           no_warn try_first_pass
+auth   required        pam_unix.so          no_warn try_first_pass
+
+# Identity Manager Fan-Out Driver variation
+auth   required        pam_nologin.so       no_warn
+auth   sufficient      pam_opie.so          no_warn no_fake_prompts
+auth   requisite       pam_opieaccess.so    no_warn allow_local
+#auth   sufficient      pam_krb5.so          no_warn try_first_pass
+#auth   sufficient      pam_ssh.so           no_warn try_first_pass
+auth   sufficient      pam_ascauth.so       stats
+auth   required        pam_unix.so          no_warn try_first_pass</pre>
+<p class="para">In the above example, <span class="filename">pam_nologin</span> and <span class="filename">pam_opie</span>* are placed above <span class="filename">pam_ascauth</span> in the stack so that the features they support remain enabled for all users. Then authentication is attempted via the Fan-Out driver. If the user can not be authenticated with the Fan-Out driver, the local authentication methods are attempted.</p>
+</div>
+
+<div class="container sect4" id="bk45uyi">
+
+<h4 class="title h4">SUSEÂ® Linux Enterprise Server (versions 10 and 12) Configuration File Fragment</h4>
+
+<p class="para">The following example represents a possible <span class="literal">auth</span> configuration for service-name <span class="literal">sshd</span> on a SUSE 10 and 11 platforms. SUSE, versions 10 and 11 (as with most distributions of Linux), uses <span class="filename">/etc/pam.d</span>, so this exampleâs <span class="literal">auth</span> fragment comes from <span class="filename">/etc/pam.d/sshd</span> and the service-name is reflected in the file name, not the first column in the file. The various configuration files for many distributions of Linux include a common file for each module type. The following example shows how to add the Fan-Out driver PAM module to a particular service without modifying the common file.</p><pre class="screen"># vendor supplied
+auth   include        common-auth
+auth   required       pam_nologin.so
+
+# Identity Manager Fan-Out Driver variation
+auth   sufficient     pam_ascauth.so
+auth   include        common-auth
+auth   required       pam_nologin.so</pre>
+</div>
+
+</div>
+
+<div class="container sect3" id="bk46632">
+
+<h3 class="title h3">Using Options with the Platform Services PAM Module</h3>
+
+<p class="para">You can specify the following parameters to the Platform Services PAM module to control its operation:</p>
+<div class="table" id="bk47phc"><p class="title"><em class="num">Table B-2 </em>Options available for the Platform Services PAM Module</p>
+<table class="topbot" width="100%"><col width="22%" /><col width="78%" />
+                  
+<tr class="headerrow" id="bk47phd"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">option</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                
+<tr class="oddrow" id="bk47phe"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">always_fail</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs PAM module to always return <span class="literal">PAM_AUTH_ERR</span> (used for testing).</p></td>
+</tr>
+<tr class="evenrow" id="bk47phf"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">always_ignore</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs PAM module to always return <span class="literal">PAM_IGNORE</span> (used for testing).</p></td>
+</tr>
+<tr class="oddrow" id="bk47phg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">conf</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies where the platform configuration file is located. The default location is <span class="filename">/usr/local/ASAM/data/asamplat.conf</span>. Example: <span class="filename">conf=/usr/local/ASAM/data/myplat.conf</span></p></td>
+</tr>
+<tr class="evenrow" id="bk47phh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">debug</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs the PAM module to write debugging records to <span class="filename">syslog</span>.</p></td>
+</tr>
+<tr class="oddrow" id="bk47phj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">ignore_no_user</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs PAM module to return <span class="literal">PAM_IGNORE</span> when an authentication request returns âNo user.â</p></td>
+</tr>
+<tr class="evenrow" id="bk47phk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">must_prompt</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs PAM module to prompts all users for current password during a password change, even excluded users.</p></td>
+</tr>
+<tr class="oddrow" id="bk47phl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">no_warn</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs PAM module not to pass any warnings to a system-entry application that is requesting authentication.</p></td>
+</tr>
+<tr class="evenrow" id="bk47phm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">root_nds</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Forces the root user to be authenticated and managed by the Identity Manager Fan-Out Driver. This is not normally desirable. If this option is not specified, the root user is managed by the local security mechanism.</p></td>
+</tr>
+<tr class="oddrow" id="bk47phn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">stats</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs the PAM module to write <span class="filename">syslog</span> records containing authentication statistics. The records contain information on what type of request was made, the result, and the elapsed time to complete the request.</p></td>
+</tr>
+<tr class="evenrow" id="bk47pho"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">succeed_no_user</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs the PAM module to return <span class="literal">PAM_SUCCESS</span> when an authentication request returns âNo user.â</p></td>
+</tr>
+<tr class="oddrow" id="bk47php"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">try_first_pass</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs the PAM module to try the password that was provided by the previous PAM module in the stack. If this does not work, the user is prompted to enter a password.</p></td>
+</tr>
+<tr class="evenrow" id="bk47phq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">use_first_pass</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Instructs the PAM module to use the password that was provided by the previous PAM module in the stack. If this does not work, the module fails.</p></td>
+</tr></table>
+</div>
+
+<p class="para">For more information about PAM module configuration, see <a href="chdibedb.html#bk45szs" class="xref">Overview of pam.conf</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

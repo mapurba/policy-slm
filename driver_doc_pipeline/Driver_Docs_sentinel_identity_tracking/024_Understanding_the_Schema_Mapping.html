@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 06 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="understanding-the-schema-mapping,bookinfo,activating-the-driver,migrating-data,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Understanding the Schema Mapping - Identity Manager Driver for Sentinel Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container chapter expanding expanded" id="understanding-the-schema-mapping">
+
+<h1 class="title h1"><span class="number">8.0</span> Understanding the Schema Mapping</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The default Sentinel Identity Tracking packages apply a schema mapping between Identity Vault attributes and the corresponding Sentinel attributes. At a high level, information about each user identity in the Identity Vault is mapped to the USR_IDENTITY table in the Sentinel database and information from each identity's multi-value DirXML-Accounts attribute is mapped to the USR_ACCOUNT table. The driver maps each account to the incoming event stream, retrieves the associated Identity information from the Identity Vault, and sends the information about the user identity to the Sentinel database.</p>
+<p class="para">The following table describes how the Identity Vault attributes are mapped to the Sentinel USR_IDENTITY table and where the associated value is placed for events that match any associated accounts:</p>
+<div class="table" id="b1029vvb"><p class="title"><em class="num">Table 8-1 </em>Mapping in USR_IDENTITY Table</p>
+<table class="topbot" width="100%"><col width="26%" /><col width="28%" /><col width="46%" />
+          
+<tr class="headerrow" id="bznpe9f"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Attribute/Metadata</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sentinel Column</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Event Field and Comments</p></th>
+</tr>
+        
+<tr class="oddrow" id="bznpe9g"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not applicable (NA)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDENTITY_GUID</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">InitiatorUserIdentityID</p>
+<p class="para">TargetUserIdentityID</p>
+<p class="para">Sentinel generates these fields internally.</p></td>
+</tr>
+<tr class="evenrow" id="bznpe9h"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">srcDN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow" id="bznpe9i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NA</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">CUST_ID</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This field is set based on the tenant ID assigned to each Identity Tracking Integration Module for Sentinel, when Sentinel is receiving data for multiple tenants.</p></td>
+</tr>
+<tr class="evenrow" id="bznpe9j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NA</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">VAULT_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This is field is set to the eDirectory tree name.</p></td>
+</tr>
+<tr class="oddrow" id="bznpe9k"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GUID</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SRC_IDENTITY_ID</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Stores the Identity Vault GUID.</p></td>
+</tr>
+<tr class="evenrow" id="bznpe9l"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">workforceID</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WFID</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">pInitiatorUserWorkforceID</p>
+<p class="para">TargetUserWorkforceID</p></td>
+</tr>
+<tr class="oddrow" id="bznpe9m"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Given Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">FIRST_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr>
+<tr class="evenrow" id="bznpe9n"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Surname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LAST_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr>
+<tr class="oddrow" id="b1029lh6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Full Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">FULL_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">InitiatorUserFullName</p>
+<p class="para">TargetUserFullName</p></td>
+</tr>
+<tr class="evenrow" id="b1029lh7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Title</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">JOB_TITLE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr>
+<tr class="oddrow" id="b1029lh8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OU</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DEPARTMENT_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">InitiatorUserDepartment</p>
+<p class="para">TargetUserDepartment</p></td>
+</tr>
+<tr class="evenrow" id="b1029lh9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">mailstop</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OFFICE_LOC_CD</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr>
+<tr class="oddrow" id="b1029lha"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Internet Email Address</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PRIMARY_EMAIL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">InitiatorEmail</p>
+<p class="para">TargetEmail</p></td>
+</tr>
+<tr class="evenrow" id="b1029lhb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Telephone Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PRIMARY_PHONE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr>
+<tr class="oddrow" id="b1029lhc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">manager</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">MGR_GUID</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Stores the Sentinel GUID that represents the identity of this person's manager. The mapping is not direct. Sentinel uses the object referenced by the Identity Vault âmanagerâ attribute to determine the manager's Sentinel Identity object and thereby obtains the actual GUID value that forms the reference in Sentinel.</p></td>
+</tr>
+<tr class="evenrow" id="b1029lhd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">photo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PHOTO</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr></table>
+</div>
+
+<p class="para">In addition to the Identity information, Sentinel stores information about accounts associated with this Identity. The Identity Manager drivers that are provisioning accounts to connected systems store information about those accounts in a multi-valued attribute on the DirXML-Accounts source User object. The format of each value in DirXML-Accounts is as follows:</p><pre class="screen">&lt;driver guid&gt;#&lt;account id type&gt;#&lt;account id&gt;#&lt;idv account status&gt;#&lt;app account status&gt;#&lt;app Name&gt;</pre>
+<p class="para">The following table describes how these fields are mapped to the internal USR_ACCOUNTS table in Sentinel:</p>
+<div class="table" id="b1029w7f"><p class="title"><em class="num">Table 8-2 </em>Mapping in USR_ACCOUNTS Table</p>
+<table class="topbot" width="100%"><col width="27%" /><col width="27%" /><col width="46%" />
+          
+<tr class="headerrow" id="b1029w7g"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sentinel Column</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Event Field and Comments</p></th>
+</tr>
+        
+<tr class="oddrow" id="b1029w7h"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;account id&gt;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">USR_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This field and USR_NAME are parsed out from the account information.</p></td>
+</tr>
+<tr class="evenrow" id="b1029w7i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">(calculated)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AUTHORITY</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This field and USR_NAME are parsed out from the account information.</p>
+<p class="para">This field and AUTHORITY are parsed out from the account information.</p></td>
+</tr>
+<tr class="oddrow" id="b1029w7j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;idv account status&gt;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">BEGIN_EFFECTIVE_DATE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This value is set based on the settings of this field and the &lt;app account status&gt; field, plus Sentinel records a temporal record of when the account status was changed.</p></td>
+</tr>
+<tr class="evenrow" id="b1029zxv"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;app account status&gt;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">END_EFFECTIVE_DATECURRENT_F</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This value is set based on the settings of this field and the &lt;idv account status&gt; field, plus Sentinel records a temporal record of when the account status was changed.</p></td>
+</tr></table>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If the default schema mapping does not meet your requirements, you can customize most of the schema mappings between the Identity Vault and Sentinel to suit your requirements. The framework is fully extensible to store arbitrary Identity attributes in Sentinel by using the Extended Attributes table (USR_IDENTITY_EXT_ATTR).</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="gcv-global-configuration-values,driver-properties,driver-configuration,delimited-driver-extensions,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Global Configuration Values - NetIQ Identity Manager Driver for Delimited Text Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="gcv-global-configuration-values">
+
+<h1 class="title h1"><span class="number">A.2</span> Global Configuration Values</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Global configuration values (GCVs) enable you to specify settings for the Identity Manager features such as password synchronization and driver heartbeat, as well as settings that are specific to the function of an individual driver configuration. Some GCVs are provided with the drivers, but you can also add your own.</p>
+<p class="para">In Identity Console:</p>
+<div class="procedure" id="bf153pf">
+<ol class="steps">
+<li class="step" id="bf153pg">
+<p class="para">Click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step" id="bf153ph">
+<p class="para">Select the driver set that contains the driver whose properties you want to edit.</p></li>
+<li class="step" id="bf153pl">
+<p class="para">Locate the Delimited Text driver icon, then click the driver icon to display the driverâs properties page.</p></li>
+<li class="step" id="bg1k2w4">
+<p class="para">Click <span class="guimenu">Global Config Values</span> drop down to display the GCV page.</p></li></ol>
+</div>
+
+<p class="para">In Designer:</p>
+<div class="procedure" id="b94psjb">
+<ol class="steps">
+<li class="step" id="b94psjc">
+<p class="para">Open a project in the Modeler.</p></li>
+<li class="step" id="b94psjd">
+<p class="para">Right-click the driver icon <img src="../graphics/driver_icon_n.png" alt="" class="inline" /> or line, then select <span class="guimenu">Properties</span> &gt; <span class="guimenu">Global Configuration Values</span>.</p></li></ol>
+</div>
+
+<p class="para">The Global Configuration Values are divided into the following categories:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="gcv-global-configuration-values.html#bry2spn" class="xref">Default Configuration</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="gcv-global-configuration-values.html#bry2uzm" class="xref">Password Synchronization</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="gcv-global-configuration-values.html#brnebcn" class="xref">Managed System Information</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bry2spn">
+
+<h2 class="title h2"><span class="number">A.2.1</span> Default Configuration</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following GCVs control the configuration of the Delimited Text driver:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bry2u82">
+              <p class="title"><em class="title">Field Delimiter:</em>
+              Specifies the character that is used to delimit field values in the input files. It must be one character. You can also use the tab as the delimiter field value. Tab is represented as {tab}. The default is a comma.</p>
+            </div>
+
+<p class="listitem">If the values of any of the input fields contain this character, enclose the entire value in quotes to prevent it from being seen as a delimiter. Changing this delimiter parameter to something other than a comma does not automatically change the delimiter character used in the output files when a Subscriber is used. To change the delimiter character in the output files, edit the Output Transform style sheet. The delimiter character is assigned to a variable at the beginning of that style sheet. For example, to change the delimiter, locate the &lt;xsl:variable name="delimiter" select="','"/&gt; line in the default style sheet and modify it appropriately.</p>
+<p class="listitem">This option in the driver configuration synchronizes User, Group, Organization, Country, and Organizational Unit objects. It also mirrors the structure of a subtree in the other tree.</p></li>
+<li class="listitem">
+<div class="formalpara" id="bry2u83">
+              <p class="title"><em class="title">Field Names:</em>
+              Specifies a comma-separated list of attribute names that can be referred to in the Schema Mapping rule. In the input files, the fields of the records must correspond to the order and positioning of the names in this list.</p>
+            </div>
+
+<p class="listitem">For example, if you list eight field names in this parameter, each record of the input files should have eight fields separated by the field delimiter character. On Windows, see sample.csv in the delimitedtext/samples directory for an example. On Solaris and Linux, sample.csv is located in the /usr/lib/dirxml/rules/delim directory.</p>
+<p class="listitem">The default values are LastName, FirstName, Title, Email, WorkPhone, Fax, WirelessPhone, and Description.</p></li>
+<li class="listitem">
+<div class="formalpara" id="b1824hsa">
+              <p class="title"><em class="title">Association Attribute:</em>
+              Specifies the attribute value used for association.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Suppress Encrypted Attribute in Trace:</em>
+              This GCV is effective only when any of the attributes is set as Encrypted Attribute or only when Encrypted Attribute policy is active. When this attribute is set to <span class="guimenu">Yes</span>, the complete content of the csv file is suppressed. In case you wish to view the content, set the attribute to <span class="guimenu">No</span>.</p>
+            </div>
+
+<p class="listitem">By default the GCV is set to <span class="guimenu">Yes</span>.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bry2uzm">
+
+<h2 class="title h2"><span class="number">A.2.2</span> Password Synchronization</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following GCVs control password synchronization for the Delimited Text driver. For more information, see the <span class="citetitle"><a href="../../../identity-manager-48/password_management/data/netiq-idm-password-management.html#netiq-idm-password-management" class="ulink">NetIQ Identity Manager Password Management Guide</a></span>.</p>
+<p class="para">In Designer, you must click the <img src="../graphics/designer_edit_pass_sync_n.png" alt="" class="inline" /> icon next to a GCV to edit it. This displays the Password Synchronization Options dialog box for a better view of the relationship between the different GCVs.</p>
+<p class="para">In Identity Console, to edit the Password management options go to <span class="guimenu">Configuration</span> > <span class="guimenu">Global Configuration Values</span>, and then change it in your Password synchronization policy tab.</p>
+<div class="formalpara" id="bry2x3m">
+          <p class="title"><em class="title">Connected System Name or Driver Name:</em>
+          Specify the name of the driver. The e-mail notification template uses this value to identify the source of the notification message.</p>
+        </div>
+
+<div class="formalpara" id="bry3crn">
+          <p class="title"><em class="title">Application accepts passwords from Identity Manager:</em>
+          If <span class="guimenu">True</span>, allows passwords to flow from the Identity Manager data store to the connected system.</p>
+        </div>
+
+<div class="formalpara" id="bry3dc6">
+          <p class="title"><em class="title">Identity Manager accepts passwords from application:</em>
+          If <span class="guimenu">True</span>, allows passwords to flow from the connected system to Identity Manager.</p>
+        </div>
+
+<div class="formalpara" id="bry3dnd">
+          <p class="title"><em class="title">Publish passwords to NDS password:</em>
+          Use the password from the connected system to set the non-reversible NDS password in eDirectory.</p>
+        </div>
+
+<div class="formalpara" id="bry3dv4">
+          <p class="title"><em class="title">Publish passwords to Distribution Password:</em>
+          Use the password from the connected system to set the NMAS Distribution Password used for Identity Manager password synchronization.</p>
+        </div>
+
+<div class="formalpara" id="bry3eam">
+          <p class="title"><em class="title">Require password policy validation before publishing passwords:</em>
+          If <span class="guimenu">True</span>, applies NMAS password policies during publish password operations. The password is not written to the data store if it does not comply.</p>
+        </div>
+
+<div class="formalpara" id="bry3elj">
+          <p class="title"><em class="title">Reset userâs external system password to the Identity Manager password on failure:</em>
+          If <span class="guimenu">True</span>, on a publish Distribution Password failure, attempt to reset the password in the connected system by using the Distribution Password from the Identity Manager data store.</p>
+        </div>
+
+<div class="formalpara" id="bry3f1e">
+          <p class="title"><em class="title">Notify the user of password synchronization failure via e-mail:</em>
+          If <span class="guimenu">True</span>, notify the user by e-mail of any password synchronization failures.</p>
+        </div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="brnebcn">
+
+<h2 class="title h2"><span class="number">A.2.3</span> Managed System Information</h2>
+
+<div class="content_wrapper">
+
+<p class="para">These settings help the Identity Reporting Module function to generate reports. There are different sections in the <span class="guimenu">Managed System Information</span> tab.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="gcv-global-configuration-values.html#brnwucf" class="xref">General Information</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="gcv-global-configuration-values.html#brnwwph" class="xref">System Ownership</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="gcv-global-configuration-values.html#brnwxtq" class="xref">System Classification</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="gcv-global-configuration-values.html#brnx41r" class="xref">Connection and Miscellaneous Information</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="brnwucf">
+
+<h3 class="title h3">General Information</h3>
+
+<div class="formalpara" id="brnwu5n">
+            <p class="title"><em class="title">Name:</em>
+            Specifies a descriptive name for this Identity Vault.</p>
+          </div>
+
+<div class="formalpara" id="brnwv4o">
+            <p class="title"><em class="title">Description:</em>
+            Specifies a brief description of this Identity Vault.</p>
+          </div>
+
+<div class="formalpara" id="brnwvj5">
+            <p class="title"><em class="title">Location:</em>
+            Specifies the physical location of this Identity Vault.</p>
+          </div>
+
+<div class="formalpara" id="brnwvz2">
+            <p class="title"><em class="title">Vendor:</em>
+            Specifies the vendor of the Identity Vault.</p>
+          </div>
+
+<div class="formalpara" id="brnwwff">
+            <p class="title"><em class="title">Version:</em>
+            Specifies the version of this Identity Vault.</p>
+          </div>
+
+</div>
+
+<div class="container sect3" id="brnwwph">
+
+<h3 class="title h3">System Ownership</h3>
+
+<div class="formalpara" id="brnwwtk">
+            <p class="title"><em class="title">Business Owner:</em>
+            Browse to and select the business owner in the Identity Vault for this Identity Vault. You must select a user object, not a role, group, or container.</p>
+          </div>
+
+<div class="formalpara" id="brnwxdl">
+            <p class="title"><em class="title">Application Owner:</em>
+            Browse to and select the application owner in the Identity Vault for this Identity Vault. You must select a user object, not a role, group, or container.</p>
+          </div>
+
+</div>
+
+<div class="container sect3" id="brnwxtq">
+
+<h3 class="title h3">System Classification</h3>
+
+<div class="formalpara" id="brnwxx4">
+            <p class="title"><em class="title">Classification:</em>
+            Specifies the classification of the Identity Vault. This information is displayed in the reports. The options are:</p>
+          </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Mission-Critical</p></li>
+<li class="listitem">
+<p class="listitem">Vital</p></li>
+<li class="listitem">
+<p class="listitem">Not-Critical</p></li>
+<li class="listitem">
+<p class="listitem">Other</p>
+<p class="listitem">If you select <span class="guimenu">Other</span>, you must specify a custom classification for the Identity Vault.</p></li></ul></div>
+
+<div class="formalpara" id="brnx6m0">
+            <p class="title"><em class="title">Environment:</em>
+            Specifies the type of environment the Identity Vault provides. The options are:</p>
+          </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Development</p></li>
+<li class="listitem">
+<p class="listitem">Test</p></li>
+<li class="listitem">
+<p class="listitem">Staging</p></li>
+<li class="listitem">
+<p class="listitem">Production</p></li>
+<li class="listitem">
+<p class="listitem">Other</p>
+<p class="listitem">If you select <span class="guimenu">Other</span>, you must specify a custom classification for the Identity Vault.</p></li></ul></div>
+
+</div>
+
+<div class="container sect3" id="brnx41r">
+
+<h3 class="title h3">Connection and Miscellaneous Information</h3>
+
+<div class="formalpara" id="brnx46c">
+            <p class="title"><em class="title">Connection and miscellaneous information:</em>
+            This options is always set to <span class="guimenu">hide</span>, so that you donât make changes to these options.</p>
+          </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

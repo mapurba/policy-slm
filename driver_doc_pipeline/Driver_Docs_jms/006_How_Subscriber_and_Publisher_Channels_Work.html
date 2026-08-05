@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-subscriber-and-publisher-channel-works,understanding-the-jms-driver,jms-messages,support-for-standard-driver-features,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>How Subscriber and Publisher Channels Work - NetIQ Identity Manager Driver for JMS Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-subscriber-and-publisher-channel-works">
+
+<h1 class="title h1"><span class="number">1.5</span> How Subscriber and Publisher Channels Work</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following sections contain information about how the Subscriber and Publisher channels work with the JMS driver. This driver functions differently than traditional Identity Manager drivers, so itâs important to review this information.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="how-subscriber-and-publisher-channel-works.html#b5j2636" class="xref">Subscriber Channel</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-subscriber-and-publisher-channel-works.html#b5j2662" class="xref">Publisher Channel</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j2636">
+
+<h2 class="title h2"><span class="number">1.5.1</span> Subscriber Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel is capable of sending messages to (and optionally receiving messages from) multiple destinations on a single broker. Multi-broker support is not yet implemented. As a side effect of sending a JMS message, the Subscriber channel can receive a response within a specified timeout interval. Message routing and RPC (Remote Procedure Call) emulation are achieved via three special attributes: <span class="guimenu">jms:send-to</span>, <span class="guimenu">jms:receive-from</span> and <span class="guimenu">jms:receive-timeout</span>.</p>
+<h4 class="bridgehead" id="b5j273c">Example Special Attributes</h4>
+<pre class="screen">&lt;jms:message xmlns:jms="urn:idm:jms"
+               jms:send-to="queueA" 
+               jms:receive-from="queueB"
+             jms:receive-timeout-seconds="10"/&gt;</pre>
+<p class="para">These attributes can be used on a <span class="guimenu">jms:message</span> envelope tag or any XDS command that is a child of input/output elements. The destination names used in these parameters can either be the JNDI (Java Naming and Directory Interface) name or the unique Identity Manager identifier assigned to the destination in the driver configuration. By default, the Subscriber sends messages to the first-defined send destination and does not wait for a message response (meaning that the message receipt is assumed to be asynchronous).</p>
+<p class="para">By using a JMS message envelope, it is possible to override headers/properties or add vendor-specific properties or application properties.</p><pre class="screen">&lt;jms:message xmlns:jms="urn:idm:jms"&gt;
+   &lt;jms:headers&gt;
+   &lt;!-- override standard headers --&gt;
+       &lt;jms:header jms:name="JMSType"&gt;type&lt;/jms:header&gt;
+       &lt;jms:header jms:name="JMSCorrelationID"&gt;blah&lt;/jms:header&gt;
+      &lt;jms:header jms:name="JMSDeliveryMode"&gt;non-persistent&lt;/jms:header&gt;
+      &lt;jms:header jms:name="JMSExpiration"&gt;10000&lt;/jms:header&gt;
+      &lt;jms:header jms:name="JMSPriority"&gt;9&lt;/jms:header&gt;
+      &lt;jms:header jms:name="JMSReplyTo"&gt;A&lt;/jms:header&gt;
+   &lt;/jms:headers&gt;
+   &lt;jms:properties&gt;
+      &lt;!-- add/override vendor-specific properties --&gt;
+      &lt;jms:property jms:name="JMS_IBM_Format"&gt;MQSTR&lt;/jms:property&gt;
+      &lt;!-- add/override application properties --&gt;
+      &lt;jms:property jms:name="Novell_IDM_MessageType"&gt;bytes&lt;/jms:property&gt;
+      &lt;jms:property jms:name="Novell_IDM_ContentType"&gt;xml&lt;/jms:property&gt;
+      &lt;jms:property jms:name="Novell_IDM_CharEncoding"&gt;UTF-8&lt;/jms:property&gt;
+   &lt;/jms:properties&gt;
+   &lt;jms:body&gt;text&lt;/jms:body&gt;
+&lt;/jms:message&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j2662">
+
+<h2 class="title h2"><span class="number">1.5.2</span> Publisher Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Publisher channel is essentially a Subscriber channel (you can send messages to a broker as a side effect of publishing messagesâincluding heartbeat documentsâand wait for a response) with the added ability to periodically monitor specified destinations to receive messages for publication.</p>
+<p class="para">You can configure the Publisher channel to monitor an unlimited number of destinations on a single message broker bounded only by certain practical considerations. Having too many monitored destinations can significantly slow down rendering of driver parameters in Identity Console or Designer, as currently implemented. Having too many destinations can result in decreased performance because all destinations are being monitored by a single thread. Furthermore, there is a finite amount of space available for storing a driver's configuration (64 KB).</p>
+<p class="para">The Publisher channel polls each monitored destination in a round-robin fashion, starting with the first declared destination. A polling cycle ends when all monitored destinations fail to return messages, at which time the Publisher sleeps for the specified polling interval until it's time to start a new polling cycle.</p>
+<p class="para">The Publisher channel receives messages in a synchronous fashion as opposed to an asynchronous one. The main reason for this is to prevent client overrunâwhen the message broker feeds messages to the driver faster than it can process themâthat can lead to memory exhaustion.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

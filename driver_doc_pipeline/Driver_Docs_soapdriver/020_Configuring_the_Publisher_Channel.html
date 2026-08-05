@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="configure-publisher-channel,secure-communication,secure-communication,configure-subscriber-channel,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring the Publisher Channel - NetIQ Identity Manager Driver for SOAP Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="configure-publisher-channel">
+
+<h1 class="title h1"><span class="number">6.1</span> Configuring the Publisher Channel</h1>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b8qusf">
+<ol class="steps">
+<li class="step" id="bw1k1td">
+<p class="para">Create a server certificate in Identity Console:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1k2qa">
+<p class="para">Under <span class="guimenu">eDirectory</span>, click <span class="guimenu">Certificate Management &gt; Server Certificate Management</span>.</p></li>
+<li class="step">
+<p class="para">Click Create Server Certificate icon <img src="../graphics/create_certificate.png" alt="" class="inline" />.</p></li>
+<li class="step" id="bw1k31m">
+<p class="para">Browse to and select the server object where the SOAP driver is installed.</p></li>
+<li class="step" id="b1k4oxh">
+<p class="para">Specify a certificate nickname.</p></li>
+<li class="step" id="bw1k369">
+<p class="para">Select <span class="guimenu">Standard</span> as the creation method, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bw1k3bx">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1k1wf">
+<p class="para">Export a self-signed certificate from the certificate authority in eDirectory:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1k3ix">
+<p class="para">Under <span class="guimenu">eDirectory</span>, click <span class="guimenu">Certificate Management &gt; Server Certificate Management</span>.</p></li>
+<li class="step" id="bw1k3on">
+<p class="para">Select your treeâs certificate authority object.</p>
+<p class="para">It is usually found in the Security container and is named something like <span class="replaceable">TREENAME CA.Security</span>.</p></li>
+<li class="step" id="bw1k42u">
+<p class="para">Click <img src="../graphics/export_certificate.png" alt="" class="inline" /> <span class="guimenu">Export Server Certificate</span> icon.</p></li>
+<li class="step" id="bw1k450">
+<p class="para">Uncheck the <span class="guimenu">Export private key</span> option.</p></li>
+<li class="step" id="bw1k479">
+<p class="para">Based on the client to be accessing the Web service, select either <span class="guimenu">File in binary DER format</span> or <span class="guimenu">File in Base64 format</span> for the certificate, then click <span class="guimenu">OK</span>.</p>
+<p class="para">If the client uses a Java-based keystore or trust store, then you can choose either format.</p></li>
+<li class="step" id="bw1k4am">
+<p class="para">Click <span class="guimenu">Save the exported certificate to a file</span>.</p></li>
+<li class="step" id="b1k4tlr">
+<p class="para">Then click <span class="guimenu">Close</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1k21x">
+<p class="para">Import the self-signed certificate into the clientâs trust store:</p>
+<p class="para">The steps to import the certificate vary depending on the client that connects to the Publisher channelâs HTTPS listener. If the client uses a typical Java keystore, you can perform the following steps to create the keystore:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1k5gw">
+<p class="para">Use the keytool executable that is included with any Java JDK.</p>
+<p class="para">For more information on keytool, see <a href="https://docs.oracle.com/javase/7/docs/technotes/tools/windows/keytool.html" class="ulink">Keytool - Key and Certificate Management Tool</a>.</p></li>
+<li class="step" id="bw1kz7n">
+<p class="para">Enter the following command at a command prompt:</p><pre class="screen">keytool -import -file <span class="replaceable">name_of_cert_file</span> -trustcacerts -noprompt 
+-keystore <span class="replaceable">filename</span> -storepass <span class="replaceable">password</span>        </pre>
+<p class="para">For example:</p><pre class="screen">keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell</pre></li></ol>
+</div>
+</li>
+<li class="step" id="bw1k2ad">
+<p class="para">Configure the Publisher channel to use the server certificate you created in <a href="configure-publisher-channel.html#bw1k1td" class="xref">Step 1</a>:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1l0uc">
+<p class="para">In Identity Console, in the <span class="guimenu">Identity Manager</span> frame, click <span class="guimenu">IDM Administration</span>.</p></li>
+<li class="step" id="bw1l0ud">
+<p class="para">Locate the driver set containing the SOAP driver, then click the driverâs icon to display the configuration page.</p></li>
+<li class="step" id="bw1l0ue">
+<p class="para">Go to <span class="guimenu">Configuration</span> &gt; <span class="guimenu">Driver Parameters</span>, then go to <span class="guimenu">Publisher Settings</span>.</p></li>
+<li class="step" id="bw1k5yj">
+<p class="para">In the <span class="guimenu">KMO name</span>, specify the certificate nickname you used in <a href="configure-publisher-channel.html#bw1k1td" class="xref">Step 1</a>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1kuwa">
+<p class="para">Click <span class="guimenu">Apply</span>, then click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

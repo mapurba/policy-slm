@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xehpq,b3r8si5,b1byr9qs,b3xfpxf,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing the Driver Shim on the Connected System - NetIQ Top Secret Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xehpq">
+
+<h1 class="title h1"><span class="number">3.6</span> Installing the Driver Shim on the Connected System</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver shim and its files are installed into data sets that you specify, and into files created by the installation process in the HFS.</p>
+<p class="para">The driver uses an embedded Remote Loader. It is not necessary to install Java on the connected system.</p>
+<p class="para">For all procedures in this section that are performed using the target system, use a user ID with administrative rights.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b686w3q" class="xref">Setting Up the Libraries on Your z/OS System</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b6gg0a2" class="xref">Authorizing the Driver TSO Commands</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b6a6dt2" class="xref">Securing the Driver Shim with SSL</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b6a6fy0" class="xref">Configuring the Remote Loader and Driver Object Passwords</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b689r3r" class="xref">Allocating and Initializing the Change Log Data Set</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b6gwofm" class="xref">Setting Up the Started Tasks</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b689zih" class="xref">Testing before Installing the Security System Exit</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b689zsr" class="xref">Installing the Driver Security System Exit IDMTSSIX</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xehpq.html#b68a0hn" class="xref">Testing the Completed Connected System Installation</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b686w3q">
+
+<h2 class="title h2"><span class="number">3.6.1</span> Setting Up the Libraries on Your z/OS System</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver shim is packaged as z/OS partitioned data sets (PDS) unloaded with the <span class="command">TRANSMIT</span> command.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b68709m">
+              <p class="title"><em class="title">Driver Samples Library:</em>
+              <span class="filename">samplib.xmt</span> contains sample cataloged procedures, other JCL, and sample configuration-related files.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b686xbm">
+              <p class="title"><em class="title">Driver Load Library:</em>
+              <span class="filename">idmload.xmt</span> contains executable programs for the driver shim.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b68709n">
+              <p class="title"><em class="title">Driver REXX Exec Library:</em>
+              <span class="filename">tssexec.xmt</span> contains the REXX execs for the scriptable framework and to perform configuration tasks.</p>
+            </div>
+</li></ul></div>
+
+<div class="procedure" id="b687lsf">
+<p class="para">To upload these files to the target system and extract them:</p>
+<ol class="steps">
+<li class="step" id="b687lsg">
+<p class="para">Use FTP to upload the files to the target system from the workstation where you placed them in <a href="b3xd1sq.html#b6a682m" class="xref">Step 2</a>.</p><pre class="screen">c:\&gt; ftp <span class="replaceable">Your-z/OS-Host</span>
+User: <span class="replaceable">Your-User-ID</span>
+Password:
+ftp&gt; quote site lrecl=80 recfm=fb
+ftp&gt; binary
+ftp&gt; put samplib.xmt
+ftp&gt; put tssexec.xmt
+ftp&gt; quote site pri=30 sec=5 cyl
+ftp&gt; put idmload.xmt
+ftp&gt; quit</pre></li>
+<li class="step" id="b689g0p">
+<p class="para">Log on to z/OS using the same user ID that you used for the FTP session.</p></li>
+<li class="step" id="b689ggk">
+<p class="para">Use the TSO <span class="command">RECEIVE</span> command to extract the data sets. When <span class="command">RECEIVE</span> prompts you for parameters, specify the appropriate data set names and volumes according to your standards.</p>
+<p class="para">Place these data sets on a disk volume that is shared by the systems that share the security system database.</p><pre class="screen">READY
+receive indataset(samplib.xmt)
+INMR901I Dataset IDM.SAMPLIB from ADMIN on SYSB
+INMR906A Enter restore parameters or 'DELETE' or 'END' +
+dsname('sys3.ts.samplib') volume(work0a)
+. . . many IEBCOPY messages . . .
+INMR001I Restore successful to dataset 'SYS3.TS.SAMPLIB'
+READY
+receive indataset(idmload.xmt)
+INMR901I Dataset IDM.LOAD from ADMIN on SYSB
+INMR906A Enter restore parameters or 'DELETE' or 'END' +
+dsname('sys3.ts.load') volume(work0a)
+. . . many IEBCOPY messages . . .
+INMR001I Restore successful to dataset 'SYS3.TS.LOAD'
+READY
+receive indataset(tssexec.xmt)
+INMR901I Dataset IDM.EXECLIB from ADMIN on SYSB
+INMR906A Enter restore parameters or 'DELETE' or 'END' +
+dsname('sys3.ts.execlib') volume(work0a)
+. . . many IEBCOPY messages . . .
+INMR001I Restore successful to dataset 'SYS3.TS.EXECLIB'
+READY
+</pre></li>
+<li class="step" id="b689pdv">
+<p class="para">Add the driver load library to the APF list.</p>
+<p class="para">Use the <span class="filename">PARMLIB</span> <span class="filename">IEAAPF<span class="replaceable">xx</span></span> or <span class="filename">PROG<span class="replaceable">xx</span></span> member as appropriate. If you use the dynamic APF facility, you can use the <span class="command">SET PROG</span> command to activate your changes. Otherwise, you must IPL for the change to take effect.</p></li>
+<li class="step" id="b6uvgm9">
+<p class="para">Restrict access to the driver load library.</p>
+<div class="warning">
+<p class="para"><em class="title">WARNING:</em>Do not put the driver load library in the linklist unless you use program protection to secure its contents against unauthorized use. Failure to protect the driver load library introduces security exposures.</p></div>
+</li>
+<li class="step" id="b6a6aw2">
+<p class="para">Customize the JOB card and run the job in the samples library member <span class="filename">HFSINST</span>.</p>
+<p class="para">This creates the HFS file system structure for the driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6gg0a2">
+
+<h2 class="title h2"><span class="number">3.6.2</span> Authorizing the Driver TSO Commands</h2>
+
+<div class="content_wrapper">
+
+<p class="para"><span class="command">LDXSERV</span>, <span class="command">SAFQUERY</span> and <span class="command">TSSLPBK</span> require APF authorization. They reside in the driver load library, which you added to the APF list in <a href="b3xehpq.html#b689pdv" class="xref">Step 4</a>. You must also add them to the list of authorized TSO commands.</p>
+<div class="procedure" id="b6gg16t">
+<ol class="steps">
+<li class="step" id="b6gg16u">
+<p class="para">Add <span class="literal">LDXSERV</span>, <span class="literal">SAFQUERY</span> and <span class="command">TSSLPBK</span> to the <span class="literal">AUTHCMD NAMES(...)</span> statement in member <span class="filename">IKJTSO<span class="replaceable">xx</span></span> of <span class="filename">SYS1.PARMLIB</span> or its equivalent.</p>
+<div class="example" id="b6gg3ee">
+              <p class="title"><em class="num">Example 3-1 </em>Example:</p>
+              <pre class="screen">AUTHCMD NAMES(...
+  <span class="replaceable">other commands</span>...
+  LDXSERV SAFQUERY TSSLPBK)</pre>
+            </div>
+</li>
+<li class="step" id="b6gg2ec">
+<p class="para">Use the <span class="command">PARMLIB</span> TSO command to activate your changes.</p>
+<div class="example" id="b6gg3nd">
+              <p class="title"><em class="num">Example 3-2 </em>Example:</p>
+              <pre class="screen">PARMLIB CHECK(00)
+PARMLIB UPDATE(00)</pre>
+            </div>
+
+<p class="para">For more information about the <span class="command">PARMLIB</span> command, see the <span class="citetitle">TSO/E System Programming Command Reference</span> for your system.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6a6dt2">
+
+<h2 class="title h2"><span class="number">3.6.3</span> Securing the Driver Shim with SSL</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b6a6e3o">
+<ol class="steps">
+<li class="step" id="b6a6e3p">
+<p class="para">Run the REXX exec in the REXX exec library member <span class="filename">SETCERT</span>.</p></li>
+<li class="step" id="b6a6ejj">
+<p class="para">When prompted, enter the Metadirectory server host name or IP address and secure LDAP port number (default is 636).</p></li>
+<li class="step" id="b6a6f3b">
+<p class="para">When prompted, enter <span class="literal">Y</span> to accept the certificate authority presented.</p></li></ol>
+</div>
+<pre class="screen">You are about to connect to the eDirectory LDAP server to retrieve
+the eDirectory Tree Trusted Root public certificate.
+
+Enter the LDAP Server Host Address [localhost]: sr.digitalairlines.com
+Enter the LDAP Server Port [636]:
+
+Certificate Authority:
+   Subject:       ou=Organizational CA,o=TREENAME
+   Not Before:    20160821144845Z
+   Not After:     20260821144845Z
+Do you accept the Certificate Authority? (Y/N) y</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6a6fy0">
+
+<h2 class="title h2"><span class="number">3.6.4</span> Configuring the Remote Loader and Driver Object Passwords</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Run the REXX exec in the driver REXX exec library member <span class="filename">SETPWDS</span>, and respond to the prompts.</p>
+<p class="para">Use the same passwords that you used in <a href="b1byr9qs.html#b1byr9re" class="xref">Step 11</a> when setting up the driver on the Metadirectory server.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b689r3r">
+
+<h2 class="title h2"><span class="number">3.6.5</span> Allocating and Initializing the Change Log Data Set</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The change log data set is a standard z/OS direct access data set. The change log data set must reside on a shared device unless it is used by only a single system.</p>
+<p class="para">Create one change log data set. It is shared by each z/OS system that shares the security system database. The log file utility <span class="command">LDXUTIL</span> is used to initialize the change log data set. The change log data set must be initialized before you start the driver shim started task for the first time.</p>
+<div class="procedure" id="b689spq">
+<p class="para">To allocate and initialize the change log data set:</p>
+<ol class="steps">
+<li class="step" id="b689spr">
+<p class="para">Customize the samples library member <span class="filename">LOGINIT</span>.</p>
+<p class="para">Update the JCL to conform to your local installation requirements, and specify the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The name of your driver load library.</p></li>
+<li class="listitem">
+<p class="listitem">A name for your change log data set.</p></li>
+<li class="listitem">
+<p class="listitem">The shared disk volume where the change log is to be allocated. Specify a different unit name if appropriate.</p></li></ul></div>
+</li>
+<li class="step" id="b689u8h">
+<p class="para">Run the LOGINIT job.</p>
+<p class="para">An IEC031I D37 message is normal and should be ignored.</p></li>
+<li class="step" id="b689uo8">
+<p class="para">Ensure that your change log data set is protected appropriately for the sensitive nature of its contents.</p></li></ol>
+</div>
+
+<div class="warning">
+<p class="para"><em class="title">WARNING:</em>If you initialize a change log data set that contains data, the data is lost.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6gwofm">
+
+<h2 class="title h2"><span class="number">3.6.6</span> Setting Up the Started Tasks</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b3xehpq.html#b6gwp0h" class="xref">Preparing User IDs for the Started Tasks</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b3xehpq.html#b689vol" class="xref">Setting Up the Change Log Started Task</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b3xehpq.html#b6b9x41" class="xref">Setting Up the Driver Shim Started Task</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b6gwp0h">
+
+<h3 class="title h3">Preparing User IDs for the Started Tasks</h3>
+
+<p class="para">You can use any name for the user IDs.</p>
+<div class="procedure" id="b6gwpgc">
+<ol class="steps">
+<li class="step" id="b6gwpgd">
+<p class="para">Create the administrative user ID for the change log started task by entering the following single command line:</p><pre class="screen">TSS CREATE(LDXLOGR) TYPE(USER) NAME('CHANGE LOG ACID') 
+  DEPARTMENT(<span class="replaceable">deptname</span>)
+  PASSWORD(NOPW,0) FACILITY(STC)</pre>
+<p class="para">Using <span class="command">NOPW</span> creates the user ID without a password. If you assign a password, you will be prompted for it upon starting the change log started task.</p>
+<p class="para">The above example uses the ACID <span class="literal">TYPE(USER)</span> for managing ACIDs in a specific Department. Use an appropriate type based on your intended management scope. For example, use <span class="literal">TYPE(SCA)</span> to manage ACIDs for any Department or Division.</p></li>
+<li class="step" id="b6gwqpi">
+<p class="para">Create the user for the driver shim started task by entering the following single command line:</p><pre class="screen">TSS CREATE(TSDRV) TYPE(DCA) NAME('DRIVER SHIM ACID')                     
+  DEPARTMENT(<span class="replaceable">deptname</span>)
+  PASSWORD(NOPW,0) FACILITY(STC)</pre>
+<p class="para">In the above example, a Top Secret type DCA is assigned to the user ID, so it can be an administrator type capable of managing ACIDs within a department.</p>
+<p class="para">Using <span class="command">NOPW</span> creates the user ID without a password. If you assign a password, you will be prompted for it upon starting the change log started task.</p></li>
+<li class="step" id="b6gwrmw">
+<p class="para">Assign OMVS attributes to the driver shim ACID, which is required to run the driver shim started task, by entering the following command lines:</p><pre class="screen">TSS ADDTO(TSDRV) ID(0) HOME(/) OMVSPGM(/bin/sh) DFLTGRP(OMVSGRP)
+
+TSS MODIFY(OMVSTABS)</pre>
+<p class="para">In this example, <span class="command">UID(0)</span>and <span class="command">DFLTGRP(OMVSGRP)</span> are used. Any UNIX user ID and group may be assigned here, provided they have read/write access to the HFS directories created in <a href="b3xehpq.html#b6a6dt2" class="xref">Securing the Driver Shim with SSL</a> and <a href="b3xehpq.html#b6a6fy0" class="xref">Configuring the Remote Loader and Driver Object Passwords</a>.</p></li>
+<li class="step" id="b6gwqvm">
+<p class="para">Assign necessary administrator privileges to the driver shim ACID by entering the following single command:</p><pre class="screen">TSS ADMIN(TSDRV) ACID(ALL) MISC1(ALL) MISC2(ALL) MISC9(ALL)
+  DATA(RESOURCE, XAUTH, INSTDATA, CICS, PROFILE, ADMIN, NAMES, ACID, 
+  PASSWORD, ALL)</pre>
+<p class="para">In the above example, administrator privileges are assigned to LIST/CREATE/DELETE/MODIFY ACIDs and all the data within their scope.</p></li>
+<li class="step" id="b10298z1">
+<p class="para">Add the user ACIDs to the STC table to assign them to the started tasks by entering the following command lines:</p><pre class="screen">TSS ADDTO(STC) PROCNAME(LDXLOGR) ACID(LDXLOGR)
+
+TSS ADDTO(STC) PROCNAME(TSDRV) ACID(TSDRV)</pre></li>
+<li class="step" id="b6gwsmk">
+<p class="para">Use the include/exclude file to exclude these users from provisioning.</p>
+<div class="example" id="b6gwtya">
+                <p class="title"><em class="num">Example 3-3 </em>Example Include/Exclude File Fragment:</p>
+                <pre class="screen">EXCLUDE
+   ...
+   LDXLOGR
+   TSDRV
+   ...
+ENDEXCLUDE</pre>
+              </div>
+
+<p class="para">For details about the include/exclude file, see <a href="b3xxit1.html" class="xref">The Connected System Include/Exclude File</a>.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b689vol">
+
+<h3 class="title h3">Setting Up the Change Log Started Task</h3>
+
+<p class="para">You must install and run the change log started task on each system that shares the security system database.</p>
+<div class="procedure" id="b689vvp">
+<p class="para">To install the change log started task:</p>
+<ol class="steps">
+<li class="step" id="b689vvq">
+<p class="para">Copy member <span class="filename">LDXLOGR</span> from the samples library to your started task procedure library (<span class="filename">SYS1.PROCLIB</span> or its equivalent). You can give the change log started task a different name if necessary.</p></li>
+<li class="step" id="b689wij">
+<p class="para">Update the JCL to specify the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The name of your driver load library</p></li>
+<li class="listitem">
+<p class="listitem">The name of your change log data set</p></li></ul></div>
+</li>
+<li class="step" id="b689x1g">
+<p class="para">Add the change log started task to your system startup and shutdown procedures.</p>
+<p class="para">For information about starting and stopping the change log started task, see <a href="b432wif.html" class="xref">Starting and Stopping the Change Log Started Task</a>.</p>
+<p class="para">The change log started task should be started during your system startup procedure before user processing begins. Any events of interest that occur are stored in the memory queue until the change log started task has initialized.</p>
+<p class="para">The change log started task should be stopped during your system shutdown procedure after all user processing has ended. Any events of interest that occur after the change log started task shuts down remain in the memory queue and are lost when the system is shut down.</p></li>
+<li class="step" id="b689ygt">
+<p class="para">Review your Workload Manager definitions to ensure that the change log started task is assigned to a Service Class appropriate for its role.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b6b9x41">
+
+<h3 class="title h3">Setting Up the Driver Shim Started Task</h3>
+
+<p class="para">Install and run the driver shim started task on only one system that shares the security system database.</p>
+<div class="procedure" id="b6b9x42">
+<p class="para">To install the driver shim started task:</p>
+<ol class="steps">
+<li class="step" id="b6b9x43">
+<p class="para">Copy member <span class="filename">TSDRV</span> from the samples library to your started task procedure library (<span class="filename">SYS1.PROCLIB</span> or its equivalent). You can give the driver shim started task a different name if necessary.</p></li>
+<li class="step" id="b6b9x44">
+<p class="para">Update the JCL to specify the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The name of your driver load library</p></li>
+<li class="listitem">
+<p class="listitem">The name of your driver shim configuration file</p>
+<p class="listitem">You can use your driver samples library member <span class="filename">DRVCONF</span> as a model. For details, see <a href="b4baik6.html" class="xref">The Driver Shim Configuration File</a>.</p></li>
+<li class="listitem">
+<p class="listitem">The name of your connected system schema file</p>
+<p class="listitem">You can use your driver samples library member <span class="filename">SCHEMDEF</span> as a model. For details, see <a href="b3xxapt.html" class="xref">The Connected System Schema File</a>.</p></li>
+<li class="listitem">
+<p class="listitem">The name of your include/exclude file</p>
+<p class="listitem">You can use your driver samples library member <span class="filename">INCEXC</span> as a model. For details, see <a href="b3xxit1.html" class="xref">The Connected System Include/Exclude File</a>.</p></li>
+<li class="listitem">
+<p class="listitem">The name of your change log data set</p></li>
+<li class="listitem">
+<p class="listitem">The name of your driver REXX exec library</p></li></ul></div>
+</li>
+<li class="step" id="b6b9x45">
+<p class="para">Add the driver shim started task to your system startup and shutdown procedures.</p>
+<p class="para">For information about starting and stopping the driver shim started task, see <a href="b6ba6cj.html" class="xref">Starting and Stopping the Driver Shim Started Task</a>.</p>
+<p class="para">The driver shim started task should be started during your system startup procedure before user processing begins. The driver shim started task should be stopped during your system shutdown procedure after all user processing has ended.</p></li>
+<li class="step" id="b6b9x46">
+<p class="para">Review your Workload Manager definitions to ensure that the driver shim started task is assigned to a Service Class appropriate for its role.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b689zih">
+
+<h2 class="title h2"><span class="number">3.6.7</span> Testing before Installing the Security System Exit</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can use the <span class="command">LDXSERV</span> command to test your installation before you install the exit.</p>
+<div class="procedure" id="b69anyp">
+<ol class="steps">
+<li class="step" id="b69anyq">
+<p class="para">If it is not already running, start the change log started task.</p>
+<p class="para">For details about starting the change log started task, see <a href="b432wif.html" class="xref">Starting and Stopping the Change Log Started Task</a>.</p></li>
+<li class="step" id="b69ao5n">
+<p class="para">Issue the following command from a TSO session that has the driver load library included in its STEPLIB concatenation:</p><pre class="screen">LDXSERV STATUS</pre>
+<p class="para">Examine the output of the command. You should see information about the memory queue, information about the change log started task, and a valid, empty change log data set.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b689zsr">
+
+<h2 class="title h2"><span class="number">3.6.8</span> Installing the Driver Security System Exit IDMTSSIX</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Follow your normal procedure for applying system-level changes to your z/OS system. We recommend that you do the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Install and test the exit on a test system or partition first.</p></li>
+<li class="listitem">
+<p class="listitem">Make a copy of applicable libraries before applying any changes.</p></li>
+<li class="listitem">
+<p class="listitem">Plan a back off procedure.</p></li></ul></div>
+
+<p class="para">This exit uses the Top Secret Recovery File Exit to capture TSS commands. There are three different procedures for installing the driver exit module IDMTSSIX into the Top Secret installation exit TSSINSTX. Use the following table to select the procedure to use based on your Top Secret version and your current use of TSSINSTX.</p>
+<div class="table" id="b6m1kkf"><p class="title"><em class="num">Table 3-1 </em>Exit Installation Procedure Choices</p>
+<table class="topbot" width="100%"><col width="33%" /><col width="33%" /><col width="33%" />
+              
+<tr class="headerrow" id="b6m1kym"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Top Secret Version</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Your Use of TSSINSTX</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Installation Procedure to Use</p></th>
+</tr>
+            
+<tr class="oddrow" id="b6m1kyn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Version 12</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not used</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="b3xehpq.html#b6cqm28" class="xref">Exit Installation Procedure 1</a>
+                  </p></td>
+</tr>
+<tr class="evenrow" id="b6m1kyo"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Version 12</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Using TSSINSTX, but not using either the security file change or password functions</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="b3xehpq.html#b6cqnyt" class="xref">Exit Installation Procedure 2</a>
+                  </p></td>
+</tr>
+<tr class="oddrow" id="b6m1kyp"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Any version supported by the driver other than version 12</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not using TSSINSTX, or using TSSINSTX but not using either the security file change or password functions</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="b3xehpq.html#b6cqnyt" class="xref">Exit Installation Procedure 2</a>
+                  </p></td>
+</tr>
+<tr class="evenrow" id="b6m1kyq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Any version supported by the driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Already using the security file change or password functions of TSSINSTX</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="b3xehpq.html#b6cqnz2" class="xref">Exit Installation Procedure 3</a>
+                  </p></td>
+</tr></table>
+</div>
+
+<div class="container sect3" id="b6cqm28">
+
+<h3 class="title h3">Exit Installation Procedure 1</h3>
+
+<div class="procedure" id="b69aqey">
+<ol class="steps">
+<li class="step" id="b102afkv">
+<p class="para">Allocate and reformat a Recovery File for Top Secret, using <span class="command">TSSMAINT</span>. It will be used in a later step.</p></li>
+<li class="step" id="b69aqot">
+<p class="para">Use <span class="command">IEBCOPY</span> to copy member <span class="filename">TSSINSTX</span> from the driver load library to your TSS load library.</p>
+<p class="para">This member was built based on the sample provided in the <span class="filename">TSSOPMAT</span> library for CA Top Secret version 12.</p></li>
+<li class="step" id="b6m2f0o">
+<p class="para">If your TSS load library is in the z/OS linklist, refresh <span class="command">LLA</span> with the following operator command:</p><pre class="screen">F LLA,REFRESH</pre></li>
+<li class="step" id="b6cr0gs">
+<p class="para">Activate the exit using the following operator command:</p><pre class="screen">F TSS,EXIT(ON)</pre></li>
+<li class="step" id="b6m1ifg">
+<p class="para">Add the following statements to your Top Secret control options parameter file if they are not already used or specified on the TSS JCL:</p><pre class="screen">EXIT(ON)
+RECOVER(ON)
+RECFILE(<span class="replaceable">dataset-name</span>)</pre></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b6cqnyt">
+
+<h3 class="title h3">Exit Installation Procedure 2</h3>
+
+<div class="procedure" id="b6cr1me">
+<ol class="steps">
+<li class="step" id="b102aigw">
+<p class="para">If you are not already using a Top Secret Recovery File, allocate and format a Recovery File for Top Secret, using <span class="command">TSSMAINT</span>.</p></li>
+<li class="step" id="b6cr1mf">
+<p class="para">Add the following statements to your modified <span class="command">TSSINSTX</span> source at both the <span class="literal">CHANGE</span> and <span class="literal">PASSWORD</span> labels:</p><pre class="screen">         GETMAIN R,LV=72            Get standard savearea
+         LR    R11,R13              Save original R13
+         LR    R13,R1               New savearea addr into R13
+         LR    R1,R9                Copy parmlist base to R1
+         L     R15,=V(IDMTSSIX)     Get addr of IDM module
+         BALR  R14,R15              Call it
+         LR    R1,R13               Copy temp savearea ptr to R1
+         LR    R13,R11              Restore R13
+         FREEMAIN R,LV=72,A=(1)     Get rid of savearea
+         B     EXIT0</pre>
+<p class="para">These statements are in the driver samples library member <span class="filename">TSSINSTX</span>.</p></li>
+<li class="step" id="b6gg91o">
+<p class="para">In the <span class="command">TSSINSTX</span> function matrix (label <span class="literal">MATRIX</span> near the beginning of the source module), set the following two entries to <span class="command">#####YES</span>:</p><pre class="screen">(32) New Password Verification
+(48) Security File Change</pre>
+<p class="para">You can use the MATRIX table in driver samples library member <span class="filename">TSSINSTX</span> as an example.</p></li>
+<li class="step" id="b6cr4zc">
+<p class="para">Assemble and link <span class="command">TSSINSTX</span> to replace your existing <span class="command">TSSINSTX</span> module. Add the following statements to the link step:</p><pre class="screen">//SYSLIB  DD  DISP=SHR,DSN=&lt;driver load library&gt;
+//SYSLIN  DD  DISP=OLD,DSN=&lt;TSSINSTX object from ASM step&gt;
+//        DD  *
+  INCLUDE SYSLIB(IDMTSSIX)      
+  ENTRY TSSINSTX
+  NAME TSSINSTX(R)</pre></li>
+<li class="step" id="b6m2f0p">
+<p class="para">If your TSS load library is in the z/OS linklist, refresh LLA with the following operator command:</p><pre class="screen">F LLA,REFRESH</pre></li>
+<li class="step" id="b6cr634">
+<p class="para">Activate the exit using the following operator command:</p><pre class="screen">F TSS,EXIT(ON)</pre></li>
+<li class="step" id="b6m1ifh">
+<p class="para">Add the following statements to your Top Secret control options parameter file if they are not already used or specified on the TSS JCL:</p><pre class="screen">EXIT(ON)
+RECOVER(ON)
+RECFILE(<span class="replaceable">dataset-name</span>)</pre></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b6cqnz2">
+
+<h3 class="title h3">Exit Installation Procedure 3</h3>
+
+<div class="procedure" id="b6cr9lr">
+<ol class="steps">
+<li class="step" id="b102aoxr">
+<p class="para">If you are not already using a Top Secret Recovery File, allocate and reformat a Recovery File for Top Secret, using <span class="command">TSSMAINT</span>. It will be used in a later step.</p></li>
+<li class="step" id="b6m1xbd">
+<p class="para">Determine the calling sequence for your functions and the driver module IDMTSSIX.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The driver exit functions never fail a request, and they expect the current request to succeed.</p></li>
+<li class="listitem">
+<p class="listitem">If your functions might reject a request, call them before IDMTSSIX.</p></li>
+<li class="listitem">
+<p class="listitem">Do not call IDMTSSIX for a request that your exit functions reject.</p></li>
+<li class="listitem">
+<p class="listitem">If your exit functions never reject a request, it does not matter whether IDMTSSIX is called before or after your functions.</p></li></ul></div>
+</li>
+<li class="step" id="b6cr9ls">
+<p class="para">Add the following statements to your modified <span class="command">TSSINSTX</span> source in both the <span class="command">CHANGE</span> and <span class="command">PASSWORD</span> functions:</p><pre class="screen">         GETMAIN R,LV=72            Get standard savearea
+         LR    R11,R13              Save original R13
+         LR    R13,R1               New savearea addr into R13
+         LR    R1,R9                Copy parmlist base to R1
+         L     R15,=V(IDMTSSIX)     Get addr of IDM module
+         BALR  R14,R15              Call it
+         LR    R1,R13               Copy temp savearea ptr to R1
+         LR    R13,R11              Restore R13
+         FREEMAIN R,LV=72,A=(1)     Get rid of savearea
+         B     EXIT0</pre>
+<p class="para">These statements are in the driver samples library member <span class="filename">TSSINSTX</span>.</p></li>
+<li class="step" id="b6ggb0i">
+<p class="para">In the <span class="command">TSSINSTX</span> function matrix (label <span class="literal">MATRIX</span> near the beginning of the source module), set the following two entries to <span class="command">#####YES</span>:</p><pre class="screen">(32) New Password Verification
+(48) Security File Change</pre>
+<p class="para">You can use the MATRIX table in driver samples library member <span class="filename">TSSINSTX</span> as an example.</p></li>
+<li class="step" id="b6cr9lt">
+<p class="para">Assemble and link <span class="command">TSSINSTX</span> to replace your existing <span class="command">TSSINSTX</span> module. Add the following statements to the link step:</p><pre class="screen">//SYSLIB  DD  DISP=SHR,DSN=&lt;driver load library&gt;
+//SYSLIN  DD  DISP=OLD,DSN=&lt;TSSINSTX object from ASM step&gt;
+//        DD  *
+  INCLUDE SYSLIB(IDMTSSIX)      
+  ENTRY TSSINSTX
+  NAME TSSINSTX(R)</pre></li>
+<li class="step" id="b6cr9lu">
+<p class="para">If your TSS load library is in the z/OS linklist, refresh LLA with the following operator command:</p><pre class="screen">F LLA,REFRESH</pre></li>
+<li class="step" id="b6cr9lv">
+<p class="para">Activate the exit using the following operator command:</p><pre class="screen">F TSS,EXIT(ON)</pre></li>
+<li class="step" id="b6m1vp6">
+<p class="para">Add the following statements to your Top Secret control options parameter file, if they are not already used or specified on the TSS JCL:</p><pre class="screen">EXIT(ON)
+RECOVER(ON)
+RECFILE(<span class="replaceable">dataset-name</span>)</pre></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b68a0hn">
+
+<h2 class="title h2"><span class="number">3.6.9</span> Testing the Completed Connected System Installation</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b69at8t">
+<ol class="steps">
+<li class="step" id="b69atuj">
+<p class="para">If it is not already running, start the change log started task.</p>
+<p class="para">For details about starting the change log started task, see <a href="b432wif.html" class="xref">Starting and Stopping the Change Log Started Task</a>.</p></li>
+<li class="step" id="b69at8u">
+<p class="para">Perform some actions to exercise the security system exit routines and create some sample events.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b69atws">
+<p class="para">Change a password using the logon screen.</p></li>
+<li class="step" id="b69au0d">
+<p class="para">Create new user ID.</p></li></ol>
+</div>
+</li>
+<li class="step" id="b69auty">
+<p class="para">Issue the following command from a TSO session that has the driver load library included in its STEPLIB concatenation:</p><pre class="screen">LDXSERV STATUS</pre>
+<p class="para">Examine the output of the command. You should see the exit routines loaded, information about the memory queue, information about the change log started task, and a valid, non-empty change log data set.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

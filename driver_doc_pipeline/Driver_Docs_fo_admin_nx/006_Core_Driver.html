@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="br12c5c,bcghdbcc,bcghdbcc,br12c5n,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Core Driver - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="br12c5c">
+
+<h1 class="title h1"><span class="number">2.1</span> Core Driver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Core Driver can be further broken down into two main parts:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The Driver Shim</p></li>
+<li class="listitem">
+<p class="listitem">The objects that represent Core Driver properties and functionality in the Identity Vault (eDirectory)</p></li></ul></div>
+
+<p class="para">The Shim is the installed driver software that provides authentication services, such as password verification, to target platforms. It provides identity provisioning events, such as add, modify, and delete, for users and groups, to target platforms. It also uses its Event Subsystem to retrieve events from Identity Manager. Finally, the Core Driver includes an embedded remote loader that replaces the functionality of the standard remote loader used by Identity Manager.</p>
+<p class="para">The objects used in the Identity Vault to store Core Driver properties and functionality include:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The driver object, which stores configuration information about the Core Driver.</p></li>
+<li class="listitem">
+<p class="listitem">The ASAM System container object, which stores configuration and user management information for users connecting to other systems via the Fan-Out Driver.</p></li></ul></div>
+
+<p class="para">A writable replica of the partition holding the ASAM System container must reside on the LDAP host server used by a Core Driver. A User object, configured during installation, is used by the driver to perform an LDAP Bind for access to eDirectory.</p>
+<div class="figure" id="bfm4xa4"><p class="title"><em class="num">Figure 2-2 </em>Core Driver</p>
+              <img src="../graphics/coredriver.png" alt="" />
+            </div>
+
+<p class="para">In summary, the Core Driver provides these functions:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">eDirectory access to platforms for Authentication Services, such as password verification.</p></li>
+<li class="listitem">
+<p class="listitem">Provisioning events to Platform Services for the maintenance of local user accounts and groups.</p></li>
+<li class="listitem">
+<p class="listitem">The Web interface that you use to configure and manage the driver</p></li>
+<li class="listitem">
+<p class="listitem">Management of the objects inside the ASAM System container</p></li>
+<li class="listitem">
+<p class="listitem">An audit trail of significant occurrences</p></li></ul></div>
+
+<p class="para">You can run multiple Core Drivers to provide redundancy for Authentication Services and Identity Provisioning functions.</p>
+<p class="para">One Core Driver is designated as the primary Core Driver. Other Core Drivers are secondary Core Drivers. Only the primary Core Driver listens for events from eDirectory. The primary Core Driver also serves the Web interface and provides environmental information during the installation process for other Core Drivers.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="bfgja9x">
+
+<h2 class="title h2"><span class="number">2.1.1</span> Core Driver Component Details</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The software architecture of the Core Driver includes eight main components. Five of the components are collectively referred to as the Provisioning Manager:</p>
+<div class="container sect3" id="bfgjav5">
+
+<h3 class="title h3">Provisioning Manager Components</h3>
+
+<p class="para">Descriptions of each component in Provisioning Manager follows.</p>
+<div class="container sect4" id="bfgjb3s">
+
+<h4 class="title h4">Object Services</h4>
+
+<p class="para">Object Services maintains the objects within the ASAM System container. Some of these objects store configuration information for the various driver components. Others represent users and groups of users that can be defined on target platforms. The object that contains these users and groups is called the Census.</p>
+<p class="para">Object Services on the primary Core Driver is notified by the Event Subsystem of events, such as add, modify, or delete, pertaining to users and groups of users in eDirectory. These events are used to maintain the Census.</p>
+<p class="para">To initially build and periodically ensure the integrity of the Census, Object Services examines specified portions of eDirectory for users and groups. This process is called a Trawl. You can use the Web interface to set the Trawl schedule. Only the primary Core Driver performs Trawls.</p>
+<p class="para">Census Search objects that you define using the Web interface describe which objects in eDirectory are included in the Census. Platform Set search objects that you define using the Web interface describe which users and groups are managed for a given set of platforms.</p>
+<p class="para">For more information about Object Services and the Census, see <a href="br12c66.html#babjjgaa" class="xref">Census Container</a>. For more information about associating users and groups with sets of platforms, see <a href="br12c66.html#babffida" class="xref">Platform Set Objects</a>.</p>
+</div>
+
+<div class="container sect4" id="bfgjbgu">
+
+<h4 class="title h4">Event Journal Services</h4>
+
+<p class="para">Event Journal Services receives provisioning events from Object Services and makes them available to sets of platforms according to the rules you specify. Event Journal Services ensures that provisioning events for a platform are delivered, even if the platform is not always available.</p>
+<p class="para">Platforms can periodically connect to Event Journal Services to receive provisioning events, or they can maintain a persistent connection and receive events as they occur.</p>
+<p class="para">By defining multiple Core Drivers to provide events to platforms, you can provide for improved availability.</p>
+</div>
+
+<div class="container sect4" id="bfgjbpe">
+
+<h4 class="title h4">Audit Services</h4>
+
+<p class="para">Audit Services maintains the Audit Log and Operational Logs for a Core Driver.</p>
+</div>
+
+<div class="container sect4" id="bfgjbuu">
+
+<h4 class="title h4">Certificate Services</h4>
+
+<p class="para">Certificate Services mints the certificates used by Secure Sockets Layer (SSL) to authenticate and secure connections between the components.</p>
+</div>
+
+<div class="container sect4" id="bfgjbym">
+
+<h4 class="title h4">Web Services</h4>
+
+<p class="para">Web Services provides the secure Web interface for monitoring and administering the Identity Manager Fan-Out Driver. The Web interface is provided through an iManager plug-in.</p>
+</div>
+
+</div>
+
+<div class="container sect3" id="bfgjd7m">
+
+<h3 class="title h3">Authentication Services</h3>
+
+<p class="para">Authentication Services provides Platform Services with the time-critical interface to eDirectory. This interface is used for such functions as checking the passwords of users logging in to the platform. This interface is also used by the AS Client API.</p>
+<p class="para">By defining multiple Core Drivers to provide Authentication Services to platforms, you can provide for improved performance and availability.</p>
+<p class="para">Authentication Services supports platform communications using SSL and DES encryption.</p>
+</div>
+
+<div class="container sect3" id="bfgjdo3">
+
+<h3 class="title h3">Event Subsystem</h3>
+
+<p class="para">The Event Subsystem uses Identity Manager to subscribe to eDirectory events and provides them to Object Services. Objects of interest must be replicated on the Core Driver server.</p>
+</div>
+
+<div class="container sect3" id="bfgjdu4">
+
+<h3 class="title h3">Embedded Remote Loader</h3>
+
+<p class="para">Identity Manager includes a software component known as the Remote Loader. It is used to interface with drivers on the various systems that can be connected to Identity Manager.</p>
+<p class="para">The Core Driver bypasses this component, using its own Embedded Remote Loader. The resulting tighter integration provides eDirectory, Identity Manager, and the Fan-Out Core Driver with greater individual resources and fault tolerance while maintaining a simple configuration</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

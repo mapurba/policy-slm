@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="bfg23nl,bcgicacb,cegddcgh,anhms6o,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Step-By-Step Installation Instructions - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bfg23nl">
+
+<h1 class="title h1"><span class="number">5.2</span> Step-By-Step Installation Instructions</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section presents the various step-by-step tasks that can be combined to cover all Core Driver installation scenarios. The tasks are grouped first into four basic categories:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="bfg23nl.html#bfiju30" class="xref">Installing the Driver Shim on Linux</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bfg23nl.html#bfgy4bx" class="xref">Installing the Driver Shim on Windows Systems</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bfg23nl.html#bfgy4by" class="xref">Setting Up the Core Driver in iManager</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bfg23nl.html#bfgygtf" class="xref">Other Tasks Following Installation</a>
+            </p></li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Be aware of the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Some of the configuration tasks discussed briefly in this section are covered again in more detail in <a href="chdcejie.html" class="xref">Section 6.0, Configuring and Administering the Core Driver</a></p></li></ul></div>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfiju30">
+
+<h2 class="title h2"><span class="number">5.2.1</span> Installing the Driver Shim on Linux</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Core Driver installation on Linux and UNIX begins with one of the following tasks, depending on your scenario:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfiju31" class="xref">Installing a New Core Driver Shim on Linux</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfiju3c" class="xref">Upgrading a Core Driver Shim on Linux</a>
+              </p></li></ul></div>
+
+<div class="container sect3" id="bfiju31">
+
+<h3 class="title h3">Installing a New Core Driver Shim on Linux</h3>
+
+<p class="para">To install a new Driver Shim on Linux:</p>
+<div class="procedure" id="bfiju32">
+<ol class="steps">
+<li class="step" id="bfiju33">
+<p class="para">From your installation media, locate and execute the appropriate self-extracting installer:</p><pre class="screen">  sh linux_x86_64_coredriver.bin</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If eDirectory has EBA enabled, you will need to run <span class="command">export DISABLE_EBA=true</span> before running this installer.</p></div>
+</li>
+<li class="step" id="bfiju34">
+<p class="para">Accept the license, select your installation directory and proceed to install the product files.</p></li>
+<li class="step" id="bfiju35">
+<p class="para">The installer will next assist you in configuring the Driver Shim. You will be prompted for the Remote Loader password, which is used to encrypt driver network communications. Enter a password and remember it, as you will use it when configuring the driver in iManager.</p></li>
+<li class="step" id="bfiju36">
+<p class="para">You will then be prompted for a Driver Object password. This is used to access the driver object in eDirectory. This password will also be used when configuring the driver in iManager.</p></li>
+<li class="step" id="bfiju37">
+<p class="para">The next entry you are asked for is the eDirectory server/port, so the installer can retrieve an SSL certificate from eDirectory using your SSL-configured LDAP server. Enter the DNS name or IP address of the LDAP server that the Core Driver Shim will use to communicate with. Typically, this will be <span class="guimenu">localhost</span> on port <span class="guimenu">636</span>.</p></li>
+<li class="step" id="bfiju38">
+<p class="para">When prompted for an eDirectory admin name/password, enter the eDirectory administratorâs ID in LDAP dot format (example: <span class="guimenu">admin.acme)</span>, followed by the password.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The installer must get a successful directory connection in order to proceed. Consult your eDirectory LDAP documentation for troubleshooting.</p></div>
+</li>
+<li class="step" id="bfiju39">
+<p class="para">When prompted for an ASAM System Container Context, specify the distinguished name (DN) of the container in which the organizational unit ASAM System should be created. The driver will store configuration and synchronization information in this container. Enter the DN in LDAP dot format. Example: <span class="guimenu">idm.acme</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you are adding a secondary driver, or upgrading a driver, the installer may detect your existing Fan-Out installation and prompt you to accept the discovered location.</p></div>
+</li>
+<li class="step" id="bfiju3a">
+<p class="para">You are next prompted for information about the Core Driver, beginning with a descriptive name and the network port it will use (default 3451).</p></li>
+<li class="step" id="bfiju3b">
+<p class="para">For the Core Driver network address, select a DNS name or IP address for the Core Driver. If your system has multiple addresses, use one which other systems (platforms) can use to communicate with the driver.</p>
+<p class="para">The installer will then create the eDirectory objects and indexes needed to completed the configuration.</p></li>
+<li class="step" id="bhg0y64">
+<p class="para">Immediately after installation, you may need to change the port setting for the Core Driverâs built-in remote loader. This is especially likely if you are also using the standard remote loader that comes with Identity Manager, since both versions of the remote loader use 8090 as their default port setting.</p>
+<p class="para">The port setting for the Core Driverâs built-in remote loader resides in the <span class="filename">fanout.conf</span> file, which is located in <span class="filename">/usr/local/ASAM/data/</span>.</p>
+<p class="para">Edit the following line in <span class="filename">fanout.conf</span> to reflect the desired port:</p><pre class="screen">-connection "ca=/usr/local/ASAM/keys/ca.pem port=8090"</pre></li>
+<li class="step" id="brchdbh">
+<p class="para">If this installation is a secondary driver, migrate the Certificate Authority from the primary system. For details, see <a href="bfg23nl.html#bi167q5" class="xref">Migrating Certificate Authority</a>.</p></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you have a firewall, be sure to add the Driver's network port (default 3451) to its open ports list.</p></div>
+
+<p class="para">At the completion of this installation task, go next to <a href="bfg23nl.html#bfgy4by" class="xref">Setting Up the Core Driver in iManager</a>.</p>
+</div>
+
+<div class="container sect3" id="bfiju3c">
+
+<h3 class="title h3">Upgrading a Core Driver Shim on Linux</h3>
+
+<p class="para">If you already have an instance of the Core Driver Shim installed on your Linux system, you may use the same installer to upgrade the installation files.</p>
+<p class="para">To upgrade a Driver Shim on Linux:</p>
+<div class="procedure" id="bfiju3d">
+<ol class="steps">
+<li class="step" id="bfiju3e">
+<p class="para">Stop the Core Driver object in iManager.</p></li>
+<li class="step" id="bfiju3f">
+<p class="para">From your installation media, locate and execute the appropriate self-extracting installer:</p><pre class="screen">  sh linux_x86_64_coredriver.bin</pre></li>
+<li class="step" id="bfiju3g">
+<p class="para">Accept the license, and enter Y to upgrade the existing installation.</p></li>
+<li class="step" id="bhf15xx">
+<p class="para">If you are currently running a Core Driver shim version prior to <span class="literal">4.8.1.0</span>, are upgrading to version <span class="literal">4.8.1.0</span> or later, and use <span class="command">systemd</span> for managing services, you may wish to convert your previous startup method from the older <span class="command">init</span> to <span class="command">systemd</span>.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Disable your current <span class="command">init</span> startup routine:</p>
+<p class="para">
+                      <span class="command">chkconfig asamcdrvd off</span>
+                    </p></li>
+<li class="step">
+<p class="para">Install new <span class="command">systemd</span> startup configuration:</p>
+<p class="para">
+                      <span class="command">cp /usr/local/ASAM/data/SystemdStartupScripts/asamcdrv.service /etc/systemd/system/</span>
+                    </p></li>
+<li class="step">
+<p class="para">Refresh <span class="command">systemd</span> and enable service:</p>
+<p class="para">
+                      <span class="command">systemctl daemon-reload</span>
+                    </p>
+<p class="para">
+                      <span class="command">systemctl enable asamcdrv</span>
+                    </p></li></ol>
+</div>
+</li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfgy4bx">
+
+<h2 class="title h2"><span class="number">5.2.2</span> Installing the Driver Shim on Windows Systems</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Core Driver installation on Windows begins with one of the following tasks, depending on your scenario:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgyl26" class="xref">Installing the Core Driver Shim on Windows Systems</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgymus" class="xref">Upgrading a Local Core Driver Shim on Windows Systems</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgyn4d" class="xref">Upgrading a Remote Core Driver Shim on Windows Systems</a>
+              </p></li></ul></div>
+
+<div class="container sect3" id="bfgyl26">
+
+<h3 class="title h3">Installing the Core Driver Shim on Windows Systems</h3>
+
+<p class="para">To install a Driver Shim on a Windows System:</p>
+<div class="procedure" id="bfgytt5">
+<ol class="steps">
+<li class="step" id="bfgytt6">
+<p class="para">From your installation media, run the following command:</p><pre class="screen">  fan-out\IDMCoreDrivers\Win\win_x86_coredriver.exe</pre>
+<p class="para">This x86 (32-bit) executable is compatible with both x86 and x64 versions of Windows.</p></li>
+<li class="step" id="bfgytt7">
+<p class="para">Accept the license, select your installation directory and proceed to install the product files.</p></li>
+<li class="step" id="bfh1d6m">
+<p class="para">The installer will next assist you in configuring the Driver Shim. You will be prompted for the Remote Loader password, which is used to encrypt driver network communications. Enter a password and remember it, as you will use it when configuring the driver in iManager.</p></li>
+<li class="step" id="bfh1dcg">
+<p class="para">You will then be prompted for a Driver Object password. This is used to access the driver object in eDirectory. This password will also be used when configuring the driver in iManager.</p></li>
+<li class="step" id="bfh1dup">
+<p class="para">The next entry you are asked for is the eDirectory server/port, so the installer can retrieve an SSL certificate from eDirectory using LDAP. Enter the DNS name or IP address of an eDirectory server, and the LDAP secure port (default 636). In the console window that appears, enter <span class="guimenu">y</span> to accept the certificate.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you are running both eDirectory and Active Directory on the Windows server, you may need to change the LDAP ports of either eDirectory or Active Directory so that they do not interfere with each other. See your product documentation for more information.</p></div>
+</li>
+<li class="step" id="bfh1dym">
+<p class="para">When prompted for an eDirectory admin name/password, enter the eDirectory administratorâs ID in LDAP dot format (example: <span class="guimenu">admin.acme)</span>, followed by the password.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The installer must get a successful directory connection in order to proceed. Consult your eDirectory LDAP documentation for troubleshooting.</p></div>
+</li>
+<li class="step" id="bfh1edo">
+<p class="para">When prompted for an ASAM System Container Context, specify the distinguished name (DN) of the container in which the organizational unit ASAM System should be created. The driver will store synchronization information in this container. This is usually the top-level organization in the tree. Example: <span class="guimenu">acme</span>.</p></li>
+<li class="step" id="bfh1eof">
+<p class="para">You are next prompted for information about the Core Driver, beginning with a descriptive name and the network port it will use (default 3451).</p></li>
+<li class="step" id="bfh1esn">
+<p class="para">For the Core Driver network address, select a DNS name or IP address for the Core Driver. If your system has multiple addresses, use one which other systems (platforms) can use to communicate with the driver.</p>
+<p class="para">The installer will then create the eDirectory objects and indexes needed to completed the configuration.</p></li>
+<li class="step" id="bhg0y66">
+<p class="para">Immediately after installation, you may need to change the port setting for the Core Driverâs built-in remote loader. This is especially likely if you are also using the standard remote loader that comes with Identity Manager, since both versions of the remote loader use 8090 as their default port setting.</p>
+<p class="para">The port setting for the Core Driverâs built-in remote loader resides in the <span class="filename">fanout.conf</span> file, which is located in <span class="filename">C:\Novell\ASAM\data\</span>.</p>
+<p class="para">Edit the following line in <span class="filename">fanout.conf</span> to reflect the desired port:</p><pre class="screen">-connection "ca=/usr/local/ASAM/keys/ca.pem port=8090"</pre></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you have a firewall, be sure to add the Driver's network port (default 3451) to its open ports list.</p></div>
+
+<p class="para">At the completion of this installation task, go next to <a href="bfg23nl.html#bfgy4by" class="xref">Setting Up the Core Driver in iManager</a>.</p>
+</div>
+
+<div class="container sect3" id="bfgymus">
+
+<h3 class="title h3">Upgrading a Local Core Driver Shim on Windows Systems</h3>
+
+<p class="para">You can upgrade a driver running in Local mode on your Windows eDirectory server. The upgraded Driver will run as a Remote Driver, with both the Driver objects and Driver Shim on the same system.</p>
+<p class="para">To upgrade a Driver Shim that is running in Local mode in Windows:</p>
+<div class="procedure" id="bfgypzl">
+<ol class="steps">
+<li class="step" id="bfgypzm">
+<p class="para">Stop the Core Driver object in iManager.</p></li>
+<li class="step" id="bfgyq75">
+<p class="para">From your installation media, run the following command:</p><pre class="screen">  fan-out\IDMCoreDrivers\Win\win_x86_coredriver.exe</pre>
+<p class="para">This x86 (32-bit) executable is compatible with both x86 and x64 versions of Windows.</p></li>
+<li class="step" id="bfihifc">
+<p class="para">Accept the license, select the same installation directory as your previous installation (usually <span class="literal">C:\Novell\ASAM</span>) and proceed to install the product files.</p></li>
+<li class="step" id="bfihvsn">
+<p class="para">The installer will next assist you in configuring the Driver Shim. You will be prompted for the Remote Loader password, which is used to encrypt driver network communications. Enter a password and remember it, as you will use it when configuring the driver in iManager.</p></li>
+<li class="step" id="bfihvso">
+<p class="para">You will then be prompted for a Driver Object password. This password will also be used when configuring the driver in iManager.</p></li>
+<li class="step" id="bfihvsp">
+<p class="para">The next entry you are asked for is the eDirectory server/port, so the installer can retrieve an SSL certificate from eDirectory using LDAP. Enter the DNS name or IP address of an eDirectory server, and the LDAP secure port (default 636). In the console window that appears, enter <span class="guimenu">y</span> to accept the certificate.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you are running both eDirectory and Active Directory on the Windows server, you may need to change the LDAP ports of either eDirectory or Active Directory so that they do not interfere with each other. See your product documentation for more information.</p></div>
+</li>
+<li class="step" id="bfihvsq">
+<p class="para">When prompted for an eDirectory admin name/password, enter the eDirectory administratorâs ID in LDAP dot format (example: <span class="guimenu">admin.acme)</span>, followed by the password.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The installer must get a successful directory connection in order to proceed. Consult your eDirectory LDAP documentation for troubleshooting.</p></div>
+</li>
+<li class="step" id="bfihvsr">
+<p class="para">When prompted for an ASAM System Container Context, specify the distinguished name (DN) of the container in which the organizational unit ASAM System resides. This is usually the top-level organization in the tree. Enter the DN in LDAP dot format. Example: <span class="guimenu">idm.acme</span>.</p></li>
+<li class="step" id="bfihjm1">
+<p class="para">When prompted whether to create a new Driver or upgrade an existing one, click <span class="guimenu">No</span> to upgrade an existing Driver.</p></li>
+<li class="step" id="bfihjos">
+<p class="para">When a list of drivers displays, select the Driver associated with the system you are upgrading.</p>
+<p class="para">The installer will then generate an updated configuration file and install indexes needed to completed the configuration. (You may receive a warning message regarding indexes since they will already exist.)</p></li>
+<li class="step" id="bhg0y67">
+<p class="para">Immediately after installation, you may need to change the port setting for the Core Driverâs built-in remote loader. This is especially likely if you are also using the standard remote loader that comes with Identity Manager, since both versions of the remote loader use 8090 as their default port setting.</p>
+<p class="para">The port setting for the Core Driverâs built-in remote loader resides in the <span class="filename">fanout.conf</span> file, which is located in <span class="filename">C:\Novell\ASAM\data\</span>.</p>
+<p class="para">Edit the following line in <span class="filename">fanout.conf</span> to reflect the desired port:</p><pre class="screen">-connection "ca=/usr/local/ASAM/keys/ca.pem port=8090"</pre></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you have a firewall, be sure to add the Driver's network port (default 3451) to its open ports list.</p></div>
+
+<p class="para">At the completion of this installation task, go next to <a href="bfg23nl.html#bfgy4by" class="xref">Setting Up the Core Driver in iManager</a>, which includes the task for upgrading a Core Driver configuration</p>
+</div>
+
+<div class="container sect3" id="bfgyn4d">
+
+<h3 class="title h3">Upgrading a Remote Core Driver Shim on Windows Systems</h3>
+
+<p class="para">If youâre running a Fan-Out Driver in Remote mode, you can upgrade the Driver Shim on the Windows system running the Connected System portion of the Driver.</p>
+<p class="para">To upgrade a Driver Shim that is running in Remote mode in Windows:</p>
+<div class="procedure" id="bfii3lv">
+<ol class="steps">
+<li class="step" id="bfii3lw">
+<p class="para">Stop the Core Driver object and the Remote Loader instance for the current driver in iManager.</p></li>
+<li class="step" id="bfii6jv">
+<p class="para">Still in iManager, open the <span class="guimenu">Identity Manager Remote Loader Console</span>, select the Fan-Out Driver instance and click <span class="guimenu">Edit</span>. Make a note of the <span class="guimenu">Connection Port</span>, <span class="guimenu">Trace Level</span> and <span class="guimenu">Trace File</span> fields.</p></li>
+<li class="step" id="bfiia3e">
+<p class="para">Because you no longer need the standard NetIQ Remote Loader, you may disable or remove it as follows, depending on whether you have other Remote Drivers:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If youâre running other Remote Drivers on the system, simply remove the Fan-Out Driver instance by selecting it in the Remote Loader Console and clicking <span class="guimenu">Remove</span>.</p></li>
+<li class="listitem">
+<p class="listitem">If you aren't running other Remote Drivers on the system, open <span class="guimenu">Control Panel</span> and run | <span class="guimenu">Add or Remove Programs</span> (<span class="guimenu">Programs and Features</span> on Windows Server 2008) to remove the NetIQ Identity Manager Connected System program.</p></li></ul></div>
+</li>
+<li class="step" id="bfii3lx">
+<p class="para">From your installation media, run the following command:</p><pre class="screen">  fan-out\IDMCoreDrivers\Win\win_x86_coredriver.exe</pre>
+<p class="para">This x86 (32-bit) executable is compatible with both x86 and x64 versions of Windows.</p></li>
+<li class="step" id="bfii3ly">
+<p class="para">Accept the license, select the same installation directory as your previous installation (usually <span class="literal">C:\Novell\ASAM</span>) and proceed to install the product files.</p></li>
+<li class="step" id="bfii3lz">
+<p class="para">The installer will next assist you in configuring the Driver Shim. You will be prompted for the Remote Loader password, which is used to encrypt driver network communications. Enter a password and remember it, as you will use it when configuring the driver in iManager.</p></li>
+<li class="step" id="bfii3m0">
+<p class="para">You will then be prompted for a Driver Object password. This password will also be used when configuring the driver in iManager.</p></li>
+<li class="step" id="bfii3m1">
+<p class="para">The next entry you are asked for is the eDirectory server/port, so the installer can retrieve an SSL certificate from eDirectory using LDAP. Enter the DNS name or IP address of an eDirectory server, and the LDAP secure port (default 636). In the console window that appears, enter <span class="guimenu">y</span> to accept the certificate.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you are running both eDirectory and Active Directory on the Windows server, you may need to change the LDAP ports of either eDirectory or Active Directory so that they do not interfere with each other. See your product documentation for more information.</p></div>
+</li>
+<li class="step" id="bfii3m2">
+<p class="para">When prompted for an eDirectory admin name/password, enter the eDirectory administratorâs ID in LDAP dot format (example: <span class="guimenu">admin.acme)</span>, followed by the password.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The installer must get a successful directory connection in order to proceed. Consult your eDirectory LDAP documentation for troubleshooting.</p></div>
+</li>
+<li class="step" id="bfii3m3">
+<p class="para">When prompted for an ASAM System Container Context, specify the distinguished name (DN) of the container in which the organizational unit ASAM System resides. This is usually the top-level organization in the tree. Enter the DN in LDAP dot format. Example: <span class="guimenu">idm.acme</span>.</p></li>
+<li class="step" id="bfii3m4">
+<p class="para">When prompted whether to create a new Driver or upgrade an existing one, click <span class="guimenu">No</span> to upgrade an existing Driver.</p></li>
+<li class="step" id="bfii3m5">
+<p class="para">When a list of drivers displays, select the Driver associated with the system you are upgrading.</p>
+<p class="para">The installer will then generate an updated configuration file and install indexes needed to completed the configuration. (You may receive a warning message regarding indexes since they will already exist.)</p></li>
+<li class="step" id="bhg0y68">
+<p class="para">Immediately after installation, you may need to change the port setting for the Core Driverâs built-in remote loader. This is especially likely if you are also using the standard remote loader that comes with Identity Manager, since both versions of the remote loader use 8090 as their default port setting.</p>
+<p class="para">The port setting for the Core Driverâs built-in remote loader resides in the <span class="filename">fanout.conf</span> file, which is located in <span class="filename">C:\Novell\ASAM\data\</span>.</p>
+<p class="para">Edit the following line in <span class="filename">fanout.conf</span> to reflect the desired port:</p><pre class="screen">-connection "ca=/usr/local/ASAM/keys/ca.pem port=8090"</pre></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you have a firewall, be sure to add the Driver's network port (default 3451) to its open ports list.</p></div>
+
+<p class="para">At the completion of this installation task, go next to <a href="bfg23nl.html#bfgy4by" class="xref">Setting Up the Core Driver in iManager</a>, which includes the task for upgrading a Core Driver configuration.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfgy4by">
+
+<h2 class="title h2"><span class="number">5.2.3</span> Setting Up the Core Driver in iManager</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You will use the Fan-Out Driverâs Web application to complete the Core Driver installation. This application resides in recent versions of iManager as a standard plug-in. If your version of iManager does not include the plug-in, you can install it from the software that comes with the Core Driver.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In addition to iManager, you can use Designer, an application interface that comes with Identity Manager, for setting up and modeling large deployments of the Fan-Out Driver. A Fan-Out Driver application plug-in is included as part of the Designer installation. For more information on using Designer, see <a href="chdijbdi.html" class="xref">Applications For Configuration</a>.</p></div>
+
+<p class="para">After you have installed or upgraded a Driver Shim, the installation process continues in iManager with the following tasks, depending on your scenario:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgz7zl" class="xref">Importing a Configuration for a Newly Installed Core Driver</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgz8fu" class="xref">Upgrading a Core Driver Configuration</a>
+              </p></li></ul></div>
+
+<p class="para">If your version of iManager does not include the plug-in or if you are not familiar with iManager, you can refer to two additional topics at the end of this section before starting:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgz253" class="xref">Installing the iManager Plug-In (If not Preinstalled)</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgz79y" class="xref">Using the iManager Interface</a>
+              </p></li></ul></div>
+
+<div class="container sect3" id="bfgz7zl">
+
+<h3 class="title h3">Importing a Configuration for a Newly Installed Core Driver</h3>
+
+<p class="para">Use iManager to configure a Core Driver in the Identity Vault (eDirectory). To import a Core Driver configuration:</p>
+<div class="procedure" id="bfgzamr">
+<ol class="steps">
+<li class="step" id="bfgzams">
+<p class="para">Login to iManager for your tree and select the <span class="guimenu">Import Configuration</span> task under <span class="guimenu">Identity Manager Utilities</span> on the left.</p></li>
+<li class="step" id="bfh1fv6">
+<p class="para">Keep the Driver Set selection and, if this is a new Driver Set, select the server in eDirectory where the Driver will run.</p></li>
+<li class="step" id="bfh1fx9">
+<p class="para">From the <span class="guimenu">Configurations</span> menu, select <span class="filename">Fan-Out-IDM3_6_0-V1.xml</span>. If this file is not available, select <span class="guimenu">Import a configuration from the client</span> and select the file <span class="filename">rules\Fan-Out-IDM3_6_0-V1.xml</span> under the directory where the Driver Shim is installed (<span class="filename">C:\Novell\ASAM</span> by default).</p></li>
+<li class="step" id="bfh1g0f">
+<p class="para">Enter the following configuration fields. The installer will have filled in some of these fields:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Driver Name</span>: Enter a descriptive name.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Activation Group</span>: Choose the selection that corresponds to the activation you purchased. The Driver will operate in evaluation mode for 90 days if you donât have an activation.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">LDAP Host and Port</span>: Enter the DNS name or IP address and TCP port of your LDAP host.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Remote Host Name and Port</span>: Enter the DNS name or IP address and TCP port used by the system where the Driver Shim runs.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">ASAM Master User/Password</span>: Enter an LDAP account that will be used to manage Driver information.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Driver Object Password/Remote Loader Password</span>: Enter the passwords you entered when installing the Driver Shim.</p></li></ul></div>
+</li>
+<li class="step" id="bfh1g3u">
+<p class="para">Click <span class="guimenu">Define Security Equivalences</span> and add your ASAM Master User.</p></li>
+<li class="step" id="bfh1grk">
+<p class="para">Click <span class="guimenu">Exclude Administrative Roles</span> and add the admin user, the ASAM Master User and other high-privilege users to the <span class="guimenu">Excluded Users</span> list.</p></li>
+<li class="step" id="bfh1gvg">
+<p class="para">Click <span class="guimenu">Finish</span> to complete the import.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="bfgz8fu">
+
+<h3 class="title h3">Upgrading a Core Driver Configuration</h3>
+
+<p class="para">If you upgrade a Core Driver Shim, you also need to upgrade its configuration in iManager. To upgrade a configuration:</p>
+<div class="procedure" id="bfgzdlg">
+<ol class="steps">
+<li class="step" id="bfruwd0">
+<p class="para">Login to iManager for your tree and select the <span class="guimenu">Import Configuration</span> task under <span class="guimenu">Identity Manager Utilities</span> on the left.</p></li>
+<li class="step" id="bfgzdli">
+<p class="para">Select the Driver Set that contains the Driver to be upgraded.</p></li>
+<li class="step" id="bfiitax">
+<p class="para">Click <span class="guimenu">Next</span> to keep the Driver Set selection.</p></li>
+<li class="step" id="bfiitud">
+<p class="para">From the <span class="guimenu">Configurations</span> menu, select <span class="filename">Fan-Out-IDM3_6_0-V1.xml</span>. If this file is not available, select <span class="guimenu">Import a configuration from the client</span> and select the file <span class="filename">rules\Fan-Out-IDM3_6_0-V1.xml</span> under the directory where the Driver Shim is installed (<span class="filename">C:\Novell\ASAM</span> by default).</p></li>
+<li class="step" id="bfiitzh">
+<p class="para">On the next page, to the right of the <span class="guimenu">Driver Name</span> field, select the driver you wish to upgrade from the <span class="guimenu">Existing Drivers</span> drop-down box.</p></li>
+<li class="step" id="bfiiw5a">
+<p class="para">Enter the following configuration fields, consistent with your current installation. The installer will have filled in some of these fields:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Activation Group</span>: Choose the selection that corresponds to the activation you purchased. The Driver will operate in evaluation mode for 90 days if you donât have an activation.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">LDAP Host and Port</span>: Enter the DNS name or IP address and secure TCP port of your LDAP host.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Remote Host Name and Port</span>: Enter the DNS name or IP address and TCP port used by the system where the Driver Shim runs.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">ASAM Master User/Password</span>: Enter an LDAP account that will be used to manage Driver information.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Driver Object Password/Remote Loader Password</span>: Enter the passwords you entered when installing the Driver Shim.</p></li></ul></div>
+</li>
+<li class="step" id="bfiiwbu">
+<p class="para">On the next page, select <span class="guimenu">Update everything about that driver and policy libraries</span> and click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bfiiy4p">
+<p class="para">Click <span class="guimenu">Finish</span> to complete the import.</p></li>
+<li class="step" id="bfiiyff">
+<p class="para">If necessary, apply any manual customizations.</p></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>You must install the new version of the iManager Plug-in before using the Driver. See <a href="bfg23nl.html#bfgz253" class="xref">Installing the iManager Plug-In (If not Preinstalled)</a>.</p></div>
+
+</div>
+
+<div class="container sect3" id="bfgz253">
+
+<h3 class="title h3">Installing the iManager Plug-In (If not Preinstalled)</h3>
+
+<p class="para">If your installation of iManager does not display the Fan-Out Driver Configuration role (Roles and Tasks menu on the left), you can install the iManager plug-in manually.</p>
+<p class="para">To install the iManager plug-in:</p>
+<div class="procedure" id="bfgz8sv">
+<ol class="steps">
+<li class="step" id="bfgz8sw">
+<p class="para">Login to iManager as an administrative user.</p></li>
+<li class="step" id="bfgz90f">
+<p class="para">Click the <span class="guimenu">Configure</span> icon at the top.</p></li>
+<li class="step" id="bfh1isn">
+<p class="para">Click <span class="guimenu">Available NetIQ Plug-in Modules</span> under <span class="guimenu">Plug-in Installation</span> on the left menu.</p></li>
+<li class="step" id="bfh1ivp">
+<p class="para">Click <span class="guimenu">Add</span> above the list of plug-ins.</p></li>
+<li class="step" id="bfh1ixl">
+<p class="para">Select <span class="filename">fan-out\iManagerPlugIn\FanOutWeb.npm</span> from your installation media and click <span class="guimenu">OK</span>.</p></li>
+<li class="step" id="bfh1iz5">
+<p class="para">Check the box next to <span class="guimenu">NetIQ Identity Manager - Fan-Out Driver Plug-in</span> and click <span class="guimenu">Install</span> above the list of plug-ins.</p></li>
+<li class="step" id="bfh1j1c">
+<p class="para">Restart the Tomcat or Tomcat5 service on your iManager system, and exit and log back into iManager.</p></li>
+<li class="step" id="bfh1j53">
+<p class="para">If the Fan-Out Driver Configuration role has not appeared, continue with the following steps.</p></li>
+<li class="step" id="bfh1j5j">
+<p class="para">Click the <span class="guimenu">Configure</span> icon at the top.</p></li>
+<li class="step" id="bfh1j7p">
+<p class="para">Click <span class="guimenu">RBS Configuration</span> under <span class="guimenu">Role Based Services</span> on the left menu.</p></li>
+<li class="step" id="bfh1j9o">
+<p class="para">Click the number under the <span class="guimenu">Not-Installed</span> column in the table.</p></li>
+<li class="step" id="bfh1jbo">
+<p class="para">Check the box next to <span class="guimenu">FanOutWeb</span> and click <span class="guimenu">Install</span> above the list.</p></li>
+<li class="step" id="bfh1jd7">
+<p class="para">Click the <span class="guimenu">Roles and Tasks</span> icon at the top.</p></li></ol>
+</div>
+
+<p class="para">With the plug-in now installed, you can proceed to your next task.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>For additional information about using iManager with the Fan-Out Driver application plug-in, see <a href="chdijbdi.html" class="xref">Applications For Configuration</a>.</p></div>
+
+</div>
+
+<div class="container sect3" id="bfgz79y">
+
+<h3 class="title h3">Using the iManager Interface</h3>
+
+<p class="para">To use the iManager interface for setting up a Core Driver:</p>
+<div class="procedure" id="bfgz92r">
+<ol class="steps">
+<li class="step" id="bfgz92s">
+<p class="para">In iManager, select the <span class="guimenu">Configure iManager Plug-In</span> task under <span class="guimenu">Fan-Out Driver Configuration</span>.</p></li>
+<li class="step" id="bfgz9ie">
+<p class="para">Enter the DNS name or IP address and port of the system running the Driver Shim and click <span class="guimenu">Apply</span>.</p></li>
+<li class="step" id="bfh1k0s">
+<p class="para">You may now use any of the items under <span class="guimenu">Fan-Out Driver Configuration</span> and <span class="guimenu">Fan-Out Driver Utilities</span> in iManager.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfgygtf">
+
+<h2 class="title h2"><span class="number">5.2.4</span> Other Tasks Following Installation</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After the initial installation or upgrade of a Core Driver, other tasks that you may need to perform from time to time include the following:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bi167q5" class="xref">Migrating Certificate Authority</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgzjwn" class="xref">Starting the Core Driver</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgzjwr" class="xref">Stopping the Core Driver</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#b12f3265" class="xref">Configuring the Core Driver Shim to Auto-Start</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfgzjwv" class="xref">Reconfiguring the Driver Shim</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfikvwi" class="xref">Installing Secondary Drivers</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="bfg23nl.html#bfh02k4" class="xref">Installing a New Primary Driver</a>
+              </p></li></ul></div>
+
+<div class="container sect3" id="bi167q5">
+
+<h3 class="title h3">Migrating Certificate Authority</h3>
+
+<p class="para">If you have migrated your primary Core Driver from one system to another, or have added a new secondary Core Driver, you will need to physically copy the Certificate Authority files from your previous host system to your new host system. These files are:</p><pre class="screen">  ASAM/data/CoreDriver/certs/ca_cert.pem
+  ASAM/data/CoreDriver/certs/ca_key.pem
+  ASAM/data/CoreDriver/certs/ca.pem</pre>
+<p class="para">If you do not perform this migration, your new primary Core Driver system will generate a new Certificate Authority when it first starts up. This will invalidate any platform certificates that may have been signed using the previous Certificate Authority.</p>
+</div>
+
+<div class="container sect3" id="bfgzjwn">
+
+<h3 class="title h3">Starting the Core Driver</h3>
+
+<p class="para">Both the Identity Manager Driver object and Driver Shim service must be running for the Core Driver to operate. To start the Core Driver:</p>
+<div class="procedure" id="bfgzjwo">
+<ol class="steps">
+<li class="step" id="bfgzjwp">
+<p class="para">In iManager, select the <span class="guimenu">Identity Manager Overview</span> task under <span class="guimenu">Identity Manager</span>.</p></li>
+<li class="step" id="bfgzjwq">
+<p class="para">Select the Driver Set where the Driver is installed.</p></li>
+<li class="step" id="bfh1how">
+<p class="para">Click the status indicator (stop line) in the upper right corner of the driver icon, then click <span class="guimenu">Start Driver</span>.</p></li>
+<li class="step" id="bfh1hrf">
+<p class="para">On the Driver Shim system, start the Fan-Out Driver as follows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the system is running Linux/UNIX, using <span class="command">init</span>, enter the following command:</p><pre class="screen">/etc/init.d/asamcdrvd start </pre></li>
+<li class="listitem">
+<p class="listitem">If the system is running Linux/UNIX, using <span class="command">systemd</span>, enter the following command:</p><pre class="screen">systemctl start asamcdrv</pre></li>
+<li class="listitem">
+<p class="listitem">If the system is running Windows, open <span class="guimenu">Control Panel</span> and run <span class="guimenu">Administrative Tools</span> &gt; <span class="guimenu">Services</span>. Start the NetIQ IDM Fan-Out Driver service.</p></li></ul></div>
+</li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="bfgzjwr">
+
+<h3 class="title h3">Stopping the Core Driver</h3>
+
+<p class="para">To stop the Core Driver:</p>
+<div class="procedure" id="bfgzjws">
+<ol class="steps">
+<li class="step" id="bfgzjwt">
+<p class="para">On the Driver Shim system, stop the Fan-Out Driver as follows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the system is running Linux/UNIX, using <span class="command">init</span>, enter the following command:</p><pre class="screen">/etc/init.d/asamcdrvd stop</pre></li>
+<li class="listitem">
+<p class="listitem">If the system is running Linux/UNIX, using <span class="command">systemd</span>, enter the following command:</p><pre class="screen">systemctl stop asamcdrv</pre></li>
+<li class="listitem">
+<p class="listitem">If the system is running Windows, open <span class="guimenu">Control Panel</span> and run <span class="guimenu">Administrative Tools</span> &gt; <span class="guimenu">Services</span>. Stop the NetIQ IDM Fan-Out Driver service.</p></li></ul></div>
+</li>
+<li class="step" id="bfgzjwu">
+<p class="para">In iManager, stop the Driver in the Driver Set Overview.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b12f3265">
+
+<h3 class="title h3">Configuring the Core Driver Shim to Auto-Start</h3>
+
+<p class="para">If you want the Core Driver Shim (<span class="filename">asamcdrv</span>) to automatically start at system startup, you will need to configure the operating system startup routines.</p>
+<p class="para">
+              <span class="strong">Using chkconfig</span>
+            </p>
+<p class="para">For systems using <span class="command">init</span>, the <span class="filename">asamcdrvd</span> startup script for Linux automatically integrates with the Linux <span class="filename">chkconfig</span> utility. To set <span class="filename">asamcdrvd</span> to auto-start, enter the following command:</p><pre class="screen">chkconfig asamcdrvd on
+</pre>
+<p class="para">
+              <span class="strong">Using systemctl</span>
+            </p>
+<p class="para">For systems using <span class="command">systemd</span>, the <span class="command">asamcdrv.service</span> configuration will automatically be installed and set to start automatically.</p>
+</div>
+
+<div class="container sect3" id="bfgzjwv">
+
+<h3 class="title h3">Reconfiguring the Driver Shim</h3>
+
+<p class="para">The Driver Shim can be reconfigured in a number of areas, as itemized below.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Always be sure to stop the Driver Shim before starting any of these reconfiguration tasks as described in <a href="bfg23nl.html#bfgzjwr" class="xref">Stopping the Core Driver</a>.</p></div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">To re-run the installerâs configuration wizard in Windows, open <span class="guimenu">Control Panel</span> and run <span class="guimenu">Add or Remove Programs</span> (<span class="guimenu">Programs and Features</span> on Windows Server 2008). Click the <span class="guimenu">Change</span> button under <span class="guimenu">NetIQ IDM Fan-Out Core Driver</span>. Then select <span class="guimenu">Modify or Repair</span> from the dialog box that opens.</p>
+<p class="listitem">You can use the installer to create a new installation, create a new driver or upgrade an existing driver. Note that the installer doesn't remember previously configured fields, so you'll have to enter the fields like you did on the first-time install.</p></li>
+<li class="listitem">
+<p class="listitem">To change the Remote Loader and/or Driver Object passwords:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the system is running Linux, enter the following command and select menu item 1:</p><pre class="screen">/usr/local/ASAM/setup/fandrv-config</pre></li>
+<li class="listitem">
+<p class="listitem">If the system is running Windows, execute the following command from the installation directory (<span class="filename">C:\Novell\ASAM</span> by default):</p><pre class="screen">bin\CoreDriver\asamcdrv.exe -sp </pre></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">To retrieve a new SSL certificate from eDirectory:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the system is running Linux, enter the following command and select menu item 2:</p><pre class="screen">/usr/local/ASAM/setup/fandrv-config</pre></li>
+<li class="listitem">
+<p class="listitem">If the system is running Windows, execute the following command from the installation directory (<span class="filename">C:\Novell\ASAM</span> by default):</p><pre class="screen">bin\CoreDriver\asamcdrv.exe -s </pre></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">To install or remove the Driver Shim service in Windows, execute the following command from the installation directory (<span class="filename">C:\Novell\ASAM</span> by default) using either the <span class="command">installService</span> or <span class="command">removeService</span> parameter:</p><pre class="screen">bin\CoreDriver\asamcdrv.exe -<span class="replaceable">parameter</span> </pre></li></ul></div>
+
+</div>
+
+<div class="container sect3" id="bfikvwi">
+
+<h3 class="title h3">Installing Secondary Drivers</h3>
+
+<p class="para">For scalability, you can install secondary drivers to handle platform synchronization and password requests. A system can run only one Driver Shim. See <a href="bfmn9rs.html" class="xref">Performance Tuning</a> for more information on specifying secondary drivers.</p>
+<p class="para">To install a secondary driver.</p>
+<div class="procedure" id="bfgzjx0">
+<ol class="steps">
+<li class="step" id="bfikplb">
+<p class="para">On the secondary Driver Shimâs system, follow steps 1-7 under one of the following tasks, depending on your operating environment:</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In step 7, be sure to specify the container that holds the ASAM System Container.</p></div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                      <a href="bfg23nl.html#bfiju31" class="xref">Installing a New Core Driver Shim on Linux</a>
+                    </p></li>
+<li class="listitem">
+<p class="listitem">
+                      <a href="bfg23nl.html#bfgy4bx" class="xref">Installing the Driver Shim on Windows Systems</a>
+                    </p></li></ul></div>
+</li>
+<li class="step" id="bfgzrlh">
+<p class="para">You will be prompted to create a new Driver or upgrade a Driver. Click <span class="guimenu">Yes</span> to create a new Driver.</p></li>
+<li class="step" id="bfgzjx2">
+<p class="para">Specify a distinct name for the Driver as well as its port.</p></li>
+<li class="step" id="bfh1pyp">
+<p class="para">Select the Driverâs network address.</p></li>
+<li class="step" id="bfh1q0z">
+<p class="para">When you are prompted whether to make the new Driver primary, click <span class="guimenu">No</span> to keep the Driver secondary.</p></li>
+<li class="step" id="bfh1q57">
+<p class="para">Once the Driver Shim is installed, import a new Driver following the steps in <a href="bfg23nl.html#bfgz7zl" class="xref">Importing a Configuration for a Newly Installed Core Driver</a>. Be sure to use the XML configuration file generated for the secondary Driver.</p></li>
+<li class="step" id="brchhsg">
+<p class="para">Migrate the Certificate Authority from the primary system. For details, see <a href="bfg23nl.html#bi167q5" class="xref">Migrating Certificate Authority</a>.</p></li></ol>
+</div>
+
+<p class="para">You can now run the secondary Driver as you would the primary Driver.</p>
+</div>
+
+<div class="container sect3" id="bfh02k4">
+
+<h3 class="title h3">Installing a New Primary Driver</h3>
+
+<p class="para">Depending on your configuration needs, you may decide to install a Driver Shim for a new primary driver.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If the Core Driver you wish to make primary is already installed, you can use the <span class="guimenu">Configure Core Drivers</span> menu task in iManager to do this.</p></div>
+
+<div class="procedure" id="bfgzw4d">
+<ol class="steps">
+<li class="step" id="bfgzw4e">
+<p class="para">Stop all Identity Manager Driver objects and Driver Shims. See <a href="bfg23nl.html#bfgzjwr" class="xref">Stopping the Core Driver</a>.</p></li>
+<li class="step" id="bfgzw4f">
+<p class="para">Follow all the steps in the task, <a href="bfg23nl.html#bfikvwi" class="xref">Installing Secondary Drivers</a>, with the following exception:</p>
+<p class="para">In step 5, click <span class="guimenu">Yes</span> to make the driver primary.</p></li>
+<li class="step" id="bfh00te">
+<p class="para">Start all Identity Manager Driver objects and Driver Shims. See <a href="bfg23nl.html#bfgzjwn" class="xref">Starting the Core Driver</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3fxjz5,bookinfo,b3gy8qc,legal,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Messages - NetIQ Linux and UNIX Settings Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container appendix expanding expanded" id="b3fxjz5">
+
+<h1 class="title h1"><span class="number">C.0</span> Messages</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Identity Manager driver for Linux and UNIX Settings appends status elements containing message text to XDS commands as necessary to report unexpected conditions. You can view these in a trace. The driver produces the following status messages:</p>
+<div class="container simplemsgentry" id="b3iy9ri">
+<div class="msgtext">
+          
+<p class="para">Error finding sambaSID object for context <span class="replaceable">userDN</span> Error finding sambaSID object <span class="replaceable">searchDN</span></p>
+        </div><div class="msgexplan">
+          <span class="title">Explanation:</span>
+          <span class="para">The sambaSID could not be determined for a user. The samba SID is stored in the sambaSID attribute of a sambaDomain object. The sambaDomain object is located by searching the userâs container, and then each higher container up the tree until a sambaDomain object is located. The userâs sambaSID is set to the sambaSID of the sambaDomain object concatenated with a hyphen and the value of the userâs uidNumber attribute.</span>
+          
+<p class="para">The sambaDomain object is created when NetIQÂ® Samba is configured on OES using YaST.</p>
+        </div><div class="msgexplan">
+          <span class="title">Possible Cause:</span>
+          <span class="para">A sambaDomain object does not exist in the same context as the User object or in a parent container of the User object.</span>
+        </div><div class="msgexplan">
+          <span class="title">Action:</span>
+          <span class="para">Create a sambaDomain object in the same context as the User object or in a parent container of the User object.</span>
+        </div>
+</div>
+
+<div class="container simplemsgentry" id="b3iy9rj">
+<div class="msgtext">
+          
+<p class="para">Error searching for uidInUse <span class="replaceable">searchDN</span> Error searching for gidInUse <span class="replaceable">searchDN</span></p>
+        </div><div class="msgexplan">
+          <span class="title">Explanation:</span>
+          <span class="para">The driver received an error from Identity Manager while checking to see if a uidNumber or gidNumber is already in use.</span>
+        </div><div class="msgexplan">
+          <span class="title">Possible Cause:</span>
+          <span class="para">The searchDN is not valid.</span>
+        </div><div class="msgexplan">
+          <span class="title">Action:</span>
+          <span class="para">Ensure that the searchDN is correct. You can modify the searchDN with GCVs for the driver. These are located under the <span class="guimenu">Data Integrity</span> heading. Inspect and modify the following settings if necessary:</span>
+          
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">Subtree to Search for Existing UIDs to Avoid Duplicate UID Assignment</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">Subtree to Search for Existing GIDs to Avoid Duplicate GID Assignment</span>
+              </p></li></ul></div>
+
+        </div>
+</div>
+
+<div class="container simplemsgentry" id="b3iy9rk">
+<div class="msgtext">
+          
+<p class="para">Could not retrieve LUM object <span class="replaceable">UnixConfigDN</span></p>
+        </div><div class="msgexplan">
+          <span class="title">Explanation:</span>
+          <span class="para">The driver could not locate the Linux/UNIX Config object used to hold UID and GID information for LUM.</span>
+          
+<p class="para">The Linux/UNIX Config object is created when LUM is configured on OES using YaST.</p>
+        </div><div class="msgexplan">
+          <span class="title">Possible Cause:</span>
+          <span class="para">The Linux/UNIX Config object is not at the location specified by the GCV named <span class="literal">LUM Linux/UNIX Configuration Object DN</span>.</span>
+        </div><div class="msgexplan">
+          <span class="title">Action:</span>
+          <span class="para">Ensure that the GCV named <span class="literal">LUM Linux/UNIX Configuration Object DN</span> is set to the DN of an existing Linux/UNIX Config object.</span>
+        </div>
+</div>
+
+<div class="container simplemsgentry" id="b3iy9rl">
+<div class="msgtext">
+          
+<p class="para">Error finding NxSettings document</p>
+        </div><div class="msgexplan">
+          <span class="title">Explanation:</span>
+          <span class="para">The driver could not locate the NxSettings Stylesheet object that holds UID and GID information.</span>
+        </div><div class="msgexplan">
+          <span class="title">Possible Cause:</span>
+          <span class="para">The NxSettings Stylesheet object has been deleted, or an error occurred when the driver was imported.</span>
+        </div><div class="msgexplan">
+          <span class="title">Action:</span>
+          <span class="para">Import the driver again.</span>
+        </div>
+</div>
+
+<div class="container simplemsgentry" id="b3iy9rm">
+<div class="msgtext">
+          
+<p class="para">Setting set <span class="replaceable">settingSetName</span> not found</p>
+        </div><div class="msgexplan">
+          <span class="title">Explanation:</span>
+          <span class="para">The policy uses XPath calls to retrieve settings from the NxSettings Stylesheet object. A settings element name was referenced that does not exist in the NxSettings Stylesheet object.</span>
+        </div><div class="msgexplan">
+          <span class="title">Possible Cause:</span>
+          <span class="para">A settings element name that does not exist in the NxSettings Stylesheet object was referenced in a policy.</span>
+        </div><div class="msgexplan">
+          <span class="title">Action:</span>
+          <span class="para">Ensure that the policy does not reference a settings element name that does not exist.</span>
+          
+<p class="para">In the following code snippet, <span class="literal">DefaultSet</span> is the settings name:</p>
+          <pre class="screen">&lt;token-xpath expression='driverShim:getNextGIDFromXMLDoc($driverShimInstance,"DefaultSet", "gid", $searchBase)'/&gt;</pre>
+          
+<p class="para">The settings name <span class="literal">DefaultSet</span> is defined in the following NxSettings Stylesheet object:</p>
+          <pre class="screen">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;nxSettings&gt;
+  &lt;settings name="DefaultSet"&gt;
+    &lt;setting name="uid" type="range"&gt;
+      &lt;ranges last-used="601"&gt;
+        &lt;range end="56500" start="600"/&gt;
+      &lt;/ranges&gt;
+    &lt;/setting&gt;
+    &lt;setting name="gid" type="range"&gt;
+      &lt;ranges last-used="601"&gt;
+        &lt;range end="56500" start="600"/&gt;
+      &lt;/ranges&gt;
+    &lt;/setting&gt;
+  &lt;/settings&gt;
+&lt;/nxSettings&gt;</pre>
+        </div>
+</div>
+
+<div class="container simplemsgentry" id="b3iy9rn">
+<div class="msgtext">
+          
+<p class="para">Setting <span class="replaceable">settingName</span> not defined in setting set <span class="replaceable">settingSetName</span></p>
+        </div><div class="msgexplan">
+          <span class="title">Explanation:</span>
+          <span class="para">The policy uses XPath calls to retrieve settings from the NxSettings Stylesheet object. A setting element name was referenced that does not exist in the NxSettings Stylesheet object.</span>
+        </div><div class="msgexplan">
+          <span class="title">Possible Cause:</span>
+          <span class="para">A setting element name that does not exist in the NxSettings Stylesheet object was referenced in a policy.</span>
+        </div><div class="msgexplan">
+          <span class="title">Action:</span>
+          <span class="para">Ensure that the policy does not reference a setting element name that does not exist.</span>
+          
+<p class="para">In the following code snippet, <span class="literal">gid</span> is the setting name:</p>
+          <pre class="screen">&lt;token-xpath expression='driverShim:getNextGIDFromXMLDoc($driverShimInstance,"DefaultSet", "gid", $searchBase)'/&gt;</pre>
+          
+<p class="para">The setting name <span class="literal">gid</span> is defined in the following NxSettings Stylesheet object:</p>
+          <pre class="screen">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;nxSettings&gt;
+  &lt;settings name="DefaultSet"&gt;
+    &lt;setting name="uid" type="range"&gt;
+      &lt;ranges last-used="601"&gt;
+        &lt;range end="56500" start="600"/&gt;
+      &lt;/ranges&gt;
+    &lt;/setting&gt;
+    &lt;setting name="gid" type="range"&gt;
+      &lt;ranges last-used="601"&gt;
+        &lt;range end="56500" start="600"/&gt;
+      &lt;/ranges&gt;
+    &lt;/setting&gt;
+  &lt;/settings&gt;
+&lt;/nxSettings&gt;</pre>
+        </div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

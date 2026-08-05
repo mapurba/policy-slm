@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="methods-for-executing-sql-statements,embed-sql-statements-in-xds-events-for-jdbc-driver,set-transaction-isolation-level-for-jdbc-driver,how-sql-queries-work-in-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Statement Type - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="methods-for-executing-sql-statements">
+
+<h1 class="title h1"><span class="number">12.7</span> Statement Type</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel executes embedded SQL statements, but it doesnât understand them. The JDBC 1 interface defines several methods for executing different types of SQL statements. The following table contains these methods:</p>
+<div class="table" id="b9fxny0"><p class="title"><em class="num">Table 12-1 </em>Methods for Executing SQL Statements</p>
+<table class="topbot" width="95%"><col width="34%" /><col width="66%" />
+            
+<tr class="headerrow" id="b9fxny1"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Statement Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method Executed</p></th>
+</tr>
+          
+<tr class="oddrow" id="b9fxny2"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SELECT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">java.sql.Statement.executeQuery(String query):java.sql.ResultSet</p></td>
+</tr>
+<tr class="evenrow" id="b9fxny3"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">INSERT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">java.sql.Statement.executeUpdate(String update):int</p></td>
+</tr>
+<tr class="oddrow" id="b9fxny4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">UPDATE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">java.sql.Statement.executeUpdate(String update):int</p></td>
+</tr>
+<tr class="evenrow" id="b9fxny5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DELETE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">java.sql.Statement.executeUpdate(String update):int</p></td>
+</tr>
+<tr class="oddrow" id="b9fxny6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">CALL or EXECUTE SELECT INSERT UPDATE DELETE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">java.sql.Statement.execute(String sql):boolean</p></td>
+</tr></table>
+</div>
+
+<p class="para">The simplest solution is to map all SQL statements to the <span class="literal">java.sql.Statement.execute(String sql):boolean</span> method. By default, the Subscriber channel uses this method.</p>
+<p class="para">Some third-party drivers, particularly Oracleâs JDBC drivers, incorrectly implement the methods used to determine the number of result sets that this method generates. Consequently, the driver can get caught in an infinite loop leading to high CPU utilization. To circumvent this problem, you can use the <span class="literal">jdbc:type</span> attribute on any <span class="literal">&lt;jdbc:statement&gt;</span> element to map the SQL statements contained in it to the following methods instead of the default method:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">java.sql.Statement.executeQuery(String query):java.sql.ResultSet</span>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">java.sql.Statement.executeUpdate(String update):int</span>
+          </p></li></ul></div>
+
+<p class="para">The <span class="literal">jdbc:type</span> attribute has two values: <span class="literal">update</span> and <span class="literal">query</span>. For <span class="literal">INSERT</span>, <span class="literal">UPDATE</span>, or <span class="literal">DELETE</span> statements, set the value to <span class="literal">update</span>. For <span class="literal">SELECT</span> statements, set the value to <span class="literal">query</span>. In the absence of this attribute, the driver maps all SQL statements to the default method. If placed on any element other than <span class="literal">&lt;jdbc:statement&gt;</span>, this attribute is ignored.</p>
+<p class="para">Recommendations:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Place the <span class="literal">jdbc:type="query"</span> attribute value on all <span class="literal">SELECT</span> statements.</p></li>
+<li class="listitem">
+<p class="listitem">Place the <span class="literal">jdbc:type="update"</span> attribute value on all <span class="literal">INSERT, UPDATE,</span> and <span class="literal">DELETE</span> statements.</p></li>
+<li class="listitem">
+<p class="listitem">Place no attribute value on stored procedure/function calls.</p></li></ul></div>
+
+<p class="para">The following XML shows an example of the <span class="literal">jdbc:type</span> attribute. The attribute is in bold text.</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr"&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+    &lt;/add&gt;
+    &lt;jdbc:statement <span class="strong">jdbc:type="update"</span>&gt;
+        &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' 
+                  WHERE idu = {$idu}&lt;/jdbc:sql&gt;
+    &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

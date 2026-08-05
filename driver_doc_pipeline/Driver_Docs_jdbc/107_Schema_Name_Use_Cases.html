@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="schema-name-use-cases-for-jdbc-driver,list-of-best-practices-in-jdbc-driver,tips-to-sync-millions-of-user-records,faq,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Schema Name Use Cases - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="schema-name-use-cases-for-jdbc-driver">
+
+<h1 class="title h1"><span class="number">C.2</span> Schema Name Use Cases</h1>
+
+<div class="content_wrapper">
+
+<p class="para">In the Schema Name under schema-aware mode the driver qualifies the tables according to the following rules:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Every table that contains a primary key constraint is considered as an object class. For example, the following <span class="literal">usr</span> table created by the SQL code is considered as an object class by the driver shim if the Schema Name is set to <span class="literal">indirect</span>.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+  idu         INTEGER  NOT NULL,
+  fname       VARCHAR2(64),
+  lname       CHAR(64),
+  CONSTRAINT pk_usr_idu     PRIMARY KEY (idu),
+)</pre>
+<p class="listitem">The above table will contain two single-valued attributes; <span class="literal">fname</span> and <span class="literal">lname</span>. The driver will build its associations based on the value of the column referenced in the primary key constraint, which in this case is column <span class="literal">idu</span>.</p></li>
+<li class="listitem">
+<p class="listitem">Every table that only has a <span class="literal">Foreign Key</span> constraint is considered as a multi-valued attribute of the class that holds the primary key pointed by the said foreign key constraint. In the following example, if the driver parameter, <span class="literal">Schema Name</span> is set to <span class="literal">indirect</span>, then the <span class="literal">usr_phone.phoneno</span> table is considered a multi-valued attribute belonging to the class <span class="literal">usr</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The child table <span class="literal">usr_phone</span> only has a foreign key constraint to the parent table <span class="literal">usr</span>. The table <span class="literal">usr</span> is considered an object class since it has a primary key constraint.</p></div>
+<pre class="screen">CREATE TABLE indirect.usr
+(
+  idu         INTEGER  NOT NULL,
+  fname       VARCHAR2(64),
+  lname       CHAR(64),
+  CONSTRAINT pk_usr_idu     PRIMARY KEY (idu),
+)
+CREATE TABLE indirect.usr_phone
+(
+  idu      INTEGER       NOT NULL,
+  phoneno  VARCHAR2(64)  NOT NULL,
+  CONSTRAINT fk_phone_idu FOREIGN KEY (idu)
+    REFERENCES indirect.usr(idu) ON DELETE CASCADE
+)</pre>
+<p class="listitem">DN-type references between the two objects will have different requirements based on whether the reference points back to the same object class or to a different object class. DN-type references also change depending on whether the DN attribute is single valued or multi-valued.</p></li>
+<li class="listitem">
+<p class="listitem">If the attribute is single-valued and points back to the same object class, then the table that contains that class will have a foreign key constraint to itself and uses a local column to store the value. An example is the <span class="literal">manager</span> attribute in eDirectory. In the example below, if the driver parameter <span class="literal">Schema Name</span> is set to <span class="literal">indirect</span>, then the attribute <span class="literal">manager</span> will be a DN-type attribute that points to another row inside the <span class="literal">usr</span> table.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+  idu         INTEGER  NOT NULL,
+  fname       VARCHAR2(64),
+  lname       CHAR(64),
+  manager     INTEGER,
+  CONSTRAINT pk_usr_idu     PRIMARY KEY (idu),
+  CONSTRAINT fk_usr_manager FOREIGN KEY (manager)
+    REFERENCES indirect.usr(idu) ON DELETE SET NULL 
+)</pre></li>
+<li class="listitem">
+<p class="listitem">If the attribute is multi-valued and points back to the same object class, then we need a child table with columns, each having its own foreign key constraint to the same parent table. An example is the <span class="literal">directReports</span> attribute in eDirectory. In the following example, if the driver parameter <span class="literal">Schema Name</span> is set to <span class="literal">indirect</span>, then the attribute <span class="literal">usr_directReports.repname</span> will be a DN-type attribute that points to one or more rows inside the <span class="literal">usr</span> table.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+  idu         INTEGER  NOT NULL,
+  fname       VARCHAR2(64),
+  lname       CHAR(64),
+  CONSTRAINT pk_usr_idu     PRIMARY KEY (idu),
+)
+CREATE TABLE indirect.usr_directReports
+(
+  idu      INTEGER       NOT NULL,
+  repname  VARCHAR2(64)  NOT NULL,
+  CONSTRAINT fk_directReports_idu FOREIGN KEY (idu)
+    REFERENCES indirect.usr(idu) ON DELETE CASCADE,
+  CONSTRAINT fk_directReports_repname FOREIGN KEY (idu)
+    REFERENCES indirect.usr(idu) ON DELETE CASCADE
+)</pre></li>
+<li class="listitem">
+<p class="listitem">If the attribute is single-valued and points to a different object class, then the table that contains that class will have a foreign key constraint to the table for the other object class, and a local column to store that value. An example is the <span class="literal">Host Server</span> attribute in eDirectory. In the following example, if the driver parameter <span class="literal">Schema Name</span> is set to <span class="literal">indirect</span>, then the attribute <span class="literal">hostsrv</span> will be a DN-type attribute that points to a row inside the <span class="literal">server</span> table. In this example, both the <span class="literal">volume</span> table and the <span class="literal">server</span> table represent object classes.</p><pre class="screen">CREATE TABLE indirect.volume
+(
+  idv         INTEGER  NOT NULL,
+  vname       VARCHAR2(64),
+  hostsrv     INTEGER,
+  CONSTRAINT pk_volume_idv     PRIMARY KEY (idv),
+  CONSTRAINT fk_volume_hostsrv FOREIGN KEY (ids)
+    REFERENCES indirect.server(ids) ON DELETE SET NULL 
+)
+CREATE TABLE indirect.server
+(
+  ids         INTEGER  NOT NULL,
+  srvname     VARCHAR2(64),
+  CONSTRAINT pk_server_ids PRIMARY KEY (ids)              
+)</pre></li>
+<li class="listitem">
+<p class="listitem">If the attribute is multi-valued and points to a different object class, then we need a child table with two columns, each having a foreign key constraint to a different parent table. An example is the <span class="literal">Group Membership</span> attribute in eDirectory. In the following example, if the driver parameter <span class="literal">Schema Name</span> is set to <span class="literal">indirect</span>, then the attribute <span class="literal">usr_mbr_of.idu</span> will be a DN-type attribute that points to a row inside the <span class="literal">grp</span> table. In this example, both the <span class="literal">usr</span> table and the <span class="literal">grp</span> table represent object classes.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+  idu         INTEGER  NOT NULL,
+  fname       VARCHAR2(64),
+  lname       CHAR(64),
+  CONSTRAINT pk_usr_idu     PRIMARY KEY (idu),
+)
+CREATE TABLE indirect.grp
+(
+  idg         INTEGER  NOT NULL,
+  for_insert  INTEGER,    
+  CONSTRAINT pk_grp_idg PRIMARY KEY (idg)              
+)
+CREATE TABLE indirect.usr_mbr_of
+(
+  idu  INTEGER  NOT NULL,
+  idg  INTEGER  NOT NULL,
+  CONSTRAINT fk_mbr_of_idu FOREIGN KEY (idu)
+    REFERENCES indirect.usr(idu) ON DELETE CASCADE,
+  CONSTRAINT fk_mbr_of_idg FOREIGN KEY (idg)
+    REFERENCES indirect.grp(idg) ON DELETE CASCADE        
+)</pre></li></ul></div>
+
+<p class="para">Security/Performance:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">For performance and security reasons, run the driver remotely on the database server whenever possible. Be sure to enable SSL encryption between the Identity Vault and the Remote Loader service.</p></li>
+<li class="listitem">
+<p class="listitem">You should enable SSL encryption for third-party drivers whenever the JDBC driver is not running remotely on the database server. For information on the security capabilities of supported third-party drivers, see <a href="third-party-jdbc-drivers.html" class="xref">Section 14.0, Third-Party JDBC Drivers</a>.</p></li>
+<li class="listitem">
+<p class="listitem">In a production environment, turn off tracing.</p></li></ul></div>
+
+<p class="para">Other:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">For direct synchronization, prefix one or more view column names with â<span class="literal">pk_</span>â (case-insensitive).</p></li>
+<li class="listitem">
+<p class="listitem">For both direct and indirect synchronization, use different primary key column names between logical database classes.</p></li>
+<li class="listitem">
+<p class="listitem">Delimit (double-quote) primary key values placed in the event log <span class="literal">table_key</span> field if they contain the following characters: , ; ' + = \ " &lt; &gt; This caution is usually an issue only if the primary key column is a binary type.</p></li>
+<li class="listitem">
+<p class="listitem">When an Identity Vault is the authoritative source of primary key values, GUID rather than CN is recommended for use as a primary key. Unlike CN, GUID is single-valued and does not change.</p></li>
+<li class="listitem">
+<p class="listitem">From publication triggers, omit foreign key columns that link child and parent tables.</p></li>
+<li class="listitem">
+<p class="listitem">If primary key columns are static (they do not change), do not include them in publication triggers.</p></li>
+<li class="listitem">
+<p class="listitem">Place the <span class="literal">jdbc:type="query"</span> attribute value on all embedded <span class="literal">SELECT</span> statements. Place the <span class="literal">jdbc:type="update"</span> attribute value on all embedded <span class="literal">INSERT</span>, <span class="literal">UPDATE</span> and <span class="literal">DELETE</span> statements.</p></li>
+<li class="listitem">
+<p class="listitem">To avoid issues that arise when you run a sql query that has a reserved word as a column name, specify a fully qualified name for the column.</p>
+<p class="listitem">For example, when you use <span class="guimenu">group</span> as a column name under <span class="guimenu">usr</span> table, <span class="guimenu">group</span> being is a sql keyword, your query might not be properly executed. To avoid this, specify a fully qualified name <span class="guimenu">such as usr.group</span> (<span class="literal">&lt;Tablename&gt;.&lt;Columnname&gt;</span>) for the column.</p></li>
+<li class="listitem">
+<p class="listitem">By design, the driver doesn't allow primary keys on child tables in the Synch Schema mode. To comply with standard database best practices, if you add a primary key on all tables including the child tables containing multi-valued attributes, the driver doesn't work properly in this mode. You must operate the driver in the Synch Tables/Views mode to allow primary keys on child tables. The Synch Tables/Views mode prevents the driver from adding the child tables to the list of synchronized tables.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

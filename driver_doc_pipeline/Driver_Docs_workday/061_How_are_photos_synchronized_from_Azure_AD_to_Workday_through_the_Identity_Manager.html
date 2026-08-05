@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4fk3uns13f1,freq_asked_quest,t4fjkgz3jowk,known_issues,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>How are photos synchronized from Azure AD to Workday through the Identity Manager? - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4fk3uns13f1">
+
+<h1 class="title h1"><span class="number">10.5</span> How are photos synchronized from Azure AD to Workday through the Identity Manager?</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Azure AD supports photo synchronization in Identity Manager User container. However, Workday supports photo synchronization through a different container called <span class="filename">wd-Photo</span>.</p>
+<p class="para">Follow the procedure given below to complete the synchronization:</p>
+<div class="procedure" id="t4fk42zp15kc">
+<ol class="steps">
+<li class="step">
+<p class="para">In Identity Console, click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step">
+<p class="para">On the Driver Dashboard, click the Workday Driver icon.</p></li>
+<li class="step">
+<p class="para">Click the <span class="guimenu">Data Transformation and Synchronization</span> tab.</p></li>
+<li class="step">
+<p class="para">Click the <span class="guimenu">Filter</span> in the <span class="guimenu">Subscriber channel</span>, add the Azure attribute <span class="filename">jpegPhoto</span>. To add:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Select <span class="guimenu">User</span> as class and click <span class="guimenu">Add Attribute</span>.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Show All Attribute</span> to display the list of attributes applicable for the class.</p></li>
+<li class="step">
+<p class="para">Add <span class="filename">jpegPhoto</span>, and save.</p></li>
+<li class="step">
+<p class="para">Select the attribute from the class list and set the following:</p></li></ol>
+</div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Publisher: <span class="guimenu">Ignore</span></p></li>
+<li class="listitem">
+<p class="listitem">Subscriber: <span class="guimenu">Notify</span></p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">For the Workday attribute <span class="filename">wd-Photo</span> class, set the Subscriber channel to Synchronize.</p></li>
+<li class="step">
+<p class="para">Place the following policy in the subscriber etp after <span class="filename">NETQWDDCFG-sub-etp-SupportedOperations-users</span>:</p><pre class="screen">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;policy&gt;
+    &lt;rule&gt;
+        &lt;description&gt;subPhotoSync&lt;/description&gt;
+        &lt;comment xml:space="preserve"&gt;SubPhotoSynz&lt;/comment&gt;
+        &lt;conditions&gt;
+            &lt;and&gt;
+                &lt;if-class-name mode="nocase" op="equal"&gt;User&lt;/if-class-name&gt;
+                &lt;if-op-attr name="jpegPhoto" op="changing"/&gt;
+            &lt;/and&gt;
+        &lt;/conditions&gt;
+        &lt;actions&gt;
+            &lt;do-set-local-variable name="workerID" scope="policy"&gt;
+                &lt;arg-string&gt;
+                    &lt;token-attr name="workforceID"/&gt;
+                &lt;/arg-string&gt;
+            &lt;/do-set-local-variable&gt;
+            &lt;do-set-local-variable name="eType" scope="policy"&gt;
+                &lt;arg-string&gt;
+                    &lt;token-attr name="wd-WorkerIDType"/&gt;
+                &lt;/arg-string&gt;
+            &lt;/do-set-local-variable&gt;
+            &lt;do-set-local-variable name="photoVal" scope="policy"&gt;
+                &lt;arg-string&gt;
+                    &lt;token-op-attr name="jpegPhoto"/&gt;
+                &lt;/arg-string&gt;
+            &lt;/do-set-local-variable&gt;
+            &lt;do-add-dest-attr-value class-name="wd-Photo" name="photo" when="after"&gt;
+                &lt;arg-association&gt;
+                    &lt;token-local-variable name="workerID"/&gt;
+                    &lt;token-text xml:space="preserve"&gt;-&lt;/token-text&gt;
+                    &lt;token-local-variable name="eType"/&gt;
+                &lt;/arg-association&gt;
+                &lt;arg-value type="octet"&gt;
+                    &lt;token-local-variable name="photoVal"/&gt;
+                &lt;/arg-value&gt;
+            &lt;/do-add-dest-attr-value&gt;
+        &lt;/actions&gt;
+    &lt;/rule&gt;
+&lt;/policy&gt;</pre></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="importing-the-certificate-into-the-clients-certificate,configuring-ssl-connections,configuring-ssl-connections,configuring-mutual-authentication,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Importing the Certificate into the Clientâs Certificate Store - NetIQ Driver for Bidirectional eDirectory Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="importing-the-certificate-into-the-clients-certificate">
+
+<h1 class="title h1"><span class="number">6.1</span> Importing the Certificate into the Clientâs Certificate Store</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You need to import the trusted root certificate into a certificate store (also called a keystore) that the driver can use.</p>
+<div class="procedure" id="bwtbvxo">
+<ol class="steps">
+<li class="step" id="bwtbvxp">
+<p class="para">Import the trusted root certificate from the connected eDirectory server and save it to a file in <span class="filename">der</span> format.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bx7ve11">
+<p class="para">Log in to Identity Console.</p></li>
+<li class="step" id="bx7ve1j">
+<p class="para">Under <span class="guimenu">eDirectory</span>, go to <span class="guimenu">Certificate Management &gt; Server Certificate Management,</span> then select a server certificate.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Select an Elliptic Curve (EC) certificate if your Identity Vault and connected system have eDirectory 9.0.2.x.</p></li>
+<li class="listitem">
+<p class="listitem">Select a non-EC certificate if your Identity Vault and connected system have eDirectory 8.8.8.x.</p></li></ul></div>
+</li>
+<li class="step" id="bx7ve1k">
+<p class="para">Click <span class="guimenu">Export</span>.</p></li>
+<li class="step" id="bx7ve1m">
+<p class="para">Select <span class="guimenu">OU=Organizational CA</span> certificate from drop down menu for the <span class="guimenu">Certificate</span> option.</p></li>
+<li class="step" id="bx7ve1n">
+<p class="para">Select <span class="filename">der</span> <span class="guimenu">as the Export</span> format, then click <span class="guimenu">OK</span>.</p></li>
+<li class="step" id="bx7ve1p">
+<p class="para">Save the file to a local file system.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bwtbvxq">
+<p class="para">Add the <span class="filename">.der</span> file to the keystore by using the following command at the command line:</p><pre class="screen">keytool -import -file <span class="replaceable">PATH_OF_DERFile\PublicKeyCert.der</span> -keystore <span class="replaceable">KEYSTOERPATH\NAME.keystore</span> -storepass keystorepass </pre>
+<p class="para">You are recommended to use Java 1.8 keytool or later.</p></li>
+<li class="step" id="bwtbvxr">
+<p class="para">When you are asked to trust this certificate, select <span class="guimenu">Yes</span>, then click <span class="guimenu">Enter</span>.</p></li>
+<li class="step" id="bwtbvxs">
+<p class="para">Copy the <span class="filename">.keystore</span> file to any directory on the same file system that has the Identity Vault files.</p></li>
+<li class="step" id="bwtbvxt">
+<p class="para">In Identity Console, select <span class="guimenu">IDM Administrator</span>.</p></li>
+<li class="step" id="bwtbvxu">
+<p class="para">Select the required driveset.</p></li>
+<li class="step" id="bwtbvxv">
+<p class="para">Click the Bidirectional eDirectory driver icon, then go to <span class="guimenu">Configuration</span> tab.</p></li>
+<li class="step" id="bwtbvxw">
+<p class="para">Change the <span class="guimenu">Use SSL</span> option as <span class="guimenu">Yes</span>, enter the complete path to the <span class="filename">keystore</span> file.</p></li>
+<li class="step" id="bwtbvxx">
+<p class="para">Enable the driverâs SSL parameter and adjust the other SSL parameters as needed.</p>
+<p class="para">For information, see <a href="driver-configuration.html#b957q17" class="xref">Driver Parameters</a>.</p></li></ol>
+</div>
+
+<p class="para">Continue with <a href="configuring-mutual-authentication.html" class="xref">Configuring Mutual Authentication</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

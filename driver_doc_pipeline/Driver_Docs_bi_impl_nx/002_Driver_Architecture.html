@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3wvpsh,b3r8p5u,b3r8p5u,b3wx9up,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Architecture - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3wvpsh">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Architecture</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Linux and UNIX driver synchronizes information between the Identity Vault and the account management system (files, NIS, or NIS+) on connected Linux and UNIX systems.</p>
+<p class="para">The Identity Manager detects relevant changes to identities in the Identity Vault and notifies the Subscriber component of the driver. After customizable policy processing, events are sent to the Subscriber shim of the embedded Remote Loader process on the connected system. The Subscriber shim uses shared memory to securely pass the information to customizable shell scripts that perform the required actions.</p>
+<p class="para">A process on the connected Linux or UNIX system polls the account management system for changes at a configurable interval. If the poll returns identity changes, they are written to the change log. An authentication module on the connected system monitors password changes and submits them to the change log.</p>
+<p class="para">The Publisher shim of the embedded Remote Loader process submits the changes from the change log to the Metadirectory engine as events. The Metadirectory engine processes these events using customizable policies and posts relevant changes to the Identity Vault.</p>
+<p class="para">The following illustration shows an overview of the architecture.</p>
+<div class="figure" id="b48ni4q"><p class="title"><em class="num">Figure 1-1 </em>Linux and UNIX Driver Architecture</p>
+            <img src="../graphics/nx-arch_a.png" alt="This graphic shows the relationships and data flow between driver components as described in the sections that follow." title="This graphic shows the relationships and data flow between driver components as described in the sections that follow." />
+          </div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ww1kz">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Publisher Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Publisher shim provides identity change information to the Metadirectory engine as XDS event documents. The Metadirectory engine applies policies, takes the appropriate actions, and posts the events to the Identity Vault.</p>
+<div class="container sect3" id="b3ww1ql">
+
+<h3 class="title h3">PAM and LAM</h3>
+
+<p class="para">Pluggable Authentication Modules (PAM) and AIX Loadable Authentication Modules (LAM) are modules installed on the local system to intercept password changes for participating applications, such as the <span class="command">passwd</span> command. These changes are written to the change log and are later presented to the Metadirectory engine by the Publisher shim. For details about the PAM and LAM configurations, see <a href="b3yj5z9.html" class="xref">PAM Configuration Details</a> and <a href="b3yj64d.html" class="xref">LAM Configuration Details</a>.</p>
+</div>
+
+<div class="container sect3" id="b3ww6wx">
+
+<h3 class="title h3">Change Log</h3>
+
+<p class="para">The change log stores identity changes in encrypted form. The polling script uses the change log update command to record identity changes it detects. Password changes are written to the change log by the PAM and LAM modules. Events are removed from the change log by the Publisher shim at configurable intervals and submitted to the Metadirectory engine for processing. If communication with the Metadirectory engine is temporarily lost, events remain in the change log until communication becomes available again.</p>
+</div>
+
+<div class="container sect3" id="b3wwaqq">
+
+<h3 class="title h3">Change Log Update Command</h3>
+
+<p class="para">The change log update command, <span class="command">nxclh</span>, encrypts and writes events to the change log. Any process with rights to update the change log can use the change log update command. The change log update command takes command line arguments and standard input, and stores events in encrypted form in the change log for subsequent publishing. The polling script calls the change log update command to record identity changes. For information about using the change log update command, see the <a href="https://www.netiq.com/documentation/identity-manager-developer/driver-developer-kit.html" class="ulink">NetIQÂ® Identity Manager Linux and UNIX Driver Developer Kit Web site</a>.</p>
+</div>
+
+<div class="container sect3" id="b3wwdft">
+
+<h3 class="title h3">Polling Script</h3>
+
+<p class="para">The polling script, <span class="filename">poll.sh</span>, is a native shell script that periodically scans the local account management system for modifications that have occurred since the last polling interval. If necessary, the polling script updates the change log by calling the change log update command. You can specify the polling interval during installation and by subsequent configuration of the Driver object.</p>
+</div>
+
+<div class="container sect3" id="b40jqdk">
+
+<h3 class="title h3">Account Snapshot Files</h3>
+
+<p class="para">The account snapshot files hold information about the state of users and groups. These files are used by the polling script to detect changes made to users and groups in the account management database (files, NIS, or NIS+).</p>
+</div>
+
+<div class="container sect3" id="b3wwgbr">
+
+<h3 class="title h3">Publisher Shim</h3>
+
+<p class="para">The Publisher shim periodically scans the change log for events. Before scanning the change log, the driver calls the polling script to check the local system for changes that might have been made since the previous poll.</p>
+<p class="para">When the Publisher shim finds events in the change log, it decrypts, processes, and sends them to the Metadirectory engine in XDS format over a Secure Sockets Layer (SSL) network link.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwjcn">
+
+<h2 class="title h2"><span class="number">1.1.2</span> Subscriber Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel receives XDS command documents from the Metadirectory engine, stores them as name-value variables in shared memory, then calls the appropriate shell script or scripts to handle the command.</p>
+<p class="para">The provided shell scripts support adds, modifies, deletes, moves, and renames for User and Group objects, and handle password synchronization. You can extend the shell scripts to support other object types and events. The shell scripts have secure access to the original command data using the shared memory tool (<span class="command">nxsmh</span>) that accesses shared memory from the driver shim.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b42k9un">
+
+<h2 class="title h2"><span class="number">1.1.3</span> Scriptable Framework</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The interface between the account management database (files, NIS or NIS+) and the driver shim uses customizable shell scripts. You can extend the scripts that are provided with the driver to support other applications and databases.</p>
+<p class="para">Several utility scripts and helper commands are provided with the driver to facilitate communication with the driver shim and the change log. An extensible connected system schema file allows you to add your own objects and attributes to those already supported by the driver.</p>
+<p class="para">For more information about the shell scripts and the scriptable framework, see <a href="b410u7u.html" class="xref">The Scriptable Framework</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwpn7">
+
+<h2 class="title h2"><span class="number">1.1.4</span> Schema File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The configuration of class and attribute definitions for the connected Linux and UNIX system is specified using the schema file. You can modify and extend this file to include new objects and attributes. For details about configuring the schema file, see <a href="b3xxapt.html" class="xref">The Connected System Schema File</a>.</p>
+<p class="para">The schema for the connected system includes two classes: User and Group. These correspond to the passwd and group maps commonly found in <span class="filename">/etc/passwd</span> and <span class="filename">/etc/group</span> in the files environment.</p>
+<p class="para">By default, the User class contains the attributes loginName, uidNumber, gidNumber, gecos, homeDirectory, and loginShell. These refer to the fields in the passwd map.</p><pre class="screen">loginName:x:uidNumber:gidNumber:gecos:homeDirectory:loginShell</pre>
+<p class="para">By default, the Group class contains the attributes groupName, gidNumber, and memberUid. These refer to the fields in the group map.</p><pre class="screen">groupName:!:gidNumber:memberUid</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwr5t">
+
+<h2 class="title h2"><span class="number">1.1.5</span> Include/Exclude File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The include/exclude file allows local system policy to enforce which objects are included or excluded from provisioning, on both the Publisher channel and the Subscriber channel, independently. For details about using the include/exclude file, see <a href="b3xxit1.html" class="xref">The Connected System Include/Exclude File</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b40jq0y">
+
+<h2 class="title h2"><span class="number">1.1.6</span> Loopback State Files</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The loopback state files are used to provide automatic loopback detection for external applications that do not have mechanisms to perform loopback detection. This loopback detection prevents subscribed events from being published back to the Identity Vault.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4avmq76q86m,t4avmq76q0gt,t4avmq76q0gt,t4avmq76rihg,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Concepts - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4avmq76q86m">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Concepts</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section provides the following information:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="t4avmq76q86m.html#t4avmq76qfwf" class="xref">Data Management</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4avmq76q86m.html#t4avmq76rarn" class="xref">How the Driver Works</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4avmq76qfwf">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Data Management</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Workday driver communicates with Workday using the Workday SOAP API; especially the Human_Resource API. Some of the important Human resource APIs used in the driver, are mentioned below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Get_Workers</p></li>
+<li class="listitem">
+<p class="listitem">Get_Worker_Photos</p></li>
+<li class="listitem">
+<p class="listitem">Get_Locations</p></li>
+<li class="listitem">
+<p class="listitem">Get_Organizations</p></li>
+<li class="listitem">
+<p class="listitem">Get_Job_Profiles</p></li>
+<li class="listitem">
+<p class="listitem">Get_Job_Families</p></li>
+<li class="listitem">
+<p class="listitem">Update_Workday_Account</p></li>
+<li class="listitem">
+<p class="listitem">Get_Assign_User-Based_Security_Group</p></li>
+<li class="listitem">
+<p class="listitem">Get_Assign_User-Based_Security_Groups</p></li>
+<li class="listitem">
+<p class="listitem">Put_Assign_User-Based_Security_Groups</p></li>
+<li class="listitem">
+<p class="listitem">Assign_Roles</p></li>
+<li class="listitem">
+<p class="listitem">Change_Other_IDs</p></li>
+<li class="listitem">
+<p class="listitem">Get_Server_Timestamp</p></li>
+<li class="listitem">
+<p class="listitem">Put_Worker_Photo</p></li></ul></div>
+
+<div class="container sect3" id="t4avmq76qnm8">
+
+<h3 class="title h3">SOAP</h3>
+
+<p class="para">SOAP (Simple Object Access Protocol) is an XML-based protocol for exchanging messages. It defines the message exchange but not the message content. The driver supports SOAP 1.1.</p>
+<p class="para">SOAP documents are organized into three elements:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Envelope:</em>
+                The root XML node.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Header:</em>
+                Provides context knowledge such as a transaction ID and security information.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Body:</em>
+                The method-specific information.</p>
+              </div>
+</li></ul></div>
+
+<p class="para">SOAP follows the HTTP request/response message model, which provides SOAP request parameters in an HTTP request and SOAP response parameters in an HTTP response.</p>
+</div>
+
+<div class="container sect3" id="t4avmq76qvc1">
+
+<h3 class="title h3">XML</h3>
+
+<p class="para">XML (Extensible Markup Language) is a generic subset of Standard Generalized Markup Language (SGML) that allows for exchange of structured data on the Internet.</p>
+</div>
+
+<div class="container sect3" id="t4avmq76r31u">
+
+<h3 class="title h3">HTTP</h3>
+
+<p class="para">HTTP is a protocol used to request and transmit data over the Internet or other computer network. The protocol works well in an Internet infrastructure and with firewalls.</p>
+<p class="para">HTTP is a stateless request/response system because the connection is usually maintained only for the immediate request. The client establishes a TCP connection with the server and sends it a request command. The server then sends back its response.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Workday communication always happens over HTTPS.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4avmq76rarn">
+
+<h2 class="title h2"><span class="number">1.1.2</span> How the Driver Works</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following diagram illustrates the data flow from Workday service to Identity Manager and <span class="replaceable">vice-versa</span>:</p>
+<div class="figure" id="bhc1fvp"><p class="title"><em class="num">Figure 1-1 </em>Workday Driver Data Flow</p>
+              <img src="../graphics/idv-workday-sync-3.png" alt="" />
+            </div>
+
+<p class="para">The Workday driver polls data from Workday as SOAP request. Workday processes the request, and returns a SOAP response to the driver shim. The driver processes the response, converting it into appropriate XDS, a specialized form of XML, using XSLT style sheets. The driver stores the response data in a cache file. The Publisher channel periodically polls for additions and modifications to the objects in Workday. On a successful retrieval of the changes, it stores the polling time for use in the next polling cycle. Driver uses the cache file to submit the optimized XDS modify document to the Identity Manager Engine.</p>
+<p class="para">The Identity Manager engine uses XDS to represent events in the Identity Vault. On the Subscriber channel, the Identity Manager engine passes the XDS event to the driver policy channel, which consists of basic policies, DirXML Script, and XSLT style sheets. The driver shim receives the XDS document from the policy channel. The driver shim uses XSLT style sheets to convert the XDS document to appropriate SOAP request.</p>
+<p class="para">The Publisher channel uses two different ways of polling the Workday server for fetching the changes:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Recurring Polling:</em>
+              Recurring polling happens at a fixed interval. This type of polling happens for Worker, Relation and Job Profile object classes. Recurring polling queries the Workday server for changes from the last successful recurring polling cycle.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Scheduled Polling:</em>
+              Scheduled polling happens once in a day at a fixed time. This type of polling happens for Terminated Workers, Location, Worker Photo, Job Family and Organization object classes.</p>
+            </div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

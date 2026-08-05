@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="download-instant-client,setup-oci-client-on-linux-for-jdbc-driver,b67o2bo,configure-oci-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Setting Up the OCI Client - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="download-instant-client">
+
+<h1 class="title h1"><span class="number">M.2</span> Setting Up the OCI Client</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Set up the Oracle Instant Client on the machine where the JDBC driver is running (not on the machine where Oracle is running).</p>
+<div class="procedure" id="b67nk72">
+<ol class="steps">
+<li class="step" id="b67nks7">
+<p class="para">Log into Linux as <span class="systemitem">root</span>, and create the following structure:</p>
+<p class="para"><span class="filename">/oracle</span> <span class="filename">/oracle/client</span> <span class="filename">/oracle/client/bin</span> <span class="filename">/oracle/client/lib</span> <span class="filename">/oracle/client/network/admin</span></p></li>
+<li class="step" id="b67nksk">
+<p class="para">Unzip all files from <span class="filename">instantclient-basic-linux32-11.1.0.7.zip</span> to <span class="filename">/oracle/client/lib</span>.</p></li>
+<li class="step" id="b67nksm">
+<p class="para">Unzip all files from <span class="filename">instantclient-sqlplus-linux32-11.1.0.7.zip</span> to <span class="filename">/oracle/client/bin</span>.</p></li>
+<li class="step" id="b67nkso">
+<p class="para">Copy <span class="filename">libsqlplus.so</span> from <span class="filename">/oracle/client/bin</span> to <span class="filename">/oracle/client/lib</span>.</p></li>
+<li class="step" id="b67nksp">
+<p class="para">Copy <span class="filename">libsqlplusic.so</span> from <span class="filename">/oracle/client/bin</span> to <span class="filename">/oracle/client/lib</span>.</p></li>
+<li class="step" id="b67nksr">
+<p class="para">Using <span class="command">chmod</span>, ensure that the file <span class="filename">sqlplus</span> in /o<span class="filename">racle/client/bin</span> is executable.</p></li>
+<li class="step" id="b67nnn5">
+<p class="para">Copy a valid <span class="filename">tnsnames.ora</span> into /<span class="filename">oracle/client/network/admin</span>.</p>
+<p class="para">If you donât have a <span class="filename">tnsnames.ora</span> file, use the Oracle configuration tool to create one.</p>
+<p class="para">Make sure that the <span class="filename">tnsnames.ora</span> filename is in lowercase.</p></li>
+<li class="step" id="b67nnn8">
+<p class="para">Modify the <span class="filename">profile.local</span> file by adding the following lines:</p><pre class="screen">export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/oracle/client/lib  </pre><pre class="screen">export TNS_ADMIN=/oracle/client/network/admin</pre><pre class="screen">export PATH=$PATH:/oracle/client/lib</pre>
+<p class="para">The <span class="filename">profile.local</span> file is in the <span class="filename">/etc</span> folder. If the file doesnât exist, create one. The file can consist of only the three export lines.</p>
+<p class="para">The <span class="filename">profile.local</span> file extends the LD_LIBRARY_PATH, sets TNS_ADMIN, and extends the PATH. This file is read when the server boots.</p></li>
+<li class="step" id="b67nnnc">
+<p class="para">Ensure that the exports in the <span class="filename">profile.local</span> file are always valid.</p></li>
+<li class="step" id="b67no6v">
+<p class="para">Copy the appropriate jar files to the Identity Manager classes directory.</p>
+<p class="para">These .<span class="filename">jar</span> files are supplied with the Instant Client.</p>
+<p class="para">The Identity Manager classes directory is the directory where your driver is located.</p></li>
+<li class="step" id="b67noak">
+<p class="para">Start SQL Plus with the following example command (assuming that the directory is <span class="filename">/oracle/client/bin</span>):</p>
+<p class="para">
+            <span class="literal">./sqlplus <span class="replaceable">username</span>/<span class="replaceable">password</span>@<span class="replaceable">sid</span></span>
+          </p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

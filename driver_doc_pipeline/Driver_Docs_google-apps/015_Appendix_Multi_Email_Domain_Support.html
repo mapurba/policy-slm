@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g4kj9az,bookinfo,t4cb3g4etjrn,t4cb3g4nohoi,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Appendix â Multi Email Domain Support - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container appendix expanding expanded" id="t4cb3g4kj9az">
+
+<h1 class="title h1"><span class="number">A.0</span> Appendix â Multi Email Domain Support</h1>
+
+<div class="content_wrapper">
+
+<p class="para">While the connector is capable of managing multiple domains within one connector instance, in many cases, it is recommended that a one domain per driver instance model be used. This is a best practice recommendation. The connector does not support a one to many model between IDV users and Google domain users. As a result, a single IDV user instance can only be in one domain at a time, if all domains are managed by a single driver instance. Configuring a driver instance per domain (each child domain is set as the primary domain for the driver serving that domain) gives considerable flexibility for provisioning users and groups in multiple domains from a single IDV source object.</p>
+<p class="para">The GÂ Suite email application â Gmail â is included with all versions of Google Apps. This application can be turned off by an administrator for the entire domain or a subset of users (via an organization). There are three types of mail domains within Google Apps:</p>
+<div class="variablelist">
+      
+<dl class="variablelist">
+<dt class="term">Primary Domain</dt>
+<dd class="listitem">
+<p class="listitem">â This domain is tied to the name of the GÂ Suite Domain name: i.e.Â <a href="https://www.google.com/a/mycompanys.com" class="ulink">https://www.google.com/a/mycompanys.com</a></p></dd>
+
+      
+<dt class="term">Domain Alias</dt>
+<dd class="listitem">
+<p class="listitem">â A domain Alias is an alternate domain name for the primary domain only. IfÂ you create a domain alias named myothercompany.com a user named name@mycompany.com will be able to receive an email via name@myothercompany.com.</p></dd>
+
+      
+<dt class="term">Secondary or Sub Domain</dt>
+<dd class="listitem">
+<p class="listitem">â A secondary domain is a separate email domain within GÂ Suite. An example of a secondary domain would be name@staff.mycompany.com. In the Google admin interface, it would be possible to have two accounts called ânameâ with one being in the primary domain and one in the secondary domain. It is not possible to create aÂ Domain Alias for a secondary domain.</p></dd>
+
+    </dl></div>
+
+<p class="para">Planning out your email strategy within GÂ Suite should be completed and verified prior to synchronizing accounts with the driver.</p>
+<p class="para">The Google Driver can:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Create and modify settings on a user in the Primary or Secondary Domain</p></li>
+<li class="listitem">
+<p class="listitem">Use the GmailSettingsSendAs to set the users From Name and Email Address if there is a domain alias. Note that it is not possible to setup a SendAs with an account in a Secondary Domain.</p></li>
+<li class="listitem">
+<p class="listitem">Switch users between parent and child domain via a rename operation</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Rename the user from <a href="mailto:username@domain1.org" class="ulink">username@domain1.org</a> to <a href="mailto:username@domain2.org" class="ulink">username@domain2.org</a></p></li>
+<li class="listitem">
+<p class="listitem">If the domains are within the same GÂ Suite service, the user account should switch to the other domain.</p></li></ul></div>
+</li></ul></div>
+
+<p class="para">In order to create a user in a specific e-mail domain all you have to do is set the UserName (Google Attribute Name mapped to CN by default) to the domain name of your choice i.e. user@domain.com. The driver import comes with disabled policies for adding a secondary domain. These policies can be copied if there is more than one policy.</p>
+<p class="para">To enable these policies, you must first decide which users will go to which domain. This can be via entitlements, group membership, attribute values or containment within a container. For example, theÂ following policy (used in the create rule) will create a user in the students.com email domain if theÂ attribute employeeType is set to the value of student:</p>
+<div class="figure" id="t4cbmxdrt0k0"><p class="title"><em class="num">Figure A-1 </em>Sample User Creation Policy</p>
+          <img src="../graphics/figure51.png" alt="" />
+        </div>
+
+<p class="para">Note that you will need to modify your matching rule in a similar fashion.</p>
+<p class="para">Groups also fall into the same category as users. A policy would need to be written in the matching and create rule to facilitate adding a secondary domain for groups. The attribute that facilitates this is the DirXML-GAGroupEMailAddress. As with users all you have to do is set the attribute to determine which email domain the group will belong to with the email address of the group.Â </p>
+<p class="para">The Google Apps driver packages included with Designer have examples of how to setup entitlements for multiple email domains.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="hr-example-without-hr-driver,customize-driver,hr-example-hr-driver,create-manage-work-orders,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Human Resource Example without an HR Driver - NetIQ Identity Manager WorkOrder Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="hr-example-without-hr-driver">
+
+<h1 class="title h1"><span class="number">6.3</span> Human Resource Example without an HR Driver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This example creates a new user and postpones activating the new employeeâs access to the system until the hire date by putting policies into the WorkOrder driver to create the work order. <a href="hr-example-without-hr-driver.html#b8ylff6" class="xref">Figure 6-2</a> illustrates this sample configuration.</p>
+<div class="figure" id="b8ylff6"><p class="title"><em class="num">Figure 6-2 </em>Data Flow without an HR Driver</p>
+            <img src="../graphics/work_order_decision005_a.png" alt="" />
+          </div>
+
+<p class="para">When a new user object is created in the Identity Vault, a policy in the WorkOrder driver checks to see if the loginDisabled attribute is set to True. If it is not set to True, the Create rule blocks the event. If it is set to True, the policy creates a work order to set the loginDisabled attribute on the user to False on the loginActivationTime.</p>
+<p class="para">The following policies or rules show how to implement the sample configuration:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="hr-example-without-hr-driver.html#bg9wmyb" class="xref">Filter Additions</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="hr-example-without-hr-driver.html#bg9wnaj" class="xref">Subscriber Create Rule</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="hr-example-without-hr-driver.html#bg9wnhi" class="xref">Subscriber Command Transform</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="hr-example-without-hr-driver.html#bg9wns1" class="xref">Work Order E-Mail Notification of Work Order Completion</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bg9wmyb">
+
+<h2 class="title h2"><span class="number">6.3.1</span> Filter Additions</h2>
+
+<div class="content_wrapper">
+
+<p class="para">These additions modify the filter to allow user objects with loginActivationTime and loginDisabled attributes to synchronize on the Subscriber channel. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/wo-filter.xml" class="ulink">wo-filter.xml</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bg9wnaj">
+
+<h2 class="title h2"><span class="number">6.3.2</span> Subscriber Create Rule</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Create rule vetoes this event if the loginActivationTime or the loginDisabled attributes are not present. It also vetoes this event if the loginDisabled attribute is set to False. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/wo-create.xml" class="ulink">wo-create.xml</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bg9wnhi">
+
+<h2 class="title h2"><span class="number">6.3.3</span> Subscriber Command Transform</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This policy checks to see if the event is an Add of a user object. If that is true, the policy creates a WorkOrder object. The DN of the user object is added to the DirXML-nwoContent attribute. The DirXML-DueDate is set to the loginActivationTime. The DirXML-nwoStatus is set to pending. The DirXML-nwoSendToPublisher attribute is set to True.</p>
+<p class="para">This work order has not yet been created in the Identity Vault, so the sample configuration creates the work order in the Identity Vault by setting the SendToPublisher attribute to True. This tells the publisher in the WorkOrder driver to write the policy to the work order container that it looks in for work orders to be processed. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/wo-sub-cmd-transform.xml" class="ulink">wo-sub-cmd-transform.xml</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bg9wns1">
+
+<h2 class="title h2"><span class="number">6.3.4</span> Work Order E-Mail Notification of Work Order Completion</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This policy can be used with the WorkOrder driver to send e-mail notification of a completed work order. This policy is in the Publisher Command Transform. The policy checks to see if a DirXML-WorkOrder modify event is happening. If it is, it builds an e-mail from the status, description, and process log of the work order and then sends it to an administrator. This notifies the administrator that a work order has been processed and gives them the results. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/wo-pub-cmd-transform.xml" class="ulink">wo-pub-cmd-transform.xml</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

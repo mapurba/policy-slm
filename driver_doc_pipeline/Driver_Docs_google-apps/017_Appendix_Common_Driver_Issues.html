@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g4r9gok,bookinfo,t4cb3g4nohoi,t4cb3g4ukwaa,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Appendix â Common Driver Issues - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container appendix expanding expanded" id="t4cb3g4r9gok">
+
+<h1 class="title h1"><span class="number">C.0</span> Appendix â Common Driver Issues</h1>
+
+<div class="content_wrapper">
+
+<div class="table" id="t4cb3g4r9odg"><p class="title"><em class="num">Table C-1 </em>Common Driver Issues</p>
+<table class="topbot" width="100%"><col width="33%" /><col width="67%" />
+          
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                <span class="bold">Issue</span>
+              </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                <span class="bold">Example and Notes</span>
+              </p></th>
+</tr>
+        
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User Placement. Do not use a leading "\" to place users or Organization Units.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">To place a user in the root container, the dest-dn should only contain the Username. If you are placing a user in the google Sales\Marketing container your dest-dn should look like:</p>
+<p class="para">&lt;add class-name="User" dest-dn="Sales\Marketing\myname"/&gt;</p>
+<p class="para">Organization Units use the same format for dest-dn.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Group Placement: Do not use a placement rule on groups as Google does not support placing groups in organizations.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Groups are not kept in a hierarchical structure. Placement is not relevant to group objects.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Unique naming: It is important that Nicknames, Group names and usernames be unique in the G Suite domain.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">When developing a matching rule be sure to check for nicknames and usernames to ensure proper matching. Further, naming must be unique across all Google Organization units. It is not legal to have Sales\Marketing\myname and Engineering\myname since myname needs to be unique across the domain.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver Unable to Start</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="orderedlist">
+                
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Are the driver jar files installed and eDirectory restarted?</p></li>
+                
+<li class="listitem">
+<p class="listitem">Have you created the admin account in Google and logged into the web interface at least once?</p></li>
+                
+<li class="listitem">
+<p class="listitem">Examine a level 3 or higher trace log of the driver start up for errors.</p></li>
+              </ol></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver Exceeds Quota on requests to specific services.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Google has specific default quotas defined for the various services the driver uses. The quotas limit the total number of requests allowed in a given 24-hour period. Once these quotas are exceeded the driver will receive an HTTP 403: Forbidden error. Read about quotas and how to resolve this issue in Appendix D â Google API Quotas.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Token Response Exception when using Gmail Settings Attributes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The trace will show something like this:Â </p>
+<p class="para">DirXML Log Event -------------------</p>
+<p class="para">Driver: \GLOBAL-DOMINATION\system\driverset1\Google Apps</p>
+<p class="para">Status: Fatal</p>
+<p class="para">Message: &lt;description&gt;com.google.api.client.auth.oauth2. TokenResponseException: 401 Unauthorized&lt;/description&gt;</p>
+<p class="para">&lt;exception class-name= "com.google.api.client.auth.oauth2. TokenResponseException"&gt;</p>
+<p class="para">&lt;message&gt;401 Unauthorized&lt;/message&gt;</p>
+<p class="para">&lt;/exception&gt;</p>
+<p class="para">This error is due to not authorizing the new Gmail scopes within the Security section of your G Suite domain. For more information, see the OAuth Guide and reset the authorized scopes for the service account. </p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GoogleJsonResponseException error 403 forbidden when accessing Gmail Settings attributes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The trace will show something like this:Â </p>
+<p class="para">&lt;status level="retry" type="app-connection"&gt;</p>
+<p class="para">&lt;description&gt;IOException: com.google.api.client.googleapis.json. GoogleJsonResponseException: 403 Forbidden</p>
+<p class="para">{</p>
+<p class="para">"code" : 403,</p>
+<p class="para">"errors" : [ {</p>
+<p class="para">"domain" : "usageLimits",</p>
+<p class="para">"message" : "Access Not Configured. Gmail API has not been used in project 1233 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=1233 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.",</p>
+<p class="para">"reason" : "accessNotConfigured",</p>
+<p class="para">The Gmail API has not been enabled for your GÂ Suite domain. Enable it in your service account's developers console project.Â </p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

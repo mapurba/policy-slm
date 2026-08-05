@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xehpq,b3r8si5,b3xdkfa,b3xfpxf,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing the Driver Shim on the Connected System - NetIQ IBM i (i5/OS and OS/400) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xehpq">
+
+<h1 class="title h1"><span class="number">3.7</span> Installing the Driver Shim on the Connected System</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can install multiple instances of the driver on one IBM i system if necessary to support applications via customized CL programs. By default, the driver shim installation uses the <span class="filename">I5OSDRV</span> library and the <span class="filename">/usr/local/i5osdrv</span> IFS path.</p>
+<p class="para">For details see <a href="b4ab5n6.html" class="xref">Driver Shim Library and IFS Contents</a>.</p>
+<p class="para">The driver uses an embedded Remote Loader. It is not necessary to install Java on the connected system.</p>
+<div class="procedure" id="b3xejex">
+<ol class="steps">
+<li class="step" id="b4rplg4">
+<p class="para">Sign on as QSECOFR or an equivalent user to the target IBM i system.</p></li>
+<li class="step" id="b4rpm3n">
+<p class="para">Use the following command to create a temporary file to contain the driver shim distribution package:</p><pre class="screen">CRTSAVF FILE(QSYS/NOVELLDIST)</pre></li>
+<li class="step" id="b3xd5r6">
+<p class="para">On the workstation that you used in <a href="b3xd1sq.html#b4rpe2a" class="xref">Step 2</a>, use FTP to transfer <span class="filename">i5osdrv.sav</span> to the <span class="filename">NOVELLDIST</span> file just created in <a href="b3xehpq.html#b4rpm3n" class="xref">Step 2</a> on your target IBM i system:</p><pre class="screen">&gt;ftp <span class="replaceable">server_address</span>
+(Authenticate to the server)
+ftp&gt; cd qsys
+ftp&gt; bin
+ftp&gt; put i5osdrv.sav novelldist.file
+ftp&gt; quit</pre></li>
+<li class="step" id="b454bve">
+<p class="para">On the IBM i system, execute the following command to restore the driver shim distribution library:</p><pre class="screen">RSTLIB SAVLIB(NOVELLDIST) DEV(*SAVF) SAVF(QSYS/NOVELLDIST)</pre></li>
+<li class="step" id="b4rqh0c">
+<p class="para">Remove the temporary file:</p><pre class="screen">DLTF FILE(QSYS/NOVELLDIST)</pre></li>
+<li class="step" id="b4rqhvv">
+<p class="para">Execute the installation program:</p><pre class="screen">CALL PGM(NOVELLDIST/INSTALL)</pre></li>
+<li class="step" id="b4rqjej">
+<p class="para">Respond to the prompts as appropriate to complete the installation:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b4tsgkn">
+<p class="para">Read and accept the license agreement.</p></li>
+<li class="step" id="b4tsgqc">
+<p class="para">Specify the driver library name and the driver IFS path. These default to <span class="filename">I5OSDRV</span> and to <span class="filename">/usr/local/i5osdrv</span> respectively.</p><pre class="screen">The driver requires a library in i5os and a path in the Integrated File System.
+Library: I5OSDRV</pre><pre class="screen">IFS Path: /user/local/i5osdrv</pre></li>
+<li class="step" id="b4tsi0n">
+<p class="para">Specify the TCP port number for the driver shim to listen on. The default port is 8090.</p><pre class="screen">The driver must listen on a port for connections from the Metadirectory server.</pre><pre class="screen">Remote Loader Port: 8090</pre></li>
+<li class="step" id="b4tskx9">
+<p class="para">Create a new User profile for the driver or specify an existing profile.</p><pre class="screen">The driver requires a User Profile with *SECADM and *ALLOBJ Special Privileges. A new Profile can be created by the installation, or an existing Profile can be used.
+Create New Profile: Y</pre><pre class="screen">User Profile: I5OSDRV</pre></li>
+<li class="step" id="b4tsl2u">
+<p class="para">Specify a subsystem and a job queue for the driver.</p><pre class="screen">The driver must be assigned to a subsystem and a job queue.</pre><pre class="screen">Subsystem: QSYSWRK</pre><pre class="screen">Job Queue: QSYSNOMAX</pre></li>
+<li class="step" id="b4tsq55">
+<p class="para">Specify whether the driver should be automatically started when the system starts.</p><pre class="screen">Autostart Job at IPL: Y</pre></li>
+<li class="step" id="b4tsqjp">
+<p class="para">Specify whether to install the profile exits, the distribution directory exit, and the password exit.</p>
+<p class="para">If you do not install the exits, the driver cannot publish the corresponding information.</p><pre class="screen">Exits must be installed for the driver to publish profile and password changes to the Identity Vault.</pre><pre class="screen">Install Profile Exits: Y
+   QIBM_QSY_CHG_PROFILE
+   QIBM_QSY_CRT_PROFILE
+   QIBM_QSY_DLT_PROFILE
+   QIBM_QSY_RST_PROFILE</pre><pre class="screen">Install Distribution Directory Exit: Y
+   QIBM_QOK_NOTIFY</pre><pre class="screen">Install Password Exit: Y
+   QIBM_QSY_VLD_PASSWRD</pre></li>
+<li class="step" id="b3xejil">
+<p class="para">Provide the Remote Loader and Driver object passwords that you entered when creating the driver in <a href="b3xdkfa.html#b12f3q0b" class="xref">Step 7</a>.</p><pre class="screen">Enter Remote Loader Password:
+Confirm Remote Loader Password:
+Enter Driver Object Password:
+Confirm Driver Object Password:</pre></li>
+<li class="step" id="b3xenl0">
+<p class="para">Specify the Metadirectory server host name or IP address and secure LDAP port number.</p>
+<p class="para">These are used to secure the driver shim with SSL.</p><pre class="screen">DNS name or IP address of the LDAP Server:
+TCP port number for LDAP SSL (default 636):</pre></li></ol>
+</div>
+</li>
+<li class="step" id="b4rqlso">
+<p class="para">Start the driver shim.</p>
+<p class="para">Enter <span class="command">GO I5OSDRV/I5OSDRV</span>, then select option 1.</p>
+<p class="para">If you did not use the default library name, substitute your driver library name as shown in the following example:</p><pre class="screen">GO <span class="replaceable">yourDriverLibrary</span>/I5OSDRV</pre></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

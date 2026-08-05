@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4eqymkdeu0j,custom_wd_driver,t4eqyl8053wa,t4finm19niw9,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Customizing the Subscriber Channel for Additional Attributes - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4eqymkdeu0j">
+
+<h1 class="title h1"><span class="number">3.2</span> Customizing the Subscriber Channel for Additional Attributes</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The procedure involves the following steps for subscriber channel:</p>
+<div class="procedure" id="t4er1dlsewk0">
+<ol class="steps">
+<li class="step">
+<p class="para">Fetch the XDS event from the Workday log.</p></li>
+<li class="step">
+<p class="para">Identify the XPATH of the required attribute from the fetched XDS event.</p></li>
+<li class="step">
+<p class="para">Build the XPATH for the attribute in the required format, to add to the custom stylesheet.</p></li>
+<li class="step" id="step4_xslt_path_subscriber">
+<p class="para">Add the XPATH of the new attribute to the custom stylesheet. You can copy the custom stylesheet, edit and upload it as per your requirement.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em></p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Ensure that you provide a complete updated stylesheet file when configuring the driver.</p></li>
+<li class="listitem">
+<p class="listitem">This feature is supported only for <span class="filename">worker</span> and <span class="filename">photo</span> objects.</p></li></ul></div>
+</div>
+
+<p class="para">For example, you have to add BirthDate template and the Caller template (to call the BirthDate template) in the custom stylesheet for the BirthDate attribute.</p>
+<p class="para">The examples for BirthDate and BirthDate Caller templates are shown below:</p>
+<h4 class="bridgehead" id="t4f4hmiv8vqz">Sample BirthDate template:</h4>
+<pre class="screen">&lt;xsl:template name="Date_of_Birth"&gt;
+&lt;xsl:param name="Birthdate"/&gt;
+&lt;xsl:param name="workerIdValue"/&gt;
+&lt;xsl:param name="workerIdType"/&gt;
+&lt;!-- Prepare SOAP envelope for DOB --&gt;
+&lt;soapenv:Envelope
+xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:bsvc="urn:com.workday/bsvc"&gt;
+&lt;soapenv:Header /&gt;
+&lt;soapenv:Body&gt;
+&lt;xsl:message&gt;version is: &lt;xsl:value-of select="$wdVersion"/&gt;&lt;/xsl:message&gt;
+&lt;bsvc:Change_Personal_Information_Request bsvc:version="{$wdVersion}"&gt;
+&lt;bsvc:Change_Personal_Information_Data&gt;
+&lt;bsvc:Worker_Reference bsvc:Descriptor="?"&gt;
+&lt;bsvc:ID bsvc:type="{$workerIdType}"&gt;
+&lt;xsl:value-of select="$workerIdValue"/&gt;&lt;/bsvc:ID&gt;
+&lt;/bsvc:Worker_Reference&gt;
+&lt;bsvc:Personal_Information_Data&gt;
+&lt;bsvc:Date_of_Birth&gt;&lt;xsl:value-of select="$Birthdate"/&gt;&lt;/bsvc:Date_of_Birth&gt;
+&lt;/bsvc:Personal_Information_Data&gt;
+&lt;/bsvc:Change_Personal_Information_Data&gt;
+&lt;/bsvc:Change_Personal_Information_Request&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+&lt;/xsl:template&gt;</pre>
+<h4 class="bridgehead" id="t4f4hmiv8zsu">Sample BirthDate Caller template:</h4>
+<pre class="screen">&lt;!--Personal Info attributes --&gt;
+ &lt;xsl:variable name="lv-Birthdate" select="<span class="strong">modify-attr[(@attr-name='wd-BirthDate')]/add-value/value/text()</span>"/&gt;
+&lt;xsl:call-template name="Date_of_Birth"&gt;
+&lt;xsl:with-param name="Birthdate" select="$lv-Birthdate"/&gt;
+&lt;xsl:with-param name="workerIdType" select="$lv-wd-WorkerIDType"/&gt;
+&lt;xsl:with-param name="workerIdValue" select="$lv-wd-EMPLID"/&gt;
+&lt;/xsl:call-template&gt;</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In the above example, the bold text is the XPATH that is built for BirthDate attribute by referring to the fetched schema file from Workday.</p></div>
+</li>
+<li class="step">
+<p class="para">In Identity Console<span class="guimenu">,</span> click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step">
+<p class="para">On the Driver Dashboard, click the Workday Driver icon.</p></li>
+<li class="step">
+<p class="para">Click the <span class="guimenu">Data Transformation and Synchronization</span> tab.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Filter</span> in the <span class="guimenu">Subscriber Channel</span>.</p></li>
+<li class="step">
+<p class="para">Add the attribute <span class="filename">wd-BirthDate</span>. To add:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Select <span class="guimenu">User</span> as class and click <span class="guimenu">Add Attribute</span>.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Show All Attribute</span> to display the list of attributes applicable for the class.</p></li>
+<li class="step">
+<p class="para">Add <span class="filename">wd-BirthDate</span>, and save.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Select the attribute from the class list and set the <span class="guimenu">Subscriber</span> option to <span class="guimenu">Synchronize</span> to match the attribute name with the schema extension name.</p></li>
+<li class="step">
+<p class="para">Restart the driver for the changes to take effect.</p></li></ol>
+</div>
+
+<p class="para">In Designer:</p>
+<div class="procedure" id="t4mtpuayz6l3">
+<ol class="steps">
+<li class="step">
+<p class="para">double click the connector line and navigate to <span class="guimenu">Driver Configuration &gt; Driver Parameters</span>.</p></li>
+<li class="step">
+<p class="para">Select Subscriber Options &gt; Worker Settings &gt; Import Worker Stylesheet.</p></li>
+<li class="step">
+<p class="para">Add the XSLT stylesheet path as prepared in <a href="t4eqymkdeu0j.html#step4_xslt_path_subscriber" class="xref">Step 4</a>, and deploy the driver.</p></li>
+<li class="step">
+<p class="para">Restart the driver for the changes to take effect.</p></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>When supplied stylesheets are used as a template to create external stylesheets, it is critical that the results of processing the response document through the stylesheet will return the right association value in the resulting XML. For the most efficient processing, the external stylesheet must return the attributes only that have a different value or any new attributes. However, it is advised to retain the code that generates association as is, to ensure that the results of the external stylesheet are correctly merged with the results from the internal stylesheet.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

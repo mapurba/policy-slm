@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3wvpsh,b3r8p5u,b3r8p5u,b3wx9up,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Architecture - NetIQ IBM i (i5/OS and OS/400) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3wvpsh">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Architecture</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The IBM i driver synchronizes information between the Identity Vault and the IBM i security system.</p>
+<p class="para">The Identity Manager detects relevant changes to identities in the Identity Vault and notifies the Subscriber component of the driver. After customizable policy processing, events are sent to the Subscriber shim of the embedded Remote Loader process on the connected system. The Subscriber shim uses a user space to securely pass the information to customizable CL programs that perform the required actions.</p>
+<p class="para">The driver uses exits on the IBM i system for notification of identity and password changes. These changes are submitted to the change log. The Publisher shim of the embedded Remote Loader process submits the changes from the change log to the Metadirectory engine as events. The Metadirectory engine processes these events using customizable policies and posts relevant changes to the Identity Vault.</p>
+<p class="para">The following illustration shows an overview of the architecture.</p>
+<div class="figure" id="b48ni4q"><p class="title"><em class="num">Figure 1-1 </em>IBM i Driver Architecture</p>
+            <img src="../graphics/i5os-arch_a.png" alt="This graphic shows the relationships and data flow between driver components as described in the sections that follow." title="This graphic shows the relationships and data flow between driver components as described in the sections that follow." />
+          </div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ww1kz">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Publisher Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Publisher shim provides identity change information to the Metadirectory engine as XDS event documents. The Metadirectory engine applies policies, takes the appropriate actions, and posts the events to the Identity Vault.</p>
+<div class="container sect3" id="b4mk194">
+
+<h3 class="title h3">Identity Changes</h3>
+
+<p class="para">The Publisher shim uses standard operating system exits for notification that an account has changed.</p>
+<div class="table" id="b4mk5mw"><p class="title"><em class="num">Table 1-1 </em>Exit Programs</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow" id="b4mk7fg"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Exit Point Name</p></th>
+</tr>
+              
+<tr class="oddrow" id="b4mk7fh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Directory Maintenance Exit Program</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">QIBM_QOK_NOTIFY</p></td>
+</tr>
+<tr class="evenrow" id="b4mk7fi"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Change User Profile Exit Program</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">QIBM_QSY_CHG_PROFILE</p></td>
+</tr>
+<tr class="oddrow" id="b4mk7fj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Create User Profile Exit Program</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">QIBM_QSY_CRT_PROFILE</p></td>
+</tr>
+<tr class="evenrow" id="b4mk7fk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Delete User Profile Exit Program</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">QIBM_QSY_DLT_PROFILE</p></td>
+</tr>
+<tr class="oddrow" id="b4mk7fl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Restore User Profile Exit Program</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">QIBM_QSY_RST_PROFILE</p></td>
+</tr></table>
+</div>
+
+<p class="para">The exit program notifies the Publisher shim of a change. The Publisher shim compares the state of changed objects and the account snapshot files to determine the details of the change, then submits the event to the change log.</p>
+</div>
+
+<div class="container sect3" id="b4mk2cs">
+
+<h3 class="title h3">Password Changes</h3>
+
+<p class="para">The Publisher shim uses QIBM_QSY_VLD_PASSWRD, which is the Validate Password exit program, to capture password change information, and submits it to the change log.</p>
+</div>
+
+<div class="container sect3" id="b3ww6wx">
+
+<h3 class="title h3">Change Log</h3>
+
+<p class="para">The change log stores identity changes in encrypted form. Events are removed from the change log by the Publisher shim at configurable intervals and submitted to the Metadirectory engine for processing. If communication with the Metadirectory engine is temporarily lost, events remain in the change log until communication becomes available again.</p>
+</div>
+
+<div class="container sect3" id="b40jqdk">
+
+<h3 class="title h3">Account Snapshot Files</h3>
+
+<p class="para">The account snapshot files hold information about the state of users and groups. The Publisher shim maintains the account snapshot files to determine details about changes, because the exits do not provide complete information.</p>
+</div>
+
+<div class="container sect3" id="b3wwgbr">
+
+<h3 class="title h3">Publisher Shim</h3>
+
+<p class="para">The Publisher shim periodically scans the change log for events. When the Publisher shim finds events in the change log, it decrypts, processes, and sends them to the Metadirectory engine in XDS format over a Secure Sockets Layer (SSL) network link.</p>
+<p class="para">IBM i profile names are uppercase. The Publisher shim converts profile names to lowercase when sending events to the Metadirectory engine.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwjcn">
+
+<h2 class="title h2"><span class="number">1.1.2</span> Subscriber Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel receives XDS command documents from the Metadirectory engine, stores them as name-value variables in a user space, then calls the appropriate CL programs to handle the command.</p>
+<p class="para">The provided CL programs support adds, modifies, renames, and deletes for User and Group objects, and handle password synchronization. You can extend the CL programs to support other object types and events. The CL programs securely access the original command data by calling <span class="command">GETIDMVAR</span>, which provides access to the user space.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b42k9un">
+
+<h2 class="title h2"><span class="number">1.1.3</span> Scriptable Framework</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The interface between the IBM i security system and the driver shim uses customizable CL programs. You can extend the programs that are provided with the driver to support other applications and databases.</p>
+<p class="para">Several helper commands are provided with the driver to enable communication with the driver shim and the change log. An extensible connected system schema file allows you to add your own objects and attributes to those already supported by the driver.</p>
+<p class="para">For more information about the CL programs and the scriptable framework, see <a href="b410u7u.html" class="xref">The Scriptable Framework</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwpn7">
+
+<h2 class="title h2"><span class="number">1.1.4</span> Schema File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The configuration of class and attribute definitions for the connected IBM i system is specified using the schema file. You can modify and extend this file to include new objects and attributes. For details about configuring the schema file, see <a href="b3xxapt.html" class="xref">The Connected System Schema File</a>.</p>
+<p class="para">The schema for the connected system includes two classes: UserProfile and GroupProfile. UserProfile contains fields from both the *USRPRF object and the distribution directory. Exactly one distribution directory entry can be associated with each user profile.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwr5t">
+
+<h2 class="title h2"><span class="number">1.1.5</span> Include/Exclude File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The include/exclude file allows local system policy to enforce which objects are included or excluded from provisioning, on both the Publisher channel and the Subscriber channel, independently. For details about using the include/exclude file, see <a href="b3xxit1.html" class="xref">The Connected System Include/Exclude File</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b40jq0y">
+
+<h2 class="title h2"><span class="number">1.1.6</span> Loopback State Files</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The loopback state files are used to provide automatic loopback detection for external applications that do not have mechanisms to perform loopback detection. This loopback detection prevents subscribed events from being published back to the Identity Vault.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

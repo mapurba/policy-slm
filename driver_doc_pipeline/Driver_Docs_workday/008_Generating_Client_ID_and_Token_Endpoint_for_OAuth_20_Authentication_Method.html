@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4eie9te8d7c,t4avmq79x4ee,t4cyxdli4lue,t4azuzp4pnau,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Generating Client ID and Token Endpoint for OAuth 2.0 Authentication Method - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4eie9te8d7c">
+
+<h1 class="title h1"><span class="number">2.4</span> Generating Client ID and Token Endpoint for OAuth 2.0 Authentication Method</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Before creating the driver object, you must generate the workday client ID and the end point token URL. It is also recommended to create a public key certificate prior to creating the client ID and token endpoint. The following sections explain the procedure to create a Public Key Certificate, and the Client ID and Token Endpoint.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="t4f4hedopy5q">
+
+<h2 class="title h2"><span class="number">2.4.1</span> Creating x509 Public Key Certificate</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following steps explain the procedure to create a public key certificate:</p>
+<div class="procedure" id="t4f3tisurzca">
+<ol class="steps">
+<li class="step">
+<p class="para">Run the following <span class="filename">keytool</span> command on your platform:</p>
+<p class="para">
+              <span class="filename">keytool -genkey -keyalg RSA -alias Workday -keystore JWTkeystore.ks -storetype PKCS12 -storepass &lt;Workday123!&gt; -validity 360 -keysize 2048</span>
+            </p>
+<div class="note"><p class="title">NOTE:</p>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The <span class="filename">keytool</span> command is common for both Linux and Windows platforms.</p></li>
+<li class="listitem">
+<p class="listitem">You must specify the <span class="filename">storetype</span> as <span class="filename">PKCS12</span> as shown in the above <span class="filename">keytool</span> command.</p></li></ul></div>
+</div>
+</li>
+<li class="step">
+<p class="para">Enter the following details when prompted:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">First Name</p></li>
+<li class="listitem">
+<p class="listitem">Last Name</p></li>
+<li class="listitem">
+<p class="listitem">Organizational Unit</p></li>
+<li class="listitem">
+<p class="listitem">Organization</p></li>
+<li class="listitem">
+<p class="listitem">City</p></li>
+<li class="listitem">
+<p class="listitem">Province</p></li>
+<li class="listitem">
+<p class="listitem">Country Code</p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">Enter <span class="command">Yes</span> to confirm. The keystore file is created, for example: <span class="filename">JWTkeystore.pkcs12</span>.</p></li>
+<li class="step">
+<p class="para">Extract the public key and the certificate by entering the following command:</p><pre class="screen">keytool -export -alias Workday -keystore JWTkeystore.ks -rfc -file publickey.cert</pre></li>
+<li class="step">
+<p class="para">You will be prompted to enter the password. Enter the password to create the certificate, for example <span class="filename">publickey.cert</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The password does not display on the screen when entered. Ensure to remember the entered password or save it in a convenient location.</p></div>
+</li>
+<li class="step">
+<p class="para">Run the following command, to display the certificate.</p>
+<p class="para">
+              <span class="command">cat publickey.cert</span>
+            </p></li>
+<li class="step">
+<p class="para">Copy the certificate from the <span class="command">BEGIN CERTIFICATE</span> line till <span class="command">END CERTIFICATE</span> line, and save it in a convenient location.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4f4helql9pu">
+
+<h2 class="title h2"><span class="number">2.4.2</span> Generating Client ID and Token Endpoint</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Perform the following steps to generate the Client ID and Token Endpoint:</p>
+<div class="procedure" id="t4eieajwcl0s">
+<ol class="steps">
+<li class="step">
+<p class="para">Login to Workday application.</p></li>
+<li class="step">
+<p class="para">Search and click on <span class="guimenu">Register API Client</span>.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">In the <span class="guimenu">Client Name</span> field, enter the name of the client.</p></li>
+<li class="step">
+<p class="para">In the <span class="guimenu">Client Grant Type</span> field, select <span class="guimenu">Jwt Bearer Grant</span>.</p></li>
+<li class="step">
+<p class="para">In the <span class="guimenu">x509 Certificate</span> field, select <span class="guimenu">Create x509 Public Key</span>.</p></li>
+<li class="step">
+<p class="para">In the Create x509 Public Key page, enter your name and paste the certificate generated as shown in <a href="t4eie9te8d7c.html#t4f4hedopy5q" class="xref">Creating x509 Public Key Certificate</a>.</p></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Access Token Type</span> as <span class="guimenu">Bearer</span>.</p></li>
+<li class="step">
+<p class="para">Enter the <span class="guimenu">Redirection URL</span>. This could be your organizationâs home page URL.</p></li>
+<li class="step">
+<p class="para">Select the following <span class="guimenu">Scope</span> values from Workday REST API:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Contact Information</p></li>
+<li class="listitem">
+<p class="listitem">Integration</p></li>
+<li class="listitem">
+<p class="listitem">Jobs &amp; Positions</p></li>
+<li class="listitem">
+<p class="listitem">Organizations &amp; Roles</p></li>
+<li class="listitem">
+<p class="listitem">Personal Data</p></li>
+<li class="listitem">
+<p class="listitem">System</p></li>
+<li class="listitem">
+<p class="listitem">Tenant Non-configurable</p></li>
+<li class="listitem">
+<p class="listitem">Include Workday Owned Scope</p></li></ul></div>
+</li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Click <span class="guimenu">OK</span> to generate the <span class="strong">Client ID</span> and the <span class="strong">Token Endpoint</span>.</p></li>
+<li class="step">
+<p class="para">Save the <span class="strong">Client ID</span> and the <span class="strong">Token Endpoint</span> in a convenient location, as these values will be required to configure OAuth 2.0 authentication method for the Workday driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

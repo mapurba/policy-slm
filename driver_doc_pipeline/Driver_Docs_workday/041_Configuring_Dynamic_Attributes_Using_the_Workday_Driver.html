@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4b44ov3owjn,t4avmq7f8jir,t4avmq7f8jir,t4avmq7g8zdp,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring Dynamic Attributes Using the Workday Driver - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4b44ov3owjn">
+
+<h1 class="title h1"><span class="number">8.1</span> Configuring Dynamic Attributes Using the Workday Driver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section provides information on how to use various dynamic attributes provided by the Workday driver.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="t4b44ov3owjn.html#t4b44p540azt" class="xref">Synchronizing Custom IDs Using the Workday Driver</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4b44ov3owjn.html#t4b44payzy58" class="xref">Configuring Derived Attributes for Worker</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4b44ov3owjn.html#t4b44paz0t79" class="xref">Configuring Custom Fields Using the Workday Driver</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4b44ov3owjn.html#t4b52f9ggury" class="xref">Adding New Attribute to the Filter</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4b44p540azt">
+
+<h2 class="title h2"><span class="number">8.1.1</span> Synchronizing Custom IDs Using the Workday Driver</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver can be configured to synchronize <span class="guimenu">Other IDs</span> displayed on the <span class="guimenu">IDs</span> tab of the <span class="guimenu">Personal</span> section in Workday. The driver and API refer to these other IDs as Custom IDs. Using the <span class="literal">Change_Other_IDs_Request</span> API, the driver can update custom ids in Workday. Perform the following steps to configure Custom IDs for the Workday driver:</p>
+<div class="procedure" id="t4b3ug60d0u3">
+<ol class="steps">
+<li class="step">
+<p class="para">Collect <span class="filename">Custom_ID_Type_ID</span> of the Custom IDs that need to be synchronized with Identity Manager. This information can be collected from the Workday implementation team. The IDs are case-sensitive.</p></li>
+<li class="step">
+<p class="para">In Designer, go to <span class="guimenu">Workday Driver Properties</span> &gt; <span class="guimenu">Driver Configurations</span> &gt; <span class="guimenu">Driver Parameters</span> &gt; <span class="guimenu">Driver Options</span> &gt; <span class="guimenu">Transformation Parameters</span> and specify the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Parameter Name:</em>
+                  
+                    <span class="literal">wdCustomIdList</span>
+                  </p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Parameter Value:</em>
+                  Multi valued list of all the IDs that are required to synchronize data between Workday and Identity Manager. For example, <span class="filename">CUSTOM_ID_TYPE-6-10</span> is a parameter value of one Custom ID in Workday driver.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step">
+<p class="para">In Designer, add a driver schema mapping for <span class="literal">{IDV attribute name}</span> to <span class="literal">{WD Custom Attribute}_Custom_ID</span> on the Workday driver. For example, <span class="literal">CUSTOM_ID_TYPE-6-10</span> to <span class="literal">CUSTOM_ID_TYPE-6-10_Custom_ID</span>.</p></li>
+<li class="step">
+<p class="para">If multiple Custom IDs are being updated from Identity Manager on Subscriber channel, then for each custom ID, you must create <span class="filename">wd-user</span> auxiliary class attribute in Designer or Identity Console to hold the Workday Reference ID of the Custom ID. This stores an internal Workday reference which is needed in order to update the value of the Custom ID in Workday. These auxiliary class attributes should be created as single valued and can be case ignore string. For example, <span class="literal">AUX_ID_WID</span>.</p></li>
+<li class="step">
+<p class="para">In schema mapping policy, add a mapping of <span class="literal">{WD Custom Attribute}_Custom_ID_Shared_Reference</span> with the attribute created in the previous step. For example, <span class="literal">CUSTOM_ID_TYPE-6-10_Custom_ID</span>_Shared_Reference to AUX_ID_WID.</p></li>
+<li class="step">
+<p class="para">Once a custom ID is specified in the <span class="literal">wdCustomIdList</span>, the driver shim will also return an attribute of the format <span class="literal">{WD Custom Attribute}_Description</span>. For example, <span class="literal">CUSTOM_ID_TYPE-6-10_Description</span>.</p></li>
+<li class="step">
+<p class="para">In driver filter, add an entry for the Identity Manager attribute that is mapped to <span class="literal">{WD Custom Attribute}_Custom_ID</span> so that it flows to Workday on the subscriber and/or from Workday on the publisher channels. For example, <span class="literal">AUX_ID</span>.</p></li>
+<li class="step">
+<p class="para">If one or more custom IDs are updated from Identity Manager, then create a driver filter entry for each newly created attribute holding the custom ID attributes so they flow back to Identity Manager on the publisher channel. For example, <span class="literal">AUX_ID</span>, AUX_ID_WID, AUX_ID_Description.</p></li>
+<li class="step">
+<p class="para">If one or more custom IDs are updated from Identity Manager, then create an output transformation policy to append the Shared Reference of the custom ID that is changing to the driver-operation-data. Ensure that value which is appended to the driver-operation-data is prefaced with <span class="literal">WD-</span> even though the attribute name in the data mapping does not have <span class="literal">WD-</span>.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Append the XML element <span class="literal">WD-{WD Custom Attribute}_Custom_ID_Shared_Reference</span> to driver-operation-data. For example, <span class="literal">WD-CUSTOM_ID_TYPE-6-10_Custom_ID_Shared_Reference</span>.</p></li>
+<li class="listitem">
+<p class="listitem">Append the text from the IDV source attribute. For example, <span class="literal">AUX_ID_WID</span>.</p></li>
+<li class="listitem">
+<p class="listitem">Create a rule for each Custom ID attribute that you are sending to Workday. The policy should be added after <span class="filename">NETQWDDCFG-otp-user</span> output transformation policy. If the attribute holding the custom ID is not in the IDV, nothing will be appended to the driver-operation-data. A sample policy rule has been shown below:</p><pre class="screen">&lt;rule&gt; 
+    &lt;description&gt;Add driver-operation-data element for modify AUX_ID events&lt;/description&gt; 
+    &lt;conditions&gt; 
+        &lt;and&gt; 
+            &lt;if-op-attr name="AUX_ID_Custom_ID" op="changing"/&gt; 
+
+            &lt;if-operation mode="nocase" op="equal"&gt;modify&lt;/if-operation&gt; 
+
+            &lt;if-class-name mode="nocase" op="equal"&gt;User&lt;/if-class-name&gt; 
+        &lt;/and&gt; 
+    &lt;/conditions&gt; 
+    &lt;actions&gt;
+        &lt;do-if&gt; 
+            &lt;arg-conditions&gt; 
+                &lt;and&gt; 
+                    &lt;if-attr name="AUX_ID_WID" op="available"/&gt; 
+                &lt;/and&gt; 
+            &lt;/arg-conditions&gt; 
+            &lt;arg-actions&gt; 
+                &lt;do-append-xml-element expression="driver-operation-data" name="WD-CUSTOM_ID_TYPE-6-10_Custom_ID_Shared_Reference"/&gt; 
+                &lt;do-append-xml-text expression="driver-operation-data/WD-CUSTOM_ID_TYPE-6-10_Custom_ID_Shared_Reference"&gt; 
+                    &lt;arg-string&gt; 
+                        &lt;token-attr name="AUX_ID_WID"/&gt; 
+                    &lt;/arg-string&gt; 
+                &lt;/do-append-xml-text&gt; 
+            &lt;/arg-actions&gt; 
+            &lt;arg-actions/&gt; 
+        &lt;/do-if&gt; 
+    &lt;/actions&gt; 
+&lt;/rule&gt; </pre></li></ul></div>
+</li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4b44payzy58">
+
+<h2 class="title h2"><span class="number">8.1.2</span> Configuring Derived Attributes for Worker</h2>
+
+<div class="content_wrapper">
+
+<p class="para">When an organization is added to the <span class="literal">wdOrgList</span> transformation parameter of the Workday driver, the shim will automatically derive the following 3 attributes on worker object for each organization type/organization sub-type combination:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="filename">_RefID</span> is used for data in the <span class="filename">Organization_Reference_ID</span> element</p></li>
+<li class="listitem">
+<p class="listitem"><span class="filename">_Name</span> is used for data in the <span class="filename">Organization_Name</span> element</p></li>
+<li class="listitem">
+<p class="listitem"><span class="filename">_Code</span> is used for data in the <span class="filename">Organization_Code</span> element</p></li>
+<li class="listitem">
+<p class="listitem">
+              <span class="filename">|<span class="replaceable">RoleID</span>_Employee_ID</span>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <span class="filename">|<span class="replaceable">RoleID</span>_Contingent_Worker_ID</span>
+            </p></li></ul></div>
+
+<p class="para">The above derived attributes should be suffixed to the <span class="literal">Organization-type | Organization-sub-type</span>. These attributes are available to be added to the schema mapping policy and to the filter. For example:</p><pre class="screen">Supervisory|Department_RefID
+Supervisory|Department_Name
+Supervisory|Department_Code</pre>
+<p class="para">In the above example, <span class="filename">Supervisory</span> is the Organization type and <span class="filename">Department</span> is the Organization sub-type. The values for Organization type and Organization sub-type are derived from the following SOAP API response path of <span class="filename">Get_Workers</span> API:</p><pre class="screen">wd:Worker_Data/wd:Organization_Data//wd:Organization_Data[wd:Organization_Type_Reference/wd:ID[@wd:type='Organization_Type_ID'] | wd:Worker_Data/wd:Organization_Data//wd:Organization_Data[wd:Organization_Type_Reference/wd:ID[@wd:type='Organization_Type_ID']/wd:Organization_Subtype_Reference/wd:ID[@wd:type='Organization_Subtype_ID']</pre>
+<p class="para"><span class="filename">RoleID</span> is derived from the following SOAP API response path of <span class="filename">Get_Workers</span> API:</p><pre class="screen">wd:Worker_Data/wd:Organization_Data//wd:Organization_Data[wd:Organization_Type_Reference/wd:iD[@wd:type='Organization_Type_ID']/wd:Organization_Support_Role_Data/wd:Organization_Support_Role/wd:Organization_Role_Reference/wd:iD[@wd:type='Organization_Role_ID']</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4b44paz0t79">
+
+<h2 class="title h2"><span class="number">8.1.3</span> Configuring Custom Fields Using the Workday Driver</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Worker has a functionality where a Workday implementer can create override fields that have data calculated from the data in one or more other data fields. This option can be used to get data that the current driver shim does not return. For instance, one customer wanted to synchronize the pay grade which is a part of the compensation data returned if <span class="filename">Include_Compensation</span> were included in the response group data. However, since <span class="filename">Include_Compensation</span> includes all the salary information, the shim was purposely designed to not return that data. To get the pay grade for this customer, the Workday implementers set up an override field for just the pay grade.</p>
+<p class="para">In order to use Workday override calculated field information from the Worker data in the driver, you must take the following steps:</p>
+<div class="procedure" id="t4b44mjhepl6">
+<ol class="steps">
+<li class="step">
+<p class="para">Obtain the Integration System ID from the Workday team. for more information, see <a href="t4b44ov3owjn.html#t4cs8wgwzt6n" class="xref">Obtaining Integration System ID from Workday</a>.</p></li>
+<li class="step">
+<p class="para">Place the Integration System ID in the Publisher driver parameters in the <span class="guimenu">Field and Parameter Criteria Provider Reference List</span> of the corresponding class.</p></li>
+<li class="step">
+<p class="para">Obtain the override field name.</p></li>
+<li class="step">
+<p class="para">Once you have obtained the name of the override fields, the field names must be placed in the <span class="filename">wdIntFieldAttrList</span> transformation parameters.</p></li>
+<li class="step">
+<p class="para">The override fields are now available for data mapping or use in policies by appending <span class="filename">_CF</span> to the override field name. For example, the override field returned by the shim will be <span class="filename">mailStop_CF</span> for <span class="filename">mailstop</span> override field. This will be the application attribute name used in the schema mapping or input and output transformation policies.</p></li></ol>
+</div>
+
+<div class="container sect3" id="t4cs8wgwzt6n">
+
+<h3 class="title h3">Obtaining Integration System ID from Workday</h3>
+
+<p class="para">Perform the following steps to obtain the integration system ID from Workday:</p>
+<div class="procedure" id="t4cs8xri0mxe">
+<ol class="steps">
+<li class="step">
+<p class="para">Search for the <span class="guimenu">View Integration Field Override Service</span> in Workday.</p></li>
+<li class="step">
+<p class="para">Select your <span class="guimenu">Integration Field Override Service</span> and click <span class="guimenu">OK</span>.</p></li>
+<li class="step">
+<p class="para">View your <span class="guimenu">Integration Field</span> and click on the value of <span class="guimenu">Integration System</span>. For example, <span class="guimenu">WorkDay_Driver</span>.</p></li>
+<li class="step">
+<p class="para">Collect the value from <span class="guimenu">System ID</span> field. Sample value for my tenant System ID is <span class="guimenu">WorkDay_Driver/WorkDay_Driver/StartHere</span>.</p></li>
+<li class="step">
+<p class="para">Place the Integration System ID in the Publisher driver parameters in the <span class="guimenu">Field and Parameter Criteria Provider Reference List</span> of the corresponding class</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4b52f9ggury">
+
+<h2 class="title h2"><span class="number">8.1.4</span> Adding New Attribute to the Filter</h2>
+
+<div class="content_wrapper">
+
+<p class="para">If you want the additional attributes (newly added to filter) to be populated on workers who are already migrated to the Identity Vault, You can perform one of the following steps:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Migrate the workers again through the driver which in turn clears the cache.</p></li>
+<li class="listitem">
+<p class="listitem">No changes required. The attributes will flow automatically as part of regular polling by the driver, provided that there is a change on that worker in Workday.</p></li></ul></div>
+
+<p class="para">Another sync option is to set the <span class="filename">wd-Merge</span> attribute to <span class="guimenu">True</span> on the workers to sync. If the <span class="filename">wd-Merge-effectiveDate</span> is set before setting the <span class="filename">wd-Merge</span> to <span class="guimenu">True</span>, the sync will be according to the <span class="filename">wd-Merge-effectiveDate</span> if that is in the future. Otherwise, the current date will be used as the effective date for the sync. However, for this option to work correctly, all workers that have the <span class="filename">wd-Merge</span> attribute set to true, must already have the correct value for the <span class="filename">wd-WorkerIDType</span> (Employee_ID or Contingent_Worker_ID).</p>
+<p class="para">If the worker has not been modified in Workday, the driver will never get that user data during polling and the new attributes will not be populated for that worker in Identity Vault. However, there will be delay in populating additional attributes until that worker gets modified in Workday.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

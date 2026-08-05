@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b8n5d0x,b8n5bw5,b8n5bw5,b8n6pr6,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Scripting Driver Data Definition - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b8n5d0x">
+
+<h1 class="title h1"><span class="number">5.1</span> Scripting Driver Data Definition</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Topics in this section include</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n5d0x.html#b8n5dfz" class="xref">Defining Data Classes and Attributes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n5d0x.html#b8n6pqx" class="xref">Associating Identity Vault and Application Classes and Attributes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n5d0x.html#b8n6pqy" class="xref">Defining an Association Rule</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n5d0x.html#b8n6pqz" class="xref">Defining Excluded Identities</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n5d0x.html#b8n6pr0" class="xref">Defining Relevant Events</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n5dfz">
+
+<h2 class="title h2"><span class="number">5.1.1</span> Defining Data Classes and Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The first task is to examine your external applicationâs identity data and to determine what data is relevant and how it should be managed. Below is a series of questions to ask in this process. The list is not all-inclusive; there might be other questions you need to consider.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Are identities stored in a hierarchical or flat format? In a hierarchical system, objects known as containers can contain identities and perhaps other containers, resulting in a tree-like structure. A flat system contains all identities at a single level.</p></li>
+<li class="listitem">
+<p class="listitem">What types of identities exist in the external application? For example, NetIQÂ® eDirectoryâ¢ contains Users, Groups and Dynamic Groups, to name a few. Identity types, like Groups, are often aggregates of other identity types.</p></li>
+<li class="listitem">
+<p class="listitem">What uniquely distinguishes (or names) each type of identity? The name is usually an attribute, known as the naming attribute. Systems often use a human-readable name and a unique serial number. You should determine which is suitable for your needs.</p></li>
+<li class="listitem">
+<p class="listitem">What relationships exist among the identity types? Suppose Groups can contain Users. Can Groups contain other Groups? Are these relationships one-to-one or one-to-many?</p></li>
+<li class="listitem">
+<p class="listitem">Is there a way for an identity to link to or represent another identity? For example, eDirectory provides Alias objects, which link to other objects. Your driver might need to handle these types of objects.</p></li>
+<li class="listitem">
+<p class="listitem">What attributes describe each relevant type of object? Which of these attributes is relevant? What is the data type (string, number, etc.) for each attribute? Can the attribute contain multiple values? Are there restrictions on the attributeâs values, such as being read-only, or are they restricted to a certain range of values?</p></li>
+<li class="listitem">
+<p class="listitem">How will this data be synchronized between the Identity Vault and the application? Some attributes will be synchronized one-way (eDirectory-to-application or vice versa), and others will be synchronized bi-directionally.</p></li>
+<li class="listitem">
+<p class="listitem">Does your application need password synchronization? Will password synchronization be one-way or bi-directional? Restrictions might also apply to other sensitive data. You need to study the APIs for your application to determine how this should be done.</p></li>
+<li class="listitem">
+<p class="listitem">Are there identity types or specific identities that should be excluded from synchronization? Administrative users are often excluded from synchronization to avoid security issues.</p></li>
+<li class="listitem">
+<p class="listitem">Does data need to be transformed when it is synchronized? For example, eDirectory stores a personâs first name and last name as separate attribute, but an external application might store a name as one attribute. Such transformations can be done in policies or in the scripts.</p></li></ul></div>
+
+<p class="para">Through this process, you should make a list of the applicationâs identity types (also known as classes), their attributes, and each attributeâs data type and special properties. This list can then be specified in the driverâs <span class="filename">schema.def</span> file:</p><pre class="screen">SCHEMA
+   CLASS User
+     ATTRIBUTE loginName NAMING REQUIRED
+     ATTRIBUTE firstName
+     ATTRIBUTE lastName
+         (etc.)</pre>
+<p class="para">The format of this <span class="filename">schema.def</span> file is the same regardless of operating system and scripting language. See <a href="b8n6pr6.html" class="xref">The Connected System Schema File</a> for more information.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n6pqx">
+
+<h2 class="title h2"><span class="number">5.1.2</span> Associating Identity Vault and Application Classes and Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The next step is to examine the Identity Vaultâs classes and attributes and determine which best correspond to the external applicationâs identities. If the Identity Vault does not provide a suitable class or attribute, you can define your own by modifying the Identity Vaultâs schema. For more information, see the <span class="citetitle">NetIQ eDirectory Administration Guide</span>.</p>
+<p class="para">The driverâs driver filter allows the Metadirectory engine to determine which attributes and classes are relevant to the driver. For the Subscriber channel, the engine notifies the driver of changes for only those classes and attributes that are set to Synchronize in the filter. When the driver receives application identity changes on the Publisher channel, Synchronize must be set on classes and attributes for those items to be changed in eDirectory. The easiest way to define a driver filter is to create a new driver with the default XML configuration file provided with the Scripting driver (<span class="filename">Scripting.xml</span>). In NetIQ iManager, edit the Driver Filter to include relevant classes and attributes. Then, export the driverâs configuration to an XML file for later use. See <a href="b8n6prs.html" class="xref">Managing Additional Attributes</a> for more information.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n6pqy">
+
+<h2 class="title h2"><span class="number">5.1.3</span> Defining an Association Rule</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Each identity needs an association that uniquely identifies that identity for both eDirectory and the external application. The association must be based on information shared between both the Identity Vault and the application. The association is usually based on one or more attribute values. Below are some ideas for forming an association:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If a naming attribute is unique across all classes, you could use that attribute value.</p></li>
+<li class="listitem">
+<p class="listitem">If a naming attribute is unique for a specific class, concatenate the attribute and class name to form the association. For example, an identity named âBobâ with the class âUserâ could have association âBobUserâ.</p></li>
+<li class="listitem">
+<p class="listitem">In a hierarchical system (like eDirectory), you could use a name with its complete hierarchical path, assuming that it is unique. For example, an identity with a hierarchical path âBob.Users.ACMEâ could use that path as its association.</p></li>
+<li class="listitem">
+<p class="listitem">A system can provide a serial number for each identity. This unique number can be used for an association.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n6pqz">
+
+<h2 class="title h2"><span class="number">5.1.4</span> Defining Excluded Identities</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You might have a list of identities that you want to exclude from synchronization. Also, if an identity is synchronized with sensitive information, you might want to reject that identity. The <span class="filename">include-exclude.conf</span> file allows such specifications:</p><pre class="screen">EXCLUDE
+   adminUser
+   CLASS secureUser</pre>
+<p class="para">The format of this file is the same regardless of operating system and scripting language. See <a href="b8n6prd.html" class="xref">The Connected System Include/Exclude File</a> for more information.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n6pr0">
+
+<h2 class="title h2"><span class="number">5.1.5</span> Defining Relevant Events</h2>
+
+<div class="content_wrapper">
+
+<p class="para">When data changes in an identity management system, an event is said to have occurred. In preparation for the next step, evaluate which event types are relevant for your application:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b8n6pr1">
+              <p class="title"><em class="title">Add:</em>
+              An identity is created. All required attributes must be created. Security parameters, such as a password, should be defined for the identity to ensure that security isnât compromised.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b8n6pr2">
+              <p class="title"><em class="title">Modify:</em>
+              One or more attributes of an existing identity are changed. This might affect identities that have a relationship to the changed identity.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b8n6pr3">
+              <p class="title"><em class="title">Modify-password:</em>
+              An identityâs password has changed. This event type can be considered a subtype of Modify, but because it often requires special handling, it is treated as a separate event type.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b8n6pr4">
+              <p class="title"><em class="title">Delete:</em>
+              An identity is destroyed. This might mean permanent deletion, or a change of status of the identity so that it can be undeleted if necessary. This might affect other identities. For example, deleting a User that is a member of a Group might cause a Modify event for that Group.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b8vzd10">
+              <p class="title"><em class="title">Rename:</em>
+              An identityâs naming attribute has changed.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b8n6pr5">
+              <p class="title"><em class="title">Move:</em>
+              An identityâs logical location has changed. This usually applies to identities in a hierarchical system.</p>
+            </div>
+</li></ul></div>
+
+<p class="para">An event of a certain type in one system can result in an event of a different type in the synchronized system. For example, when a Modify event occurs for an identity that does not yet exist in the external system, an Add event is submitted.</p>
+<p class="para">There is one more type of event that does not represent a change but is a request for information: the Query event. NetIQ eDirectory issues queries to your application on the Subscriber channel. You can also query eDirectory from scripts on either Subscriber or Publisher channels.</p>
+<p class="para">NetIQ eDirectory supports all of the events above. You should make a list of what the result of a particular event in eDirectory will be in your external application. Conversely, you should list what event types can occur in your external application, which event types are relevant and what the result of relevant events should be in the Identity Vault.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

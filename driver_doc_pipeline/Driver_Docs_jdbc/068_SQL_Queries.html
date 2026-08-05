@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-sql-queries-work-in-jdbc-driver,embed-sql-statements-in-xds-events-for-jdbc-driver,methods-for-executing-sql-statements,how-to-execute-ddl-statements-in-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>SQL Queries - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-sql-queries-work-in-jdbc-driver">
+
+<h1 class="title h1"><span class="number">12.8</span> SQL Queries</h1>
+
+<div class="content_wrapper">
+
+<p class="para">To fully support the query capabilities of a database and avoid the difficulty of translating native SQL queries into an XDS format, the driver supports native SQL query processing. You can embed select statements in XDS documents in exactly the same way as any other SQL statement.</p>
+<p class="para">For example, assume that the table <span class="literal">usr</span> has the following contents:</p>
+<div class="table" id="b9fxoc9"><p class="title"><em class="num">Table 12-2 </em>Example Contents</p>
+<table class="topbot" width="95%"><col width="31%" /><col width="28%" /><col width="41%" />
+            
+<tr class="headerrow" id="b9fxoca"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">idu</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">fname</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">lname</p></th>
+</tr>
+          
+<tr class="oddrow" id="b9fxocb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">John</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Doe</p></td>
+</tr></table>
+</div>
+
+<p class="para">The XML document below results in an output document containing a single result set.</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;<span class="strong">jdbc:statement jdbc:type="query"</span>&gt;
+        &lt;<span class="strong">jdbc:sql&gt;SELECT * FROM indirect.usr&lt;/jdbc:sql</span>&gt;
+    &lt;<span class="strong">/jdbc:statement</span>&gt;
+&lt;/input&gt;</pre><pre class="screen">&lt;output xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;<span class="strong">jdbc:result-set jdbc:number-of-rows="1"</span>&gt;
+        &lt;<span class="strong">jdbc:row jdbc:number="1"</span>&gt;
+            &lt;<span class="strong">jdbc:column jdbc:name="idu"</span>
+                         <span class="strong">jdbc:position="1"</span>
+                         <span class="strong">jdbc:type="java.sql.Types.BIGINT</span>
+                &lt;<span class="strong">jdbc:value&gt;l&lt;/jdbc:value</span>&gt;
+            &lt;<span class="strong">/jdbc:column</span>&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â &lt;<span class="strong">jdbc:column jdbc:name="fname</span>"
+                         <span class="strong">jdbc:position="2"</span>
+                         <span class="strong">jdbc:type="java.sql.Types.VARCHAR</span>&gt;
+                &lt;<span class="strong">jdbc:value&gt;John&lt;/jdbc:value</span>&gt;
+            &lt;<span class="strong">/jdbc:column</span>&gt;
+            &lt;<span class="strong">jdbc:column jdbc:name="lname"</span>
+                         <span class="strong">jdbc:position="3"</span>
+                         <span class="strong">jdbc:type="java.sql.Types.VARCHAR</span>&gt;
+                &lt;<span class="strong">jdbc:value&gt;Doe&lt;/jdbc:value</span>&gt;
+            &lt;<span class="strong">/jdbc:column</span>&gt;
+        &lt;<span class="strong">/jdbc:row</span>&gt;
+    &lt;<span class="strong">/jdbc:result-set</span>&gt;
+    &lt;status level="success"/&gt;
+&lt;/output&gt;</pre>
+<p class="para">SQL queries always produce a single <span class="literal">&lt;jdbc:result-set&gt;</span> element whether or not the result set contains any rows. If the result set is empty, the <span class="literal">jdbc:number-of-rows</span> attribute is set to zero.</p>
+<p class="para">You can embed more than one query in a document. SQL queries donât require that the referenced tables/views in the synchronization schema be visible to the driver. However, XDS queries do.</p>
+<p class="para">If you are building an event to be sent via the Command Processor instead of part of the regular event flow, you need to build the XML in a nodeset variable and use the Parse XML token before issuing the command. For more information, see <q class="quote"><a href="../../../identity-manager-48/policy_designer/data/tokenxmlparse.html#tokenxmlparse" class="ulink">XML Parse</a></q> in the <a href="../../../identity-manager-48/policy_designer/data/using-designer-to-create-policies.html#using-designer-to-create-policies" class="ulink">NetIQ Identity Manager - Using Designer to Create Policies</a>.</p>
+<p class="para">Example logic XML:</p><pre class="screen">&lt;policy xmlns:cmd="http://www.novell.com/nxsl/java/com.novell.nds.dirxml.driver.XdsCommandProcessor"&gt;
+  &lt;rule&gt;
+    &lt;description&gt;generate SQL Select Statement&lt;/description&gt;
+    &lt;conditions&gt;
+      &lt;and&gt;
+        &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+      &lt;/and&gt;
+    &lt;/conditions&gt;
+    &lt;actions&gt;
+      &lt;do-set-local-variable name="sqlstatement"&gt;
+        &lt;arg-node-set&gt;
+          &lt;token-xml-parse&gt;
+            &lt;token-text xml:space="preserve"&gt;&amp;lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;&amp;lt;jdbc:statement jdbc:type="query"&gt;&amp;lt;jdbc:sql&gt;&lt;/token-text&gt;
+            &lt;token-text xml:space="preserve"&gt;SELECT * FROM lab.users;&lt;/token-text&gt;
+            &lt;token-text xml:space="preserve"&gt;&amp;lt;/jdbc:sql&gt;&amp;lt;/jdbc:statement&gt;&amp;lt;/input&gt;&lt;/token-text&gt;
+          &lt;/token-xml-parse&gt;
+        &lt;/arg-node-set&gt;
+      &lt;/do-set-local-variable&gt;
+      &lt;do-trace-message color="yellow" level="1"&gt;
+        &lt;arg-string&gt;
+          &lt;token-xpath expression="cmd:execute($destCommandProcessor, $sqlstatement)"/&gt;
+        &lt;/arg-string&gt;
+      &lt;/do-trace-message&gt;
+      &lt;do-veto/&gt;
+    &lt;/actions&gt;
+  &lt;/rule&gt;
+&lt;/policy</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The queries on the Publisher channel with srcCommandProcessor are scheduled for execution on the Subscriber channel and the script processing does not wait for the result to become available.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

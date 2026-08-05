@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="br12c5n,bcghdbcc,br12c5c,br12c66,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Platform Services - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="br12c5n">
+
+<h1 class="title h1"><span class="number">2.2</span> Platform Services</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Platform Services enables a system to utilize the Core Driver functions. A platform can use Authentication Services for some or all users, and can use Identity Provisioning in maintaining some or all local user accounts and groups. For a complete account redirection solution, a platform can use the Name Service Switch and Platform Services Cache Daemon for some or all users.</p>
+<p class="para">Some types of platforms communicate with Authentication Services using SSL, and others use DES encryption. All platform communication with Event Journal Services uses SSL.</p>
+<p class="para">A platform that uses SSL-based communication must have a valid certificate to communicate with the Core Driver for most functions. A platform that uses DES encryption must use the same DES key as defined for it in the Core Driver configuration.</p>
+<p class="para">The Identity Manager Fan-Out Driver does not support authentication or password changes for eDirectory users who have a null password.</p>
+<div class="figure" id="br12c5o"><p class="title"><em class="num">Figure 2-3 </em>Platform Services</p>
+              <img src="../graphics/platserv_a.gif" alt="" />
+            </div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br12c5p">
+
+<h2 class="title h2"><span class="number">2.2.1</span> User and Group Management</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Management of users and groups on the platform is carried out by Receiver scripts, which are called by the Platform Receiver based on provisioning events obtained from the Core Driver.</p>
+<div class="container sect3" id="babedccd">
+
+<h3 class="title h3">Platform Receiver</h3>
+
+<p class="para">The Platform Receiver connects to the Event Journal Services component of the Core Driver, requests provisioning events, and runs a script to carry out the appropriate platform-specific processing for the given type of event. The Platform Receiver provides failover support for connections to Event Journal Services if more than one Core Driver is available.</p>
+</div>
+
+<div class="container sect3" id="br12c5q">
+
+<h3 class="title h3">Receiver Scripts</h3>
+
+<p class="para">Receiver scripts are run by the Platform Receiver to process provisioning events.</p>
+<p class="para">The Identity Manager Fan-Out Driver provides a set of fully functional base scripts in the customary scripting language for each supported platform. You can extend these base scripts as appropriate for your needs.</p>
+<p class="para">The Receiver script functions are</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Add User</p></li>
+<li class="listitem">
+<p class="listitem">Modify User</p></li>
+<li class="listitem">
+<p class="listitem">Delete User</p></li>
+<li class="listitem">
+<p class="listitem">Delete User Pending</p></li>
+<li class="listitem">
+<p class="listitem">Enable User</p></li>
+<li class="listitem">
+<p class="listitem">Disable User</p></li>
+<li class="listitem">
+<p class="listitem">Rename User</p></li>
+<li class="listitem">
+<p class="listitem">Add User to Group</p></li>
+<li class="listitem">
+<p class="listitem">Remove User from Group</p></li>
+<li class="listitem">
+<p class="listitem">Add Group</p></li>
+<li class="listitem">
+<p class="listitem">Modify Group</p></li>
+<li class="listitem">
+<p class="listitem">Delete Group</p></li>
+<li class="listitem">
+<p class="listitem">Delete Group Pending</p></li>
+<li class="listitem">
+<p class="listitem">Rename Group</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br12c5r">
+
+<h2 class="title h2"><span class="number">2.2.2</span> User Authentication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Authentication redirection is handled by the Platform Services Process, which is called by the System Intercept. The Platform Services Process is also called by applications using the AS Client API.</p>
+<p class="para">Platforms that use password replication receive notification of password changes in eDirectory through the Platform Receiver and send notification of local password changes detected by the password change intercept to the Core Driver using the Platform Services Process.</p>
+<p class="para">Account redirection is handled by the Platform Services Cache Daemon, which is called by the Name Service Switch. Platforms that are configured for account redirection use a local memory cache pool for account records and retrieve all account and password information from this cache.</p>
+<div class="container sect3" id="br12c5s">
+
+<h3 class="title h3">Platform Services Process</h3>
+
+<p class="para">The Platform Services Process establishes and maintains connections to Core Drivers for Authentication Services, and provides load balancing and failover among them. These connections are used to provide Authentication Services to the platform.</p>
+</div>
+
+<div class="container sect3" id="b15kxyfs">
+
+<h3 class="title h3">Platform Services Cache Daemon</h3>
+
+<p class="para">The Platform Services Cache Daemon establishes and maintains a connection to a Core Driver and receives event data from Event Journal Services. This data is stored away in memory cache and used to supply account information to the Name Service Switch.</p>
+</div>
+
+<div class="container sect3" id="br12c5t">
+
+<h3 class="title h3">AS Client API</h3>
+
+<p class="para">The AS Client API provides a programming interface to Authentication Services. It is furnished as routines that can be called from C and Java<sup class="superscript">*</sup>. The AS Client API induces functions to</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Validate a user ID/password combination</p></li>
+<li class="listitem">
+<p class="listitem">Change a user's password, given the current password</p></li>
+<li class="listitem">
+<p class="listitem">Perform an administrative password reset</p></li>
+<li class="listitem">
+<p class="listitem">Obtain the fully distinguished name for a user ID</p></li>
+<li class="listitem">
+<p class="listitem">Determine if a user has Security Equal To a given object</p></li>
+<li class="listitem">
+<p class="listitem">Determine if an object has the specified effective rights to the specified attribute of a given object</p></li>
+<li class="listitem">
+<p class="listitem">Obtain a list of members of a group</p></li>
+<li class="listitem">
+<p class="listitem">Obtain a list of security equivalences for a user</p></li>
+<li class="listitem">
+<p class="listitem">Obtain the eDirectory Home Directory attribute value for a user</p></li>
+<li class="listitem">
+<p class="listitem">Determine if a given user is in the Authentication Services Include/Exclude list</p></li></ul></div>
+
+<p class="para">For details about using the AS Client API, see <a href="bexh68d.html" class="xref">Section V, API Development</a>.</p>
+</div>
+
+<div class="container sect3" id="br12c5u">
+
+<h3 class="title h3">System Intercept</h3>
+
+<p class="para">The System Intercept is called by the native security system for password verification and password change. Because passwords are checked using eDirectory or, on supported platforms, replicated from eDirectory, a user has the same password throughout the enterprise, regardless of the platform used.</p>
+<p class="para">System Intercepts are implemented using standard, vendor-provided mechanisms.</p>
+</div>
+
+<div class="container sect3" id="br12c5v">
+
+<h3 class="title h3">Authentication Services Methods</h3>
+
+<p class="para">There are two methods for providing users with the same password across the platforms in your enterprise.</p>
+<div class="formalpara" id="br12c5w">
+              <p class="title"><em class="title">Password Redirection:</em>
+              Requests to check passwords are intercepted at the platform and redirected to objects in eDirectory. The end result is that the user has the same password on all systems.</p>
+            </div>
+
+<div class="formalpara" id="br12c5x">
+              <p class="title"><em class="title">Password Replication:</em>
+              Changes to passwords are intercepted and replicated between eDirectory and participating platforms. As with password redirection, the end result is that the user has the same password on all systems.</p>
+            </div>
+
+<div class="container sect4" id="br12c63">
+
+<h4 class="title h4">Password Redirection</h4>
+
+<p class="para">Platforms that use password redirection employ a System Intercept to gain control when a password is to be verified. The System Intercept passes the request to Authentication Services, through the Platform Services Process. Authentication Services uses the Census to identify the User or Alias object in eDirectory that corresponds to the request. Then Authentication Services verifies the password using that object and returns the result to the platform.</p>
+<p class="para">The System Intercepts for z/OS* and UNIX systems store the password in the local security system upon a successful authentication or password change. For logins, if Authentication Services cannot be reached, the user's password is verified using the local security system.</p>
+</div>
+
+<div class="container sect4" id="br12c64">
+
+<h4 class="title h4">Password Replication</h4>
+
+<p class="para">Platforms that use password replication receive notification of password changes through the Platform Receiver.</p>
+<p class="para">The Core Driver is notified of changes to passwords as follows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">By ensuring that your eDirectory is configured to fully support Universal Password, the driver is notified of password changes in eDirectory.</p></li></ul></div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The Password Validation Program Exit is installed on an IBM i (i5/OS and OS/400) system and captures password change information.</p></li></ul></div>
+
+<p class="para">When Authentication Services receives notification of a password change, it verifies the authenticity of the notification and then stores the encrypted password. This is detected by the Event Subsystem, which generates the appropriate provisioning event to notify those platforms that are authorized to receive password information.</p>
+<p class="para">By default, passwords are converted to lowercase before they are sent to a platform.</p>
+<div class="formalpara" id="b15kxyft">
+                <p class="title"><em class="title">Account Redirection:</em>
+                Requests for Posix user and group information are intercepted at the platform Name Service Switch and redirected to objects in eDirectory. This information includes loginName, uidNumber, gidNumber, gecos, homeDirectory, loginShell, groupName, memberUid and passwords.</p>
+              </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br12c65">
+
+<h2 class="title h2"><span class="number">2.2.3</span> Platform Configuration File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You use the platform configuration file to specify Platform Services configuration information, such as</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Which users are authenticated using Authentication Services and which users are authenticated using the local security system</p></li>
+<li class="listitem">
+<p class="listitem">Which user accounts and groups are managed using Identity Provisioning and which are managed locally</p></li>
+<li class="listitem">
+<p class="listitem">Information used to locate the Core Driver servers.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

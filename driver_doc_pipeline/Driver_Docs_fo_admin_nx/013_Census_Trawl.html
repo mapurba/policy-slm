@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="babgfgjh,chdecidh,babefbbb,babehjdf,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Census Trawl - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="babgfgjh">
+
+<h1 class="title h1"><span class="number">3.3</span> Census Trawl</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Object Services of the primary Core Driver periodically performs a Trawl to verify the contents of the Census. A Trawl is also run to initially build the Census, or a part of it, whenever you use the Web interface to define a new Census Search object.</p>
+<p class="para">The following steps are performed for each Census Search object:</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Object Services scans the Census Search object for users and groups.</p></li>
+          
+<li class="listitem">
+<p class="listitem">For any user or group that does not have a corresponding eUser or eGroup in the Census container:</p>
+<div class="orderedlist">
+              
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Object Services creates an eUser or eGroup object in the Census container, and associates the user or group with the Platform Set container objects whose Platform Set Search objects cover the user or group.</p>
+<p class="listitem">If the common name of the new user or new group is the same as a user or group that already exists in the Census container, the eUser or eGroup object is instead created in the Exceptions container, and the exception must be resolved by an administrator. For guidance in avoiding and resolving exceptions, see <a href="bexh6ct.html" class="xref">Section II, Core Driver Administration</a>.</p></li>
+              
+<li class="listitem">
+<p class="listitem">Object Services notifies Event Journal Services.</p></li>
+              
+<li class="listitem">
+<p class="listitem">When each Platform Receiver of the associated Platform Sets requests an event and this event is the next one for that Platform, Event Journal Services obtains detailed information about the new user or group by reading its object from eDirectory and passes the provisioning event to the Platform Receiver.</p>
+<p class="listitem">If Event Journal Services cannot obtain the information yet because directory synchronization is not complete, the next event for the platform is processed and this one is tried again later.</p></li>
+              
+<li class="listitem">
+<p class="listitem">Each Platform Receiver that receives the provisioning event checks to see if a user or group by that name already exists (unless the user or group is excluded from processing based on specifications in the platform configuration file).</p>
+<p class="listitem">If the user or group already exists, the Platform Receiver notifies Event Journal Services.</p>
+<p class="listitem">If the user or group does not exist, the Platform Receiver calls the Add User or Add Group Receiver script, which adds the new user or group to the local security system and prepares it for use. The Platform Receiver then notifies Event Journal Services of the script outcome.</p></li>
+              
+<li class="listitem">
+<p class="listitem">Event Journal Services notifies Audit Services, which records the action in the Audit Log.</p></li>
+            </ol></div>
+</li>
+        </ol></div>
+
+<p class="para">The following steps are performed for each user and group in the Census.</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Object Services verifies that the user or group is still covered by a Search object.</p>
+<p class="listitem">If it does not, the same steps are followed as for <a href="babehjdf.html" class="xref">User Deleted from eDirectory</a> or <a href="babgadhf.html" class="xref">Group Deleted from eDirectory</a>.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Object Services verifies that the User object or Group object that corresponds to the user or group still exists in eDirectory.</p>
+<p class="listitem">If it does not, the same steps are followed as for <a href="babehjdf.html" class="xref">User Deleted from eDirectory</a> or <a href="babgadhf.html" class="xref">Group Deleted from eDirectory</a>.</p></li>
+        </ol></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

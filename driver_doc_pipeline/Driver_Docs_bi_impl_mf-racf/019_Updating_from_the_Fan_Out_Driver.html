@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="bmn9pto,b3r9hzv,b3r9hzv,bmn9sxw,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Updating from the Fan-Out Driver - NetIQ RACF Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bmn9pto">
+
+<h1 class="title h1"><span class="number">4.1</span> Updating from the Fan-Out Driver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Fan-Out driver provides one-way synchronization to a heterogeneous mix of systems including Linux and UNIX systems, and IBM i5/OS<sup class="superscript">*</sup> (OS/400<sup class="superscript">*</sup> operating system) and z/OS systems. The Fan-Out driver also provides authentication redirection from those systems.</p>
+<p class="para">Moving to the Identity Manager 4.8 driver for RACF provides two main advantages:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b3yyw3d">
+            <p class="title"><em class="title">Bidirectional Synchronization:</em>
+            The driver allows synchronization from the connected system.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b3yywrw">
+            <p class="title"><em class="title">Standard Identity Manager Policies That Simplify Customization:</em>
+            The Fan-Out driver makes minimal use of Identity Manager policies.</p>
+          </div>
+</li></ul></div>
+
+<p class="para">Consider the following before migrating from the Fan-Out driver:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b3yyx16">
+            <p class="title"><em class="title">Heterogeneity:</em>
+            The Fan-Out driver supports operating system environments besides RACF. You can continue to use the Fan-Out driver for those systems while using the Identity Manager 4.8 driver for RACF on your RACF systems.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b3yyy8k">
+            <p class="title"><em class="title">Authentication Redirection:</em>
+            The Fan-Out driver provides authentication redirection using the password exit. The Identity Manager 4.8 driver for RACF provides bidirectional password synchronization.</p>
+          </div>
+</li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmn9qf0">
+
+<h2 class="title h2"><span class="number">4.1.1</span> Preparing for Migration</h2>
+
+<div class="content_wrapper">
+
+<p class="para">NetIQÂ® recommends that you perform the upgrade in a test environment similar to your production environment before upgrading production systems.</p>
+<p class="para">Before beginning the upgrade process, review <a href="b3r8si5.html" class="xref">Section 3.0, Installing the RACF Driver</a>.</p>
+<div class="procedure" id="b4ihhti">
+<p class="para">To prepare for installing the upgrade:</p>
+<ol class="steps">
+<li class="step" id="b4ihhtj">
+<p class="para">Verify that you have the required knowledge and skills.</p>
+<p class="para">For details, see <a href="b3xdcg2.html" class="xref">Required Knowledge and Skills</a>.</p></li>
+<li class="step" id="b4ihilq">
+<p class="para">Ensure that the prerequisites are met.</p>
+<p class="para">For details, see <a href="b3xccfu.html" class="xref">Prerequisites</a>.</p></li>
+<li class="step" id="b4ihj42">
+<p class="para">Prepare the distribution files for installation.</p>
+<p class="para">For details, see <a href="b3xd1sq.html" class="xref">Getting the Installation Files</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmn9r3i">
+
+<h2 class="title h2"><span class="number">4.1.2</span> Migrating Fan-Out Driver Platform Services to the RACF Driver</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b3xgif4">
+<p class="para">To migrate, follow these tasks on your target platform system:</p>
+<ol class="steps">
+<li class="step" id="b3xgif5">
+<p class="para">Stop the following started tasks:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">PLATRCVR</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">ASCLIENT</span>
+                </p></li></ul></div>
+</li>
+<li class="step" id="b3xgird">
+<p class="para">Remove <span class="command">ASCLIENT</span> and <span class="command">PLATRCVR</span> from your system startup and shutdown procedures.</p></li>
+<li class="step" id="b6ab0dw">
+<p class="para">Remove the Fan-Out driverâs RACF exit.</p></li>
+<li class="step" id="b4ifj03">
+<p class="para">Install the driver shim on the connected system.</p>
+<p class="para">For details, see <a href="b3xehpq.html" class="xref">Installing the Driver Shim on the Connected System</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmn9rcd">
+
+<h2 class="title h2"><span class="number">4.1.3</span> Configuring the Driver</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To configure the driver:</p>
+<div class="procedure" id="b3xgjge">
+<ol class="steps">
+<li class="step" id="b3xgktg">
+<p class="para">Install and set up the Identity Manager driver for RACF on the Metadirectory server.</p>
+<p class="para">For details, see <a href="b1bybgrg.html" class="xref">Creating the Driver in Designer</a>.</p></li>
+<li class="step" id="b3xgl46">
+<p class="para">Make any required policy modifications.</p>
+<p class="para">Create or modify an appropriate policy to use the alternative naming attribute if one was used by the Fan-Out driver. For more information about policy customization, see the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p></li>
+<li class="step" id="b3xglpf">
+<p class="para">Start the driver.</p>
+<p class="para">Click the upper right corner of the driver icon, then click <span class="guimenu">Start driver</span>.</p></li>
+<li class="step" id="b3xglrs">
+<p class="para">Migrate the users to make new associations. For details, see <a href="b3xxotz.html#b3xxpl3" class="xref">Migrating Identities from the Identity Vault to the Connected System</a> and <a href="b3xxotz.html#b3xxw83" class="xref">Migrating Identities from the Connected System to the Identity Vault</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmn9rku">
+
+<h2 class="title h2"><span class="number">4.1.4</span> Post-Migration Tasks</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Perform the tasks listed in <a href="b3xfpxf.html" class="xref">Post-Installation Tasks</a>.</p>
+<div class="procedure" id="b3xgmb1">
+<p class="para">After the new driver is operating properly, you can remove the Fan-Out driver components:</p>
+<ol class="steps">
+<li class="step" id="b3xgmb2">
+<p class="para">Delete the Platform object from the Fan-Out driver configuration.</p></li>
+<li class="step" id="b3xgnm2">
+<p class="para">On the connected system, uninstall Platform Services.</p></li>
+<li class="step" id="b3xgmm7">
+<p class="para">If this is the last platform being served by the Fan-Out driver, you can uninstall the Fan-Out core driver.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b3xgmzc">
+<p class="para">Remove the <span class="filename">ASAM</span> directory from the file system.</p></li>
+<li class="step" id="b3xgn99">
+<p class="para">Remove the ASAM System container object and all of its subordinates from the tree.</p></li>
+<li class="step" id="b3xgnh9">
+<p class="para">Uninstall the Fan-Out driver plug-ins.</p></li></ol>
+</div>
+</li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

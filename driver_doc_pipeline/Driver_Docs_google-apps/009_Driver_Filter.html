@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g4dy104,t4cb3g4da6yy,t4cb3g4dnvqx,t4cb3g4e2b6f,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Filter - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4cb3g4dy104">
+
+<h1 class="title h1"><span class="number">3.2</span> Driver Filter</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver supports Contacts, Users, Groups and Organizational Units classes. For Users and Contacts the following table lists the default list of attributes. These classes support many more attributes that can be found by refreshing the application schema and mapping them to an eDirectory attribute in the schema mapping rule.</p>
+<div class="table" id="t4cb3g4e1vr8"><p class="title"><em class="num">Table 3-1 </em>Contact and User Attributes for Driver Filters</p>
+<table class="topbot" width="100%"><col width="20%" /><col width="29%" /><col width="51%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Class</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Notes</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">OrganizationUnit</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Description</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OU</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This is the naming value of the attribute</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">Group</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Member</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Owner</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">CN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DirXML-GAGroupEMailAddress</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This attribute is required in order to determine which email domain the group belongs to. The value should be in the form of an email address i.e.Â <a href="mailto:info@yourcompany.com" class="ulink">info@yourcompany.com</a>.</p></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="20%" /><col width="26%" /><col width="54%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Class</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Notes</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">User</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DirXML-EntitlementRef</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required if using entitlements</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">nspmDistributionPassword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required if synchronizing user passwords. Note that it is required to set a password for a new user. Even if you are using SAML for authentication you will need to set a password on the account to have it provision to GÂ Suite.Â </p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Given Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Surname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Login Disabled</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">assistant</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">See manager attribute</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">manager</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Assistant and Manager are DN attributes in eDirectory. In Google, these map to text fields. It is recommended that the developer decide what should be synchronized to Google (i.e. Given Name Last Name) and write a transformation for displaying that information in the Google Contacts application.Â </p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Telephone Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Mobile</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Company</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">L</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OU</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Department</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Title</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">preferredName</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">preferredName is mapped by default to the Alias attribute in GÂ Suite. This should be in the form of an email address: i.e.Â <a href="mailto:name@yourcompany.com" class="ulink">name@yourcompany.com</a>.Â </p></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="20%" /><col width="38%" /><col width="42%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Class</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Notes</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">DirXML-GAContact</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Surname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Facsimile Telephone Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Given Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Mobile</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OU</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">L</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Title</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Pager</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Telephone Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Company</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Internet Email Address</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">Group</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">EmailAddress</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required naming attribute</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Group descriptive name</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Description</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Description of the group</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Members</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">List of members</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Owners</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">List of owners. In Google, owners are just members with an owner flag set.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AllowExternalMembers</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows external members to view and join the group. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AllowGoogleCommunication</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows Google to contact group administrators. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AllowWebPosting</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows posting to the group web forum. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ArchiveOnly</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows the group to be only archived. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IsArchived</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows the contents of the group to be archived. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">MaxMessageBytes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Maximum size of a message. Default is 1Â Mbyte.</p></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="20%" /><col width="38%" /><col width="42%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Class</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Notes</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">MessageModerationLevel</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">MODERATE_ALL_MESSAGES</p></li>
+<li class="listitem">
+<p class="listitem">MODERATE_NEW_MESSAGES</p></li>
+<li class="listitem">
+<p class="listitem">MODERATE_NONE</p></li>
+<li class="listitem">
+<p class="listitem">MODERATE_NONMEMBERS</p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SpamModerationLevel</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALLOW</p></li>
+<li class="listitem">
+<p class="listitem">MODERATE</p></li>
+<li class="listitem">
+<p class="listitem">SILENTLY_MODERATE</p></li>
+<li class="listitem">
+<p class="listitem">REJECT</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ReplyTo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">REPLY_TO_CUSTOM</p></li>
+<li class="listitem">
+<p class="listitem">REPLY_TO_IGNORE</p></li>
+<li class="listitem">
+<p class="listitem">REPLY_TO_LIST</p></li>
+<li class="listitem">
+<p class="listitem">REPLY_TO_MANAGERS</p></li>
+<li class="listitem">
+<p class="listitem">REPLY_TO_OWNER</p></li>
+<li class="listitem">
+<p class="listitem">REPLY_TO_SENDER</p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">CustomReplyTo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Custom REPLY_TO message</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SendMessageDenyNotification</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows member to be notified if his message is denied by the owner. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DefaultMessageDenyNotificationText</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Notification message text sent when a message is denied.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ShowInGroupDirectory</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows groups to be listed in the Groups directory. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">MembersCanPostAsTheGroup</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Allows members to post using the group email address. Possible values are TRUE or FALSE.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PrimaryLanguage</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Group Primary Language. SeeÂ âGoogle Language Tagsâ at <a href="https://developers.google.com/admin-sdk/email-settings/#language_tags" class="ulink">https://developers.google.com/admin-sdk/email-settings/#language_tags</a></p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">MessageDisplayFont</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Default message display font:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">DEFAULT_FONT</p></li>
+<li class="listitem">
+<p class="listitem">FIXED_WIDTH_FONT</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IncludeInGlobalAddressList</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Enables the group to be included in the Global Address List. Possible values are TRUE or FALSE.</p></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="22%" /><col width="42%" /><col width="37%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Class</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Notes</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WhoCanJoin</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Permission to join the group</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALL_IN_DOMAIN_CAN_JOIN</p></li>
+<li class="listitem">
+<p class="listitem">ANYONE_CAN_JOIN</p></li>
+<li class="listitem">
+<p class="listitem">CAN_REQUEST_TO_JOIN</p></li>
+<li class="listitem">
+<p class="listitem">INVITED_CAN_JOIN</p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WhoCanViewMembership</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALL_IN_DOMAIN_CAN_VIEW</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MANAGERS_CAN_VIEW</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MEMBERS_CAN_VIEW</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WhoCanViewGroup</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALL_IN_DOMAIN_CAN_VIEW</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MANAGERS_CAN_VIEW</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MEMBERS_CAN_VIEW</p></li>
+<li class="listitem">
+<p class="listitem">ANYONE_CAN_VIEW</p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WhoCanInvite</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALL_MEMBERS_CAN_INVITE</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MANAGERS_CAN_INVITE</p></li>
+<li class="listitem">
+<p class="listitem">NONE_CAN_INVITE</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WhoCanPostMessage</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALL_IN_DOMAIN_CAN_POST</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MANAGERS_CAN_POST</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MEMBERS_CAN_POST</p></li>
+<li class="listitem">
+<p class="listitem">ANYONE_CAN_POST</p></li>
+<li class="listitem">
+<p class="listitem">NONE_CAN_POST</p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WhoCanLeaveGroup</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALL_MANAGERS_CAN_LEAVE</p></li>
+<li class="listitem">
+<p class="listitem">ALL_MEMBERS_CAN_LEAVE</p></li>
+<li class="listitem">
+<p class="listitem">NONE_CAN_LEAVE</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">WhoCanContactOwner</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ALL_IN_DOMAIN_CAN_CONTACT</p>
+<p class="para">ALL_MANAGERS_CAN_CONTACT</p>
+<p class="para">ALL_MEMBERS_CAN_CONTACT</p>
+<p class="para">ANYONE_CAN_CONTACT</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

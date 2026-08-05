@@ -1,0 +1,3 @@
+# 4.3 Upgrade Procedure
+
+The process for upgrading the Delimited Text driver is the same as for other Identity Manager drivers. For detailed instructions, see "[Upgrading the Identity Manager Drivers](../../../identity-manager-48/setup_linux/data/upgrading-drivers.html#upgrading-drivers)" in the [NetIQ Identity Manager Setup Guide for Linux](../../../identity-manager-48/setup_linux/data/front.html#front) or "[Upgrading the Identity Manager Drivers](../../../identity-manager-48/setup_windows/data/upgrade-drivers.html#upgrade-drivers)" in the [NetIQ Identity Manager Setup Guide for Windows](../../../identity-manager-48/setup_windows/data/front.html#front).

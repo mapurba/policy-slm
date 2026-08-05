@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="set-transaction-isolation-level-for-jdbc-driver,embed-sql-statements-in-xds-events-for-jdbc-driver,manual-and-automatic-jdbc-transactions,methods-for-executing-sql-statements,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Transaction Isolation Level - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="set-transaction-isolation-level-for-jdbc-driver">
+
+<h1 class="title h1"><span class="number">12.6</span> Transaction Isolation Level</h1>
+
+<div class="content_wrapper">
+
+<p class="para">In addition to grouping statements, you can use transactions to preserve the integrity of data in a database. Transactions can lock data to prevent concurrent access or modification. The isolation level of a transaction determines how locks are set. Usually, the default isolation level that the driver uses is sufficient and should not be altered.</p>
+<p class="para">The custom attribute <span class="literal">jdbc:isolation-level</span> allows you to adjust the isolation transaction level if necessary. The java.sql.Connection parameter defines five possible values in the interface. See <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection.html" class="ulink">java.sql.Connection</a>.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">none</span>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">read uncommitted</span>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">read committed</span>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">repeatable read</span>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">serializable</span>
+          </p></li></ul></div>
+
+<p class="para">The driverâs default transaction isolation level is <span class="literal">read committed</span> unless overridden by a descriptor file. In manual transactions, place the <span class="literal">jdbc:isolation-level</span> attribute on the first element in the transaction. This attribute is ignored on subsequent elements. In the following example. the attribute is in bold text.</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr" jdbc:transaction-id="0"
+                          <span class="strong">jdbc:isolation-level="serializable"</span>&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+    &lt;/add&gt;
+    &lt;jdbc:statement jdbc:transaction-type="manual"
+                    jdbc:transaction-id="0"&gt;
+        &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John'
+                  WHERE idu = {$idu}&lt;/jdbc:sql&gt;
+    &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">This XML resolves to:</p><pre class="screen">SET AUTOCOMMIT OFF
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
+INSERT INTO indirect.usr(lname) VALUES('Doe');
+UPDATE indirect.usr SET fname = 'John' WHERE idu = 1;
+COMMIT; -- explicit commit</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

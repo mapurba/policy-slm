@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="aiorg4v,faq,aiorg10,aiorgdi,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Processing Rows in the Event Log Table - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="aiorg4v">
+
+<h1 class="title h1"><span class="number">D.3</span> Processing Rows in the Event Log Table</h1>
+
+<div class="content_wrapper">
+
+<div class="formalpara" id="b1uxsij">
+        <p class="title"><em class="title">Question:</em>
+        Why isnât the driver processing rows in the Event Log Table?</p>
+      </div>
+
+<div class="formalpara" id="b1uxsuh">
+        <p class="title"><em class="title">Answer:</em>
+        Do the following:</p>
+      </div>
+
+<div class="procedure" id="b10wyte">
+<ol class="steps">
+<li class="step" id="bxj6gh6">
+<p class="para">Check the <span class="literal">perpetrator</span> field of the rows in question and make sure that the value is set to something other than the driverâs database username.</p>
+<p class="para">The Publisher channel checks the <span class="literal">perpetrator</span> field to detect loopback events if the Publisher channel Allow Loopback parameter is set to Boolean False (the default). See <a href="how-to-set-publication-parameters.html#bvw4x51" class="xref">Allow Loopback?</a>.</p>
+<p class="para">When the Allow Loopback parameter is set to Boolean False, the Publisher channel ignores all records where the <span class="literal">perpetrator</span> field value is equal to the driverâs database username. The driverâs database username is specified by using the Authentication ID parameter. See <a href="jdbc-driver-parameters.html#bvqz2y8" class="xref">Authentication ID</a>.</p></li>
+<li class="step" id="bxj6gh8">
+<p class="para">Ensure that the recordâs <span class="literal">status</span> field is set to <span class="literal">N</span> (new).</p>
+<p class="para">Records with <span class="literal">status</span> fields set to something other than <span class="literal">N</span> will not be processed.</p></li>
+<li class="step" id="bxj6gh9">
+<p class="para">Make sure to explicitly commit changes.</p>
+<p class="para">Changes are often tentative until explicitly committed.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

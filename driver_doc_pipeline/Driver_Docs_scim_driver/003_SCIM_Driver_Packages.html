@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="February 17 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4czl7k7x983,scim-driver,t4czidi7ul1m,b94c4u0,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>SCIM Driver Packages - NetIQ SCIM Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4czl7k7x983">
+
+<h1 class="title h1"><span class="number">1.2</span> SCIM Driver Packages</h1>
+
+<div class="content_wrapper">
+
+<p class="para">In Designer, navigate to <span class="guimenu">Help &gt; Package Updates</span> to update the SCIM driver packages. When you update the required driver packages in designer, the designer updates the policies, rules and the parameters that are associated with the driver object. These rules, policies, and associated parameters are used to establish communication and synchronize data between Identity Manager and the connected application.</p>
+<p class="para">The SCIM driver packages and the details are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM Base (NETQSCIMBASE</span>): Contains the mandatory basic SCIM configurations required for SCIM driver. The base configurations include:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Driver Authentication methods such as Basic and OAuth2.0.</p></li>
+<li class="listitem">
+<p class="listitem">Subscriber settings with HTTPS error codes to retry such as 307, 400 etc,.</p></li>
+<li class="listitem">
+<p class="listitem">Publisher settings with Polling interval, Heartbeat interval, and Polling Resource option.</p></li>
+<li class="listitem">
+<p class="listitem">Advanced settings with the Schema and Modifier setting options.</p></li>
+<li class="listitem">
+<p class="listitem">Options for Remote Loader settings.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM Default (NETQSCIMDCFG)</span>: Contains the mandatory default configurations required for configuring the SCIM driver. The default configurations include the policies as shown below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Matching policy</span>: This policy finds the matches for objects based on attributes. SCIM Driver by default, has implementation for generating filters for simple and complex attributes. It does not have capability to provide filter for complex multivalue attribute.</p>
+<p class="listitem">If the attribute is complex multivalued, then the SCIM driver generates the filter using the value enclosed within the âValueâ element in the query.</p>
+<p class="listitem">For Example:</p><pre class="screen">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+        &lt;source&gt;
+        &lt;product edition="Advanced" version="4.8.0.0"&gt;DirXML&lt;/product&gt;
+        &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+        &lt;/source&gt;
+        &lt;input&gt;
+        &lt;query class-name="Users" event-id="0" scope="subtree"&gt;
+          &lt;search-class class-name="Users"/&gt;
+          &lt;search-attr attr-name="Internet Email address"&gt;
+          &lt;value&gt;asdhscnSL@mf.com&lt;/value&gt;
+          &lt;/search-attr&gt;
+          &lt;read-attr/&gt;
+        &lt;/query&gt;
+        &lt;/input&gt;
+      &lt;/nds&gt;</pre>
+<p class="listitem">Since search-attr attr-name is Internet Email address, it is a complex multivalue. SCIM driver generates the filter using the âValueâ element as follows:</p>
+<p class="listitem">
+                <span class="command">https://&lt;Base Url&gt;/scim/Users?filter=asdhscnSL@mf.com</span>
+              </p>
+<p class="listitem">Appropriate filter must be provided by the user using the policy.</p>
+<p class="listitem">The below sample snippet is the output Transformation Policy to provide an appropriate filter for complex multivalue.</p><pre class="screen">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;policy&gt;
+  &lt;rule&gt;
+    &lt;description&gt;Replace search-attr value with appropriate filter.&lt;/description&gt;
+    &lt;conditions&gt;
+      &lt;and&gt;
+        &lt;if-class-name op="equal"&gt;urn:ietf:params:scim:schemas:core:2.0:User&lt;/if-class-name&gt;
+        &lt;if-operation op="equal"&gt;query&lt;/if-operation&gt;
+      &lt;/and&gt;
+    &lt;/conditions&gt;
+    &lt;actions&gt;
+      &lt;do-for-each&gt;
+        &lt;arg-node-set&gt;
+          &lt;token-xpath expression="search-attr"/&gt;
+        &lt;/arg-node-set&gt;
+        &lt;arg-actions&gt;
+          &lt;do-set-local-variable name="searchAttr"&gt;
+            &lt;arg-node-set&gt;
+              &lt;token-xpath expression="$current-node/@attr-name"/&gt;
+            &lt;/arg-node-set&gt;
+          &lt;/do-set-local-variable&gt;
+          &lt;do-if&gt;
+            &lt;arg-conditions&gt;
+              &lt;and&gt;
+                &lt;if-local-variable name="searchAttr" op="equal"&gt;emails:work:value&lt;/if-local-variable&gt;
+              &lt;/and&gt;
+            &lt;/arg-conditions&gt;
+            &lt;arg-actions&gt;
+              &lt;do-set-local-variable name="emailValue"&gt;
+                &lt;arg-string&gt;
+                  &lt;token-xpath expression="$current-node/value"/&gt;
+                &lt;/arg-string&gt;
+              &lt;/do-set-local-variable&gt;
+              &lt;do-strip-xpath expression="$current-node/value"/&gt;
+              &lt;do-append-xml-element expression="$current-node" name="value"/&gt;
+              &lt;do-append-xml-text expression="$current-node/value"&gt;
+                &lt;arg-string&gt;
+                  &lt;token-text xml:space="preserve"&gt;emails eq &lt;/token-text&gt;
+                  &lt;token-text xml:space="preserve"&gt;"&lt;/token-text&gt;
+                  &lt;token-local-variable name="emailValue"/&gt;
+                  &lt;token-text xml:space="preserve"&gt;"&lt;/token-text&gt;
+                &lt;/arg-string&gt;
+              &lt;/do-append-xml-text&gt;
+            &lt;/arg-actions&gt;
+            &lt;arg-actions/&gt;
+          &lt;/do-if&gt;
+        &lt;/arg-actions&gt;
+      &lt;/do-for-each&gt;
+    &lt;/actions&gt;
+  &lt;/rule&gt;
+&lt;/policy&gt;</pre></li></ul></div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Creation policy</span>: The creation policy defines the conditions that must be met to create a new object. The creation policy is of two types, Subscriber Creation policy and Publisher Creation policy. The policy definitions can be same or different for the respective channels.</p>
+<p class="listitem">For example, if you try to create a new user in Identity Manager by providing only the user's name and user ID, the user is created in Identity Manager but does not sync to the connected application. This happens when the definitions for creating the user are not specified completely in the creation policy. You can add templates in the creation policy to ensure that all the required definitions are specified.</p>
+<p class="listitem">The Creation Policies are commonly used to:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Reject the creation of objects that donât qualify, possibly because of a missing attribute.</p></li>
+<li class="listitem">
+<p class="listitem">Provide default attribute values.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Placement policy</span>: This policy specifies the containers where objects are to be placed.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Command Transformation policy</span>: This policy is to provide the final processing commands that are sent to the Identity Manager or to the connected application.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Schema Mapping policy</span>: The Schema Mapping policies store the definition of the class and attribute mappings between the Identity Manager and the connected application.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Filter</span>: Filter allows the object and its specific attributes to synchronize between the Identity Manger and the connected application.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM JSON (NETQSCIMJSON)</span>: (Optional) This package contains the JSON configurations for SCIM driver to implement XDS to JSON conversion. The JSON that is created by using this package will be compatible with the connected application, to perform required operations.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

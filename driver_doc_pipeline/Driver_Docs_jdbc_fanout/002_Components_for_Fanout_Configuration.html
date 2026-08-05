@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="components-to-configure-identity-manager-jdbc-fan-out-driver,introduction-identity-manager-jdbc-fanout-driver,introduction-identity-manager-jdbc-fanout-driver,data-transfer-between-identity-vault-jdbc-fan-out-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Components for Fanout Configuration - NetIQ Identity Manager Driver for JDBC Fanout Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="components-to-configure-identity-manager-jdbc-fan-out-driver">
+
+<h1 class="title h1"><span class="number">1.1</span> Components for Fanout Configuration</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Fanout driver relies on the following independent components. <a href="components-to-configure-identity-manager-jdbc-fan-out-driver.html#t482udtdrl0g" class="xref">Figure 1-1</a> shows how these components work together.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+            <p class="title"><em class="title">Fanout Driver Shim:</em>
+            The Fanout driver shim is a Java-based interface driver. The driver shim virtually connects to the Fanout agent through ActiveMQ.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+            <p class="title"><em class="title">ActiveMQ:</em>
+            The Fanout driver and the Fanout agent use ActiveMQ for transferring the Subscriber events, configuration data, and the queries. The Fanout agent creates a separate queue for each JDBC driver instance. The JDBC driver instances wait for the events in their respective queues. For information about installing ActiveMQ, see <a href="how-to-use-activemq-with-jdbc-fan-out-driver.html" class="xref">Working with ActiveMQ</a>. To manage the ActiveMQ queues, launch the URL: <span class="literal">http://&lt;ActiveMQ IP Address&gt;:8161/admin/queues.jsp</span>.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+            <p class="title"><em class="title">Fanout Agent:</em>
+            The Fanout agent is a standalone Java process that works independently of the Identity Vault. The Fanout agent loads the JDBC driver instances based on the configuration of the connection objects in the Fanout driver. For more information about the connection objects, see <a href="jdbc-fan-out-driver-concepts.html" class="xref">Driver Concepts</a>.</p>
+          </div>
+
+<p class="listitem">The Fanout agent provides an interface through REST endpoints for performing basic monitoring and management tasks. To ease the initial deployment, the Fanout agent auto-initializes with the default configuration values when it is started for the first time. To change the default settings, use the REST endpoints. For more information about REST endpoints supported for the driver, see <a href="the-jdbc-fan-out-rest-endpoints.html" class="xref">Section D.0, REST Endpoints</a>. The driver installation folder contains sample scripts that you can run to manage the Fanout agent. The sample scripts internally use the REST endpoints. For more information, see <a href="how-to-manage-jdbc-fan-out-agent.html" class="xref">Managing the Fanout Agent</a>.</p>
+<p class="listitem">Alternatively, you can manually edit the configuration file. This method requires you to restart the Fanout agent for the changes to take effect. However, this is not required for all the changes made through the REST endpoints. To understand which changes need a restart of the Fanout agent, see <a href="how-to-generate-the-default-configuration-file.html" class="xref">Generating the Default Configuration File</a>.</p></li></ul></div>
+
+<div class="figure" id="t482udtdrl0g"><p class="title"><em class="num">Figure 1-1 </em>Identity Manager JDBC Fanout Driver Architecture</p>
+            <img src="../graphics/architecture_diagram_fanout driver .png" alt="" />
+          </div>
+
+<p class="para">The Fanout process works as follows:</p>
+<div class="procedure" id="t41vmnhufix6">
+<ol class="steps">
+<li class="step">
+<p class="para">The Identity Vault stores the connection object configuration. The configuration includes connection, authentication, and trace information.</p></li>
+<li class="step">
+<p class="para">The Fanout driver receives the initialization document from the engine.</p></li>
+<li class="step">
+<p class="para">The Fanout driver and the Fanout agent perform a handshake to establish a connection. This signals the start of the communication between the agent and the driver. The handshake is done through challenge-response sets.</p></li>
+<li class="step">
+<p class="para">The Fanout driver queries the Identity Vault for the connection objects associated with this driver and creates multiple initialization documents based on the content in the connection objects.</p></li>
+<li class="step">
+<p class="para">The Fanout driver sends the initialization documents to the Fanout agent through ActiveMQ.</p></li>
+<li class="step">
+<p class="para">The Fanout agent loads the JDBC driver instances.</p></li>
+<li class="step">
+<p class="para">The Fanout driver sends the events to the Fanout agent through ActiveMQ.</p></li>
+<li class="step">
+<p class="para">The Fanout agent determines which JDBC driver instances this event should be sent to.</p></li>
+<li class="step">
+<p class="para">The JDBC driver processes the event and sends the status of the event to the Fanout agent, which in turn sends this information to the Fanout driver through ActiveMQ.</p></li>
+<li class="step">
+<p class="para">The Fanout driver sends this status to the Identity Manager engine.</p></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Only one flavour of database can be managed per agent. For example: only Oracle databases or only MS SQL databases on a single agent.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

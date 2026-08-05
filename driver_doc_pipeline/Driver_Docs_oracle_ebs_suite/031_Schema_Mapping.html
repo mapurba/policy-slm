@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="schema-mapping,bookinfo,increasing-the-memory-heap-size,driver-properties,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Schema Mapping - NetIQ Identity Manager Driver for Oracle E-Business Suite (User Management, HR, and TCA) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container chapter expanding expanded" id="schema-mapping">
+
+<h1 class="title h1"><span class="number">8.0</span> Schema Mapping</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The policies and filters included in the driver packages provide bidirectional creation, deletion, and modification of user information in the Identity Vault and the Oracle EBS system. The driver is configured to synchronize information from the Identity Vault to the Oracle EBS system (Subscriber channel) and from the Oracle EBS system to the Identity Vault (Publisher channel). You can modify the policies and the filter to work with your specific business environment.</p>
+<p class="para">The Schema Mapping policy is referenced by the driver object and applies to both the Subscriber and the Publisher channel. The purpose of the Schema Mapping policy is to map schema names (particularly attribute names and class names) between the Identity Vault and the Oracle User database table (idmusrmgt.idm_events). Any modification or removal of existing entries in the Schema Mapping policy could destroy the default configuration and policies processing behavior. Adding new attribute mappings is discretionary.</p>
+<p class="para"><a href="schema-mapping.html#b14xhdey" class="xref">Table 8-1</a>, <a href="schema-mapping.html#b14xhdez" class="xref">Table 8-2</a>, and <a href="schema-mapping.html#b14xhdff" class="xref">Table 8-3</a> contain default mappings between the Oracle EBS user attributes for User Management, HR, and TCA modules and the Identity Vault attributes.</p>
+<div class="table" id="b14xhdey"><p class="title"><em class="num">Table 8-1 </em>Oracle User Management Attributes and the Identity Vault Attributes</p>
+<table class="topbot" width="100%"><col width="28%" /><col width="72%" />
+          
+<tr class="headerrow" id="b11vfrmf"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Attribute</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Oracle User Management Attribute</p></th>
+</tr>
+        
+<tr class="oddrow" id="b14xi71v"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="strong">User</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">i<span class="strong">netOrgPerson</span></p></td>
+</tr>
+<tr class="evenrow" id="b11vfrmg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">CN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">USER_NAME</p></td>
+</tr>
+<tr class="oddrow" id="b11vfrmh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Description</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DESCRIPTION</p></td>
+</tr>
+<tr class="evenrow" id="b11vfrmi"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Facsimile Telephone Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">FAX</p></td>
+</tr>
+<tr class="oddrow" id="b11vfrml"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Internet EMail Address</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">EMAIL_ADDRESS</p></td>
+</tr>
+<tr class="evenrow" id="b11vfrmm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Surname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Mapped as default password if the password is not specified for the user.</p></td>
+</tr>
+<tr class="oddrow" id="b14xjedf"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Login Expiration Time</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">END_DATE</p></td>
+</tr>
+<tr class="evenrow" id="b11vfrmo"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">loginActivationTime</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">START_DATE</p></td>
+</tr>
+<tr class="oddrow" id="b11vfrmn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Password Expiration Interval</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PASSWORD_LIFESPAN_DAYS</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>If the <span class="guimenu">Password Expiration</span> field is set to <span class="guimenu">Accesses</span> in the Oracle EBS system, the password expiration interval is turned off. The Identity Vault does not have a corresponding attribute for <span class="guimenu">Accesses</span>; therefore, the driver fails to synchronize the password expiration changes with the Identity Vault. However, the changes are successfully synchronized if the password expiration interval is set to <span class="guimenu">number of days</span>.</p></div>
+</td>
+</tr>
+<tr class="evenrow" id="b129uhvj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Login Disabled</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LOGIN_DISABLED</p></td>
+</tr>
+<tr class="oddrow" id="b16xjd6j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DirXML-ebsPersonId</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">EMPLOYEE_ID</p></td>
+</tr></table>
+</div>
+
+<div class="table" id="b14xhdez"><p class="title"><em class="num">Table 8-2 </em>Oracle HR Attributes and the Identity Vault Attributes</p>
+<table class="topbot" width="100%"><col width="27%" /><col width="73%" />
+          
+<tr class="headerrow" id="b14xhdf0"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Attribute</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Oracle HR Attribute</p></th>
+</tr>
+        
+<tr class="oddrow" id="b14xi7hn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="strong">User</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">i<span class="strong">netOrgPerson</span></p></td>
+</tr>
+<tr class="evenrow" id="b14xhdf8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Internet EMail Address</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">P_EMAIL_ADDRESS</p></td>
+</tr>
+<tr class="oddrow" id="b14xhdf9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Surname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">P_LAST_NAME</p></td>
+</tr>
+<tr class="evenrow" id="b14xhdfa"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Given Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">P_FIRST_NAME</p></td>
+</tr>
+<tr class="oddrow" id="b14xhdfd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">mailstop</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">P_MAILSTOP</p></td>
+</tr>
+<tr class="evenrow" id="b14xhdfe"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">L</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">P_INTERNAL_LOCATION</p></td>
+</tr>
+<tr class="oddrow" id="b14xi0mu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Initials</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">P_MIDDLE_NAMES</p></td>
+</tr>
+<tr class="evenrow" id="b16xje65"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DirXML-ebsGender</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">P_SEX</p></td>
+</tr></table>
+</div>
+
+<div class="table" id="b14xhdff"><p class="title"><em class="num">Table 8-3 </em>Oracle TCA Attributes and the Identity Vault Attributes</p>
+<table class="topbot" width="100%"><col width="27%" /><col width="73%" />
+          
+<tr class="headerrow" id="b14xhdfg"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Attribute</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Oracle TCA Attribute</p></th>
+</tr>
+        
+<tr class="oddrow" id="b14xi7ho"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="strong">User</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">i<span class="strong">netOrgPerson</span></p></td>
+</tr>
+<tr class="evenrow" id="b14xhdfh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">CN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">USER_NAME</p></td>
+</tr>
+<tr class="oddrow" id="b14xhdfi"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Description</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DESCRIPTION</p></td>
+</tr>
+<tr class="evenrow" id="b14xhdfj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Facsimile Telephone Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">FAX</p></td>
+</tr>
+<tr class="oddrow" id="b14xhdfk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Login Expiration Time</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">END_DATE</p></td>
+</tr>
+<tr class="evenrow" id="b14xhdfl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">loginActivationTime</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">START_DATE</p></td>
+</tr>
+<tr class="oddrow" id="b14xhdfm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Password Expiration Interval</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PASSWORD_LIFESPAN_DAYS</p></td>
+</tr>
+<tr class="evenrow" id="b15z3w4y"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Internet EMail Address</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TCA_EMAIL_ADDRESS</p></td>
+</tr>
+<tr class="oddrow" id="b14xhdfn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Login Disabled</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LOGIN_DISABLED</p></td>
+</tr>
+<tr class="evenrow" id="b14xhdfp"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Surname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TCA_PERSON_LAST_NAME</p></td>
+</tr>
+<tr class="oddrow" id="b14xhdfq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Given Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TCA_PERSON_FIRST_NAME</p></td>
+</tr>
+<tr class="evenrow" id="b14xhdfr"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">EMail Address</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">EMAIL_ADDRESS</p></td>
+</tr>
+<tr class="oddrow" id="b14xi029"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Initials</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TCA_PERSON_MIDDLE_NAME</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

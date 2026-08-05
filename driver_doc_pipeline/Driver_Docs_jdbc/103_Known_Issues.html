@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="list-of-jdbc-driver-known-issues,list-of-known-issues-limitations-of-jdbc-driver,list-of-known-issues-limitations-of-jdbc-driver,list-of-jdbc-driver-limitations,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Known Issues - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="list-of-jdbc-driver-known-issues">
+
+<h1 class="title h1"><span class="number">B.1</span> Known Issues</h1>
+
+<div class="content_wrapper">
+
+<h4 class="bridgehead" id="t41vwt22z62u">JDBC Driver</h4>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Identity Vault Time and Timestamp syntaxes are inadequate for expressing the range and granularity of their database counterparts. This is a publication problem because database time-related types typically have a wider range and greater degree of granularity (typically nanoseconds). The converse is not true. For more information, see <a href="configure-jdbc-driver-specific-parameters.html#b1pu3jg" class="xref">Time Syntax</a>.</p></li>
+<li class="listitem">
+<p class="listitem">The JDBC driver is unable to parse proprietary database time stamp formats. Some databases, such as Sybase and DB2, have proprietary time stamp formats that the <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Timestamp.html" class="ulink">java.sql.Timestamp</a> class canât parse. When synchronizing time stamp columns from these databases, the JDBC driver, by default, assumes that time stamp values placed in the event log table are in ODBC canonical format (that is, <span class="literal">yyyy-mm-dd hh:mm:ss.fffffffff</span>). The recommended method for enabling the JDBC driver to handle proprietary database time stamp formats is to implement a custom <span class="literal">DBTimestampTranslator</span> class. This interface is documented in the JavaDoc Tool that ships with the JDBC driver. Using this approach avoids the problem of reformatting time stamps in the database before they are inserted into the event log table or reformatted in style sheets. The JDBC driver ships with default implementations for the native DB2 time stamp format and the Sybase style 109 time stamp format.</p></li>
+<li class="listitem">
+<p class="listitem">Statements executed against the database server might block indefinitely.</p>
+<p class="listitem">Typically, blocking is caused by a database resource being exclusively locked. Because the locking mechanisms and locking SQL vary by database, the general solution to this problem is to implement a custom <span class="literal">DBLockStatementGenerator</span> class. For additional information, see <a href="configure-jdbc-driver-specific-parameters.html#b1pu3n5" class="xref">Lock Statement Generator Class</a>. The JDBC driver ships with a default implementation for Oracle.</p>
+<p class="listitem">Many factors can cause blocking. To mitigate the likelihood of blocking, we recommend that you do not set the <a href="configure-jdbc-driver-specific-parameters.html#b1pu3me" class="xref">Transaction Isolation Level</a> parameter to a level greater than <span class="literal">read committed</span>.</p>
+<p class="listitem">The JDBC interface defines a method <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Statement.html" class="ulink">java.sql.Statement.setQueryTimeout(int):void</a> that allows a statement to time out after a specified number of seconds. Unfortunately, implementations of this method between third-party JDBC drivers range from not being implemented to having bugs. For this reason, this method was deemed unsuitable as a general-purpose solution.</p></li>
+<li class="listitem">
+<p class="listitem">The JDBC displays an exception error âUser is unassociated" when performing a Modify and/or Delete event with dest-dn. This is because the JDBC driver does not support CRUD operation.</p></li>
+<li class="listitem">
+<p class="listitem">In MSSQL database you can only add new values to the view only if the view is created from a single base table. If multiple base tables are used to create the view, you cannot update the view.</p></li></ul></div>
+
+<h4 class="bridgehead" id="t41vwt22zdtb">JDBC Fan-Out Driver</h4>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the Cached Priority Synchronisation event is a modify of the Referential Attribute, the driver sends a Success status. However, the modified change is not updated in the target database.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

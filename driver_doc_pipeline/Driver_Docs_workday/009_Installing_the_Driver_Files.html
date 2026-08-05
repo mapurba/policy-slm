@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4azuzp4pnau,t4avmq79x4ee,t4eie9te8d7c,t4avmq79xc47,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing the Driver Files - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4azuzp4pnau">
+
+<h1 class="title h1"><span class="number">2.5</span> Installing the Driver Files</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Workday driver is a Java-based driver and can be run on the Identity Manager engine or on a Remote Loader server. It works only with native and Java Remote Loader.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="t4azuzp4pnau.html#t4dsciq3uvqu" class="xref">Installing the Driver Files as a Root User</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4azuzp4pnau.html#t4dscj2smtnz" class="xref">Installing the Driver Files as a Non-Root User</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4azuzp4pnau.html#t4azv02eedmk" class="xref">Configuring Remote Loader for the Driver Instance</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4dsciq3uvqu">
+
+<h2 class="title h2"><span class="number">2.5.1</span> Installing the Driver Files as a Root User</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You must install the driver files manually. The Workday driver files are installed on the Identity Manager server at the same time as the Identity Manger engine. The installation program extends the Identity Vaultâs schema and installs the driver shim and the driver configuration file, but does not create the driver in the Identity Vault or upgrade an existing driverâs configuration. For information about creating the driver, see <a href="t4avmq79xc47.html" class="xref">Creating the Driver Object</a>.</p>
+<p class="para">If you want to run the driver with Remote loader, verify that the <span class="filename">WorkdayShim.jar</span> file is present in the following directories for the Remote Loader:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Linux:</em>
+              
+                <span class="filename">/opt/novell/eDirectory/lib/dirxml/classes</span>
+              </p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Windows:</em>
+              
+                <span class="filename">C:\novell\remoteloader\lib</span>
+              </p>
+            </div>
+</li></ul></div>
+
+<p class="para">Else, copy the file from the Identity Vault server to the appropriate directory based on the operating system.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Linux</span>: Install the new <span class="filename">novell-DXMLWday.rpm</span> in your driver installation directory by running the following command in a terminal window:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If you are installing the binary, run the command: <span class="strong"><span class="filename">rpm -Ivh (binaries-path)/novell-DXMLWday.rpm</span></span></p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Windows</span>: Copy <span class="filename">WorkdayShim.jar</span> in the <span class="filename">{IDM-Install-Folder\nds\lib}</span> directory of the Identity Manager Engine. If you want to run the driver with Remote loader on Windows, verify that the <span class="filename">WorkdayShim.jar</span> file is present in the <span class="filename">{remoteloader\lib}</span> directory.</p></li></ul></div>
+
+<p class="para">To install the dependent <span class="filename">jar</span> files, perform the following actions on your platform as applicable:</p>
+<div class="itemizedlist" id="dependent_jar_files">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Linux</span>:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Copy the jar file <span class="filename">WorkdayUtils.jar</span>, from <span class="filename"><span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common</span> folder and place it in <span class="filename">/opt/novell/eDirectory/lib/dirxml/classes/</span> directory in the Identity Manager engine.</p></li>
+<li class="listitem">
+<p class="listitem">Copy the <span class="filename">WorkdayUtils.jar</span>, <span class="filename">imgscalr-lib-4.2.jar</span>, <span class="filename">jcce-1.3.0.jar</span>, and <span class="filename">jcce-oauth-1.3.0.jar</span> from <span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common folder and place it in the driver installation folder. For example, <span class="filename">/opt/novell/eDirectory/lib/dirxml/classes/</span> (for local or remote installation).</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Windows</span>:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Copy the jar files WorkdayUtils.jar from <span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common folder and place it in Identity Manager engine path \NetIQ\IdentityManager\NDS\lib.</p></li>
+<li class="listitem">
+<p class="listitem">Copy the imgscalr-lib-4.2.jar, jcce-1.3.0.jar and jcce-oauth-1.3.0.jar from <span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common folder and place it in the driver installation folder. For example, <span class="filename">\NetIQ\IdentityManager\NDS</span> (local installation) or <span class="filename">\Novell\RemoteLoader\64bit</span> (remote installation).</p></li></ul></div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4dscj2smtnz">
+
+<h2 class="title h2"><span class="number">2.5.2</span> Installing the Driver Files as a Non-Root User</h2>
+
+<div class="content_wrapper">
+
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Verify that the <span class="strong"><span class="filename">/rpm</span></span>directory exists and contains the <span class="strong"><span class="filename">_db.*</span></span> file.</p></li>
+          
+<li class="listitem">
+<p class="listitem">The<span class="strong"><span class="filename">_db.*</span></span> file is created during a non-root installation of the Identity Manager engine. The absence of this file indicates that the Identity Manager is not installed properly. In such a case, reinstall the Identity Manager to correctly place the file in the mentioned directory.</p></li>
+          
+<li class="listitem">
+<p class="listitem">To set the root directory to the location of non-root in Identity Manager, enter the following command in the command prompt:</p>
+<p class="listitem">
+              <span class="strong">
+                <span class="command">ROOTDIR=&lt;non-root eDirectory location&gt;</span>
+              </span>
+            </p>
+<p class="listitem">This will set the environmental variables to the directory where Identity Manager is installed as a non-root user.</p></li>
+          
+<li class="listitem">
+<p class="listitem">For example, to install the Workday driver rpm, use this command:</p>
+<p class="listitem">
+              <span class="strong">
+                <span class="command">rpm --dbpath $ROOTDIR/rpm -Ivh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory --relocate=/etc=$ROOTDIR/etc --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml --relocate=/var=$ROOTDIR/var --badreloc --nodeps --replacefiles /home/user/novell-DXMLWday.rpm</span>
+              </span>
+            </p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In the above command <span class="strong"><span class="filename">/opt/novell/eDirectory</span></span> is the location where non-root Identity Manager is installed, and <span class="strong"><span class="filename">/home/user/</span></span> is the home directory of the non-root user.</p></div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">To install the dependent <span class="filename">jar</span> files, perform the following actions based on your platform:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Linux</span>:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Copy the jar file <span class="filename">WorkdayUtils.jar</span>, from <span class="filename"><span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common</span> folder and place it in <span class="filename">/opt/novell/eDirectory/lib/dirxml/classes/</span> directory in the Identity Manager engine.</p></li>
+<li class="listitem">
+<p class="listitem">Copy the <span class="filename">WorkdayUtils.jar</span>, <span class="filename">imgscalr-lib-4.2.jar</span>, <span class="filename">jcce-1.3.0.jar</span>, and <span class="filename">jcce-oauth-1.3.0.jar</span> from <span class="filename"><span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common</span> folder and place it in the driver installation folder. For example, <span class="filename">/opt/novell/eDirectory/lib/dirxml/classes/</span> (for local or remote installation).</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Windows</span>:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Copy the jar files <span class="filename">WorkdayUtils.jar</span> from from <span class="filename"><span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common</span> folder and place it in Identity Manager engine path <span class="filename">\NetIQ\IdentityManager\NDS\lib</span>.</p></li>
+<li class="listitem">
+<p class="listitem">Copy the <span class="filename">imgscalr-lib-4.2.jar</span>, <span class="filename">jcce-1.3.0.jar</span> and <span class="filename">jcce-oauth-1.3.0.jar</span> from <span class="filename"><span class="replaceable">&lt;IDM_WorkDayDriver_1300&gt;</span>/common</span> folder and place it in the driver installation folder. For example, <span class="filename">\NetIQ\IdentityManager\NDS</span> (local installation) or <span class="filename">\Novell\RemoteLoader\64bit</span> (remote installation).</p></li></ul></div>
+</li></ul></div>
+</li>
+        </ol></div>
+
+<p class="para">You must configure the driver to use an SSL connection between the Remote Loader and the Identity Manager server. For more information, see <a href="../../../identity-manager-49/driver_admin/data/b18xta1v.html#t461ov2hxlp7" class="ulink">Creating a Secure Connection to the Identity Manager Engine</a> in the <span class="citetitle"><a href="../../../identity-manager-49/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span>.</p>
+<p class="para">For more information on configuring the Remote Loader, see <a href="t4azuzp4pnau.html#t4azv02eedmk" class="xref">Configuring Remote Loader for the Driver Instance</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4azv02eedmk">
+
+<h2 class="title h2"><span class="number">2.5.3</span> Configuring Remote Loader for the Driver Instance</h2>
+
+<div class="content_wrapper">
+
+<p class="para">For more information about specifying values for these parameters, see <a href="../../../identity-manager-49/driver_admin/data/b18xta1v.html#b18xta1v" class="ulink">Configuring the Remote Loader and Drivers</a> in the <span class="citetitle"><a href="../../../identity-manager-49/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span>.</p>
+<p class="para">Below is an example of a configuration file with some sample values.</p><pre class="screen">-description "Workday Driver"
+-commandport 8000
+-connection "port=8090"
+-trace 3
+-tracefile "/opt/netiq/workdaydriver.log" (or "C:\novell\remoteloader\64bit\WorkdayDriver-Trace.log" on Windows)
+-tracefilemax 100M
+-class "com.netiq.dirxml.driver.workday.WDDriverShim"</pre>
+<p class="para">Once the driver instance is running, you can use the command line on Linux or Remote Loader Console on Windows to instruct the Remote Loader to perform a function. For example, turn the trace on or off on Windows or stop the driver instance.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

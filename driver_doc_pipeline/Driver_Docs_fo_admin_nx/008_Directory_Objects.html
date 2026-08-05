@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="br12c66,bcghdbcc,br12c5n,br12c6m,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Directory Objects - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="br12c66">
+
+<h1 class="title h1"><span class="number">2.3</span> Directory Objects</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Identity Manager Fan-Out Driver maintains objects in eDirectory with configuration information for the Core Driver and platforms as well as users and groups of users available to the platforms. These are stored in the ASAM System container.</p>
+<p class="para">You maintain configuration information by using the Web interface. Do not use any other method of changing objects in the ASAM System container unless advised by support personnel.</p>
+<p class="para">A writable replica of the partition holding the ASAM System container must reside on the LDAP host server used by a Core Driver.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="br12c68">
+
+<h2 class="title h2"><span class="number">2.3.1</span> The ASAM Master User Object</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Core Driver processes perform an LDAP Bind as the ASAM Master User to gain access to eDirectory. The ASAM Master User object can be specified during installation.</p>
+<p class="para">The ASAM Master User must have Supervisor rights to the container in eDirectory that holds the users and groups that can be added to the Census. This is known as the User and Group Subtree. These rights are granted during installation.</p>
+<p class="para">To use the AS Client API to access objects outside of the User and Group Subtree, you must grant additional rights to the ASAM Master User.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">You must grant the ASAM Master User Browse object rights and Compare property rights to any object that is accessed through the AS Client API.</p></li>
+<li class="listitem">
+<p class="listitem">You must grant the ASAM Master User Read property rights to any object whose Security Equals list or Group Membership list, or other attribute value is accessed through the AS Client API.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br12c6a">
+
+<h2 class="title h2"><span class="number">2.3.2</span> Configuration-Oriented Objects</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Configuration information for Identity Manager Fan-Out Driver components is stored in objects that correspond to them.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Audit Services object</p></li>
+<li class="listitem">
+<p class="listitem">Certificate Services object</p></li>
+<li class="listitem">
+<p class="listitem">Event Journal Services object</p></li>
+<li class="listitem">
+<p class="listitem">Object Services object</p></li>
+<li class="listitem">
+<p class="listitem">Web Services object</p></li>
+<li class="listitem">
+<p class="listitem">Event Subsystem objects</p></li>
+<li class="listitem">
+<p class="listitem">Authentication Services objects</p></li>
+<li class="listitem">
+<p class="listitem">UID/GID Set objects</p></li>
+<li class="listitem">
+<p class="listitem">Platform Set objects</p></li>
+<li class="listitem">
+<p class="listitem">Platform objects</p></li></ul></div>
+
+<p class="para">Identity Manager Fan-Out Driver program component configuration objects list each of their host server network addresses. Before accepting a communication connection from another component, driver components verify that the connection originates from a network address listed in the corresponding configuration object.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="babjjgaa">
+
+<h2 class="title h2"><span class="number">2.3.3</span> Census Container</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Based on your specifications, Object Services maintains a Census of users and groups of users for use with target platforms. Users in the Census are represented by Enterprise User (eUser) objects. Groups of users in the Census are represented by Enterprise Group (eGroup) objects.</p>
+<p class="para">Object Services uses events from the Event Subsystem to maintain the Census. Object services of the primary Core Driver also periodically trawls eDirectory for information to ensure the validity of the Census.</p>
+<p class="para">Authentication Services uses eUser objects in the Census to locate the corresponding User objects in eDirectory for password verification and other functions. For information about associating eUsers and eGroups from the Census with sets of platforms for provisioning purposes, see <a href="br12c66.html#babffida" class="xref">Platform Set Objects</a>.</p>
+<p class="para">You use the Web interface to specify Census Search objects that identify the users and groups that are to be included in the Census.</p>
+<p class="para">Search objects can get Enterprise Users from</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Specifically identified User objects</p></li>
+<li class="listitem">
+<p class="listitem">Group object membership</p></li>
+<li class="listitem">
+<p class="listitem">Organizational Role object occupant lists</p></li>
+<li class="listitem">
+<p class="listitem">Objects in containers (and subcontainers, to whatever depth you set)</p></li></ul></div>
+
+<p class="para">Search objects can get Enterprise Groups from</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Specifically identified Group objects</p></li>
+<li class="listitem">
+<p class="listitem">Group objects in containers (and subcontainers, to whatever depth you set)</p></li>
+<li class="listitem">
+<p class="listitem">Identity Manager entitlements</p></li></ul></div>
+
+<div class="container sect3" id="bcgbjhdh">
+
+<h3 class="title h3">Dynamic Groups as Search Objects</h3>
+
+<p class="para">Dynamic groups use an LDAP search filter to define a set of rules that, when matched by eDirectory User objects, define the members of the group. Membership in the group is evaluated dynamically by eDirectory. There is no actual list of members for a dynamic group like there is for a static group.</p>
+<p class="para">Events involving users who are already in the Census that affect their membership in a dynamic group that is a Search object are seen by the Event Subsystem as they happen. This is because the Core Driver interrogates Search objects to discover if an event involving a given User object is of interest.</p>
+<p class="para">Events involving users not already in the Census and events involving the LDAP search filter of a dynamic group that is a Search object are not seen by the Event Subsystem. This is because there is nothing to drive the LDAP search. Such changes are not detected until the next Trawl is run.</p>
+</div>
+
+<div class="container sect3" id="br12c6b">
+
+<h3 class="title h3">Naming Exceptions</h3>
+
+<p class="para">Because Enterprise User objects and Enterprise Group objects share the same name space, their names must be unique. If a duplicate name is found based on your Census Search objects, the resulting Enterprise User or Enterprise Group object is placed in the Exceptions container rather than being made available in the Census. You can use the Web interface to review naming exceptions.</p>
+</div>
+
+<div class="container sect3" id="br12c6c">
+
+<h3 class="title h3">Enterprise User Objects</h3>
+
+<p class="para">Enterprise User (eUser) objects reside in the Census container. An eUser object represents a single User object, or an Alias object that references a User object, in eDirectory.</p>
+<p class="para">An eUser object includes a reference to the User object or Alias object that it represents in eDirectory. The User object referenced by an Alias object is provisioned to platforms, not the Alias object itself.</p>
+</div>
+
+<div class="container sect3" id="br12c6e">
+
+<h3 class="title h3">Enterprise Group Objects</h3>
+
+<p class="para">Enterprise Group (eGroup) objects reside in the Census container. An eGroup object represents a group of users, and is based on a Group object, or an Alias object that references a Group object, in eDirectory. Enterprise Group objects must be based on static Group objects. Dynamic Group objects are not provisioned.</p>
+<p class="para">An eGroup object includes a reference to the Group object or Alias object that it represents in eDirectory. The Group object referenced by an Alias object is provisioned to platforms, not the Alias object itself.</p>
+<p class="para">Enterprise Group objects in the Census contain a list of the eUser objects that are represented in the corresponding Group object in eDirectory (but not any users that are not present in the Census).</p>
+</div>
+
+<div class="container sect3" id="br12c6d">
+
+<h3 class="title h3">Inactive Users and Groups</h3>
+
+<p class="para">You can choose to have Enterprise User and Enterprise Group objects whose corresponding User or Group object is deleted from eDirectory or is no longer covered by a Census Search object remain in the Census in an inactive state. Because Enterprise User objects relate to User objects in eDirectory through a globally unique identifier, this prevents another person from receiving access to resources as an unintended result of the reuse of the user name. Inactive users cannot authenticate through Authentication Services.</p>
+</div>
+
+<div class="container sect3" id="br1lf4n">
+
+<h3 class="title h3">Delete Pending Duration</h3>
+
+<p class="para">You can use the Web interface to specify a Delete Pending Duration. During this interval, eUser and eGroup objects whose corresponding User and Group objects have either been deleted from eDirectory or are no longer covered by a Search object are not deleted from target platforms. The results of a Delete User or Delete Group Receiver script can be difficult to reverse. Delete Pending Duration provides a grace period to allow recovery from a disastrous mistake affecting many users.</p>
+<p class="para">The Delete User Pending or Delete Group Pending Receiver script is called when a delete event becomes pending for a user or group. The Delete User or Delete Group script is not called until the Delete Pending Duration expires.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br12c6k">
+
+<h2 class="title h2"><span class="number">2.3.4</span> Platform Objects</h2>
+
+<div class="content_wrapper">
+
+<p class="para">A Platform object represents a specific target platform that runs Platform Services.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="babffida">
+
+<h2 class="title h2"><span class="number">2.3.5</span> Platform Set Objects</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Platform Set objects provide the relationship between Search objects and Platform objects. You can use Platform Sets to group together multiple platforms that share the same user and group population.</p>
+<p class="para">The following example illustrates how you can fan out your user and group population to platforms that are grouped into Platform Sets.</p>
+<div class="table" id="bb676g8"><p class="title"><em class="num">Table 2-1 </em>Platform Set Example</p>
+<table class="topbot" width="95%"><col width="25%" /><col width="25%" /><col width="25%" /><col width="25%" />
+<tr class="oddrow" id="bs3aafl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="strong">Containers with Users</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3ahvs">
+                      <p class="title"><em class="title">OU=Students</em>
+                      Henri Markus Rie</p>
+                    </div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3aifb">
+                      <p class="title"><em class="title">OU=Faculty</em>
+                      Carmen Eleu Mario</p>
+                    </div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3aim6">
+                      <p class="title"><em class="title">OU=Staff</em>
+                      Isabel Claire Kenji</p>
+                    </div>
+</td>
+</tr>
+<tr class="evenrow" id="bs3aafm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="strong">Search Objects</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OU: Students Include Users: Yes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OU: Faculty Include Users: Yes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">OU: Staff Include Users: Yes</p></td>
+</tr>
+<tr class="oddrow" id="bs3aafn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="strong">Platform Sets</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3aj1d">
+                      <p class="title"><em class="title">Academic</em>
+                      Search Objects: Students, Faculty Platforms: StudentDataServer, LabWorkstation1, LabWorkstation2, LabWorkstation3</p>
+                    </div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3aj96">
+                      <p class="title"><em class="title">Employee</em>
+                      Search Objects: Faculty, Staff Platforms: BenefitsServer, EmployeeDataServer</p>
+                    </div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3ajdn">
+                      <p class="title"><em class="title">Everyone</em>
+                      Search Objects: Students, Faculty, Staff Platforms: MailServer, LibraryServer</p>
+                    </div>
+</td>
+</tr>
+<tr class="evenrow" id="bs3aafo"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="strong">Platforms</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3akjv">
+                      <p class="title"><em class="title">StudentDataServer</em>
+                      Platform Set: Academic Users: Henri, Markus, Rie, Carmen, Eleu, Mario</p>
+                    </div>
+
+<div class="formalpara" id="bs3akvp">
+                      <p class="title"><em class="title">LabWorkstation1</em>
+                      Platform Set: Academic Users: Henri, Markus, Rie, Carmen, Eleu, Mario</p>
+                    </div>
+
+<div class="formalpara" id="bs3au3c">
+                      <p class="title"><em class="title">LabWorkstation2</em>
+                      Platform Set: Academic Users: Henri, Markus, Rie, Carmen, Eleu, Mario</p>
+                    </div>
+
+<div class="formalpara" id="bs3au3d">
+                      <p class="title"><em class="title">LabWorkstation3</em>
+                      Platform Set: Academic Users: Henri, Markus, Rie, Carmen, Eleu, Mario</p>
+                    </div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3anoq">
+                      <p class="title"><em class="title">BenefitsServer</em>
+                      Platform Set: Employee Users: Carmen, Eleu, Mario, Isabel, Claire, Kenji</p>
+                    </div>
+
+<div class="formalpara" id="bs3anor">
+                      <p class="title"><em class="title">EmployeeDataServer</em>
+                      Platform Set: Employee Users: Carmen, Eleu, Mario, Isabel, Claire, Kenji</p>
+                    </div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="formalpara" id="bs3anos">
+                      <p class="title"><em class="title">MailServer Platform Set: Everyone</em>
+                      Users: Henri, Markus, Rie, Carmen, Eleu, Mario, Isabel, Claire, Kenji</p>
+                    </div>
+
+<div class="formalpara" id="bs3aomo">
+                      <p class="title"><em class="title">LibraryServer</em>
+                      Platform Set: Everyone Users: Henri, Markus, Rie, Carmen, Eleu, Mario, Isabel, Claire, Kenji</p>
+                    </div>
+</td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

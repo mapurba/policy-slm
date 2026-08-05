@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="list-of-jdbc-fan-out-driver-known-issues,known-issues-limitations-of-jdbc-fan-out-driver,known-issues-limitations-of-jdbc-fan-out-driver,list-of-jdbc-fan-out-driver-limitations,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Known Issues - NetIQ Identity Manager Driver for JDBC Fanout Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="list-of-jdbc-fan-out-driver-known-issues">
+
+<h1 class="title h1"><span class="number">A.1</span> Known Issues</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">In the MSSQL database the underline base table can be modified through a view only if the INSERT, UPDATE and DELETE statements refers to the column of the single base table.</p></li>
+<li class="listitem">
+<p class="listitem">If you are connecting the driver to Microsoft SQL database, the driver does not support Windows NTLM and Windows Single Sign-On authentication.</p></li>
+<li class="listitem">
+<p class="listitem">For modifications of the referential attributes (for example: Manager), the JDBC driver returns a success status even if the referenced object or user does not have the association (not present in the target database).</p></li>
+<li class="listitem">
+<p class="listitem">Due to the above mentioned reason, if the Out of Band sync is enabled for the referential attribute, there is a possibility of event loss if the modify event of the referential attribute is processed before the referenced user's add event was processed. Hence, NetIQ recommends not to enable Out of Band events for referential attributes.</p></li>
+<li class="listitem">
+<p class="listitem">The Fanout driver configuration page of Identity Console displays the Remote Loader option. Ensure that you do not use this option with the Fanout driver.</p></li>
+<li class="listitem">
+<p class="listitem">The Fanout driver does not support direct synchronization mode for MySQL InnoDB. This is because the driver does not support the Subscriber Add operation in this mode.</p></li>
+<li class="listitem">
+<p class="listitem">If you use the Tab key to navigate the Password field in the Fanout Configuration page of Designer, Designer prompts you to save the resource when no change is made to the resource.</p></li>
+<li class="listitem">
+<p class="listitem">Identity Manager does not support the non-root installation of the Fanout agent.</p></li>
+<li class="listitem">
+<p class="listitem">When you stop the Fanout agent, the command server log file displays a warning message stating that one thread cannot be stopped. Ignore the warning message.</p></li>
+<li class="listitem">
+<p class="listitem">If you are connecting to a Sybase database, additional operations cannot be performed if the transaction log is full. The JDBC driver instance waits for the transaction log to be cleared before processing further events.</p></li>
+<li class="listitem">
+<p class="listitem">JDBC drivers stop working if a wrong password is specified when a driver is authenticating with a connected system. This is an expected behavior. However, the JDBC driver for Sybase continues to retry the connection and does not stop. </p></li>
+<li class="listitem">
+<p class="listitem">Changes in Fanout instance names do not reflect in the DirXML-Accounts and DirXML-Associations attributes. Therefore, they become invalid. NetIQ does not recommend you to change the connection object names and the instance names.</p></li>
+<li class="listitem">
+<p class="listitem">Sometimes when a codemap refresh is done, you may not receive codemap data of all the connected databases. You may get errors such as âUnable to complete the CODE MAP refresh for entitlementâ in catalina.out. This is due to the time taken by the query to return the codemap results. Hence, you need to increase the timeout for the following parameters:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Default Query Timeout (<span class="guimenu">IDMProv web UI</span> &gt; <span class="guimenu">Roles and Resources</span> &gt; <span class="guimenu">Configure Roles and Resource Settings</span> &gt; <span class="guimenu">Entitlement Query Settings</span> &gt; <span class="guimenu">Default Query Timeout</span>).</p>
+<p class="listitem">If the value of this parameter is 10 minutes, then increase the value of NCPCLIENT_REQ_TIMEOUT parameter.</p></li>
+<li class="listitem">
+<p class="listitem">NCPCLIENT_REQ_TIMEOUT</p>
+<p class="listitem">Refer to <a href="https://www.netiq.com/support/kb/doc.php?id=7016855" class="ulink">Knowledgebase</a> for more information on how to increase the value of this parameter.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">If you upgraded to Identity Manager 4.7 and updated the base packages for your driver, the package update process does not overwrite the default setting (<span class="literal">False</span>) of <span class="guimenu">Enable Service Channel</span> ECV.</p>
+<p class="listitem">To workaround this issue, manually change the ECV for the driver.</p>
+<p class="listitem">This issue does not occur when you create a new driver.</p>
+<p class="listitem">To change the ECV in Designer:</p></li></ul></div>
+
+<div class="procedure" id="t41p5g2jp1hk">
+<ol class="steps">
+<li class="step">
+<p class="para">In Modeler, right-click the driver line.</p></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Properties &gt; Engine Control Values</span>.</p></li>
+<li class="step">
+<p class="para">Click the tooltip icon to the right of <span class="guimenu">Engine Controls for Server</span>.</p>
+<p class="para">If a server is associated with the Identity Vault, and if you are authenticated, the engine control values display in the large pane.</p></li>
+<li class="step">
+<p class="para">Change the value for <span class="guimenu">Enable Subscriber Service Channel</span>.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li>
+<li class="step">
+<p class="para">For the change to take effect, deploy the driver to the live Identity Vault.</p></li></ol>
+</div>
+
+<p class="para">To change the ECV in Identity Console:</p>
+<div class="procedure" id="t41hj9uznsfk">
+<ol class="steps">
+<li class="step">
+<p class="para">Click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step">
+<p class="para">On the Driver Dashboard locate the driver, then click the driver icon.</p></li>
+<li class="step">
+<p class="para">Click the <span class="guimenu">Configuration</span> tab.</p></li>
+<li class="step">
+<p class="para">Expand the <span class="guimenu">Engine Control Values</span> section.</p></li>
+<li class="step">
+<p class="para">Change the value for <span class="guimenu">Enable Subscriber Service Channel</span>.</p></li>
+<li class="step">
+<p class="para">Save.</p></li>
+<li class="step">
+<p class="para">For the change to take effect, restart the driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

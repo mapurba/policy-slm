@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="hr-example-hr-driver,customize-driver,policies-rules-used-in-basic-configuration,hr-example-without-hr-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Human Resource Example Using an HR Driver - NetIQ Identity Manager WorkOrder Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="hr-example-hr-driver">
+
+<h1 class="title h1"><span class="number">6.2</span> Human Resource Example Using an HR Driver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following example illustrates how the WorkOrder driver can be used with an HR driver (SAP, PeopleSoft, and so forth) to create a new user and postpone activating the new employeeâs access to the system until the hire date. <a href="hr-example-hr-driver.html#b8ylevn" class="xref">Figure 6-1</a> illustrates how these drivers work together in the example configuration.</p>
+<div class="figure" id="b8ylevn"><p class="title"><em class="num">Figure 6-1 </em>Data Flow with an HR Driver</p>
+            <img src="../graphics/work_order_decision004_a.png" alt="" />
+          </div>
+
+<p class="para">In this scenario, assume that the new employeeâs name is Albert Hauser. Albert is hired, but does not begin work until a future date and time. He is put into the HR system with the hire date set. Albert is marked as not active and does not have access to the system.</p>
+<p class="para">The HR Identity Manager driver writes Albertâs user object to the Identity Vault. A policy in that driver checks to see if he is active. If he is active, the driver performs the work. If he is not active, the policy creates a work order to activate Albertâs account on the hire date. The work order is marked as pending. A policy in the WorkOrder driver processes the work order on the hire date. The policy in the WorkOrder driver sets the user objectâs loginDisabled attribute to False, allowingAlbert to log in.</p>
+<p class="para">The sample could be extended to allow other Identity Manager drivers to have a Create rule to disallow the creation of the user object in other connected systems until the user objectâs loginDisabled attribute is set to False. The result is that the userâs system access is provisioned on his hire date and not before.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="b92ozzt">
+
+<h2 class="title h2"><span class="number">6.2.1</span> Human Resource Driver Policies</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following policies or rules show how to implement this sample. In the sample, the WorkOrder driver is acting as the HR system interface. The WorkOrder driver is configured to provide the needed attributes: LastName, FirstName, HireDate, and Disabled.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="hr-example-hr-driver.html#b92p17g" class="xref">Mapping Rule</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="hr-example-hr-driver.html#b92p1sp" class="xref">Filter</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="hr-example-hr-driver.html#b92p29h" class="xref">Command Transformation Policy</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b92p17g">
+
+<h3 class="title h3">Mapping Rule</h3>
+
+<p class="para">The mapping rule maps the attributes used in the WorkOrder driver to attributes in the Identity Vault. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/hr-drv-schema-map.xml" class="ulink">hr-drv-schema-map.xml</a>.</p>
+</div>
+
+<div class="container sect3" id="b92p1sp">
+
+<h3 class="title h3">Filter</h3>
+
+<p class="para">The filter attribute allows only the attributes that are needed by this example to be passed through. The DirXML-DueDate is notify only. This attribute should not be applied to the user object. However, it should be available for the Command Transformation. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/hr-drv-filter.xml" class="ulink">hr-drv-filter.xml</a></p>
+</div>
+
+<div class="container sect3" id="b92p29h">
+
+<h3 class="title h3">Command Transformation Policy</h3>
+
+<p class="para">The Command Transformation policy checks to see if a user object is being added to the Identity Vault. It also ensures that the loginDisabled attribute is set to True. If the conditions are satisfied, the policy then creates a work order and places it in the WorkOrder container. The WorkOrder driver looks in this container for work orders to process. The policy puts the DN of the user that was created into the DirXML-nwoContent attribute. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/hr-drv-cmd-transform.xml" class="ulink">hr-drv-cmd-transform.xml</a>.</p>
+<p class="para">The policy also puts the DirXML-DueDate from the user into the WorkOrder object DirXML-DueDate and then sets the work order status to Pending.</p>
+<p class="para">There is a second policy that sets the status of the work order. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/hr-drv-cmd-transform2.xml" class="ulink">hr-drv-cmd-transform2.xml</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b92p3i9">
+
+<h2 class="title h2"><span class="number">6.2.2</span> WorkOrder Driver Policy</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The WorkOrder driver policy uses only the Publisher Command Transformation policy. The Command Transformation policy checks to see that a DirXML-WorkToDo object is being added. If it is, the policy gets the DN of the user from the DirXML-nwoContent attribute. It then sets the userâs Login Disable attribute to False. This allows the user to log in.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em><span class="literal">&lt;do-add-dest-attr-value class-name="User" direct="true" name="Login Disabled"&gt;</span> should not be used.</p></div>
+
+<p class="para">When <span class="literal">direct</span> is equal to True, the action is performed as desired, but the results are not returned to the driver. Therefore, the driver cannot correctly report the results of the write. You can view the sample at <a href="http://www.novell.com/documentation/idm40drivers/work_order/samples/hr-wo-drv-pub-cmd-transform.xml" class="ulink">hr-wo-drv-pub-cmd-transform.xml</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

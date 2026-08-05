@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b8mn84s,b8mn6ko,b8mn6ko,b8mncmk,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Architecture - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b8mn84s">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Architecture</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Scripting driver synchronizes information between the Identity Vault and an external account management system (the connected system).</p>
+<p class="para">The Identity Manager detects relevant changes to identities in the Identity Vault and notifies the Subscriber component of the driver. After customizable policy processing, events are sent to the Subscriber shim of the embedded Remote Loader process on the connected system. The Subscriber shim securely passes the information to customizable scripts that perform the required actions.</p>
+<p class="para">A process on the connected system polls the account management system for changes at a configurable interval. If the poll returns identity changes, they are written to the change log.</p>
+<p class="para">The Publisher shim of the embedded Remote Loader process submits the changes from the change log to the Metadirectory engine as events. The Metadirectory engine processes these events using customizable policies and posts relevant changes to the Identity Vault.</p>
+<p class="para">Topics in this section include</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mn84s.html#b8mn91p" class="xref">Publisher Channel</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mn84s.html#b8mnaj8" class="xref">Subscriber Channel</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mn84s.html#b8mnaxe" class="xref">Scriptable Framework</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mn84s.html#b8mnb6n" class="xref">Schema File</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mn84s.html#b8mnbeb" class="xref">Include/Exclude File</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mn84s.html#b8mnblv" class="xref">Loopback State Files</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mn91p">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Publisher Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Publisher shim provides identity change information to the Metadirectory engine as XDS event documents. The Metadirectory engine applies policies, takes the appropriate actions, and posts the events to the Identity Vault.</p>
+<div class="container sect3" id="b8mn9j4">
+
+<h3 class="title h3">Change Log</h3>
+
+<p class="para">The change log stores identity changes in encrypted form. The polling script uses the change log update command to record identity changes it detects. Events are removed from the change log by the Publisher shim at configurable intervals and submitted to the Metadirectory engine for processing. If communication with the Metadirectory engine is temporarily lost, events remain in the change log until communication becomes available again.</p>
+</div>
+
+<div class="container sect3" id="b8mn9qe">
+
+<h3 class="title h3">Change Log Update Command</h3>
+
+<p class="para">The change log update command encrypts and writes events to the change log. Any process with rights to update the change log can use the change log update command. The change log update command takes command line arguments and standard input, and stores events in encrypted form in the change log for subsequent publishing. The polling script calls the change log update command to record identity changes. For information about using the change log update command, see the developer guides in <a href="b8n5bw5.html" class="xref">Section 5.0, Customizing the Scripting Driver</a>.</p>
+</div>
+
+<div class="container sect3" id="b8mn9zk">
+
+<h3 class="title h3">Polling Script</h3>
+
+<p class="para">The polling script periodically scans the local account management system for modifications that have occurred since the last polling interval. If necessary, the polling script updates the change log by calling the change log update command. You can specify the polling interval during installation and by subsequent configuration of the Driver object.</p>
+</div>
+
+<div class="container sect3" id="b8mna6g">
+
+<h3 class="title h3">Publisher Shim</h3>
+
+<p class="para">The Publisher shim periodically scans the change log for events. Before scanning the change log, the driver calls the polling script to check the local system for changes that might have been made since the previous poll.</p>
+<p class="para">When the Publisher shim finds events in the change log, it decrypts, processes, and sends them to the Metadirectory engine in XDS format over a Secure Sockets Layer (SSL) network link.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mnaj8">
+
+<h2 class="title h2"><span class="number">1.1.2</span> Subscriber Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel receives XDS command documents from the Metadirectory engine and calls the appropriate script or scripts to handle the command.</p>
+<p class="para">The provided scripts must be customized to handle connected system events. For more information see <a href="b8n5bw5.html" class="xref">Section 5.0, Customizing the Scripting Driver</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mnaxe">
+
+<h2 class="title h2"><span class="number">1.1.3</span> Scriptable Framework</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The interface between the connected system and the driver shim uses customizable scripts. You must extend the scripts that are provided with the driver to support your connected system. Several utility scripts and helper commands are provided with the driver to facilitate communication with the driver shim and the change log. An extensible connected system schema file allows you to add your own objects and attributes to those already supported by the driver.</p>
+<p class="para">For more information about the scriptable framework, see <a href="b8n5bw5.html" class="xref">Section 5.0, Customizing the Scripting Driver</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mnb6n">
+
+<h2 class="title h2"><span class="number">1.1.4</span> Schema File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The configuration of class and attribute definitions for the connected system is specified using the schema file. You can modify and extend this file to include new objects and attributes. For details about configuring the schema file, see <a href="b8n6pr6.html" class="xref">The Connected System Schema File</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mnbeb">
+
+<h2 class="title h2"><span class="number">1.1.5</span> Include/Exclude File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The include/exclude file allows local system policy to enforce which objects are included or excluded from provisioning, on both the Publisher channel and the Subscriber channel, independently. For details about using the include/exclude file, see <a href="b8n6prd.html" class="xref">The Connected System Include/Exclude File</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mnblv">
+
+<h2 class="title h2"><span class="number">1.1.6</span> Loopback State Files</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The loopback state files are used to provide automatic loopback detection for external applications that do not have mechanisms to perform loopback detection. This loopback detection prevents subscribed events from being published back to the Identity Vault.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

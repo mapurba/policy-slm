@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="configuring-secure-data-transfers,securing-driver-communication,securing-driver-communication,configuring-authentication-between-drivers,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring Secure Data Transfers - NetIQ Driver for eDirectory Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="configuring-secure-data-transfers">
+
+<h1 class="title h1"><span class="number">5.1</span> Configuring Secure Data Transfers</h1>
+
+<div class="content_wrapper">
+
+<p class="para">All eDirectory driver communication is secured through SSL. You can configure your eDirectory drivers through Designer.</p>
+<p class="para">For information about configuring eDirectory drivers through Designer, see Designer for Identity Manager Administration Guide</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="configuring-secure-data-transfers.html#understanding-secure-connections-via-the-driver-edirectory-driver" class="xref">Understanding Secure Connections via the eDirectory Driver</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="configuring-secure-data-transfers.html#creating-certificates-using-designer" class="xref">Creating Certificates Using Designer</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="configuring-secure-data-transfers.html#establishing-secure-connections-using-kmo" class="xref">Establishing Secure Connections Using KMO</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="configuring-secure-data-transfers.html#establishing-secure-connections-using-keystore" class="xref">Establishing Secure Connections Using Keystore</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="understanding-secure-connections-via-the-driver-edirectory-driver">
+
+<h2 class="title h2"><span class="number">5.1.1</span> Understanding Secure Connections via the eDirectory Driver</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following items can help you understand how secure connections are established when using the eDirectory driver:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The driver uses SSL sockets to provide authentication and a secure connection. SSL uses digital certificates to allow the parties to an SSL connection to authenticate one another. Identity Manager in turn uses NetIQ Certificate Server certificates for secure management of sensitive data.</p></li>
+<li class="listitem">
+<p class="listitem">To use the driver, you must have the NetIQ Certificate Server running in each tree. We recommend that you use the certificate authority from one of the trees containing the driver to issue the certificates used for SSL. If your tree does not have a certificate authority, you need to create one. You can use an external certificate authority. For information about NetIQ Certificate Server, see the <a href="http://www.NetIQ.com/documentation/crt33/" class="ulink">NetIQ Certificate Server 3.3 Documentation Web site</a>.</p></li>
+<li class="listitem">
+<p class="listitem">The NetIQ implementation of SSL that the driver uses is based on NetIQ Secure Authentication Services (SAS) and NTLS for eDirectory. These must be installed and configured on the server where the driver runs. eDirectory usually does this automatically.</p></li>
+<li class="listitem">
+<p class="listitem">To configure driver security, it is necessary to create and reference certificates in the eDirectory trees that will be connected using the driver. The two SSL types for securing the connection are Key Material Objects (KMOs) and Keystore.</p></li>
+<li class="listitem">
+<p class="listitem">Certificate objects in eDirectory are called KMO because they securely contain both the certificate data including the public key and the private key associated with the certificate.</p>
+<p class="listitem">A minimum of two KMOs (one KMO per tree) must be created for use with the eDirectory drivers. This section explains using a single KMO per tree.</p>
+<p class="listitem">The NDS-to-NDS Driver Certificate Wizard sets up the KMOs.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="creating-certificates-using-designer">
+
+<h2 class="title h2"><span class="number">5.1.2</span> Creating Certificates Using Designer</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To provide security while transmitting information between two Identity Vaults, you must configure the eDirectory driver to communicate with the destination eDirectory driver through an SSL connection.</p>
+<p class="para">In addition, you can provide additional security by requiring the two eDirectory drivers to authenticate to one another. Although this is optional, it is strongly recommended.</p>
+<p class="para">The following section explains how to set up SSL and configure driver authentication using designer.</p>
+<h4 class="bridgehead" id="t44zobgnoebn">Establishing Secure Connection and Creating Certificates Using Designer</h4>
+
+<p class="para">Perform the following actions to configure two eDirectory drivers and communicate with each other over a secure channel.</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Open your project in Designer.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Select two Identity Vaults from the palette between which you wish to secure a connection.</p></li>
+          
+<li class="listitem">
+<p class="listitem">The Driver Configuration Wizard appears. The purpose of the Driver Configuration Wizard is to help you install drivers. For more information on creating a driver, see <a href="creating-a-new-driver-object.html" class="xref">Section 3.0, Creating a New Driver Object</a>.</p>
+<p class="listitem">To create a driver with packages, select the available base package listed. If there are no packages listed, then the packages are not imported into the package catalog. For more information about importing and installing packages, see <a href="https://www.netiq.com/documentation/identity-manager-46/designer_admin/data/packman.html" class="ulink">Installing or Upgrading Packages.</a></p></li>
+          
+<li class="listitem">
+<p class="listitem">Configure the drivers. For more information on configuring the driver, see <a href="creating-the-driver-object-in-designer.html#configuring-the-driver" class="xref">Configuring the Driver</a>.</p>
+<p class="listitem">To create a driver with a driver configuration file, click Import Driver Configuration. All of the driver configurations files for the version of your Identity Manager server are listed. For more information about importing a driver configuration file, see <a href="https://www.netiq.com/documentation/identity-manager-46/designer_admin/data/importfromfile.html" class="ulink">Importing a Driver Configuration File.</a></p></li>
+          
+<li class="listitem">
+<p class="listitem">Deploy the driver.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Configure the driver settings to communicate the two eDirectory drivers. For more information, see <a href="https://www.netiq.com/documentation/identity-manager-46/designer_admin/data/importfromfile.html" class="ulink">Configure TLS for eDir-to-eDir drivers</a>.</p>
+<p class="listitem">To configure the driver settings, navigate to <span class="guimenu">Preferences</span> &gt; <span class="guimenu">NetIQ</span> &gt; <span class="guimenu">Identity Manager &gt;</span>  > <span class="guimenu">Configuration</span> &gt; <span class="guimenu">eDir-to-eDir SSL/TLS tab settings</span>.</p>
+<div class="table" id="b486j2f"><p class="title"><em class="num">Table 5-1 </em>Preferences: NetIQ &gt; Identity Manager &gt; Configuration &gt; eDir-to-eDir SSL/TLS Tab Settings</p>
+<table class="topbot" width="95%"><col width="50%" /><col width="50%" />
+                  
+<tr class="headerrow" id="b486j2g"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Setting</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                
+<tr class="oddrow" id="b486j2h"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="guimenu">Preferred key size</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the preferred key size that is generated when drivers are encrypted and stored in eDirectory: 256, 384, 512, 768, 1024, or 2048 bytes.</p></td>
+</tr>
+<tr class="evenrow" id="b486j2i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="guimenu">Preferred secure hash algorithm</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the preferred hash algorithm to use when encrypting drivers: SHA1-RSA, MD2-RSA, MD5-RSA, SHA256-ECDSA, or SHA384-ECDSA.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">For 256 key size, Designer provides SHA256-ECDSA algorithm.</p></li>
+<li class="listitem">
+<p class="listitem">For 384 key size, Designer provides SHA384-ECDSA algorithm.</p></li></ul></div>
+
+<p class="para">SHA256-ECDSA and SHA384-ECDSA are Suite B-compliant algorithms.</p></td>
+</tr>
+<tr class="oddrow" id="b486j2j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="guimenu">Preferred validity period</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the validity period for a driver certificate, ranging from 6 months to 10 years.</p></td>
+</tr>
+<tr class="evenrow" id="b486j2k"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="guimenu">Always overwrite existing certificates</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies that existing driver certificates are overwritten with each deployment. If you select this option, Designer deletes existing certificates and creates new ones. The new certificates are then good for another two years (assuming the default value is two years, as defined in the <span class="guimenu">Preferred Validity Period</span> field.) If you select <span class="guimenu">Live</span> &gt; <span class="guimenu">Create eDir-to-eDir Certificates</span>, Designer deletes old certificates and creates new ones.</p></td>
+</tr>
+<tr class="oddrow" id="b486j2l"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="guimenu">Overwrite certificates only if they have expired</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies that only expired driver certificates are overwritten with each deployment. This is the default setting. The default expiration length is two years. If a certificate expires, SSL/TLS stops working. If a certificate is expired, Designer deletes it and creates a new one.</p></td>
+</tr>
+<tr class="evenrow" id="b486j2m"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="guimenu">Never overwrite existing certificates</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Never overwrites driver certificates.</p></td>
+</tr>
+<tr class="oddrow" id="b486j2n"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="guimenu">Restart drivers after building certificates</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Restarts drivers after certificates have been updated or created.</p></td>
+</tr></table>
+</div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Enable TLS.</p>
+<p class="listitem">Perform the following actions to enable TLS:</p>
+<div class="orderedlist">
+              
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Right-click <span class="guimenu">eDir-to-eDir</span> in the Outline view, then click <span class="guimenu">Secure Connection Settings</span>.</p></li>
+              
+<li class="listitem">
+<p class="listitem">Right-click an eDir-to-eDir driver, click <span class="guimenu">Properties</span> &gt; <span class="guimenu">Driver Configuration</span> &gt; <span class="guimenu">Authentication</span>, then click <span class="guimenu">Configure TLS</span>. The <span class="guimenu">Configure TLS</span> icon displays only on eDir-to-eDir driver pages.</p></li>
+              
+<li class="listitem">
+<p class="listitem">Click <span class="guimenu">Enable SSL/TLS</span>.</p>
+<div class="informalfigure">
+                      <img src="../graphics/apptlscfg_a.png" alt="" />
+                    </div>
+</li>
+              
+<li class="listitem">
+<p class="listitem">Select a direction of trust.</p>
+<p class="listitem">These options apply to certificates that NetIQ creates for eDirectory. The options do not apply to third-party security certificates.</p>
+<p class="listitem">The default is Mutual Trust, which is considered to be the most secure.</p>
+<p class="listitem">Unless you want to use the certificate for authentication, the option that you select doesnât matter. If only encryption is important, you can select any one of the three options.</p>
+<p class="listitem">If authentication is important, select the option that gives you the appropriate trust.</p>
+<div class="formalpara" id="b6db1kc">
+                  <p class="title"><em class="title">Scenario: JJ Infrastructure Tree Trusts JT ID Vault.</em>
+                  JJ Infrastructure Tree is the organizational certificate authority. JJ Infrastructure Tree signed a certificate and placed it in JT IDVault. JT ID Vault trusts JJ Infrastructure Tree. The two vaults synchronize data through a secure connection.</p>
+                </div>
+
+<p class="listitem">If the two vaults break their trusted relationship, JJ Infrastructure Tree can prevent sensitive data from being synchronized by revoking its certificate.</p>
+<div class="formalpara" id="b6db25g">
+                  <p class="title"><em class="title">Scenario: JT ID Vault Trusts JJ Infrastructure Tree.</em>
+                  JJ Infrastructure Tree creates two certificates. One is placed in JJ Infrastructure Tree, and the other is placed in JT ID Vault. The two vaults synchronize data through a secure connection.</p>
+                </div>
+
+<p class="listitem">If the two vaults break their trusted relationship, JJ Infrastructure Tree can prevent sensitive data from being synchronized by revoking its certificate.</p>
+<div class="formalpara" id="b6db25h">
+                  <p class="title"><em class="title">Scenario: Mutual Trust.</em>
+                  JT ID Vault and JJ Infrastructure Tree both sign certificates.</p>
+                </div>
+</li>
+              
+<li class="listitem">
+<p class="listitem">(Optional) Use the <span class="guimenu">Advanced TLS Configuration</span> to select key size, hash algorithm, and validity period.</p>
+<p class="listitem">The validity period is important for when a certificate has expired and you need to overwrite or create a new one.</p></li>
+            </ol></div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Click <span class="guimenu">OK</span>.</p>
+<p class="listitem">You can enable or configure TLS without immediately deploying the drivers. You can turn the settings on. However, you canât create SSL/TLS certificates unless the drivers have been deployed into their respective Identity Vaults. If you enable SSL/TLS but want to create certificates later, you can do so. When you later deploy the eDir-to-eDir drivers, Designer guides you through steps to automatically create certificates.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Perform the following actions to create certificate.</p>
+<p class="listitem">The first time you enable and configure SSL/TLS on driverâs <span class="guimenu">Authentication</span> tab, click <span class="guimenu">OK</span>, then follow the prompts. A Create Certificates dialog box appears. Click <span class="guimenu">Yes</span>.</p>
+<p class="listitem">You can also create certificate by right-clicking the eDir2eDir application.</p>
+<p class="listitem">Click <span class="guimenu">Live</span> &gt; <span class="guimenu">Create eDir-to-eDir Certificates</span>.</p>
+<p class="listitem">For more information, see <a href="https://www.netiq.com/documentation/identity-manager-46/designer_admin/data/appprefsnovell.html#appprefsconfig" class="ulink">Configuration</a> in Designer Administrator guide.</p></li>
+        </ol></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If the settings are not configured, the certificate is created using the default settings.</p></div>
+
+<p class="para">To view the details of the certificate in Identity Console, navigate to <span class="guimenu">Certificate Management</span>. Click the name of the certificate to view the summary of the certificate. Click <img src="../graphics/validate_certificate.png" alt="" class="inline" /> <span class="guimenu">Validate</span> on top of the screen to view if the certificate is valid or if it has expired.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="establishing-secure-connections-using-kmo">
+
+<h2 class="title h2"><span class="number">5.1.3</span> Establishing Secure Connections Using KMO</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To configure your Identity Vault system to handle secure Identity Manager data transfers:</p>
+<h4 class="bridgehead" id="t45amvqng8hh">Creating the Certificate Manually</h4>
+
+<p class="para">Perform the following actions to manually create the certificate and establish a secure communication between the two eDirectory drivers.</p>
+<p class="para">The following example explains how to manually create the certificate.</p>
+<p class="para">Prerequisites</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Two Linux servers</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>1 server is a SLES 12.2 which is the main IDV (vault) tree and the other is a Red Hat 7.2 server.</p></div>
+</li>
+<li class="listitem">
+<p class="listitem">Both servers have eDirectory installed</p></li>
+<li class="listitem">
+<p class="listitem">Both servers have Identity Manager 4.6 installed</p></li>
+<li class="listitem">
+<p class="listitem">Both servers have eDirectory driver installed</p></li></ul></div>
+
+<p class="para">Perform the following actions to create the certificate using KMO method:</p>
+<div class="procedure" id="t45amvqngg7a">
+<ol class="steps">
+<li class="step">
+<p class="para">Create a normal server certificate by navigating to <span class="guimenu">Certificate Management</span> &gt; <span class="guimenu">Server certificate Management</span>, click <img src="../graphics/create_certificate.png" alt="" class="inline" /> to create server certificate.</p></li>
+<li class="step">
+<p class="para">Browse for the <span class="guimenu">Server</span>. Provide a <span class="guimenu">Nickname</span>. Choose the <span class="guimenu">Creation method</span> as <span class="guimenu">Custom</span> as we would manually make some changes. Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="step3_kmocertificate">
+<p class="para">Select <span class="guimenu">Organizational certificate authority</span> (default) and click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="step4_kmocertificate">
+<p class="para">Select <span class="guimenu">SSL or TLS</span> as <span class="guimenu">Key type</span>. Select <span class="guimenu">Server</span> under <span class="guimenu">Extended key type</span>.</p></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">SHA 256-RSA(SHA2)</span> as the <span class="guimenu">Signature algorithm</span> as it is considered more secure. Change the <span class="guimenu">validity period</span> as <span class="guimenu">Maximum</span> (as per your choice). Click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Your organizationâs certificate</span> (default). Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="step7_kmocertificate">
+<p class="para">The summary of the certificate information is listed. Click <span class="guimenu">OK</span>.</p></li>
+<li class="step">
+<p class="para">The KMO object is successfully created and listed under <span class="guimenu">Tree view &gt; system &gt; servers</span>.</p></li></ol>
+</div>
+
+<p class="para">Log into the Red Hat server and repeat the above procedure to create the certificate. However, the following changes needs to be made:</p>
+<div class="procedure" id="t45amvqngnx2">
+<ol class="steps">
+<li class="step">
+<p class="para">In <a href="configuring-secure-data-transfers.html#step3_kmocertificate" class="xref">Step 3</a>, select <span class="guimenu">External certificate authority</span>.</p></li>
+<li class="step">
+<p class="para">After <a href="configuring-secure-data-transfers.html#step7_kmocertificate" class="xref">Step 7</a>, click <span class="guimenu">Save Certificate Signing Request</span> and save it in a preferred location.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>This is a .csr file.</p></div>
+
+<p class="para">Exit the Red Hat server and log into the main server (SLES).</p></li>
+<li class="step">
+<p class="para">Navigate to <span class="guimenu">Certificate Management</span> &gt; <span class="guimenu">Issue certificate</span>. Browse for the saved <span class="filename">.csr</span> file and click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">The <span class="guimenu">Key Type</span> and <span class="guimenu">Extended Key Type</span> remains same as mentioned in <a href="configuring-secure-data-transfers.html#step4_kmocertificate" class="xref">Step 4</a>, click <span class="guimenu">Next</span>. The <span class="guimenu">Certificate Type</span> and <span class="guimenu">Path length</span> remains with default settings. Click <span class="guimenu">Next</span>.<span class="guimenu">Validity period</span> is set to <span class="guimenu">Maximum</span>. Click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">Save the File in <span class="guimenu">Base 64</span> format and click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Finish</span>.</p></li>
+<li class="step">
+<p class="para">Save the file to a preferred location. This file is saved in a .b64 format.</p></li>
+<li class="step">
+<p class="para">Navigate to <span class="guimenu">Certificate Management &gt; CA Management</span>. In the <span class="guimenu">Certificate</span> tab, check the Self Signed Certificate CA certificate and click <img src="../graphics/export_certificate.png" alt="" class="inline" /> to export.</p></li>
+<li class="step">
+<p class="para">Uncheck the <span class="guimenu">Export private key</span> checkbox. Select the format as <span class="guimenu">Base64</span> and click <span class="guimenu">OK</span>.</p>
+<p class="para">Save the exported certificate to a preferred location. The saved file is in .b64 format.</p>
+<p class="para">Exit from the main vault.</p></li></ol>
+</div>
+
+<p class="para">Login to the Red Hat server and perform the following actions to synchronize data:</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Navigate to <span class="guimenu">View Objects</span> and browse for the KMO object. Click the <span class="guimenu">KMO</span> object. Click the <span class="guimenu">Certificate</span> tab &gt;<span class="guimenu">Trusted Root certificate</span> tab and click <span class="guimenu">Import</span>.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Browse and select the self signed certificate. Click <span class="guimenu">OK</span>.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Click <span class="guimenu">New</span> on the top left hand corner and browse for the issued certificate. Click <span class="guimenu">OK</span>.</p>
+<div class="informalfigure">
+                  <img src="../graphics/kmo_step3.png" class="border" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Two certificates to import are listed. Click <span class="guimenu">Next</span>, <span class="guimenu">Finish</span> and <span class="guimenu">Ok</span>.</p>
+<p class="listitem">For KMO method, configure and start the eDirectory driver.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Exit from the Red Hat server and login to the main vault server.</p>
+<p class="listitem">Configure and start the driver on the vault. Both the connections are secure.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Navigate to <span class="guimenu">View objects</span> and make a change (edit) to an object.</p>
+<p class="listitem">For example: changing the description of a user.</p></li>
+        </ol></div>
+
+<p class="para">Exit from the main server and login to the Red Hat server. The changes made to the user can be noticed here. The data is successfully synchronized.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="establishing-secure-connections-using-keystore">
+
+<h2 class="title h2"><span class="number">5.1.4</span> Establishing Secure Connections Using Keystore</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To establish a secure connection between two eDirectory servers using eDirectory driver, you need to import the trusted root certificate into keystore of connected eDirectory server and vice versa.</p>
+<div class="procedure" id="bwtbvxo">
+<ol class="steps">
+<li class="step" id="b1fhbv9u">
+<p class="para">Create a server certificate in Identity Console.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b1fhbv9v">
+<p class="para">In the <span class="guimenu">eDirectory</span> frame, click <span class="guimenu">Certificate Management &gt; Server Certificate Management</span>.</p></li>
+<li class="step" id="b1fhbv9w">
+<p class="para">Click <img src="../graphics/create_certificate.png" alt="" class="inline" />, browse to and select the server object where the eDirectory driver is installed.</p></li>
+<li class="step" id="b1fhbv9x">
+<p class="para">Specify a certificate nickname. For example <span class="literal">maincert</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>NetIQ recommends that you avoid using spaces in the certificate nickname. For example, use <span class="filename">maincert</span> instead of <span class="filename">main cert</span>.</p>
+<p class="para">Also, make a note of the certificate nickname. This nickname is used for the KMO name in the driver properties.</p></div>
+</li>
+<li class="step" id="b1fhbv9y">
+<p class="para">Select <span class="guimenu">Custom</span> in the certificate creation method, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">Keep the default <span class="guimenu">Organizational Certificate Authority</span> selection, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">Uncheck <span class="guimenu">Enable extended key usage</span> check box.</p></li>
+<li class="step" id="b1fhbv9z">
+<p class="para">Accept the default settings and review the summary, click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="b1fhbydj">
+<p class="para">Export the certificate.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b1fhbydk">
+<p class="para">In the <span class="guimenu">eDirectory</span> frame, click <span class="guimenu">Certificate Management &gt; Server Certificate Management</span>.</p></li>
+<li class="step" id="b1fhbydl">
+<p class="para">Select the KMO object that you created in <a href="configuring-secure-data-transfers.html#b1fhbv9u" class="xref">Step 1</a> and click <span class="guimenu">Validate</span>. For example, <span class="literal">maincert</span>.</p></li>
+<li class="step">
+<p class="para">Select the validated KMO object and click <span class="guimenu">Export</span>.</p></li>
+<li class="step" id="b1fhbydm">
+<p class="para">Select the KMO object from the <span class="guimenu">Certificates</span> list.</p></li>
+<li class="step" id="b1fhbydn">
+<p class="para">Ensure the <span class="guimenu">Export private key</span> check box is checked.</p></li>
+<li class="step" id="b1fhbydo">
+<p class="para">Provide a password and click <span class="guimenu">Next</span>.</p>
+<p class="para">Use this as a source password while generating a keystore.</p></li>
+<li class="step" id="b1fhbydp">
+<p class="para">Save the certificate to a file in <span class="literal">.pfx</span> format, click <span class="guimenu">Close</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="b1fhbydq">
+<p class="para">Generate a keystore from the exported certificate using the following command at the command line:</p><pre class="screen">keytool -importkeystore -srckeystore <span class="replaceable">&lt;file saved in step 2&gt;</span> -srcstoretype PKCS12 -destkeystore &lt;name of the keystore&gt; -alias <span class="replaceable">&lt;kmo name provided in Step 1&gt;</span> </pre>
+<p class="para">For example:</p><pre class="screen">keytool -importkeystore -srckeystore <span class="replaceable">maincert</span>.pfx -srcstoretype PKCS12 -destkeystore new.keystore -alias <span class="replaceable">maincert</span> </pre>
+<p class="para">After executing this command, specify the destination password, then provide the source password which you want to use as a <span class="guimenu">Keystore password</span> while configuring the driver.</p></li>
+<li class="step" id="bwtbvxp">
+<p class="para">Import the trusted root certificate from the connected eDirectory server and save it to a file in <span class="filename">der</span> format.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bx7ve11">
+<p class="para">In Identity Console, log in to the connected eDirectory server with administrator rights.</p></li>
+<li class="step" id="bx7ve1j">
+<p class="para">In the <span class="guimenu">eDirectory</span> view, click <span class="guimenu">Certificate Management &gt; Server Certificate Management</span>.</p></li>
+<li class="step">
+<p class="para">Select any server KMO object and click <span class="guimenu">Validate</span>. For example, <span class="literal">SSL CertificateDNS</span>.</p></li>
+<li class="step">
+<p class="para">Select the validated KMO object and click <span class="guimenu">Export</span>.</p></li>
+<li class="step" id="bx7ve1m">
+<p class="para">Select <span class="guimenu">OU=Organizational CA</span> certificate from drop down menu for the <span class="guimenu">Certificate</span> option.</p></li>
+<li class="step" id="bx7ve1n">
+<p class="para">Select <span class="guimenu">DER</span>  > <span class="guimenu">as the Export</span> format, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bx7ve1p">
+<p class="para">Save the file to a local file system in <span class="literal">der</span> format. For example <span class="literal">PublicKeyCert.der</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bwtbvxq">
+<p class="para">Add the <span class="guimenu">DER</span> file to the keystore created in <a href="configuring-secure-data-transfers.html#b1fhbydq" class="xref">Step 3</a> by using the following command at the command line:</p><pre class="screen">keytool -import -file &lt;Certificate name&gt; -keystore <span class="replaceable">KEYSTOERPATH\new.keystore</span> -storepass &lt;keystorepass&gt; </pre>
+<p class="para">For example,</p><pre class="screen">keytool -import -file <span class="replaceable">PATH_OF_DERFile\PublicKeyCert.der</span> -keystore <span class="replaceable">KEYSTOERPATH\new.keystore</span> -storepass keystorepass </pre>
+<p class="para">In this command, <span class="literal">storepass</span> value is same as the destination password that you have provided in <a href="configuring-secure-data-transfers.html#b1fhbydq" class="xref">Step 3</a>.</p>
+<p class="para">NetIQ recommends that you use Java 1.6 or higher version keytool. This command might not work with versions earlier than Java 1.6.</p></li>
+<li class="step" id="bwtbvxr">
+<p class="para">When you are asked to trust this certificate, type <span class="literal">YES</span>, then press <span class="guimenu">Enter</span>.</p></li>
+<li class="step" id="bwtbvxs">
+<p class="para">Copy the <span class="filename">new.keystore</span> file to any directory on the same file system that has the Identity Vault files.</p></li>
+<li class="step" id="bwtbvxt">
+<p class="para">In Identity Console, select <span class="guimenu">IDM Administrator</span>.</p></li>
+<li class="step" id="bwtbvxu">
+<p class="para">Select the required driverset.</p></li>
+<li class="step">
+<p class="para">Click the eDirectory driver icon, then go to <span class="guimenu">Configuration</span> tab.</p></li>
+<li class="step" id="b1frfnww">
+<p class="para">Click the <span class="guimenu">Driver Parameters</span> drop down.</p></li>
+<li class="step" id="bwtbvxw">
+<p class="para">Change the <span class="guimenu">Use SSL</span> option as <span class="guimenu">Yes</span>, enter the complete path to the <span class="filename">keystore</span> file.</p></li>
+<li class="step" id="bwtbvxx">
+<p class="para">Enable the driverâs SSL parameters and configure the other SSL parameters as needed.</p>
+<p class="para">For information, see <a href="driver-configuration.html#driver-parameters" class="xref">Driver Parameters</a>.</p></li>
+<li class="step">
+<p class="para">Repeat this procedure for the eDirectory driver deployed in the connected eDirectory server.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

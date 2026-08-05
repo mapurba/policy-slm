@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="manage-driver-operation-data,customize-driver,create-xslt-stylesheet,secure-communication,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Managing Driver Operation Data - NetIQ Identity Manager Driver for SOAP Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="manage-driver-operation-data">
+
+<h1 class="title h1"><span class="number">5.5</span> Managing Driver Operation Data</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver shim applies special handling to Subscriber commands based on the <span class="command">&lt;driver-operation-data&gt;</span> element. On the Subscriber channel, the <span class="command">&lt;driver-operation-data&gt;</span> element can be added to a command for two purposes:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Specify XML data that you want included with the command result. In this way, you can match commands with the responses they generate, which is useful for creating associations.</p></li>
+<li class="listitem">
+<p class="listitem">Override default Subscriber options on a per-command basis.</p></li></ul></div>
+
+<p class="para">As discussed in <a href="soap-driver-concepts.html#bvp9xer" class="xref">Understanding Driver Operation Data</a>, the <span class="command">&lt;driver-operation-data&gt;</span> element is added to the command from one of the Subscriber channel policies. The driver shim removes the operation data from the command before it is sent to the application, and restores the <span class="command">&lt;driver-operation-data&gt;</span> element (and all child elements) to the resulting response.</p><pre class="screen">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+   &lt;source&gt;
+      &lt;product edition="Advanced" version="4.0.2.0"&gt;DirXML&lt;/product&gt;
+         &lt;contact&gt;Novell, Inc.&lt;/contact&gt;
+    &lt;/source&gt;
+           &lt;input&gt;
+            &lt;user email="thomas.wagner@example.COM" enabled="true"
+ns1:password="Password1!" username="thomas.wagner"
+xmlns:ns1="http://docs.openstack.org/identity/api/ext/OS-KSADM/v1.0"
+xmlns:ns2="http://docs.openstack.org/identity/api/v2.0"&gt;
+           &lt;driver-operation-data&gt;
+                 &lt;request-headers remove-existing="true"&gt;
+                    &lt;request-header name="accept"&gt;application/xml
+                    &lt;/request-header&gt;
+                 &lt;request-header
+             name="X-Auth-Token"&gt;262f9eefc1e9488fa65474c5aa0f5ca1&lt;/request-header&gt;
+                 &lt;/request-headers&gt;
+           &lt;/driver-operation-data&gt;
+          &lt;/user&gt;
+         &lt;/input&gt;
+&lt;/nds&gt;</pre>
+<p class="para"><span class="literal">&lt;driver-operation-data&gt;</span> must be a child element of the operation node which is the <span class="literal">&lt;user&gt;</span> node in this example. Otherwise, <span class="literal">&lt;user&gt;</span> and <span class="literal">&lt;driver-operation-data&gt;</span> are considered as separate operations and will not be applied to the <span class="literal">&lt;user&gt;</span> operation.</p>
+<p class="para">Consider another example below.</p><pre class="screen">&lt;input&gt; 
+    &lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt; 
+        &lt;soapenv:Header&gt; 
+            &lt;soapenv:Body&gt; 
+                &lt;ser:findRoleByExampleWithOperatorRequest xmlns:ser="http://www.novell.com/role/service"&gt; 
+                    &lt;ser:role&gt; 
+                        &lt;ser:name&gt;abRole&lt;/ser:name&gt; 
+                    &lt;/ser:role&gt; 
+                    &lt;ser:operator&gt;false&lt;/ser:operator&gt; 
+                &lt;/ser:findRoleByExampleWithOperatorRequest&gt; 
+            &lt;/soapenv:Body&gt; 
+        &lt;/soapenv:Header&gt; 
+        &lt;driver-operation-data VALUE="true" VALUE2="This is valid. driver-operation-data can also be in the child nodes also from here." /&gt; 
+    &lt;/soapenv:Envelope&gt; 
+    &lt;driver-operation-data VALUE="true" VALUE2="This should not be placed here. It does not satisfy condition 1" /&gt;
+&lt;/input&gt;</pre>
+<p class="para">In this example, <span class="literal">&lt;driver-operation-data&gt;</span> is a child element of <span class="literal">&lt;soapenv:Envelope&gt;</span> operation node.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="manage-driver-operation-data.html#b1kgdlv" class="xref">Using Driver Operation Data to Specify XML to Be Returned on the Result</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="manage-driver-operation-data.html#b1kghug" class="xref">Using Driver Operation Data to Override Default Subscriber Options</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1kgdlv">
+
+<h2 class="title h2"><span class="number">5.5.1</span> Using Driver Operation Data to Specify XML to Be Returned on the Result</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="command">&lt;driver-operation-data&gt;</span> is appended as a child element of the root node when it is restored on the response. You can override this by providing one or more parent-node-<span class="replaceable">n</span> attributes to the <span class="command">&lt;driver-operation-data&gt;</span> element, where <span class="replaceable">n</span> is a number beginning with 1 that is incremented for each parent specifier provided. The driver shim looks for parent-node-<span class="replaceable">n</span> attributes. If the attribute is found, the attribute is checked to see if the named node exists. If the node is found, the driver shim uses it as the parent for the <span class="command">&lt;driver-operation-data&gt;</span> element on the response.</p>
+<p class="para">The following example shows the usage of parent-node-<span class="replaceable">n</span> in driver-operation-data when requesting and returning commands:</p><pre class="screen">&lt;soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+      &lt;soap-env:Body&gt;
+        &lt;batchRequest xmlns="urn:oasis:names:tc:DSML:2:0:core" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+          &lt;searchRequest derefAliases="neverDerefAliases" dn="data\users\so1user120" requestID="0" scope="baseObject" sizeLimit="100"&gt;
+            &lt;filter&gt;
+              &lt;and&gt;
+                &lt;equalityMatch name="objectclass"&gt;
+                  &lt;value&gt;inetOrgPerson&lt;/value&gt;
+                &lt;/equalityMatch&gt;
+              &lt;/and&gt;
+            &lt;/filter&gt;
+            &lt;attributes&gt;
+              &lt;attribute name="1.1"/&gt;
+            &lt;/attributes&gt;
+            &lt;driver-operation-data <span class="strong">parent-node-1="searchResponse"</span> parent-node-2="errorResponse"&gt;
+              &lt;return-to-me class-name="inetOrgPerson" command="query" dest-dn="data\users\so1user120" event-id="0" scope="entry"/&gt;
+            &lt;/driver-operation-data&gt;
+          &lt;/searchRequest&gt;
+        &lt;/batchRequest&gt;
+      &lt;/soap-env:Body&gt;
+    &lt;/soap-env:Envelope&gt;</pre>
+<p class="para">The driver shim checks for <span class="literal">&lt;searchResponse&gt;</span> or <span class="literal">&lt;errorResponse&gt;</span> nodes in the applicationsâ response. If one of these nodes is present in the response, the driver shim appends the <span class="literal">&lt;driver-operation-data&gt;</span> as a child element of the <span class="literal">&lt;searchResponse&gt;</span> node similar to below.</p><pre class="screen">&lt;soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+      &lt;soap-env:Body&gt;
+        &lt;batchResponse xmlns="urn:oasis:names:tc:DSML:2:0:core" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+          <span class="strong">&lt;searchResponse&gt;</span>
+            &lt;searchResultDone requestID="searchRequest"&gt;
+              &lt;resultCode code="0" descr="success" xmlns=""/&gt;
+            &lt;/searchResultDone&gt;
+            <span class="strong">&lt;driver-operation-data</span> parent-node-1="searchResponse" parent-node-2="errorResponse"&gt;
+              &lt;return-to-me class-name="inetOrgPerson" command="query" dest-dn="data\users\so1user120" event-id="0" scope="entry"/&gt;
+            <span class="strong">&lt;/driver-operation-data&gt;</span>
+<span class="strong">          &lt;/searchResponse&gt;</span>
+        &lt;/batchResponse&gt;
+      &lt;/soap-env:Body&gt;
+    &lt;/soap-env:Envelope&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1kghug">
+
+<h2 class="title h2"><span class="number">5.5.2</span> Using Driver Operation Data to Override Default Subscriber Options</h2>
+
+<div class="content_wrapper">
+
+<p class="para">There are three ways to override default Subscriber options for a command:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="manage-driver-operation-data.html#b1kgj83" class="xref">Creating and Using Multiple Subscriber Option Sets (Connections)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="manage-driver-operation-data.html#b1kgo7h" class="xref">Overriding Single Subscriber Options</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="manage-driver-operation-data.html#bfkckmf" class="xref">Overriding the Authorization Header</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b1kgj83">
+
+<h3 class="title h3">Creating and Using Multiple Subscriber Option Sets (Connections)</h3>
+
+<p class="para">You can override the default Subscriber option by creating multiple sets of the Subscriber options (called connections) in your configuration, and by using the <span class="command">&lt;driver-operation-data&gt;</span> element to specify which connection set to use for the current command.</p>
+<p class="para">To use the <span class="command">&lt;driver-operation-data&gt;</span> element to override the default Subscriber connection parameters:</p>
+<div class="procedure" id="b1kgkdt">
+<ol class="steps">
+<li class="step" id="b1kgkdu">
+<p class="para">Edit the <span class="guimenu">Subscriber Settings</span> section of the driver configuration.</p></li>
+<li class="step" id="b1kgkkg">
+<p class="para">Using the XML edit feature of Identity Console, find each Subscriber setting that ends with a dash and the number 1, such as subURL-1, duplicate it, and increment the number.</p>
+<p class="para">For example: <span class="command">subURL-2</span></p></li>
+<li class="step" id="b1kglqv">
+<p class="para">Edit the values of the new settings to be the values you want to use for the second connection.</p>
+<p class="para">You can configure any number of connections this way if the numbers you use are incremental without gaps.</p></li>
+<li class="step" id="b1kgmh9">
+<p class="para">Add an attribute to the <span class="command">&lt;driver-operation-data&gt;</span> element called <span class="command">connection</span> and give it the value of the connection number you want to use.</p>
+<p class="para">For example:</p><pre class="screen">&lt;driver-operation-data connection="2"&gt;
+  ...(other driver-operation-data elements)
+&lt;/driver-operation-data&gt;</pre></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b1kgo7h">
+
+<h3 class="title h3">Overriding Single Subscriber Options</h3>
+
+<p class="para">Instead of using the concept of connections to override multiple Subscriber options, you can override only the URL, the HTTP method, or the soap-action values, by directly using attributes on an <span class="command">&lt;driver-operation-data&gt;</span> element. The following table lists the attributes that can be used and the Subscriber option they are meant to override.</p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="20%" /><col width="26%" /><col width="55%" />
+                
+<tr class="headerrow" id="b1kgxo7"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">&lt;driver-operation-data&gt; Attribute</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Subscriber Option Being Overridden</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+              
+<tr class="oddrow" id="b1kgxo8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">url</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">subURL-1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This is the URL or (or URI) of the Web Service or HTTP application. Overriding the URL might be useful if the application has one Web Service for adding a user and a different Web Service for deleting a user.</p></td>
+</tr>
+<tr class="evenrow" id="b1kgxo9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">method</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">subHttpMethod-1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This is POST by default but can be set to other methods as defined in RFC 2616 Section 9.</p></td>
+</tr>
+<tr class="oddrow" id="b1kgxoa"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">soap-action</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">HTTP Request-Header field with the âSOAPActionâ key</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">With the DSML and SPML samples, this value is always #batchRequest. However, there are some Web services that require this value to change, depending on the command.</p></td>
+</tr></table>
+</div>
+
+<p class="para">Examples:</p><pre class="screen">      &lt;driver-operation-data url="http://137.66.10.13:18180/soap"&gt;
+          ...(other driver-operation-data elements if required)
+      &lt;/driver-operation-data&gt;
+
+        &lt;driver-operation-data method="GET"&gt;
+          ...(other driver-driver-operation-data elements if required)
+        &lt;/driver-operation-data&gt;
+
+             &lt;driver-operation-data soap-action="addUser"&gt;
+               ...(other driver-operation-data elements if required)
+             &lt;/driver-operation-data&gt;</pre>
+</div>
+
+<div class="container sect3" id="bfkckmf">
+
+<h3 class="title h3">Overriding the Authorization Header</h3>
+
+<p class="para">You can set the Authorization header dynamically (from within policy) in the <span class="literal">&lt;driver-operation data&gt;</span>.</p>
+<p class="para">Example:</p><pre class="screen">&lt;driver-operation-data&gt;
+    &lt;request-headers remove-existing="true"&gt;
+        &lt;request-header name="Authorization"&gt;Basic
+cn=admin,o=n:n&lt;/request-header&gt;
+        &lt;request-header name="SOAPAction"&gt;#batchRequest&lt;/request-header&gt;
+    &lt;/request-headers&gt;
+&lt;/driver-operation-data&gt;</pre>
+<p class="para">By default, the driver encodes the Authorization header value sent as part of the <span class="literal">&lt;driver-operation data&gt;</span>. In this scenario, you must specify the authorization information in clear text format.</p>
+<p class="para">Example:</p><pre class="screen">&lt;driver-operation-data&gt;
+    &lt;request-headers remove-existing="true"&gt;
+        &lt;request-header name="Authorization"&gt;Basic
+cn=admin,o=n:n&lt;/request-header&gt;
+        &lt;/request-headers&gt;
+&lt;/driver-operation-data&gt;</pre>
+<p class="para">If you do not want the driver to encode the Authorization header value, set the flag <span class="literal">"encode=false</span>â. In this scenario, you must specify the authorization information in base64 format.</p>
+<p class="para">Example:</p><pre class="screen">&lt;driver-operation-data&gt;
+    &lt;request-headers remove-existing="true"&gt;
+        &lt;request-header encode="false" name="Authorization"&gt;Basic
+c2VydmVyMTpub3ZlbGw=&lt;/request-header&gt;
+    &lt;/request-headers&gt;
+&lt;/driver-operation-data&gt;</pre>
+<p class="para">The <span class="command">remove-existing</span> flag defines whether the set of request-headers defined in the Subscriber-options should be used in addition to the new headers defined in the <span class="literal">&lt;driver-operation-data</span>&gt; or should replace the existing request-headers.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the remove-existing flag is set to true, the set of request-headers defined in the <span class="literal">&lt;driver-operation-data&gt;</span> replaces the existing ones defined in the Subscriber option.</p></li>
+<li class="listitem">
+<p class="listitem">If the remove-existing flag is set to false, the set of request-headers defined in the Subscriber options is used in addition to the new headers defined in the <span class="literal">&lt;driver-operation-data</span>&gt;.</p></li></ul></div>
+
+<p class="para">If the Authorization header already exists, it is overridden. Otherwise, it is added as new.</p>
+<p class="para"></p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

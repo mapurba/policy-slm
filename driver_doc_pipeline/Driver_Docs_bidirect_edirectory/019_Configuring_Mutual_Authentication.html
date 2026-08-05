@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="configuring-mutual-authentication,configuring-ssl-connections,importing-the-certificate-into-the-clients-certificate,security-considerations,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring Mutual Authentication - NetIQ Driver for Bidirectional eDirectory Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="configuring-mutual-authentication">
+
+<h1 class="title h1"><span class="number">6.2</span> Configuring Mutual Authentication</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Use the following procedure to configure mutual authentication between the Bidirectional eDirectory driver and the Identity Vault:</p>
+<div class="procedure" id="bx56m0l">
+<ol class="steps">
+<li class="step" id="bx56n6n">
+<p class="para">Complete <a href="importing-the-certificate-into-the-clients-certificate.html#bwtbvxp" class="xref">Step 1</a> through <a href="importing-the-certificate-into-the-clients-certificate.html#bwtbvxx" class="xref">Step 9</a> in <a href="importing-the-certificate-into-the-clients-certificate.html" class="xref">Importing the Certificate into the Clientâs Certificate Store</a>.</p></li>
+<li class="step" id="bx56m0m">
+<p class="para">Create a user certificate that the driver can use:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bx56mr4">
+<p class="para">In Identity Console, log in to the connected eDirectory server with administrator rights.</p></li>
+<li class="step" id="bx56mvy">
+<p class="para">Go to <span class="guimenu">Certificate Management</span> &gt; <span class="guimenu">User Certificate</span>  > <span class="guimenu">Management</span>.</p></li>
+<li class="step">
+<p class="para">Click <img src="../graphics/create_certificate.png" alt="" class="inline" /> to create new user certificate.</p></li>
+<li class="step" id="bx56my6">
+<p class="para">In the right pane of the <span class="guimenu">User Certificate</span> tab, specify the <span class="guimenu">Nickname</span>, then select <span class="guimenu">Standard</span>, and then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bx56n0e">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bx56npu">
+<p class="para">Import the user <span class="filename">cert.pfx</span> file:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bx56nz3">
+<p class="para">In Identity Console, log in to the connected eDirectory server as the driverâs authenticated user.</p></li>
+<li class="step" id="bx56nzz">
+<p class="para">Go to <span class="guimenu">Certificate Management</span> &gt; <span class="guimenu">User Certificate</span>  > <span class="guimenu">Management</span>, select the user certificate created in <a href="configuring-mutual-authentication.html#bx56m0m" class="xref">Step 2</a>.</p>
+<p class="para">You are recommended to use Java 1.8 keytool or later.</p></li>
+<li class="step" id="bx56o5l">
+<p class="para">Click <img src="../graphics/export_certificate.png" alt="" class="inline" /> to export the certificate.</p></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Export Private key</span> checkbox, specify the private key password for the certificate, then click <span class="guimenu">OK</span>.</p></li>
+<li class="step" id="bx56o8y">
+<p class="para">Save the <span class="filename">cert.pfx</span> file to a local file system.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bx5lk4u">
+<p class="para">Copy the <span class="filename">cert.pfx</span> file to any directory on the same file system that has the Identity Vault files.</p></li>
+<li class="step" id="bx56nq9">
+<p class="para">Add the private key to the keystore by using the following command at the command line:</p><pre class="screen">keytool -importkeystore -srckeystore <span class="replaceable">cert.pfx</span> -srcstoretype PKCS12 -destkeystore mykeystore -alias <span class="replaceable">AliasName</span></pre>
+<p class="para">The <span class="guimenu">AliasName</span> must be the same as <span class="guimenu">Nickname</span> that you specified for the user certificate. Ensure that you use the same keystore file that you used for the SSL configuration in <a href="importing-the-certificate-into-the-clients-certificate.html#bwtbvxq" class="xref">Step 2</a>.</p></li>
+<li class="step" id="bx56nqb">
+<p class="para">Adjust the driverâs configuration as needed.</p></li>
+<li class="step" id="bx56par">
+<p class="para">Change the LDAP options of the connected eDirectory server to enable mutual authentication with the Identity Vault:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bx56pgb">
+<p class="para">In Identity Console, log in to the connected eDirectory server with administrator rights.</p></li>
+<li class="step" id="bx56pid">
+<p class="para">Go to <span class="guimenu">LDAP Configuration</span>, then select the LDAP server that connected eDirectory server from the list of servers with which you want to enable mutual authentication.</p></li>
+<li class="step" id="bx5lgux">
+<p class="para">In the <span class="guimenu">Modify LDAP Server</span> pane, select the <span class="guimenu">Information</span> drop down.</p></li>
+<li class="step" id="bx5lf4h">
+<p class="para">Change the <span class="guimenu">Client Certificate</span> option to <span class="guimenu">Requested</span>, leave other settings as the defaults.</p>
+<p class="para">To communicate only with mutual authentication, set this option to <span class="guimenu">Required</span>.</p></li>
+<li class="step" id="bx57nhz">
+<p class="para">Click <span class="guimenu">Save</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bx5l4dy">
+<p class="para">Start the driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

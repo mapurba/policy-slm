@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="August 05 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="driver-concept,introduction-peoplesoft-driver,abbu2m8,supported-driver-features,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Concepts - NetIQ Identity Manager Driver for PeopleSoft Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="driver-concept">
+
+<h1 class="title h1"><span class="number">1.3</span> Driver Concepts</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following sections explain the concepts you should understand before attempting to implement the PeopleSoft driver in your environment:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="driver-concept.html#driver-components" class="xref">Driver Components</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="driver-concept.html#how-driver-works" class="xref">How the Driver Works</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="driver-concept.html#aht32gc" class="xref">Configuring Your PeopleSoft Environment</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="driver-concept.html#aht32xs" class="xref">Configuring Your Identity Manager System</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="driver-components">
+
+<h2 class="title h2"><span class="number">1.3.1</span> Driver Components</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver includes the following components:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="driver-concept.html#bs8g6mg" class="xref">Driver Shim</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="driver-concept.html#bs8g6v6" class="xref">Driver Packages</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="driver-concept.html#bs8g86r" class="xref">PeopleSoft Service Agent</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bs8g6mg">
+
+<h3 class="title h3">Driver Shim</h3>
+
+<p class="para">The driver shim (<span class="filename">psoftshim.jar</span>) enables communication between PeopleSoft and the Identity Vault. It bidirectionally reports object change events and applies object modification commands between these systems.</p>
+</div>
+
+<div class="container sect3" id="bs8g6v6">
+
+<h3 class="title h3">Driver Packages</h3>
+
+<p class="para">The driver packages contain configuration information and policies that enable Identity manager to handle the synchronization and data object manipulation between PeopleSoft and the Identity Vault.</p>
+<p class="para">The packages act as a template that contains the most common synchronization tasks performed in a typical integration scenario. You should configure your policies based on your own business processes and integration points. For more information, refer to <a href="create-driver-object.html" class="xref">Section 4.0, Creating a New Driver Object</a> and <a href="modify-driver-policies.html" class="xref">Modifying Driver Policies</a>.</p>
+</div>
+
+<div class="container sect3" id="bs8g86r">
+
+<h3 class="title h3">PeopleSoft Service Agent</h3>
+
+<p class="para">The PeopleSoft Service Agent (PSA) is a collection of PeopleSoft application objects developed for use with the driver shim and default driver configuration. Because all of the objects (fields, records, pages, components, component interfaces) are specifically named with a DirXML identifier, the PSA can be deployed onto a PeopleSoft application server without affecting existing PeopleSoft applications and objects.</p>
+<p class="para">The various pieces of the PSA provide examples of how data can be integrated between Identity Vault and PeopleSoft, such as the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Implementation of an intermediate staging table. The synchronization between the NetIQ sample Personnel Application and the staging table shows the best practices of PeopleSoft internal application integration using PeopleCode Component Interfaces.</p></li>
+<li class="listitem">
+<p class="listitem">Integration can be accomplished directly to the sample Personnel Application by simply changing the driver's configuration.</p></li>
+<li class="listitem">
+<p class="listitem">PeopleCode is provided to show how database events on the sample Personnel Application can be reported to the driver shim via the transaction record interface required by the driver shim.</p></li>
+<li class="listitem">
+<p class="listitem">PeopleCode is provided to show how to implement a Delete method on a Component Interface.</p></li></ul></div>
+
+<p class="para">Similar to the driver configuration, the PSA is not intended for use in a production environment. It acts as a template that contains most of the common synchronization tasks needed in typical integration scenarios. You should configure your policies based on your own business processes and integration points. For more information, refer to <a href="configure-driver-environment.html" class="xref">Section 3.0, Configuring Your PeopleSoft Environment</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="how-driver-works">
+
+<h2 class="title h2"><span class="number">1.3.2</span> How the Driver Works</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following section describes the basic functions of the driver. It uses the Remote Loader configuration as an example; however, the driver does not require the use of the Remote Loader. For more information, refer to <a href="install-driver-files.html" class="xref">Section 2.0, Installing the Driver Files</a>.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="driver-concept.html#bs8g9mm" class="xref">The Publisher Channel</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="driver-concept.html#bs8ga4a" class="xref">The Subscriber Channel</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bs8g9mm">
+
+<h3 class="title h3">The Publisher Channel</h3>
+
+<p class="para">The Publisher channel synchronizes data from PeopleSoft to the Identity Vault.</p>
+<div class="figure" id="b1fyuaq"><p class="title"><em class="num">Figure 1-1 </em>The Publisher Channel</p>
+                <img src="../graphics/pub1_a.png" alt="" />
+              </div>
+
+<p class="para">As events occur within PeopleSoft, transactions are placed into a transaction table. These transactions are usually written to the table through PeopleCode (you can use other methods such as Batch SQL, COBOL, SQR, and so forth.) Component Interface (CI) objects enable the driver to access transactions within the PeopleSoft system, and to query for relevant data associated with an individual transaction type. These CI objects are included as part of the PeopleSoft Service Agent (PSA).</p>
+<p class="para">The driver accesses the PeopleSoft environment by connecting through the Component Interface at the Application Server level. The driver periodically requests transactions that are waiting to be processed by driver subtype (such as Employee, Student, or Customer.) It processes only those transactions that have an available status and a transaction date and time less than or equal to the current date and time.</p>
+<p class="para">The driver then constructs an XML document from the data it retrieves and passes it to the Identity Manager engine for processing. When Identity Manager engine finishes processing the transaction, the driver updates the transaction with the status and any applicable messages in the transaction table inside of PeopleSoft. When events occur within Identity Vault, the driver connects to the appropriate CI and updates the PeopleSoft staging table accordingly. You can also configure the Driver to poll the Application server for event changes.</p>
+</div>
+
+<div class="container sect3" id="bs8ga4a">
+
+<h3 class="title h3">The Subscriber Channel</h3>
+
+<p class="para">The Subscriber channel synchronizes data from other applications via Identity Vault to PeopleSoft.</p>
+<div class="figure" id="b1fyqdo"><p class="title"><em class="num">Figure 1-2 </em>The Subscriber Channel</p>
+                <img src="../graphics/sub1_a.png" alt="" />
+              </div>
+
+<p class="para">As events occur within Identity Vault, the driver receives an XML document from the Identity Manager engine and updates PeopleSoft. By configuring the filter on the Subscriber channel, you can specify what data you want updated in PeopleSoft. The driver uses the Schema Component Interface (CI) and updates a staging table inside the PeopleSoft environment.</p>
+<p class="para">If you want to move the data from the staging table into PeopleSoft, you can create and apply the necessary PeopleCode to handle this transaction. (All PeopleSoft objects that can interact with the transaction table, application data, as well as the CI, are delivered with the sample project.)</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="aht32gc">
+
+<h2 class="title h2"><span class="number">1.3.3</span> Configuring Your PeopleSoft Environment</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You must configure your PeopleSoft application to do two things:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Trap events that occur within PeopleSoft and place transactions into a transaction table.</p></li>
+<li class="listitem">
+<p class="listitem">Expose the transactions and any other desired data to the driver.</p></li></ul></div>
+
+<p class="para">For detailed instructions regarding how to configure these processes, refer to <a href="configure-driver-environment.html" class="xref">Section 3.0, Configuring Your PeopleSoft Environment</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="aht32xs">
+
+<h2 class="title h2"><span class="number">1.3.4</span> Configuring Your Identity Manager System</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver interacts with PeopleSoft at the PeopleTools level by using Component Interface (CI) technology. By using existing CI definitions within the PeopleSoft modules, along with a collection of the driver's preconfigured CI objects, you can do the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Create Identity Vault objects as new data is synchronized from PeopleSoft.</p></li>
+<li class="listitem">
+<p class="listitem">Synchronize data bidirectionally between a PeopleSoft application and Identity Vault.</p></li>
+<li class="listitem">
+<p class="listitem">Enable bidirectional object Create and Delete events.</p></li>
+<li class="listitem">
+<p class="listitem">Transform Identity Vault events (such as Delete, Rename, or Move events) into different events in PeopleSoft.</p></li>
+<li class="listitem">
+<p class="listitem">Maintain publication authority over data.</p></li>
+<li class="listitem">
+<p class="listitem">Establish Group, Role, or other relationships in Identity Vault based on relationships defined within the PeopleSoft application.</p></li>
+<li class="listitem">
+<p class="listitem">Provide notifications based on various events or required approval processes.</p></li>
+<li class="listitem">
+<p class="listitem">Adhere to enterprise business processes and policies.</p></li>
+<li class="listitem">
+<p class="listitem">Share data with other systems involved in your enterprise provisioning solution.</p></li></ul></div>
+
+<p class="para">For more information on configuring your Identity Manager system, refer to <a href="customize-driver.html" class="xref">Section 6.0, Customizing the Driver</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

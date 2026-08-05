@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xxapt,b3r8tim,b410u7u,b3xxit1,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>The Connected System Schema File - NetIQ Top Secret Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xxapt">
+
+<h1 class="title h1"><span class="number">6.2</span> The Connected System Schema File</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The schema file on the connected system is used to specify the classes and attributes that are available on the system.</p>
+<p class="para">The schema file is read by the driver shim when the Metadirectory engine requests it. This typically happens at driver startup. The schema file is also used by the Policy Editor to map the schema of the Identity Vault to the schema of the external application.</p>
+<p class="para">If you change the schema file, you must restart the driver shim and the driver.</p>
+<p class="para">The REXX execs that are provided with the driver depend on the classes and attributes in the schema file that is provided with the driver.</p>
+<p class="para">The connected system schema file must be a sequential file or a member of a partitioned data set. The SCHEMDEF DD statement in the driver shim started task JCL identifies the schema file. An example schema file with the required classes and attributes is provided in the driver samples library member <span class="filename">SCHEMDEF</span>.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xxapt.html#b3zz1g1" class="xref">Schema File Syntax</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xxapt.html#b3zyqih" class="xref">Example Schema File</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3zz1g1">
+
+<h2 class="title h2"><span class="number">6.2.1</span> Schema File Syntax</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Each line in the schema file represents an element and must begin with the element name: SCHEMA, CLASS, or ATTRIBUTE.</p>
+<p class="para">The first element of the schema file is the schema definition. The schema definition is followed by class definitions. Each class definition can contain attribute definitions.</p>
+<p class="para">Except for the values of class and attribute names, the contents of the schema file are case insensitive.</p>
+<div class="container sect3" id="b3zz30f">
+
+<h3 class="title h3">Comments</h3>
+
+<p class="para">Lines that begin with an octothorpe (#) are comments.</p><pre class="screen"># This is a comment.</pre>
+</div>
+
+<div class="container sect3" id="b3zyh42">
+
+<h3 class="title h3">Schema Definition</h3>
+
+<p class="para">The first line in the schema file that is not a comment must be the schema definition.</p><pre class="screen">SCHEMA [HIERARCHICAL]</pre>
+<p class="para">HIERARCHICAL specifies that the target application is not a flat set of users and groups, but is organized by hierarchical components, such as a directory-based container object.</p>
+</div>
+
+<div class="container sect3" id="b3zyhcq">
+
+<h3 class="title h3">Class Definition</h3>
+<pre class="screen">CLASS <span class="replaceable">className</span> [CONTAINER]</pre>
+<p class="para">You must specify a class name. Enclose the class name in double quotes (") if it contains spaces.</p>
+<p class="para">Add the CONTAINER keyword if objects of this class can contain other objects.</p>
+<p class="para">The class definition is ended by another class definition or by the end of the file.</p>
+</div>
+
+<div class="container sect3" id="b3zyi3f">
+
+<h3 class="title h3">Attribute Definition</h3>
+
+<p class="para">Any number of attribute definitions can follow a class definition. Attribute definitions define attributes for the class whose definition they follow.</p><pre class="screen">ATTRIBUTE <span class="replaceable">attributeName</span> [<span class="replaceable">TypeAndProperties</span>]</pre>
+<p class="para">An attribute name is required. Enclose the attribute name in double quotes (") if it contains spaces.</p>
+<p class="para">If no attribute type is specified, the attribute has the string type. The allowable types are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">STRING</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">INTEGER</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">STATE</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">DN</span>
+              </p></li></ul></div>
+
+<p class="para">The allowable attribute properties are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">REQUIRED</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">NAMING</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">MULTIVALUED</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">CASESENSITIVE</span>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <span class="literal">READONLY</span>
+              </p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3zyqih">
+
+<h2 class="title h2"><span class="number">6.2.2</span> Example Schema File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">For a complete example connected system schema file, see the driver samples library member <span class="filename">SCHEMDEF</span>. An excerpt from that file follows.</p><pre class="screen">SCHEMA
+
+  CLASS USER
+
+    ATTRIBUTE ACID NAMING REQUIRED
+    ATTRIBUTE ACTION MULTIVALUED
+    ATTRIBUTE AFTER
+    ATTRIBUTE AUDIT STATE
+    ATTRIBUTE AUTOUID STATE
+    . . .
+    ATTRIBUTE XCOMMAND MULTIVALUED
+    ATTRIBUTE XSUSPEND STATE
+    ATTRIBUTE XTRANSACTIONS
+
+  CLASS GROUP
+
+    ATTRIBUTE ACID NAMING REQUIRED
+    ATTRIBUTE AUTOGID STATE
+    ATTRIBUTE GID</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

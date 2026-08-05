@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 06 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="installing-on-windows,installing-the-driver-shim,installing-the-driver-shim,installing-on-linux,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing on Windows - Identity Manager Driver for Sentinel Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="installing-on-windows">
+
+<h1 class="title h1"><span class="number">5.1</span> Installing on Windows</h1>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="bzmscal">
+<ol class="steps">
+<li class="step" id="bzmscam">
+<p class="para">Download the Integration Module for Sentinel (driver shim), <span class="filename">sentinel_driver_install.exe</span>, from the <a href="http://download.novell.com/index.jsp" class="ulink">NetIQ download Web site</a>.</p></li>
+<li class="step" id="bzmscjm">
+<p class="para">Execute the <span class="filename">sentinel_driver_install.exe</span> file on the Windows system, which is either the Identity Manger server or the Remote Loader, depending on where you want to install the driver shim.</p></li>
+<li class="step" id="bzmv1yj">
+<p class="para">Follow the installer prompts.</p></li></ol>
+</div>
+
+<p class="para">Once the installation is complete, ensure that you import the certificate since the driver users TLS/SSL protocol to communicate with the server. The type of certificate depends on the Sentinel server configuration:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-on-windows.html#self_signedcerti" class="xref">Self-signed public key certificate</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-on-windows.html#trusted_rootcert" class="xref">Trusted root certificate of the certificate authority</a>
+          </p></li></ul></div>
+
+<h4 class="bridgehead" id="self_signedcerti">Self-signed Certificate</h4>
+
+<p class="para">If your organization has not replaced the default Web server certificate, which is created when the Sentinel server is installed, you must obtain the self-signed certificate from the Sentinel server.</p>
+<p class="para">You can obtain this certificate either by <a href="installing-on-windows.html#using_getcertutil" class="xref">using the supplied <span class="filename">getcert</span> utility</a> or <a href="installing-on-windows.html#obtaining_certks" class="xref">extracting it from the keystore file</a> on the Sentinel server.</p>
+<div class="formalpara" id="using_getcertutil">
+        <p class="title"><em class="title">Using the getcert utility</em>
+        </p>
+      </div>
+
+<div class="procedure" id="bzlsqkd">
+<ol class="steps">
+<li class="step" id="bzlsqke">
+<p class="para">Run the <span class="filename">getcert</span> utility on the system where you are running Identity Manager Designer. If the <span class="filename">getcert.jar</span> file is not located on the Identity Manager Designer system, you can either copy the <span class="filename">getcert.jar</span> file from the system on which you ran the Integration Module installer or install the getcert.jar file directly on the system using the Integration Module installer:</p>
+<div class="formalpara" id="bzlsqt2">
+            <p class="title"><em class="title">Windows:</em>
+            Locate the <span class="filename">getcert.jar</span> file in Windows Explorer and double-click the file.</p>
+          </div>
+
+<div class="formalpara" id="bzlsr0r">
+            <p class="title"><em class="title">Linux:</em>
+            Execute the <span class="filename">/opt/novell/eDirectory/lib/dirxml/util/sentinel_rest/getcert.jar</span> file by using the following command:</p>
+          </div>
+<pre class="screen">java -jar getcert.jar</pre></li>
+<li class="step" id="bzlsr6u">
+<p class="para">Specify the address and port of the Sentinel server and click <span class="guimenu">Get Certificate</span>.</p>
+<p class="para">The certificate data is displayed.</p></li>
+<li class="step" id="bzlssln">
+<p class="para">Verify the certificate data and if the certificate is correct, click <span class="guimenu">Yes</span>.</p></li>
+<li class="step" id="bzlst5t">
+<p class="para">Use this certificate data when prompted for the Sentinel TLS/SSL certificate while creating the driver.</p>
+<p class="para">For more information, see <a href="creating-the-driver.html#bzpuulz" class="xref">Step 4</a> in <a href="creating-the-driver.html" class="xref">Creating the Driver</a>.</p></li></ol>
+</div>
+
+<div class="formalpara" id="obtaining_certks">
+        <p class="title"><em class="title">Obtaining the certificate from the keystore file</em>
+        </p>
+      </div>
+
+<p class="para">Extract the <span class="filename">Webserver</span> certificate as the <span class="systemitem">root</span> user, from the following Java keystore file:</p><pre class="screen">/etc/opt/novell/sentinel/config/.webserverkeystore.jks</pre>
+<p class="para">The keystore password is <span class="command">password</span>.</p>
+<h4 class="bridgehead" id="trusted_rootcert">Trusted Root Certificate of the Certificate Authority</h4>
+
+<p class="para">If your organization has replaced the Sentinel server default Web server certificate with a public key certificate signed by a certificate authority, such as Verisign or Entrust, you must obtain the appropriate trusted root certificate that corresponds to the certificate authority. You can obtain the trusted root certificate from your organization or the certificate authority your organization uses.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

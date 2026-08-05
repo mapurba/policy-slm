@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b4evgzg,b3r8rjm,b3r8rjm,b4evh8y,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Deployment Planning - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b4evgzg">
+
+<h1 class="title h1"><span class="number">2.1</span> Deployment Planning</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Review <a href="b3r8si5.html" class="xref">Section 3.0, Installing the Linux and UNIX Driver</a> and <a href="b3r8t50.html" class="xref">Section 5.0, Configuring the Linux and UNIX Driver</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Consider where and how you will install each component, and how you will respond to the installation script prompts and other installation decisions.</p></li>
+<li class="listitem">
+<p class="listitem">Is this a new installation, or are you replacing a NIS driver or Fan-Out driver Platform Services installation? For details about upgrading from the NIS driver or the Fan-Out driver, see <a href="b3r9hzv.html" class="xref">Section 4.0, Upgrading from Another Driver</a>.</p></li>
+<li class="listitem">
+<p class="listitem">How do you plan to prototype, test, and roll out your deployment?</p></li>
+<li class="listitem">
+<p class="listitem">Do you plan to use the include/exclude file on the connected system to limit your initial deployment to a small number of users and groups?</p></li>
+<li class="listitem">
+<p class="listitem">If you are using AIX and want to publish password changes, will you use PAM or LAM?</p>
+<p class="listitem">AIX version 5.3 can use either PAM or LAM, but previous AIX versions must use LAM.</p>
+<p class="listitem">LAM supports only the files database type. LAM does not support NIS and NIS+. If you have AIX 5.2 and need to support NIS or NIX+, you can do either of the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Upgrade to AIX 5.3 or newer and use PAM</p></li>
+<li class="listitem">
+<p class="listitem">Require users to change their passwords on the Identity Vault.</p></li></ul></div>
+
+<p class="listitem">If you have AIX 5.3 or newer, <span class="filename">/etc/security/login.cfg</span> will include a configuration setting for <span class="literal">auth_type</span>. The valid values for <span class="literal">auth_type</span> are <span class="literal">STD_AUTH</span> and <span class="literal">PAM_AUTH</span>. Within the context of the bidirectional driver, if you choose <span class="literal">STD_AUTH</span>, then you must use LAM to publish password changes. If you choose <span class="literal">PAM_AUTH</span>, then you must use PAM to publish password changes.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The setting you choose for <span class="literal">auth_type</span> may be influenced by reasons outside the scope of the bidirectional driver.</p></div>
+</li>
+<li class="listitem">
+<p class="listitem">If any of the systems you connect to Identity Manager are running AIX or HP-UX, you may need to replace the standard <span class="literal">comm</span> utility included with those operating systems. For more information, see <a href="b3xccfu.html#bk2nxtn" class="xref">Replacing comm Utility for AIX and HP-UX</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Do you have NIS or NIS+ clients that you want to publish password changes from?</p></li>
+<li class="listitem">
+<p class="listitem">What are the host names or IP addresses of all systems that will participate in your configuration?</p></li>
+<li class="listitem">
+<p class="listitem">Will you use the default TCP port numbers?</p>
+<div class="table" id="b4kgv9q"><p class="title"><em class="num">Table 2-1 </em>Default TCP Port Numbers</p>
+<table class="topbot" width="96%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow" id="b4kgvkv"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Purpose</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">TCP Port Number</p></th>
+</tr>
+              
+<tr class="oddrow" id="b4kgz7p"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver shim connection to Metadirectory engine</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8090</p></td>
+</tr>
+<tr class="evenrow" id="b4kgvkx"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver shim HTTP services for log viewing and access by remote NIS or NIS+ client PAM modules</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8091</p></td>
+</tr>
+<tr class="oddrow" id="b4kgx05"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Secure LDAP port</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">636</p></td>
+</tr>
+<tr class="evenrow" id="b4kgvkw"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Non-secure LDAP port</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">389</p></td>
+</tr></table>
+</div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

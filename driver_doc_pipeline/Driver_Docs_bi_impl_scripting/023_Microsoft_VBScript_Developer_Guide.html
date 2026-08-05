@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b8nlv23,b8n5bw5,bf1lm3e,bf24xms,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Microsoft VBScript Developer Guide - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b8nlv23">
+
+<h1 class="title h1"><span class="number">5.8</span> Microsoft VBScript Developer Guide</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Scripting driver provides a complete Microsoft VBScript API for interacting with identity management systems whose tools (including APIs) are available on Windows. The Identity Vault and Identity Manager can run on any supported operating system. Identity Manager can communicate with any supported system on which the driver is installed via an encrypted network connection.</p>
+<p class="para">Before beginning script development, review the preceding topics in this section for information on defining what data is synchronized between identity management systems.</p>
+<p class="para">With additional development work, the driver can also be adapted to support any scripting language that supports command line operation.</p>
+<p class="para">Developing a custom driver with VBScript is discussed in this section. Topics include</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b8nlv23.html#b8nlxlb" class="xref">Application Tools Evaluation</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8nlv23.html#b8nm2b1" class="xref">Policy and Script Development</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8nlv23.html#b8nnc2b" class="xref">Deployment</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nlxlb">
+
+<h2 class="title h2"><span class="number">5.8.1</span> Application Tools Evaluation</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To change the data in your external application, you need to know how to use the applicationâs tools or API (Application Programming Interface). These tools must provide automated operation and not require user input.</p>
+<div class="container sect3" id="b8nlxu2">
+
+<h3 class="title h3">Application Command Line Tools</h3>
+
+<p class="para">An application often provides command line tools. These tools are manually executed from the Windows command prompt, and they can be executed from scripts. For example, suppose the application provides a tool to add identities with a program called <span class="filename">appadd.exe</span>.</p><pre class="screen">appadd -n "Bob Smith" -t "818-555-2100"</pre>
+<p class="para">This command adds an identity named âBob Smithâ with the specified phone number. The strings following the program name are called parameters or arguments. The Scripting driver provides a function called <span class="command">IDMExecute</span> to execute external programs.</p><pre class="screen">   CommandLine = "appadd -n " &amp; UserName &amp; " -t " &amp; PhoneNumber
+   ExitCode = IDMExecute(CommandLine)</pre>
+<p class="para">There is also a function called <span class="command">IDMExecuteIO</span> that allows you to pass information on the programâs standard input, and receive output from the programâs standard output and standard error.</p><pre class="screen">  Dim Input(1)
+
+  Input(0) = "USERNAME=bobsmith"
+  Input(1) = "TELEPHONE=818-555-2100"
+
+  Output = IDMExecuteIO("appadd", Input)
+
+  ExitCode = Output(0)</pre>
+<p class="para"><span class="command">IDMExecuteIO'</span>s first parameter is the command line, and its second parameter is an array of strings (or Empty) that is submitted as lines to the command program. It returns an array, the first element of which is the programâs exit code, and then strings that represent lines returned on the programâs standard output and standard error.</p>
+<p class="para">For command line tools, you can construct the command lineâs parameters using the values passed to the script, then execute the program.</p>
+</div>
+
+<div class="container sect3" id="b8nlzdk">
+
+<h3 class="title h3">Application Objects</h3>
+
+<p class="para">Another way to modify application data is through Windows COM (Common Object Model) objects. Consult your applicationâs documentation to see whether it exposes any COM objects. These COM objects can be loaded directly in VBScript:</p><pre class="screen">   Set AppObject = WScript.CreateObject("MyApplication.MyObject")
+   AppObject.AddIdentity("Bob Smith", "818-555-2100")</pre>
+<p class="para">There are no guarantees regarding what types of tools are available, or even whether any tools are available. You must determine if sufficient tools are provided by the application. If they are not, you can contact the applicationâs developers and request that such tools be made available.</p>
+<p class="para">You should make a list of what tools can be used for each event type. The application might provide one program that can be used for any event type, or it might provide multiple tools.</p>
+</div>
+
+<div class="container sect3" id="b8nm1ki">
+
+<h3 class="title h3">Application Event Monitoring</h3>
+
+<p class="para">You also need to determine what tools are available for monitoring event changes in the application. The Scripting driver works on a polling system. It periodically calls a polling script to determine what has changed in the external application. You can use the following ideas for monitoring changes:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The first time the polling script is run, a list of identities and relevant attributes is read from the application using an application-provided tool. This list is stored as a file. On subsequent polls, a new list is generated and compared to the old list. Any differences are submitted as events to the driver.</p></li>
+<li class="listitem">
+<p class="listitem">The application provides a tool that allows you to request all identities that have changed after a certain point in time. The polling script requests events that have occurred since the previous poll.</p></li>
+<li class="listitem">
+<p class="listitem">The application allows a script to be run when an event occurs. You write a script that stores the event data into a file. When the Scripting driver polling script runs, it consumes this file and submits the data as an event to the driver.</p></li></ul></div>
+
+<p class="para">Monitoring the applicationâs changes might be the most difficult aspect of developing your driver. You must study your applicationâs tools to determine the best way to achieve synchronization.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nm2b1">
+
+<h2 class="title h2"><span class="number">5.8.2</span> Policy and Script Development</h2>
+
+<div class="content_wrapper">
+
+<p class="para">At this point you should have a list of what data will be synchronized, how events will be handled, and what application tools are available. It is time to develop the heart of your driver in policies and scripts.</p>
+<p class="para">Many types of tasks can be handled in driver policies. You can import the driver configuration provided with the Scripting driver, and then edit policies in NetIQ iManager. You can also edit policies and simulate their operation in NetIQ Designer. The extensive functionality of policies is outside the scope of this document, so you should refer to your Identity Manager policy guides on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a> for help.</p>
+<p class="para">Tasks that donât interact with the external application might be more suited to policies. On the other hand, if you are more familiar with your scripting language than policies, you can develop your driver more quickly by using scripts.</p>
+<div class="container sect3" id="b8nm2li">
+
+<h3 class="title h3">Event Data Format</h3>
+
+<p class="para">Event data is submitted to the scripts in name/value pair format. This format consists of lines containing a name, an equal sign (=) and a value. Therefore, each line is a name/value pair. Each name/value pair is unique, but there can be multiple name/value pairs with identical names but different values.</p><pre class="screen">   ASSOCIATION=BobUser
+   ADD_TELEPHONE=818-555-2100
+   ADD_TELEPHONE=818-555-9842</pre>
+<p class="para">You typically donât need to worry about the format. The script library provides functions for retrieving event data.</p>
+</div>
+
+<div class="container sect3" id="b8nm31x">
+
+<h3 class="title h3">Subscriber Script Development</h3>
+
+<p class="para">After all policy processing is complete, Identity Manager submits the event in XML format to the driver shim. The driver shim submits the event data to the scripts.</p>
+<p class="para">In the default Scripting driver, the <span class="filename">Subscriber.wsf script</span> in the <span class="filename">scripts</span> folder is called. This script does some preliminary processing, and then calls a routine from an included script. The included scripts correspond to the Subscriber event types: <span class="filename">Add.vbs</span>, <span class="filename">Modify.vbs</span>, <span class="filename">ModifyPassword.vbs</span>, <span class="filename">Delete.vbs</span>, <span class="filename">Rename.vbs</span>, <span class="filename">Move.vbs</span>, and <span class="filename">Query.vbs</span>.</p>
+<p class="para">For each event type, you should retrieve the information you need from the event data, submit changes to the external application using application-provided tools and return a status (such as success or failure) to Identity Manager.</p>
+<p class="para">Event data is retrieved primarily using the <span class="command">IDMGetEventValues</span> function. This function returns an array of values corresponding to the name specified as the functionâs parameter. (<span class="command">IDMGetEventValue</span> is available for single-valued items.) The following table shows many item names.</p>
+<div class="table" id="b8nm3h5"><p class="title"><em class="num">Table 5-19 </em>Item Names</p>
+<table class="topbot" width="100%"><col width="36%" /><col width="64%" />
+                
+<tr class="headerrow" id="b8nm5d0"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+              
+<tr class="oddrow" id="b8nm5d1"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">COMMAND</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The command for the event, usually indicating the event type.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5d2"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">ASSOCIATION</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The identifier that distinguishes an identity on both identity management systems.</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5d3"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">CLASS_NAME</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An identityâs class, such as User or Group.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5d4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">SRC_DN</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An identityâs distinguished name (DN) in the namespace of the source (sender), in slash format.</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5d5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">EVENT_ID</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An identifier for the event, for internal use.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5d6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">SRC_ENTRY_ID</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An identifier for the identity that generated the event, in the namespace of the source (sender).</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5d7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">DEST_DN</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An identityâs distinguished name (DN) in the namespace of the destination (receiver), in slash format.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5d8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">DEST_ENTRY_ID</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An identifier for an entry in the namespace of the destination (receiver).</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5d9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">ADD_<span class="replaceable">attr_name</span></span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A value to be added to an identity, for attribute <span class="literal"><span class="replaceable">attr_name</span></span>.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5da"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">REMOVE_<span class="replaceable">attr_name</span></span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A value to be removed from an identity, for attribute <span class="literal"><span class="replaceable">attr_name</span></span>.</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5db"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">ADD_REF_<span class="replaceable">attr_name</span></span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A value to be added to attribute <span class="replaceable">attr_name</span>, where the value is an association referring to another identity.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5dc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">REMOVE_REF_<span class="replaceable">attr_name</span></span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A value to be removed from attribute <span class="literal"><span class="replaceable">attr_name</span></span>, where the value is an association referring to another identity.</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5dd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">OLD_PASSWORD</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The previous password for an identity that has changed its password. Used in Modify Password events.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5de"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">PASSWORD</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The new password for an identity. Used in Add and Modify Password events.</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5df"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">OLD_SRC_DN</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The distinguished name of an identity before a Move or Rename event.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5dg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">REMOVE_OLD_NAME</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies whether an old relative distinguished name should be deleted or retained. Used in Rename events.</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5dh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">STATUS_LEVEL</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The status of an event: success, warning, retry, error or fatal.</p></td>
+</tr>
+<tr class="evenrow" id="b8nm5di"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">STATUS_MESSAGE</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A message to report with a status.</p></td>
+</tr>
+<tr class="oddrow" id="b8nm5dj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">STATUS_TYPE</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A type of status, such as heartbeat.</p></td>
+</tr></table>
+</div>
+
+<div class="container sect4" id="b8nm6gj">
+
+<h4 class="title h4">Handling Associations</h4>
+
+<p class="para">The association value indicates which identity has been changed. If the identity has no association, an association must be generated for it using an implementation-specific rule that you have adopted. When Identity Manager processes an event for an identity with no association, it executes the driverâs Matching policy. This policy attempts to match the eventâs identity to an identity on the external applicationâs system. Doing this usually involves executing a query. The default Matching policy included with the Scripting driver queries for matching Users and Groups based on the CN attribute. If the eventâs identity matches an identity on the external application, both identities must be assigned the new association. Assigning this association can be done as part of the query-handling script. (Handling queries is discussed in <a href="b8n6ps6.html#b8n6zhb" class="xref">Handling Query Events</a>.) If no identity matches, an Add event is issued, and the new association can be assigned as part of the Add event-handling script:</p><pre class="screen">   IDMSetCommand "ADD_ASSOCIATION"
+   IDMWriteValue "ASSOCIATION", MyAssociation
+              (etc.) </pre>
+<p class="para">The example above also illustrates the <span class="command">IDMSetCommand</span> function. This function sets a command value which indicates what action Identity Manager should perform. The <span class="command">ADD_ASSOCIATION</span> command assigns an association to an identity, as discussed above. The Subscriber can also issue <span class="command">MODIFY_ASSOCIATION</span> and <span class="command">REMOVE_ASSOCIATION</span> commands.</p>
+</div>
+
+<div class="container sect4" id="b8nm6t1">
+
+<h4 class="title h4">Returning an Event Status</h4>
+
+<p class="para">On the Subscriber channel, you often do not need Identity Manager to perform an action, but simply need to report a status. The <span class="command">IDMStatus</span> subroutines noted below can be used to indicate a status to Identity Manager. They take a message to be logged as the parameter.</p>
+<div class="table" id="b8nm72n"><p class="title"><em class="num">Table 5-20 </em>Subroutines</p>
+<table class="topbot" width="100%"><col width="31%" /><col width="69%" />
+                  
+<tr class="headerrow" id="b8nma56"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Subroutine</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Manager Action</p></th>
+</tr>
+                
+<tr class="oddrow" id="b8nma57"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMStatusSuccess</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Identity Manager marks the event as a success and submits the next event in the event queue, if any. You should issue this status even if your script does nothing.</p></td>
+</tr>
+<tr class="evenrow" id="b8nma58"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMStatusWarning</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The event can be processed, but it might require attention. Identity Manager issues your warning message in its log, and then submits the next event.</p></td>
+</tr>
+<tr class="oddrow" id="b8nma59"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMStatusRetry</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The event cannot be processed, but Identity Manager should resubmit the event because it should be able to be processed soon. This status can be issued if your external application appears to be temporarily unavailable. However, this status should be used cautiously because a backlog results if Identity Manager continually retries one event.</p></td>
+</tr>
+<tr class="evenrow" id="b8nma5a"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMStatusError</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The event cannot be processed and it should not be resubmitted. Identity Manager issues the error message and submits the next event. You should make a detailed error message so the problem can be corrected.</p></td>
+</tr>
+<tr class="oddrow" id="b8nma5b"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMStatusFatal</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">For some reason, the driver must be stopped. Identity Manager issues your message and stops the driver. This could be used if the external application appears to be permanently offline. The event remains in the queue and is resubmitted when the driver is restarted.</p></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="container sect4" id="b8nm9n3">
+
+<h4 class="title h4">Writing Values</h4>
+
+<p class="para"><span class="command">IDMSetCommand</span> and/or a status subroutine must be called before specifying values with <span class="command">IDMWriteValues</span>. <span class="command">IDMWriteValues</span> (or its single-valued version <span class="command">IDMWriteValue</span>) is used to set values to return to Identity Manager. It is passed a value name and an array of values. In the <span class="literal">ADD_ASSOCIATION</span> example above, <span class="command">IDMWriteValue</span> is used to set the <span class="literal">ASSOCIATION</span> value. You can specify values for items listed in the table above.</p>
+</div>
+
+<div class="container sect4" id="b8nm9yo">
+
+<h4 class="title h4">Handling Query Events</h4>
+
+<p class="para">For Query events, Identity Manager submits values that define the parameters of a search of the external applicationâs identity management system. Queries are usually issued from the policies you have defined for your system. The table below specifies values that can be specified in queries. Not all values are relevant to your external application.</p>
+<div class="table" id="b8nmr35"><p class="title"><em class="num">Table 5-21 </em>Query Values</p>
+<table class="topbot" width="100%"><col width="31%" /><col width="69%" />
+                  
+<tr class="headerrow" id="b8nmug6"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Value Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                
+<tr class="oddrow" id="b8nmug7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">SCOPE</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies what identities will be searched. A base object is specified with the <span class="literal">ASSOCIATION</span> or <span class="literal">DEST_DN</span> values (see below). The value âentryâ means that only the base object is searched. The value âsubordinatesâ means that the immediate subordinates of the base object are searched. The value âsubtreeâ (the default) indicates that the base object and all subordinates are searched. The last two values are only relevant in a hierarchical system.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmug8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">ASSOCIATION</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The base object for the search. If both <span class="literal">ASSOCIATION</span> and <span class="literal">DEST_DN</span> have values, <span class="literal">ASSOCIATION</span> is used. If neither is specified, the base object is the root of the identity management system.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmug9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">DEST_DN</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The base object for the search (see also <span class="literal">ASSOCIATION</span> above).</p></td>
+</tr>
+<tr class="evenrow" id="b8nmuga"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">CLASS_NAME</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The base class of the base object.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmugb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">EVENT_ID</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An identifier for the event.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmugc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">SEARCH_CLASSES</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A list of classes for which to search. Only identities of these classes are returned. If not specified, all identities in the scope matching <span class="literal">SEARCH_ATTR_</span> values are returned (see below).</p></td>
+</tr>
+<tr class="oddrow" id="b8nmugd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">SEARCH_ATTRS</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">List of attribute names used in <span class="literal">SEARCH_ATTR_</span> values (see below).</p></td>
+</tr>
+<tr class="evenrow" id="b8nmuge"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">SEARCH_ATTR_<span class="replaceable">attr_name</span></span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A value that the specified attribute must match. Replace <span class="literal"><span class="replaceable">attr_name</span></span> with the desired attribute name. Only identities matching all <span class="literal">SEARCH_ATTR_</span> filters are returned.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmugf"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">READ_ATTRS</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">List of attribute names whose values returned for each identiy match.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmugg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">ALL_READ_ATTRS</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The presence of this value indicates that all attribute values should be returned for matching identities.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmugh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">NO_READ_ATTRS</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The presence of this value indicates that no attribute values should be returned for matching identities.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmugi"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">READ_PARENT</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The presence of this value indicates that the parent object of each matching identity should be returned. Only relevant in hierarchical systems.</p></td>
+</tr></table>
+</div>
+
+<p class="para">Execute the query against the external application using application-provided tools. Then return each identity by setting an <span class="command">INSTANCE</span> command, followed by relevant values from the list below.</p>
+<div class="table" id="b8nmu55"><p class="title"><em class="num">Table 5-22 </em>Query Values</p>
+<table class="topbot" width="100%"><col width="31%" /><col width="69%" />
+                  
+<tr class="headerrow" id="b8nmugj"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Value Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                
+<tr class="oddrow" id="b8nmz55"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">CLASS_NAME</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The class of the identity. Required.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmz56"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">SRC_DN</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A distinguished name representing the logical location of the identity in the system (optional).</p></td>
+</tr>
+<tr class="oddrow" id="b8nmz57"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">ASSOCIATION</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The association of the identity, if available (optional).</p></td>
+</tr>
+<tr class="evenrow" id="b8nmz58"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">PARENT</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The association of the parent object of the identity (optional). Only relevant in hierarchical systems.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmugk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="literal">ATTR_<span class="replaceable">attr_name</span></span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A list of values for the attribute specified by <span class="literal"><span class="replaceable">attr_name</span></span>. Return attribute values specified by the <span class="literal">READ_ATTRS</span> value.</p></td>
+</tr></table>
+</div>
+
+<p class="para">After returning all identities, call <span class="command">IDMStatusSuccess</span> to indicate a successful query.</p>
+</div>
+
+<div class="container sect4" id="b8nmved">
+
+<h4 class="title h4">Subscriber Summary and Examples</h4>
+
+<p class="para">Below is a more detailed summary of the actions to take for a non-Query event.</p>
+<div class="procedure" id="b8nmvnz">
+<ol class="steps">
+<li class="step" id="b8nmvo0">
+<p class="para">Gather information about the event using <span class="command">IDMGetEventValues</span>. Return a warning or error if there is a problem.</p></li>
+<li class="step" id="b8nmvql">
+<p class="para">Submit the event data to the external application using application-provided tools.</p></li>
+<li class="step" id="b8nmvsh">
+<p class="para">Set a command using <span class="command">IDMSetCommand</span> and/or a status with the <span class="command">IDMStatus</span> subroutines, based on the result of the event.</p></li>
+<li class="step" id="b8nmvut">
+<p class="para">Set event values with <span class="command">IDMWriteValues</span>.</p></li>
+<li class="step" id="b8nmvwb">
+<p class="para">If you have not already done so, set a status with an <span class="command">IDMStatus</span> subroutine.</p></li></ol>
+</div>
+
+<p class="para">Below is an example of the <span class="filename">Add.vbs script</span>, which forms an association from an identityâs CN and class name, and uses a hypothetical tool called <span class="command">appadd</span>.</p><pre class="screen">Sub ADD
+  ClassName = IDMGetEventValue("CLASS_NAME")
+  CN = IDMGetEventValue("CN")
+  PhoneNumber = IDMGetEventValue("Telephone")
+  If IsEmpty(ClassName) Or IsEmpty(CN) Then
+    IDMStatusError "Add event: missing CLASS_NAME and/or CN"
+  Else 
+    Command = "appadd -n """ &amp; CN &amp; """ -t """ &amp; PhoneNumber &amp; """"
+    ExitCode = IDMExecute(Command)
+    If ExitCode = 0 Then
+      IDMSetCommand "ADD_ASSOCIATION"
+      IDMWriteValue "ASSOCIATION", CN &amp; ClassName    
+      IDMWriteValue "DEST_DN", IDMGetEventValue("SRC_DN")
+      IDMStatusSuccess "Add event succeeded"
+    Else
+      IDMStatusError "Add event failed with error code " &amp; ExitCode
+    End If
+  End If
+End Sub</pre>
+<p class="para">Handling a query is similar, except you return <span class="literal">INSTANCE</span> items rather than use other commands. Below is an example <span class="filename">Query.vbs</span> that searches an external application for a telephone number. It uses a hypothetical tool called <span class="command">appsearch</span>.</p><pre class="screen">Sub QUERY
+  SearchName = IDMGetEventValue("SEARCH_ATTR_CN")
+  If IsEmpty(SearchName) Then
+    IDMStatusError "Query: no search value"
+  Else
+    Command = "appsearch -n " &amp; SearchName
+    Results = IDMExecuteIO(Command, Empty)
+    If Results(0) = 0 Then
+      Phone = Results(1)
+      IDMSetCommand "INSTANCE"
+      IDMWriteValue "CLASS_NAME", IDMGetEventValue("CLASS_NAME")
+      IDMWriteValue "ASSOCIATION", IDMGetEventValue("ASSOCIATION")
+      IDMWriteValue "ATTR_Telephone", Phone
+      IDMStatusSuccess "Query succeeded"
+    Else
+      ' Return success with no results
+      IDMStatusSuccess "Query succeeded (no matches)"
+    End If
+  End If
+End Sub</pre>
+</div>
+
+</div>
+
+<div class="container sect3" id="b8nmwt7">
+
+<h3 class="title h3">Publisher Script Development</h3>
+
+<p class="para">Events that occur on the external application are submitted to Identity Manager on the Publisher channel. The Scripting driver periodically polls the external application for events. How this poll detects events is implementation-specific and must be defined by you.</p>
+<div class="container sect4" id="b8nmx3t">
+
+<h4 class="title h4">Polling for Application Events</h4>
+
+<p class="para">The Driver calls <span class="filename">Poll.wsf</span> to detect application events. <span class="filename">Poll.wsf</span> should be implemented as follows:</p>
+<div class="procedure" id="b8nmxip">
+<ol class="steps">
+<li class="step" id="b8nmxiq">
+<p class="para">Use application-provided tools to detect events in your application. (See <a href="b8nlv23.html#b8nmxka" class="xref">Step 2</a>.)</p></li>
+<li class="step" id="b8nmxka">
+<p class="para">For each event:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b8nmxoz">
+<p class="para">Call the <span class="command">IDMPublishInit</span> function to set the appropriate command.</p></li>
+<li class="step" id="b8nmxqm">
+<p class="para">Call <span class="command">IDMPublishValues</span> to set event values.</p></li>
+<li class="step" id="b8nmxs7">
+<p class="para">Call <span class="command">IDMPublish</span> to submit the event to Identity Manager.</p></li></ol>
+</div>
+</li>
+<li class="step" id="b8nmxyo">
+<p class="para">If there were events, call an <span class="command">IDMStatus</span> function to report the status.</p></li></ol>
+</div>
+
+<p class="para"><span class="command">IDMPublishInit</span> takes a command name as its single parameter. Below is a list of valid command names for <span class="command">IDMPublishInit</span>.</p>
+<div class="table" id="b8nmy7l"><p class="title"><em class="num">Table 5-23 </em>Command Names</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                  
+<tr class="headerrow" id="b8nmz59"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Command Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                
+<tr class="oddrow" id="b8nmz5a"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">ADD</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Create an identity.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmz5b"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">ADD_ASSOCIATION</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Create an association for an identity.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmz5c"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">DELETE</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Remove an identity permanently.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmz5d"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">MODIFY</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Change an identityâs attributes.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmz5e"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">MODIFY_ASSOCIATION</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Change an identityâs association.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmz5f"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">MODIFY_PASSWORD</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Change an identityâs password.</p></td>
+</tr>
+<tr class="oddrow" id="b8nmz5g"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">REMOVE_ASSOCIATION</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Delete an identityâs association.</p></td>
+</tr>
+<tr class="evenrow" id="b8nmz5h"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="command">RENAME</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Change an identityâs naming attribute.</p></td>
+</tr></table>
+</div>
+
+<p class="para">Below is an example of a <span class="filename">Poll.wsf</span> that checks for a password change. It uses a hypothetical application tool called apppwd.</p><pre class="screen">  Results = IDMExecuteIO("apppwd --changes", Empty)
+  For I = 1 To UBound(Results)
+    ' Entries are in the format "association=password"
+    Association = Left(Results(I), InStr(Results(I), "=")-1)
+    Password = Mid(Results(I), InStr(Results(I), "=")+1)
+    IDMPublishInit "MODIFY_PASSWORD"
+    IDMPublishValue "ASSOCIATION", Association
+    IDMPublishValue "PASSWORD", Password
+      
+    IDMPublish
+  Next
+  
+  IDMStatusSuccess "Poll succeeded"</pre>
+<p class="para">Events submitted using <span class="command">IDMPublish</span> are processed through your driverâs Publisher channel policies. See the Identity Manager policy guides on the <a href="https://www.netiq.com/documentation/identity-manager-48/" class="ulink">Identity Manager 4.8 Documentation Web site</a> for more information.</p>
+</div>
+
+<div class="container sect4" id="b8nn00n">
+
+<h4 class="title h4">Using the Heartbeat Script</h4>
+
+<p class="para">Another script executed in the Publisher Channel is <span class="filename">Heartbeat.wsf.</span> This script is executed when the Publisher channel is idle for the interval specified in the driver parameters. (You can set the interval to 0 so no heartbeat is issued.) You can use the heartbeat to check the availability of the external system or do âidle stateâ tasks. The IDMHeartbeatSuccess, IDMHeartbeatWarning, and IDMHeartbeatError subroutines can be used to indicate the result of the heartbeat. Below is an example based on a hypothetical tool called apphealth.</p><pre class="screen">  ExitCode = IDMExecute("apphealth")
+  If ExitCode = 0 Then
+    IDMHeartbeatSuccess "Heartbeat succeeded"
+  Else
+    IDMHeartbeatError "Heartbeat failed with error code " &amp; ExitCode
+  End If</pre>
+<p class="para">The response to the heartbeat is implementation-dependent, and can be defined in policies or in the script itself. You could send a message to auditing using NetIQ Audit. You could store a value in a file, and have Subscriber scripts read the file and call IDMStatusRetry if they find that value in the file.</p>
+</div>
+
+</div>
+
+<div class="container sect3" id="b8nn0nk">
+
+<h3 class="title h3">Other Scripting Topics</h3>
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="b8nlv23.html#b8nn0sn" class="xref">Driver Parameters</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="b8nlv23.html#b8nn44l" class="xref">Querying the Identity Vault</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="b8nlv23.html#b8nn85m" class="xref">Tracing and Debugging</a>
+              </p></li></ul></div>
+
+<div class="container sect4" id="b8nn0sn">
+
+<h4 class="title h4">Driver Parameters</h4>
+
+<p class="para">A driver has values known as driver parameters. The driver parameters are divided into driver settings applicable to the whole driver, and Subscriber and Publisher Settings for their respective channels. The IDMGetDriverParam, IDMGetSubscriberParam, and IDMGetPublisherParam functions can be used to retrieve these values. The table below shows parameters in the default Scripting driver. Other parameters can be added to the driverâs XML Configuration file (see âManaging Identity Manager Driversâ in the <span class="citetitle">NetIQ Identity Manager Administration Guide</span>).</p>
+<div class="table" id="b8nn16x"><p class="title"><em class="num">Table 5-24 </em>Driver Parameters</p>
+<table class="topbot" width="100%"><col width="25%" /><col width="25%" /><col width="25%" /><col width="25%" />
+                  
+<tr class="headerrow" id="b8nn2nk"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Parameter Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Driver/Channel</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Values</p></th>
+</tr>
+                
+<tr class="oddrow" id="b8nn2nl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">INSTALL_PATH</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The installation path of the driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">string value</p></td>
+</tr>
+<tr class="evenrow" id="b8nn2nm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">auto-loopback-detection</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Whether to enable automatic loopback detection</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">true/false</p></td>
+</tr>
+<tr class="oddrow" id="b8nn2nn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">script-command</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The command to use to execute scripts</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">string value</p></td>
+</tr>
+<tr class="evenrow" id="b8nn2no"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">script-trace-file</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The file, relative to the driver installation path, to which to write trace messages</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">string value</p></td>
+</tr>
+<tr class="oddrow" id="b8nn2np"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">subscriber-script</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Subscriber</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The script file for Subscriber events, relative to the driver installation path</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">string value</p></td>
+</tr>
+<tr class="evenrow" id="b8nn2nq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">polling-script</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Publisher</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The script file that runs when the Publisher polls for application events</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">string value</p></td>
+</tr>
+<tr class="oddrow" id="b8nn2nr"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">heartbeat-script</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Publisher</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The script file that runs when the Publisher checks application status</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">string value</p></td>
+</tr>
+<tr class="evenrow" id="b8nn2ns"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">pub-polling-interval</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Publisher</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The interval in seconds between Publisher polls for application events</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">number</p></td>
+</tr>
+<tr class="oddrow" id="b8nn2nt"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">pub-heartbeat-interval</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Publisher</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The amount of idle time in seconds before a heartbeat event is issued</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">number</p></td>
+</tr></table>
+</div>
+
+<p class="para">In the following example, a script retrieves the Publisher polling interval.</p><pre class="screen">  PollingInterval = IDMGetPublisherParam("pub-polling-interval")</pre>
+</div>
+
+<div class="container sect4" id="b8nn44l">
+
+<h4 class="title h4">Querying the Identity Vault</h4>
+
+<p class="para">Scripts might need to retrieve information from the Identity Vault. On the Subscriber channel only, they can do this by issuing a query.</p>
+<div class="procedure" id="b8nn4e0">
+<ol class="steps">
+<li class="step" id="b8nn4e1">
+<p class="para">Initialize the query with IDMQueryInit.</p></li>
+<li class="step" id="b8nn4gi">
+<p class="para">Set query search parameters using functions listed below.</p>
+<div class="informaltable">
+<table class="topbot" width="90%"><col width="50%" /><col width="50%" />
+                      
+<tr class="headerrow" id="b8nn5fa"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Function</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                    
+<tr class="oddrow" id="b8nn5fb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMQuerySetAssociation(Association)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sets the association of the object to query.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn5fc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMQuerySetSearchRoot(SearchRoot)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sets the DN (in slash format) of the object to query.</p></td>
+</tr>
+<tr class="oddrow" id="b8nn5fd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMQueryAddSearchAttr(Name, Value)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies a search condition of the form Name=Value. The query will only return an instance if the named attribute has a value matching Value.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn5fe"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMQueryAddReadAttr(Name)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies an attribute whose values will be returned with the instance.</p></td>
+</tr>
+<tr class="oddrow" id="b8nn5ff"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMQuerySetReadParent(ReadParent)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies whether the association and DN of the parent of the queried object should be returned (False by default).</p></td>
+</tr></table>
+</div>
+</li>
+<li class="step" id="b8nn4ih">
+<p class="para">Execute the query with IDMQuery.</p></li>
+<li class="step" id="b8nn4ke">
+<p class="para">Read the result (instance) using functions listed below.</p>
+<p class="para">Currently query support is limited. It will only return one instance based on the specified association or DN. (If both association and DN are specified, association is used.) The functions below allow you to retrieve information from the instance.</p>
+<div class="informaltable">
+<table class="topbot" width="90%"><col width="50%" /><col width="50%" />
+                      
+<tr class="headerrow" id="b8nn6f7"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Function</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                    
+<tr class="oddrow" id="b8nn7aj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceAssociation</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns the association of the instance.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn7ak"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceDN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns the DN of the instance (in slash format).</p></td>
+</tr>
+<tr class="oddrow" id="b8nn7al"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceClass</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns the class name of the instance.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn7am"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceParentAssociation</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns the association of the parent of the instance (if requested).</p></td>
+</tr>
+<tr class="oddrow" id="b8nn7an"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceParentDN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns the DN of the parent of the instance (if requested).</p></td>
+</tr>
+<tr class="evenrow" id="b8nn7ao"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceAttrNames</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns an array containing the names of the attributes retrieved for the instance. Returns Empty if no attributes were retrieved.</p></td>
+</tr>
+<tr class="oddrow" id="b8nn7ap"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceAttrCount</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns the number of attributes retrieved for the instance.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn7aq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceAttrValues(AttrName)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns an array of values for the attribute AttrName. Returns Empty if no values are available.</p></td>
+</tr>
+<tr class="oddrow" id="b8nn6f8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDMGetQueryInstanceAttrValue(AttrName)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Returns a string value for the attribute AttrName. If multiple values are available, the first one is returned. Returns Empty if no values are available.</p></td>
+</tr></table>
+</div>
+</li></ol>
+</div>
+
+<p class="para">The following is an example of a query that retrieves an objectâs address and postal code.</p><pre class="screen">  IDMQueryInit
+  IDMQuerySetAssociation IDMGetEventValue("ASSOCIATION")
+  IDMQueryAddReadAttr "SA"          ' Street Address
+  IDMQueryAddReadAttr "Postal Code"
+
+  If IDMQuery Then
+    Address = IDMQueryGetInstanceAttrValue("SA")
+    ZIPCode = IDMQueryGetInstanceAttrValue("Postal Code")
+    ' ... etc. ...
+  End If</pre>
+</div>
+
+<div class="container sect4" id="b8nn85m">
+
+<h4 class="title h4">Tracing and Debugging</h4>
+
+<p class="para">The IDMTrace function allows you to write a message to the Script Trace File specified in the Driver Parameters. Tracing is useful for script debugging and auditing.</p><pre class="screen">   IDMTrace "Trace message" </pre>
+<p class="para">When developing scripts, you might need to do some debugging to track down problems. The following list indicates some facilities for debugging.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The Driver traces activity to its Trace file (<span class="filename">logs\trace.log</span> by default). The trace level setting in <span class="filename">conf\wsdrv.conf</span> controls how much debugging is written to the log.</p>
+<div class="informaltable">
+<table class="topbot" width="96%"><col width="23%" /><col width="77%" />
+                      
+<tr class="headerrow" id="b8nn8uz"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Trace Level</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+                    
+<tr class="oddrow" id="b8nn9n8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">0</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">No debugging.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn9n9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1-3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Identity Manager messages. Higher trace levels provide more detail.</p></td>
+</tr>
+<tr class="oddrow" id="b8nn9na"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus Remote Loader, driver, driver shim, and Driver connection messages.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn9nb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5-7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus Change Log and loopback messages. Higher trace levels provide more detail.</p></td>
+</tr>
+<tr class="oddrow" id="b8nn9nc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus Driver status log, Driver parameters, Driver command line, Driver security, Driver Web server, Driver schema, Driver encryption, Driver SOAP API, and Driver include/exclude file messages.</p></td>
+</tr>
+<tr class="evenrow" id="b8nn9nd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">9</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus low-level networking and operating system messages.</p></td>
+</tr>
+<tr class="oddrow" id="b8nn8v0"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">10</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus maximum low-level program details.</p></td>
+</tr></table>
+</div>
+
+<p class="listitem">The trace level is set using the -trace option in <span class="filename">wsdrv.conf,</span> for example. -trace 9.</p>
+<p class="listitem">You can view the trace file through a Web browser:</p>
+<div class="orderedlist">
+                  
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Use a Web browser to access the driver shim at https://driver-address:8091. Substitute the DNS name or IP address of your driver for driver-address.</p></li>
+                  
+<li class="listitem">
+<p class="listitem">Authenticate by using any username and the password that you specified as the Remote Loader password.</p></li>
+                  
+<li class="listitem">
+<p class="listitem">Click <span class="guimenu">Trace</span>.</p></li>
+                </ol></div>
+</li>
+<li class="listitem">
+<p class="listitem">The IDMTrace function described above writes output to the trace file specified in the Driver Parameters (<span class="filename">logs\script-trace.log</span> by default).</p></li>
+<li class="listitem">
+<p class="listitem">The eDirectory tool DSTrace can be used to monitor Identity Manager activity. Set the tracing level for the Driver in iManager. DSTrace shows the XML documents being submitted to the Driver for events, and how Policies are evaluated. It also shows the status and message for each event.</p></li>
+<li class="listitem">
+<p class="listitem">The Status Log is written to <span class="filename">logs\dirxml.log.</span> It shows a summary of the events that have been recorded on the Subscriber and Publisher channels.</p>
+<p class="listitem">You can view the Status Log through a Web browser:</p>
+<div class="orderedlist">
+                  
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Use a Web browser to access the driver shim at https://driver-address:8091. Substitute the DNS name or IP address of your driver for driver-address.</p></li>
+                  
+<li class="listitem">
+<p class="listitem">Authenticate by using any username and the password that you specified as the Remote Loader password.</p></li>
+                  
+<li class="listitem">
+<p class="listitem">Click <span class="guimenu">Status</span>.</p></li>
+                </ol></div>
+</li></ul></div>
+
+<p class="para">Although it is best to run the driver as a service in production environments, you can run <span class="filename">wsdriver.exe</span> as a standard program. When you do so, a console window displays trace messages (see above) for the driver. Also, text written to standard output from scripts (such as using <span class="filename">WScript.Echo</span> in VBScript) is displayed in this window.</p>
+<p class="para">VBScript programs can be debugged using programs such as Microsoft Visual Studio and Microsoft Script Debugger. Change the Script Command driver parameter to use the //x option: cscript //nologo //x. When the driver shim executes a script, you are prompted to debug the script execution.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8nnc2b">
+
+<h2 class="title h2"><span class="number">5.8.3</span> Deployment</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Scripting driver is installed by using a setup program. See <a href="b8mow8v.html" class="xref">Installing the Windows Scripting Driver</a> for information on installing the default driver.</p>
+<div class="container sect3" id="b8nncbg">
+
+<h3 class="title h3">Deploying a Custom Driver</h3>
+
+<p class="para">To deploy your custom driver, the end user should first run the Windows Scripting driver installation program provided by the installation media (see <a href="b8mow8v.html" class="xref">Installing the Windows Scripting Driver</a> for more information.) This program installs core files needed by the driver. Then, your custom driver files can be deployed in any convenient way, whether through an installation program or even simply an archive file. The table below shows the directory structure below the installation directory and what files are installed.</p>
+<div class="table" id="b8nncnn"><p class="title"><em class="num">Table 5-25 </em>Directory Structure and Files</p>
+<table class="topbot" width="100%"><col width="33%" /><col width="33%" /><col width="33%" />
+                
+<tr class="headerrow" id="b8nncwn"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Directory</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Required Files</p></th>
+</tr>
+              
+<tr class="oddrow" id="b8nneuj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">bin\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Location of executable programs</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">EventReader.exe</span>
+                    </p>
+<p class="para">
+                      <span class="filename">idmevent.exe</span>
+                    </p>
+<p class="para">
+                      <span class="filename">wsdriver.exe</span>
+                    </p></td>
+</tr>
+<tr class="evenrow" id="b8nneuk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">changelog\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Used for Publisher event processing</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">None</p></td>
+</tr>
+<tr class="oddrow" id="b8nneul"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">conf\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Location of the driver shim configuration file</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="filename">wsdrv.conf</span> (customized)</p></td>
+</tr>
+<tr class="evenrow" id="b8nneum"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">keys\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Location of security key files</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">None</p></td>
+</tr>
+<tr class="oddrow" id="b8nneun"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">l<span class="filename">ogs\</span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Location of log files</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">None</p></td>
+</tr>
+<tr class="evenrow" id="b8nneuo"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">loopback\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Used for automatic loopback detection</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">None</p></td>
+</tr>
+<tr class="oddrow" id="b8nneup"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">rules\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Location of Driver configuration file</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="filename">Scripting.xml</span> (customized)</p></td>
+</tr>
+<tr class="evenrow" id="b8nneuq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">schema\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Location of schema files</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="filename">schema.def</span> (customized)</p></td>
+</tr>
+<tr class="oddrow" id="b8nncwo"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">scripts\</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Location of script files</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Those required by your Driver (customized)</p></td>
+</tr></table>
+</div>
+
+<p class="para">If you are using an installation program, you can obtain the driverâs installation path from the following registry value:</p><pre class="screen">     HKEY_LOCAL_MACHINE\SOFTWARE\Novell\Windows Script Driver\Path </pre>
+<p class="para">Or for the x86 driver running an x64 version of Windows, use the path from the following registry value:</p><pre class="screen">     HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Novell
+     \Windows Script Driver\Path </pre>
+<p class="para">The formats of <span class="filename">wsdrv.conf</span> and <span class="filename">schema.def</span> can be viewed in <a href="b8mqqe6.html" class="xref">The Driver Shim Configuration File</a> and <a href="b8n6pr6.html" class="xref">The Connected System Schema File</a>.</p>
+<p class="para">If SSL encryption is desired for communication between the driver shim and Identity Manager engine, a certificate must be retrieved from the Identity Vault. Run the following command and follow the prompts to retrieve the certificate:</p>
+<p class="para">
+            <span class="command">wsdriver.exe -s</span>
+          </p>
+<p class="para">The certificate will be stored in the <span class="filename">keys\</span> directory. You must have LDAP with SSL available for the Metadirectory. When making an installation program for deployment, you might want to include this command as part of the installation:</p>
+<p class="para">To ensure that only authorized systems access the Metadirectory, a Driver Object password and Remote Loader password are used. Run the following command and enter the passwords at the prompts:</p>
+<p class="para">
+            <span class="command">wsdriver.exe -sp</span>
+          </p>
+<p class="para">This action also can be incorporated into an installation program.</p>
+<p class="para">You should run a Scripting driver as a service. To the install the service, run the following command or include it as part of an installation program:</p>
+<p class="para">
+            <span class="command">wsdriver.exe -installService</span>
+          </p>
+<p class="para">The service, which can then be run from the Services applet, can be removed as follows:</p>
+<p class="para">
+            <span class="command">wsdriver.exe -removeService</span>
+          </p>
+<p class="para">You should distribute the XML configuration file that contains parameters and policies your driver needs. The user can then select it when installing your driver.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

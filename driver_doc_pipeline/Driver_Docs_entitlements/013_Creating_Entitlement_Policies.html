@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="July 11 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="create-entitlement-policies,entitlements-service-driver,bf9dg6g,control-how-entitlements-granted-revoked,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Creating Entitlement Policies - NetIQ Identity Manager Entitlements Service Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container chapter expanding expanded" id="create-entitlement-policies">
+
+<h1 class="title h1"><span class="number">6.0</span> Creating Entitlement Policies</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Entitlements Service driver implements entitlements through the use of entitlement policies. An entitlement policy contains the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bfqcq3x">
+          <p class="title"><em class="title">Membership:</em>
+          The list of users assigned to the policy. A user can be dynamically assigned to the policy when he or she meets the criteria for the policy, or the user can be statically (manually) assigned to the policy.</p>
+        </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="bfqcq3y">
+          <p class="title"><em class="title">Entitlements:</em>
+          The list of entitlements associated with the policy. Users assigned to the policy receive all of the entitlements associated with the policy. If the user is removed from the policy, he or she loses all entitlements associated with the policy.</p>
+        </div>
+</li></ul></div>
+
+<p class="para">To create an entitlement policy:</p>
+<div class="procedure" id="b10j717">
+<ol class="steps">
+<li class="step" id="bfqe4on">
+<p class="para">Log in to Identity Console.</p></li>
+<li class="step" id="bfqe4oo">
+<p class="para">In the <span class="guimenu">IDM Administration</span>, click <span class="guimenu">Role-Based Entitlements</span>.</p></li>
+<li class="step" id="bnzqxg8">
+<p class="para">In the <span class="guimenu">Select driver set</span> field, select the driver set where you want to create the entitlement policy.</p>
+<p class="para">This list displays all entitlement policies that have been created for the driver set. If you are using role-based entitlements for the first time, no policies are listed.</p>
+<div class="informalfigure">
+              <img src="../graphics/entitlement_idconsole.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" />
+            </div>
+</li>
+<li class="step" id="bnzqxpx">
+<p class="para">Click <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> to launch the Entitlement Policy Wizard.</p></li>
+<li class="step" id="bfqskz0">
+<p class="para">On the Step 1 of 6: Name and describe the Entitlement Policy page, fill in the fields:</p>
+<div class="formalpara" id="bfralma">
+          <p class="title"><em class="title">Entitlement Policy Name:</em>
+          Provide a name that indicates the purpose of the entitlement. The name must be unique within the driver set and cannot include more than 64 characters.</p>
+        </div>
+
+<div class="formalpara" id="bfralye">
+          <p class="title"><em class="title">Description:</em>
+          Provide any additional information you want to identify the policy.</p>
+        </div>
+
+<p class="para">Click <span class="guimenu">Create</span>.</p></li>
+<li class="step" id="bfqtsxq">
+<p class="para">On the Step 2 of 6: Define Dynamic Membership page, fill in the fields:</p>
+<p class="para">Dynamic membership lets you define which users should be members of the entitlement policy by specifying criteria and specifying where in the tree to search for users that meet the criteria. If a user meets the criteria you specify, the policyâs entitlements are automatically applied to the user. If the userâs information changes and no longer meets the criteria, the entitlements are revoked without any manual intervention.</p>
+<div class="formalpara" id="bframjk">
+          <p class="title"><em class="title">Search Identity:</em>
+          Specify an object that has the rights that you want to be used when querying for Dynamic Membership. This field defaults to the object you logged in as, but you can change it to an object with the appropriate rights.</p>
+        </div>
+
+<p class="para">For example, if you log in as the administrator, there might be parts of the tree that you have rights to, but you don't want them included in the query for the dynamic list of members.</p>
+<p class="para">You could use this field to specify the Driver Set object, making sure that the Driver Set has the appropriate rights. Or, you could create a User object specifically for use with entitlement policies, and assign it the rights you want the query to use.</p>
+<div class="formalpara" id="bframu8">
+          <p class="title"><em class="title">Begin Search at (Base DN):</em>
+          Specify the base container where you want the user search to begin.</p>
+        </div>
+
+<div class="formalpara" id="bfranbj">
+          <p class="title"><em class="title">Scope of Search:</em>
+          Specify whether you want to search the base container and all of its subcontainers (<span class="guimenu">This container and its subcontainers</span>) or only the base container (<span class="guimenu">This container only</span>).</p>
+        </div>
+
+<p class="para">For the entitlement policy to evaluate users in the containers you specify, the users must be in a read/write or master replica on the Identity Manager server that is running the Entitlements Service driver.</p>
+<div class="formalpara" id="bfrang9">
+          <p class="title"><em class="title">Criteria:</em>
+          Specify the criteria that determine which users are members of the policy. The criteria are organized into criteria groups. Each group can contain one or more criteria. You click the <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> icon to add criterion to a group. You can also click <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> near <span class="guimenu">Criteria Group 1</span> to create additional groups.</p>
+        </div>
+
+<p class="para">By default, the criteria include all User class objects (and objects of classes derived from the User class) within the search scope.</p>
+<p class="para">If you create a new object class derived from User, an existing entitlement policy does not recognize that class until you make a modification to the entitlement policy. This prevents users of a new class from being granted entitlements unintentionally. When any modification is made to the entitlement policy, the list of user-derived classes for that policy is updated.</p></li>
+<li class="step" id="bg1kk4w">
+<p class="para">After you have added the criteria you want, click <span class="guimenu">Test Filter</span> to view the list or users who meet the criteria.</p></li>
+<li class="step" id="bfqtx5n">
+<p class="para">On the Step 3 of 6: Define Static Members page, fill in the fields:</p>
+<p class="para">Static membership lets you include users who donât meet the dynamic membership criteria or exclude users who meet the criteria but should not be members of the policy.</p>
+<div class="formalpara" id="bfrao7n">
+          <p class="title"><em class="title">Include Members:</em>
+          Type the DN of a user you want to include, or click <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> to browse for and select the user, then press Enter to add the user to the inclusion list. To remove a user from the inclusion list, select the user and press Delete. To edit a user name, double-click the user.</p>
+        </div>
+
+<div class="formalpara" id="bfrao8z">
+          <p class="title"><em class="title">Exclude Members:</em>
+          Type the DN of a user you want to exclude, or click <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> to browse for and select the user, then press Enter to add the user to the exclusion list. To remove a user from the exclusion list, select the user and press Delete. To edit a user name, double-click the user.</p>
+        </div>
+</li>
+<li class="step" id="bfqvl09">
+<p class="para">On the Step 4 of 6: Select Entitlements on the Connected Systems to Grant to Users page, add the entitlements you want associated with the policy:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bfqv2ah">
+<p class="para">Click <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> to display a list of drivers with entitlements.</p></li>
+<li class="step" id="bfqv3a8">
+<p class="para">Select the driver with the entitlement you want to add, then click <span class="guimenu">Add</span> to display a list of the driverâs entitlements.</p></li>
+<li class="step" id="bfqv3mi">
+<p class="para">Select the entitlement you want to add, then click <span class="guimenu">Add</span>.</p></li>
+<li class="step" id="bfrb1kl">
+<p class="para">(Optional) If the entitlement requires you to set a value, click <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> to add the value.</p>
+<p class="para">or</p>
+<p class="para">If the entitlement requires a query to display the appropriate values (for example, a query for the groups in the connected system), run the query and select the appropriate value.</p>
+<p class="para">You can choose an external query, which runs a new query of the connected system, or you can choose a cached query, which simply displays the results of the last query that ran.</p></li>
+<li class="step" id="bfrb7se">
+<p class="para">To add another entitlement from the same driver, click the <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> icon located on the same line as the driver name.</p></li>
+<li class="step" id="bfrb88f">
+<p class="para">To add an entitlement from another driver, repeat <a href="create-entitlement-policies.html#bfqv2ah" class="xref">Step 9.a</a> through <a href="create-entitlement-policies.html#bfrb1kl" class="xref">Step 9.d</a>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bfrb8ya">
+<p class="para">On the Step 5 of 6: Assign Rights to Objects page, add the Identity Vault objects for which you want the entitlement policy to be a trustee.</p>
+<p class="para">Each member of the policy becomes a trustee of the objects you add. There are several reasons why you might want to make the policy a trustee of an object:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">One of the policyâs entitlements requires the policyâs members to have rights to an object.</p></li>
+<li class="listitem">
+<p class="listitem">You want to use the policy to assign users as trustees of an object even though rights to the object are not required for an entitlement. In this case, you are using the entitlement policy to grant and revoke trustee rights for members of the policy.</p></li></ul></div>
+
+<p class="para">Use the following options to manage the trustee assignments:</p>
+<div class="formalpara" id="bfrdl59">
+          <p class="title"><em class="title">Add Object:</em>
+          Use this option to browse for and select the objects that you want to make the policy a trustee of.</p>
+        </div>
+
+<div class="formalpara" id="bfrdmxc">
+          <p class="title"><em class="title">Rights to Selected Objects:</em>
+          Click an object in the Object Name list to view the policyâs rights to the object. You can add or remove rights by selecting or deselecting the desired rights. The Inherit check box determines whether the rights flow down in the tree. For example, if you are assigning rights to a container object, and you want the entitlement policy to have the same rights to the objects and sub-containers that are below that container, select the <span class="guimenu">Inherit</span> check box.</p>
+        </div>
+
+<div class="formalpara" id="bfrdohr">
+          <p class="title"><em class="title">Add Property:</em>
+          In addition to doing a global assignment of rights to all properties ([All Attributes Rights]), you can assign rights to specific properties. This lets you limit rights to some properties and expand rights to others. To add a property, click <img src="../graphics/create_certificate.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> near <span class="guimenu">Properties</span> to browse for and select the desired property. After the property is added to the Rights to Selected Objects list, make the assigned rights modifications that you want.</p>
+        </div>
+
+<div class="formalpara" id="bfrdrpq">
+          <p class="title"><em class="title">Remove Object or Property:</em>
+          Click the <img src="../graphics/delete.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> button to remove an object from the Object Name list or a property from the Rights to Selected Object list.</p>
+        </div>
+</li>
+<li class="step" id="bs8vh07">
+<p class="para">When you have finished making changes to trustee assignments, click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bfrdwnm">
+<p class="para">On the Step 6 of 6: Entitlement Policy Summary page, review the policy information, then click <span class="guimenu">Finish</span> to create the policy and add it to the Entitlement Policy List.</p></li>
+<li class="step" id="b24sd1x">
+<p class="para">Click <img src="../graphics/action_menu.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> <span class="guimenu">&gt; Restart</span> to start the Entitlements Service driver.</p>
+<p class="para">After the driver starts, it evaluates the new policy (and all other policies in the list) and grants the appropriate entitlements to the policy members.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

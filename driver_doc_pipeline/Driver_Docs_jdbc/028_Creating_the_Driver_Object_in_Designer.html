@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-create-a-driver-object-using-designer-for-jdbc-driver,create-new-driver-object-for-jdbc-driver,create-new-driver-object-for-jdbc-driver,how-to-activate-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Creating the Driver Object in Designer - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-create-a-driver-object-using-designer-for-jdbc-driver">
+
+<h1 class="title h1"><span class="number">5.1</span> Creating the Driver Object in Designer</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You create the JDBC driver by installing the driver packages and then modifying the configuration to suit your environment. After you create and configure the driver object, you need to deploy it to the Identity Vault and start it.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsf8" class="xref">Importing the Current Driver Packages</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsfi" class="xref">Installing the Driver Packages</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsgy" class="xref">Configuring the Driver Object</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsh3" class="xref">Deploying the Driver Object</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwshn" class="xref">Starting the Driver Object</a>
+          </p></li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>To create drivers, you need to use the new package management features provided in Designer.</p></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bxcwsf8">
+
+<h2 class="title h2"><span class="number">5.1.1</span> Importing the Current Driver Packages</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver packages contain the items required to create a driver object, such as policies, entitlements, filters, and Schema Mapping policies. These packages are only available in Designer. You can upgrade any package that is installed if there is a newer version of the package available. For more information on upgrading packages, see <q class="quote"><a href="../../../identity-manager-48/designer_admin/data/packman.html#packmanupgrade" class="ulink">Upgrading Installed Packages</a></q> in the <span class="citetitle"><a href="../../../identity-manager-48/designer_admin/data/bookinfo.html#bookinfo" class="ulink">NetIQ Designer for Identity Manager Administration Guide</a></span>.</p>
+<p class="para">Before creating a driver object in Designer, you need to verify that you have all the required packages already imported in the Package Catalog of Designer. Designer prompts you for importing the required packages when it creates the driver object.</p>
+<p class="para">You can create packages based on the schema for your environment, keeping in mind the data synchronization model (direct/indirect) and its dependent packages.</p>
+<p class="para">To verify you have the most recent version of the driver packages in the Package Catalog:</p>
+<div class="procedure" id="bxcwsf9">
+<ol class="steps">
+<li class="step" id="bxcwsfa">
+<p class="para">Open Designer.</p></li>
+<li class="step" id="bxcwsfb">
+<p class="para">In the toolbar, click <span class="guimenu">Help</span> &gt; <span class="guimenu">Check for Package Updates</span>.</p></li>
+<li class="step" id="bxcwsfc">
+<p class="para">Click <span class="guimenu">OK</span> to update the packages</p>
+<p class="para">or</p>
+<p class="para">Click <span class="guimenu">OK</span> if the packages are up-to-date.</p></li>
+<li class="step" id="bxcwsfd">
+<p class="para">In the Outline view, right-click the Package Catalog.</p></li>
+<li class="step" id="bxcwsfe">
+<p class="para">Click <span class="guimenu">Import Package</span>.</p>
+<div class="informalfigure">
+                  <img src="../graphics/package_import_a.png" alt="" />
+                </div>
+
+<p class="para">You can download the new packages from the <a href="http://cdn.novell.com/cached/designer/packages/idm/updatesite1_0_0/" class="ulink"><span class="citetitle">Designer Auto-update site</span></a>.</p></li>
+<li class="step" id="bxcwsff">
+<p class="para">Select any JDBC driver packages.</p>
+<p class="para">or</p>
+<p class="para">Click <span class="guimenu">Select All</span> to import all of the packages displayed.</p>
+<p class="para">By default, only the base packages are displayed. Deselect <span class="guimenu">Show Base Packages Only</span> to display all packages.</p></li>
+<li class="step" id="bxcwsfg">
+<p class="para">Click <span class="guimenu">OK</span> to import the selected packages, then click <span class="guimenu">OK</span> in the successfully imported packages message.</p></li>
+<li class="step" id="bxcwsfh">
+<p class="para">After the current packages are imported, continue with <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsfi" class="xref">Installing the Driver Packages</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bxcwsfi">
+
+<h2 class="title h2"><span class="number">5.1.2</span> Installing the Driver Packages</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After you have imported the current driver packages into the Package Catalog, you can install the driver packages to create a new driver.</p>
+<div class="procedure" id="bxcwsfj">
+<ol class="steps">
+<li class="step" id="bxcwsfk">
+<p class="para">In Designer, open your project.</p></li>
+<li class="step" id="bxcwsfl">
+<p class="para">In the Modeler, right-click the driver set where you want to create the driver, then click <span class="guimenu">New</span> &gt; <span class="guimenu">Driver</span>.</p></li>
+<li class="step" id="bxcwsfm">
+<p class="para">Select an appropriate JDBC Base Database Package, such as Oracle Base, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxcwsfn">
+<p class="para">Select the optional features to install for the JDBC driver, then click <span class="guimenu">Next</span>.</p>
+<p class="para">All options are selected by default. The options are:</p>
+<div class="formalpara" id="bxcwsfo">
+              <p class="title"><em class="title">Entitlements Support:</em>
+              These packages contain the policies that provision the user accounts on the connected database. For more information, see the <span class="citetitle"><a href="../../../identity-manager-48/entitlements/data/identity-manager-entitlements.html#identity-manager-entitlements" class="ulink">NetIQ Identity Manager Entitlements Guide</a></span>.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsfp">
+              <p class="title"><em class="title">Data Collection:</em>
+              These packages contain the policies that enable the driver to collect data for reports. If you are using Identity Reporting, ensure that this option is selected. For more information, see the <span class="citetitle"><a href="../../../identity-manager-48/report_setup/data/bookinfo.html#bookinfo" class="ulink">Administrator Guide to NetIQ Identity Reporting</a></span>.</p>
+            </div>
+
+<div class="formalpara" id="bxcwvlj">
+              <p class="title"><em class="title">Account Tracking:</em>
+              These packages contain the policies that enable account tracking information for reports. If you are using Identity Reporting, ensure that this option is selected. For more information, see the <span class="citetitle"><a href="../../../identity-manager-48/report_setup/data/bookinfo.html#bookinfo" class="ulink">Administrator Guide to NetIQ Identity Reporting</a></span>.</p>
+            </div>
+
+<div class="formalpara" id="bxfh762">
+              <p class="title"><em class="title">Synchronization Mode:</em>
+              These packages contain the GCVs and sample policies. If you choose the direct/indirect synchronization mode, ensure that you donât change this setting on the driver creation and configuration pages.</p>
+            </div>
+
+<p class="para">By default, the <span class="guimenu">Show only Applicable packages versions</span> option is selected.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>The JDBC packages provide examples of the core functions of the JDBC driver. These examples help you customize the driver for your environment. You can add new policies and settings to the driver to meet your business requirements. The final implementation can be packaged and deployed in Identity Manager.</p></div>
+</li>
+<li class="step" id="bxcwsfr">
+<p class="para">(Conditional) If there are package dependencies for the packages you selected to install for this driver, you must install them to install the selected package. Click <span class="guimenu">OK</span> to install the package dependency listed.</p></li>
+<li class="step" id="bxcwsfs">
+<p class="para">(Conditional) If more than one type of package dependency must be installed, you are presented with separate configuration pages for each package. Continue to click <span class="guimenu">OK</span> to install any additional package dependencies.</p></li>
+<li class="step" id="bxcwsft">
+<p class="para">(Conditional) The Common Settings page is displayed only if the Common Settings package is installed as a dependency. On the Install Common Settings page, specify the common settings for User and Group containers:</p>
+<div class="formalpara" id="bxcwsfu">
+              <p class="title"><em class="title">User Container:</em>
+              Select the Identity Vault container where the user accounts will be added in the Identity Vault. This value becomes the default for all drivers in the driver set.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsfv">
+              <p class="title"><em class="title">Group Container:</em>
+              Select the Identity Vault container where the groups will be added in the Identity Vault. This value becomes the default for all drivers in the driver set.</p>
+            </div>
+</li>
+<li class="step" id="bxcwsfw">
+<p class="para">Click <span class="guimenu">Next</span>.</p>
+<p class="para">When all dependencies are installed, the components must be configured.</p></li>
+<li class="step" id="bxcwsfx">
+<p class="para">On the Driver Information page, specify a name for the driver that is unique within the driver set, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxdf8zv">
+<p class="para">On the Application Authentication page, fill in the following information for the connected database:</p>
+<div class="formalpara" id="bxdf9v4">
+              <p class="title"><em class="title">Version:</em>
+              Specify the version of the connected database.</p>
+            </div>
+
+<div class="formalpara" id="bxdf9xu">
+              <p class="title"><em class="title">Synchronization Model:</em>
+              Specify the mode of data synchronization based on the selected package.</p>
+            </div>
+
+<div class="formalpara" id="bxdfa0r">
+              <p class="title"><em class="title">Data Flow:</em>
+              Specify whether the authoritative source of data is the database, Identity Manager, or bidirectional.</p>
+            </div>
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Ensure that you donât change the setting for <span class="guimenu">Synchronization Model</span> and <span class="guimenu">Data Flow</span> options that you selected earlier in the Package Configuration Wizard.</p></div>
+
+<div class="formalpara" id="bxdfa39">
+              <p class="title"><em class="title">JDBC Implementation:</em>
+              Specify the database connection details.</p>
+            </div>
+
+<div class="formalpara" id="bxfc6kn">
+              <p class="title"><em class="title">Connection Information:</em>
+              Specify the database information for the driver to use to connect to the database, such as the IP address, port, and type of the database.</p>
+            </div>
+
+<p class="para">If the database type is selected as SID, you need to enter the Oracle SID value. If the database type is selected as CDB, you need to enter the Oracle Service Name.</p>
+<div class="formalpara" id="bxfc6km">
+              <p class="title"><em class="title">Authentication ID:</em>
+              Specify the authentication ID for the connected database.</p>
+            </div>
+
+<div class="formalpara" id="bxfc6ko">
+              <p class="title"><em class="title">Password:</em>
+              Specify the password for the driver to connect to the database.</p>
+            </div>
+
+<p class="para">For more information, see <a href="modify-jdbc-driver-settings.html" class="xref">JDBC Driver Settings</a>.</p></li>
+<li class="step" id="bxcwsg2">
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxcwsg3">
+<p class="para">Fill in the following fields for Remote Loader information:</p>
+<div class="formalpara" id="bxcwsg4">
+              <p class="title"><em class="title">Connect To Remote Loader:</em>
+              Select <span class="guimenu">Yes</span> or <span class="guimenu">No</span> to determine if the driver will use the Remote Loader. For more information, see âConfiguring Identity Manager Drivers to Work with the Remote Loaderâ in the <span class="citetitle"><a href="../../../identity-manager-48/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span>.</p>
+            </div>
+
+<p class="para">If you select <span class="guimenu">No</span>, skip to <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsg9" class="xref">Step 13</a>. If you select <span class="guimenu">Yes</span>, use the following information to complete the configuration of the Remote Loader:</p>
+<div class="formalpara" id="bxcwsg5">
+              <p class="title"><em class="title">Host Name:</em>
+              Specify the IP address or DNS name of the server where the Remote Loader is installed and running.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsg6">
+              <p class="title"><em class="title">Port (Connection):</em>
+              Specify the port number for this driver object. Each driver object connects to the Remote Loader on a separate port. The default value is 8090.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsg7">
+              <p class="title"><em class="title">Remote Loader Password:</em>
+              Specify a password to control access to the Remote Loader. It must be the same password that is specified as the Remote Loader password on the Remote Loader.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsg8">
+              <p class="title"><em class="title">Driver Password:</em>
+              Specify a password for the driver object to authenticate to the Identity Manager server. It must be the same password that is specified as the Driver Object password on the Remote Loader.</p>
+            </div>
+</li>
+<li class="step" id="bxcwsg9">
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxcwsga">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Data Collection and Account Tracking groups of packages. On the JDBC Managed System Information page, fill in the following fields to define your connected database application:</p>
+<div class="formalpara" id="bxcwsgb">
+              <p class="title"><em class="title">Name:</em>
+              Specify a descriptive name for the connected database application. The name is displayed in reports.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsgc">
+              <p class="title"><em class="title">Description:</em>
+              Specify a brief description for the connected database application. The description is displayed in reports.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsgd">
+              <p class="title"><em class="title">Location:</em>
+              Specify the physical location of the connected database application. The location is displayed in reports.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsge">
+              <p class="title"><em class="title">Vendor:</em>
+              Specify the vendor of the connected database application. This information is displayed in reports.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsgf">
+              <p class="title"><em class="title">Version:</em>
+              Specify the version of the connected database application. The version is displayed in reports.</p>
+            </div>
+</li>
+<li class="step" id="bxcwsgg">
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxcwsgh">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Managed System packages and the Account Tracking packages. On the Install JDBC Managed System Information page, fill in the following fields to define the classification of the connected database application:</p>
+<div class="formalpara" id="bxcwsgi">
+              <p class="title"><em class="title">Classification:</em>
+              Select the classification of the connected database application. This information is displayed in the reports. Your options are:</p>
+            </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Mission-Critical</p></li>
+<li class="listitem">
+<p class="listitem">Vital</p></li>
+<li class="listitem">
+<p class="listitem">Not-Critical</p></li>
+<li class="listitem">
+<p class="listitem">Other</p>
+<p class="listitem">If you select <span class="guimenu">Other</span>, you must specify a custom classification for the JDBC system.</p></li></ul></div>
+
+<div class="formalpara" id="bxcwsgj">
+              <p class="title"><em class="title">Environment:</em>
+              Select the type of environment the connected database application provides. The options are:</p>
+            </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Development</p></li>
+<li class="listitem">
+<p class="listitem">Test</p></li>
+<li class="listitem">
+<p class="listitem">Staging</p></li>
+<li class="listitem">
+<p class="listitem">Production</p></li>
+<li class="listitem">
+<p class="listitem">Other</p>
+<p class="listitem">If you select <span class="guimenu">Other</span>, you must specify a custom classification for the database application.</p></li></ul></div>
+</li>
+<li class="step" id="bxcwsgk">
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxcwsgl">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Data Collection and Account Tracking groups of packages. Fill in the following fields to define the ownership of the connected database application:</p>
+<div class="formalpara" id="bxcwsgm">
+              <p class="title"><em class="title">Business Owner:</em>
+              Select a user object in the Identity Vault that is the business owner of the database application. This can only be a user object, not a role, group, or container.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsgn">
+              <p class="title"><em class="title">Application Owner:</em>
+              Select a user object in the Identity Vault that is the application owner of the database application. This can only be a user object, not a role, group, or container.</p>
+            </div>
+</li>
+<li class="step" id="bxcwsgo">
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxdfeyh">
+<p class="para">On the Entitlements Information page, specify a name for the <span class="guimenu">Account Entitlement Value</span> field, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxcx4y1">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Account Tracking groups of packages. On the Account Tracking page, fill in the following fields:</p>
+<div class="formalpara" id="bxfc8wb">
+              <p class="title"><em class="title">Connected Database:</em>
+              Specify the connected database application.</p>
+            </div>
+
+<div class="formalpara" id="bxfc8yw">
+              <p class="title"><em class="title">Synchronization Model:</em>
+              Specify the mode of data synchronization.</p>
+            </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Ensure that you donât change the setting that you selected earlier in the Package Configuration Wizard. If you change it after installing the package in a driver object, make sure that you change the <span class="guimenu">SyncModel</span> in the Publication Mode GCV.</p></div>
+
+<div class="formalpara" id="bxfc91r">
+              <p class="title"><em class="title">Object Class:</em>
+              This field is populated based on your selection in the <span class="guimenu">Synchronization Model</span>. Specify the table or view in the connected database for which account tracking is enabled. By default, the value is <span class="guimenu">usr</span>.</p>
+            </div>
+
+<div class="formalpara" id="bxfc94h">
+              <p class="title"><em class="title">Realm:</em>
+              Specify the name of the realm that uniquely identifies the location of user accounts in the connected database. For example, <span class="literal">mysql.indirect.usr,</span> where MySQL is the database name with the indirect data synchronization model, and <span class="literal">user</span> is the table or view in the connected database for which account tracking is enabled.</p>
+            </div>
+</li>
+<li class="step" id="bxfcbzx">
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bxcwsgw">
+<p class="para">Review the summary of tasks that will be completed to create the driver, then click <span class="guimenu">Finish</span>.</p></li>
+<li class="step" id="bxcwsgx">
+<p class="para">After you have installed the driver object, you must change the configuration for your environment. Proceed to <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsgy" class="xref">Configuring the Driver Object</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bxcwsgy">
+
+<h2 class="title h2"><span class="number">5.1.3</span> Configuring the Driver Object</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After importing the packages and creating the driver object, you need to configure the driver to make it operational. There are many settings that can help you customize and optimize the driver. Although it is important for you to understand all of the settings, your first priority should be to configure the driver parameters located on the Driver Configuration page. For information about the driver parameters, see <a href="configure-jdbc-driver.html" class="xref">Section 6.0, Configuring the JDBC Driver</a>. After completing the configuration tasks, continue with the next section, <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwsh3" class="xref">Deploying the Driver Object</a>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If the connected system is MS SQL Server database and if you have chosen a direct <span class="guimenu">Synchronization Model</span> option, ensure that you change the <span class="guimenu">Key-Gen-Method</span> option to <span class="guimenu">Subscriber Generated</span> in the Subscriber channel.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bxcwsh3">
+
+<h2 class="title h2"><span class="number">5.1.4</span> Deploying the Driver Object</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After the driver object is created in Designer, it must be deployed into the Identity Vault.</p>
+<div class="procedure" id="bxcwsh4">
+<ol class="steps">
+<li class="step" id="bxcwsh5">
+<p class="para">In Designer, open your project.</p></li>
+<li class="step" id="bxcwsh6">
+<p class="para">In the Modeler, right-click the driver icon <img src="../graphics/driver_icon_n.png" alt="" class="inline" /> or the driver line, then select <span class="guimenu">Live &gt; Deploy</span>.</p></li>
+<li class="step" id="bxcwsh7">
+<p class="para">If you are authenticated to the Identity Vault, skip to <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwshc" class="xref">Step 5</a>; otherwise, specify the following information:</p>
+<div class="formalpara" id="bxcwsh8">
+              <p class="title"><em class="title">Host:</em>
+              Specify the IP address or DNS name of the server hosting the Identity Vault.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsh9">
+              <p class="title"><em class="title">Username:</em>
+              Specify the DN of the user object used to authenticate to the Identity Vault.</p>
+            </div>
+
+<div class="formalpara" id="bxcwsha">
+              <p class="title"><em class="title">Password:</em>
+              Specify the userâs password.</p>
+            </div>
+</li>
+<li class="step" id="bxcwshb">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li>
+<li class="step" id="bxcwshc">
+<p class="para">Read the deployment summary, then click <span class="guimenu">Deploy</span>.</p></li>
+<li class="step" id="bxcwshd">
+<p class="para">Read the successful message, then click <span class="guimenu">OK</span>.</p></li>
+<li class="step" id="bxcwshe">
+<p class="para">Click <span class="guimenu">Define Security Equivalence</span> to assign rights to the driver object:</p>
+<p class="para">The driver object requires rights to objects within the Identity Vault. The Admin user object is most often used to supply these rights. However, you might want to create a DriversUser (for example) and assign security equivalence to that user. For receiving events from the Identity Vault, ensure that driver objectâs <span class="guimenu">Security Equals DN</span> has the following rights in the Identity Vault:</p>
+<div class="formalpara" id="bxfcdqq">
+              <p class="title"><em class="title">Entry Rights:</em>
+              The rights to create entries in the Identity Vault.</p>
+            </div>
+
+<div class="formalpara" id="bxfcdsv">
+              <p class="title"><em class="title">Attributes Rights:</em>
+              The rights to modify the attributes in the Identity Vault.</p>
+            </div>
+
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bxcwshf">
+<p class="para">Click <span class="guimenu">Add</span>, then browse to and select the object with the correct rights.</p></li>
+<li class="step" id="bxcwshg">
+<p class="para">Click <span class="guimenu">OK</span> twice.</p>
+<p class="para">For more information about defining a Security Equivalent User in objects for drivers in the Identity Vault, see <q class="quote"><a href="../../../identity-manager-48/security/data/establishing-security-equivalent-user-in-identity-manager.html#establishing-security-equivalent-user-in-identity-manager" class="ulink">Establishing a Security Equivalent User</a></q> in the <span class="citetitle"><a href="../../../identity-manager-48/security/data/identity-manager-security-guide.html#identity-manager-security-guide" class="ulink">NetIQ Identity Manager Security Guide</a></span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bxcwshh">
+<p class="para">Click <span class="guimenu">Exclude Administrative Roles</span> to exclude users that should not be synchronized:</p>
+<p class="para">You should exclude any administrative User objects (for example, Admin and DriversUser) from synchronization.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bxcwshi">
+<p class="para">Click <span class="guimenu">Add</span>, then browse to and select the user object you want to exclude.</p></li>
+<li class="step" id="bxcwshj">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li>
+<li class="step" id="bxcwshk">
+<p class="para">Repeat <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwshi" class="xref">Step 8.a</a> and <a href="how-to-create-a-driver-object-using-designer-for-jdbc-driver.html#bxcwshj" class="xref">Step 8.b</a> for each object you want to exclude.</p></li>
+<li class="step" id="bxcwshl">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bxcwshm">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bxcwshn">
+
+<h2 class="title h2"><span class="number">5.1.5</span> Starting the Driver Object</h2>
+
+<div class="content_wrapper">
+
+<p class="para">When a driver is created, it is stopped by default. To make the driver work, you must start the driver. Identity Manager is an event-driven system, so after the driver is started, it wonât do anything until an event occurs. You can use Identity Console or dxevent commands to start the driver.</p>
+<p class="para">To start the driver:</p>
+<div class="procedure" id="bxcwsho">
+<ol class="steps">
+<li class="step" id="bxcwshp">
+<p class="para">If you are using the Remote Loader with the driver, make sure the Remote Loader driver instance is running.</p></li>
+<li class="step" id="bxcwshq">
+<p class="para">In Designer, open your project.</p></li>
+<li class="step" id="bxfc2ca">
+<p class="para">In the Modeler, right-click the driver icon <img src="../graphics/driver_icon_n.png" alt="Driver icon" title="Driver icon" class="inline" /> or the driver line, then select <span class="guimenu">Live &gt; Start Driver</span>.</p></li>
+<li class="step" id="bxcwshs">
+<p class="para">Continue with <a href="how-to-activate-jdbc-driver.html" class="xref">Activating the Driver</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

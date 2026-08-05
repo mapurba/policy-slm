@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="bfqqmfq,bexh69p,bfqqm8v,bfqqmjr,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Authentication - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bfqqmfq">
+
+<h1 class="title h1"><span class="number">12.3</span> Authentication</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Users associated with a connected Linux or UNIX platform managed by the Fan-Out Driver can authenticate in any of the following ways, depending on how you have installed Platform Services.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="bfqqmfq.html#bfqqxxq" class="xref">Local Authentication</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bfqqmfq.html#bfqqztf" class="xref">Authentication Redirection</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bfqqmfq.html#bfqr0u7" class="xref">Authentication Redirection with Local Failover</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bfqqmfq.html#bfqr1fu" class="xref">Name Service Switch Authentication</a>
+            </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfqqxxq">
+
+<h2 class="title h2"><span class="number">12.3.1</span> Local Authentication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">With local authentication, passwords are stored locally (in <span class="filename">/etc/shadow</span> for example) and users that log onto the Linux or UNIX system will authenticate with this password. To synchronize passwords with the Identity Vault, ensure the following keyword statement is located inside your <span class="filename">asamplat.conf</span> file:</p><pre class="screen">  UPDATEPASSWORD</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you use the <span class="literal">UPDATEPASSWORD</span> statement, you also may include a <span class="literal">CRYPTTYPE</span> statement in the <span class="filename">asamplat.conf</span> file.</p>
+<p class="para">The <span class="literal">CRYPTTYPE</span> statement allows you to override the password storage format (DES, MD5, BLOWFISH, SHA256, SHA512 or SUN_MD5) that is automatically configured by the driver. For more information, see <a href="beiffigc.html#bucg2ea" class="xref">CRYPTTYPE Statement</a>.</p></div>
+
+<p class="para">The Platform Receiver (<span class="filename">asamrcvr</span> file) needs to be running to keep passwords synchronized with the Identity Vault. For more information, see <a href="bfmrhmm.html#bfn7bkm" class="xref">Starting the Platform Receiver</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfqqztf">
+
+<h2 class="title h2"><span class="number">12.3.2</span> Authentication Redirection</h2>
+
+<div class="content_wrapper">
+
+<p class="para">With redirected authentication, passwords are not stored locally. Instead, when a user logs on to the Linux or UNIX system, the Fan-Out Driverâs PAM (or LAM) module will redirect the request to the Identity Vault, where the password is checked along with eDirectory Password and Login rules. Optionally, password policies can be enforced.</p>
+<p class="para">To configure your system to use the PAM module for authentication redirection, you will need to manually configure PAM for each application that is to be PAM-enabled. For details on manually configuring PAM, see <a href="chdibedb.html" class="xref">PAM Configuration Notes</a>.</p>
+<p class="para">If you are running AIX and chose to use LAM for authentication redirection, you will need to manually configure LAM as detailed in <a href="brk5h3s.html" class="xref">LAM Configuration Notes</a>.</p>
+<p class="para">The Platform Services Process (<span class="filename">asampsp</span> file) also needs to be running to provide a connection pool and driver load balancing. For more information, see <a href="bfmrhmm.html#bfn7ho4" class="xref">Starting the Platform Services Process</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfqr0u7">
+
+<h2 class="title h2"><span class="number">12.3.3</span> Authentication Redirection with Local Failover</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Authentication redirection with local failover is a hybrid of local authentication and authentication redirection. In such a scenario, authentication is redirected unless the connection between Platform Services and the Identity Vault is unavailable, in which case local authentication takes place. In this configuration, you will need the Platform Receiver running to synchronize passwords and the Platform Services Process running to provide authentication. For information about starting these two services, see <a href="bfmrhmm.html#bfmrj2a" class="xref">Starting Platform Services</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfqr1fu">
+
+<h2 class="title h2"><span class="number">12.3.4</span> Name Service Switch Authentication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">If you have chosen the virtual provisioning option (see <a href="bfqqm8v.html" class="xref">Provisioning</a>), users will authenticate to the Linux or UNIX system using the Name Service Switch, which is supplied by Platform Services. Virtual users and their password information are kept in a local protected cache on the connected system. This provides the system with a local copy and therefore all the advantages of using local provisioning. If you wish to enforce eDirectory password and login rules, you will also need to manually configure PAM for authentication redirection.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

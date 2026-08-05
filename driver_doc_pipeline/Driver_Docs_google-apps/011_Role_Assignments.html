@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g4ef3ea,t4cb3g4da6yy,t4cb3g4e2b6f,t4cb3g4en7k4,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Role Assignments - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4cb3g4ef3ea">
+
+<h1 class="title h1"><span class="number">3.4</span> Role Assignments</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The GÂ Suite connector is able to create and delete role assignments for users into Google admin roles, both custom and default. The connector exposes an attribute on UserEntry objects called roleAssignment which can be used to list, create, or delete role assignments for that user within the environment.</p>
+<p class="para">The following sections provide information on role assignments:</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4eipxy">
+
+<h2 class="title h2"><span class="number">3.4.1</span> Understanding Roles and Role Assignments</h2>
+
+<div class="content_wrapper">
+
+<p class="para">GÂ Suite domains allow for granting granular rights to certain administrative functions to users within the domain. This is done via a security role assignment.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Google frequently updates the user interfaces of their web consoles. Your screens may differ from the ones shown in this guide.</p></div>
+
+<p class="para">To view your domain roles, select the Admin Roles tool from the admin console at <a href="https://admin.google.com" class="ulink">https://admin.google.com</a>.</p>
+<div class="figure" id="t4cbmt8b4wte"><p class="title"><em class="num">Figure 3-1 </em>Assigning Administrative Roles</p>
+              <img src="../graphics/figure45.png" alt="" />
+            </div>
+
+<p class="para">The default roles are visible in this panel. It is also possible to add custom roles to this list with various privileges.</p>
+<div class="figure" id="t4cbmt8b54jd"><p class="title"><em class="num">Figure 3-2 </em>Creating a New Role</p>
+              <img src="../graphics/figure46.png" alt="" />
+            </div>
+
+<p class="para">These roles can be assigned to users through a role assignment.</p>
+<div class="figure" id="t4cbmt8b5c9c"><p class="title"><em class="num">Figure 3-3 </em>Assigning Administrators to Roles</p>
+              <img src="../graphics/figure47.png" alt="" />
+            </div>
+
+<div class="figure" id="t4cbmt8b5jzb"><p class="title"><em class="num">Figure 3-4 </em>Confirming Administrator Assignments</p>
+              <img src="../graphics/figure48.png" alt="" />
+            </div>
+
+<p class="para">For more information on administrator roles and role management, see Google's documentation. <a href="https://support.google.com/a/answer/33325?hl=en&amp;ref_topic=4514341" class="ulink">https://support.google.com/a/answer/33325?hl=en&amp;ref_topic=4514341</a></p>
+<p class="para">The developer documentation for role assignments may also provide additional clarity and assistance. <a href="https://developers.google.com/admin-sdk/directory/v1/guides/manage-roles" class="ulink">https://developers.google.com/admin-sdk/directory/v1/guides/manage-roles</a></p>
+<p class="para">A role assignment consists of the following elements:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The user to whom the role is assigned</p></li>
+<li class="listitem">
+<p class="listitem">The role which is being assigned</p></li>
+<li class="listitem">
+<p class="listitem">The scope of the assignment</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The entire domain</p></li>
+<li class="listitem">
+<p class="listitem">An organizational unit</p></li></ul></div>
+</li></ul></div>
+
+<p class="para">When assigning a role to a user for multiple organizational units, multiple role assignments are used, one per organizational unit assignment.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4ek045">
+
+<h2 class="title h2"><span class="number">3.4.2</span> Identity Manager and Role Assignments</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The GÂ Suite Identity Manager connector allows for the creation and deletion of role assignments for users via a structured attribute called roleAssignment.</p>
+<p class="para">The roleAssignment attribute is an optional structured attribute on user objects. Added values are interpreted by the connector as a role assignment creation and removed values are interpreted as aÂ deletion of a role assignment. There are several elements of a roleAssignment value:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">roleId</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Unique internal ID for the role</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">roleName</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The roleâs name</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">roleDescription</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The roleâs description</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">scopeType</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The scope of the assignment.</p></li>
+<li class="listitem">
+<p class="listitem">Must be either:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">CUSTOMER</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The entire domain</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">ORG_UNIT</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">A specified org unit</p></li>
+<li class="listitem">
+<p class="listitem">Must specify either orgUnitId or orgUnitPath</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">orgUnitId</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The unique internal ID for the orgUnit</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">orgUnitPath</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The path of the orgUnit.</p></li></ul></div>
+</li></ul></div>
+</li></ul></div>
+</li></ul></div>
+
+<p class="para">These elements are not all required for add or remove value elements, however, it is necessary toÂ ensure that enough data is present in a value element to perform the task.</p>
+<p class="para">When adding a value for roleAssignment, the following requirements must be met:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">A role must be identified</p></li>
+<li class="listitem">
+<p class="listitem">A scope must be specified</p></li>
+<li class="listitem">
+<p class="listitem">If the scope is ORG_UNIT, then an organizational unit must be specified.</p></li></ul></div>
+
+<p class="para">When removing a value for roleAssignment, the connector must search the list of that userâs role assignments, identify the correct assignment, and delete it. A role assignment is matched by:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Using a provided roleAssignmentId value</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If this value is known, then it is sufficient for a remove value event.</p></li>
+<li class="listitem">
+<p class="listitem">roleAssignmentId values can be found by querying roleAssignment on a user.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">If the roleAssignmentId is not known or provided, an attempt will be made to find one using:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">roleId, roleName, or roleDescription to identify the role</p></li>
+<li class="listitem">
+<p class="listitem">scopeType</p></li>
+<li class="listitem">
+<p class="listitem">orgUnitId or orgUnitPath if the scope is ORG_UNIT</p></li></ul></div>
+</li></ul></div>
+
+<p class="para">To add or remove a value for roleAssignment, the connector needs to know two or three things: the role being assigned, the scope of the assignment, and (depending on the scope) the organizational unit which is the target of the assignment.</p>
+<p class="para">Identifying a role can be done in one of three ways:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Direct reference with the internal role unique ID value, roleId</p></li>
+<li class="listitem">
+<p class="listitem">An exact match with the role name, roleName</p></li>
+<li class="listitem">
+<p class="listitem">An exact match with the role description, roleDescription</p></li></ul></div>
+
+<p class="para">Role ID values can be found by issuing a query into the connector for object class name âRoleâ and viewing the returned instance documents in the driver trace logs. Role ID values are also returned on any query for roleAssignments on user objects. Note that role ID values are unique per instance or domain and are not the same for each domain within the Google environment.</p>
+<p class="para">As of this writing, the default system roles have the following names and descriptions:</p>
+<div class="table" id="t4cb3g4elhzx"><p class="title"><em class="num">Table 3-3 </em>Default System Roles</p>
+<table class="topbot" width="100%"><col width="28%" /><col width="38%" /><col width="34%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Admin UI Display Name</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Role Name</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Role Description</span>
+                  </p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">Super Admin</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">_SEED_ADMIN_ROLE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GÂ Suite Administrator Seed Role</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">Groups Admin</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">_GROUPS_ADMIN_ROLE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Groups Administrator</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">User Management Admin</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">_USER_MANAGEMENT_ADMIN_ROLE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User Management Administrator</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">Help Desk Admin</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">_HELP_DESK_ADMIN_ROLE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Help Desk Administrator</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">Services Admin</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">_SERVICE_ADMIN_ROLE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Services Administrator</p></td>
+</tr></table>
+</div>
+
+<p class="para">There may be other default system roles or changes to this list at any time.</p>
+<p class="para">For more information, see <a href="https://support.google.com/a/answer/2405986?hl=en" class="ulink">https://support.google.com/a/answer/2405986?hl=en</a>.</p>
+<p class="para">For custom roles, the role name and role description are defined at role creation and are the same for the connector and API as what was entered during creation.</p>
+<div class="figure" id="t4cbmtsgy0ct"><p class="title"><em class="num">Figure 3-5 </em>Creating a New Role</p>
+              <img src="../graphics/figure49.png" alt="" />
+            </div>
+
+<p class="para">For the above example custom role, the values to use for roleName and roleDescription are highlighted above.</p>
+<p class="para">A simple way to determine role ID, role Name, or role Description for any role would be to assign it to a user managed by the connector then querying that user for the attribute roleAssignment. The connector will populate all these elements for each assigned role.</p>
+<p class="para">In the following example, roleAssignment was mapped to siteLocation for testing. This is the result of a query on a test user in iManager:</p>
+<div class="figure" id="t4cbmtsgy47q"><p class="title"><em class="num">Figure 3-6 </em>Example Query from iManager</p>
+              <img src="../graphics/figure50.png" alt="" />
+            </div>
+
+<p class="para">And hereâs the trace log:</p><pre class="screen">&lt;instance class-name="UserEntry" src-dn="/teststudent1@concensus-test.com"&gt;
+ &lt;association&gt;teststudent1@concensus-test.com&lt;/association&gt;
+ &lt;attr attr-name="RoleAssignments"&gt;
+ &lt;value type="structured"&gt;
+ &lt;component name="orgUnitPath"&gt;/Weaver&lt;/component&gt;
+ &lt;component name="roleAssignmentId"&gt;1498736891002969&lt;/component&gt;
+ &lt;component name="scopeType"&gt;ORG_UNIT&lt;/component&gt;
+ &lt;component name="roleId"&gt;1498736891002894&lt;/component&gt;
+ &lt;component name="roleName"&gt;MW Test Role 1&lt;/component&gt;
+ &lt;component name="orgUnitId"&gt;03gre1hq2n7bt2m&lt;/component&gt;
+ &lt;component name="roleDescription"&gt;Weaver testing role 1&lt;/component&gt;
+ &lt;/value&gt;
+ &lt;value type="structured"&gt;
+ &lt;component name="orgUnitPath"/&gt;
+ &lt;component name="roleAssignmentId"&gt;1498736891002970&lt;/component&gt;
+ &lt;component name="scopeType"&gt;CUSTOMER&lt;/component&gt;
+ &lt;component name="roleId"&gt;1498736891002893&lt;/component&gt;
+ &lt;component name="roleName"&gt;_PLAY_FOR_WORK_ADMIN_ROLE&lt;/component&gt;
+ &lt;component name="orgUnitId"/&gt;
+ &lt;component name="roleDescription"&gt;Play For Work Administrator&lt;/component&gt;
+ &lt;/value&gt;
+ &lt;value type="structured"&gt;
+ &lt;component name="orgUnitPath"/&gt;
+ &lt;component name="roleAssignmentId"&gt;1498736891002971&lt;/component&gt;
+ &lt;component name="scopeType"&gt;CUSTOMER&lt;/component&gt;
+ &lt;component name="roleId"&gt;1498736891002886&lt;/component&gt;
+ &lt;component name="roleName"&gt;_SEED_ADMIN_ROLE&lt;/component&gt;
+ &lt;component name="orgUnitId"/&gt;
+ &lt;component name="roleDescription"&gt;Google Apps Administrator Seed Role&lt;/component&gt;
+ &lt;/value&gt;
+ &lt;/attr&gt;
+&lt;/instance&gt;</pre>
+<p class="para">From these examples, you can see how the role identifiers are present in the roleAssignment query.</p>
+<p class="para">To specify an organizational unit, either the orgUnitId or orgUnitPath must be specified. The orgUnitId is the internal identifier for the organizational unit within Google. This can be determined byÂ querying the OrgUnit and reading the attribute named OrgUnitId.</p>
+<p class="para">Example OrgUnitId:</p><pre class="screen">&lt;instance class-name="Organizational Unit" src-dn="/AK/NL"&gt;
+ &lt;association&gt;/AK/NL&lt;/association&gt;
+ &lt;attr attr-name="OrgUnitId"&gt;
+ &lt;value&gt;id:03gre1hq4d6ldwa&lt;/value&gt;
+ &lt;/attr&gt;
+ &lt;attr attr-name="OU"&gt;
+ &lt;value&gt;NL&lt;/value&gt;
+ &lt;/attr&gt;
+ &lt;attr attr-name="Description"&gt;
+ &lt;value/&gt;
+ &lt;/attr&gt;
+ &lt;attr attr-name="BlockPolicy"&gt;
+ &lt;value&gt;false&lt;/value&gt;
+ &lt;/attr&gt;
+&lt;/instance&gt;</pre>
+<p class="para">Alternately, the orgUnitPath can be specified. For the above example, the OrgUnitPath is the association value or source DN: /AK/NL.</p>
+<p class="para">If the connector cannot find a role, org unit, or role assignment to add/remove role assignments, thenÂ no operation is performed, and an error is returned.</p>
+<p class="para">Note that when matching on roleName or roleDescription, the first match is used, in the event multiple roles match.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4elpox">
+
+<h2 class="title h2"><span class="number">3.4.3</span> Examples</h2>
+
+<div class="content_wrapper">
+
+<div class="container sect3" id="t4cb3g4ems60">
+
+<h3 class="title h3">Add Value</h3>
+<pre class="screen">&lt;modify-attr attr-name="roleAssignment"&gt;
+ &lt;add-value&gt;
+ &lt;value type="structured"&gt;
+ &lt;component name="roleDescription"&gt;Weaver testing role 1&lt;/component&gt;
+ &lt;component name="scopeType"&gt;ORG_UNIT&lt;/component&gt;
+ &lt;component name="orgUnitPath"&gt;/Weaver&lt;/component&gt;
+ &lt;/value&gt;
+ &lt;/add-value&gt;
+ &lt;/modify-attr&gt;</pre>
+</div>
+
+<div class="container sect3" id="t4cb3g4emzv5">
+
+<h3 class="title h3">Remove Value</h3>
+<pre class="screen">&lt;modify-attr attr-name="roleAssignment"&gt;
+ &lt;remove-value&gt;
+ &lt;value type="structured"&gt;
+ &lt;component name="roleDescription"&gt;User Management Administrator&lt;/component&gt;
+ &lt;component name="scopeType"&gt;CUSTOMER&lt;/component&gt;
+ &lt;component name="orgUnitPath"/&gt;
+ &lt;/value&gt;
+ &lt;/remove-value&gt;
+ &lt;/modify-attr&gt;
+&lt;/modify&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

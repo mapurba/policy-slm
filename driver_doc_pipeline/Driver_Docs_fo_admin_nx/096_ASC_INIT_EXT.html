@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="babiiiag,br7ufe0,babbgdde,chdgfafi,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>ASC_INIT_EXT - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container refentry expanding expanded" id="babiiiag">
+
+<h1 class="title h1">ASC_INIT_EXT</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Reads the platform configuration file and initializes the environment so that calls can be made to a Core Driver. This function or ASC_INIT() must be called before any other API function. ASC_INIT_EXT() differs from ASC_INIT() in that you can provide a buffer into which the API places error messages if the API environment cannot be initialized.</p><div class="refsect1" id="br7swqs">
+          
+<h2 class="title">Syntax</h2>
+
+          <pre class="screen">#include &lt;ascauth.h&gt;</pre>
+          <pre class="screen">ASCENV *ASC_INIT_EXT(char *filename, char *error_msg, size_t size);</pre>
+        </div><div class="refsect1" id="br7swqt">
+          
+<h2 class="title">Parameters</h2>
+
+          
+<div class="informaltable">
+<table class="topbot" width="95%"><col width="31%" /><col width="69%" />
+<tr class="oddrow" id="br7swqu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">filename</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The name of the platform configuration file.</p>
+<p class="para">If you call ASC_INIT_EXT() with a NULL in place of the filename parameter as in ASC_INIT_EXT(NULL, buffer, BUFSIZE), the default is</p>
+<p class="para">/usr/local/ASAM/data/asamplat.conf</p></td>
+</tr>
+<tr class="evenrow" id="br7swqz"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">error_msg</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A buffer you provide into which an error message can be placed if the environment cannot be initialized.</p></td>
+</tr>
+<tr class="oddrow" id="br7swr0"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">size</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The size of the error_msg buffer you have provided.</p></td>
+</tr></table>
+</div>
+
+        </div><div class="refsect1" id="br7swr1">
+          
+<h2 class="title">Return Values</h2>
+
+          
+<p class="para">Returns a pointer to the environment item created upon success. If an error has occurred, <span class="literal">NULL</span> is returned, and a descriptive error message is placed into the <span class="literal">error_msg</span> buffer.</p>
+        </div><div class="refsect1" id="br7swr2">
+          
+<h2 class="title">Example</h2>
+
+          <pre class="screen">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;ascauth.h&gt;
+
+#define BUFSIZE 256
+
+main()
+{
+  ASCENV *asce;
+
+  /* initialize the authentication environment */
+  /*   allocate buffer */
+  buffer = (char *) malloc(BUFSIZE);
+  asce = ASC_INIT_EXT(NULL, buffer, BUFSIZE);
+  if (asce == NULL) {
+    fprintf(stderr, "Error: cannot initialize authentication environment\n");
+    fprintf(stderr, "  %s \n", buffer);
+    exit(EXIT_FAILURE);
+  }
+
+  /* now you can make additional authentication calls  here */
+
+  /* now terminate the authentication environment */
+  ASC_TERM(asce);
+  return 0;
+}</pre>
+        </div><div class="refsect1" id="br7swr3">
+          
+<h2 class="title">See Also</h2>
+
+          
+<p class="para">
+            <a href="babbgdde.html" class="xref">ASC_INIT</a>
+          </p>
+          
+<p class="para">
+            <a href="babeeidi.html" class="xref">ASC_TERM</a>
+          </p>
+        </div>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

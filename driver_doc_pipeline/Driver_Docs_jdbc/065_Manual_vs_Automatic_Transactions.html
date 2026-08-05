@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="manual-and-automatic-jdbc-transactions,embed-sql-statements-in-xds-events-for-jdbc-driver,set-virtual-triggers-for-jdbc-drivers,set-transaction-isolation-level-for-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Manual vs. Automatic Transactions - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="manual-and-automatic-jdbc-transactions">
+
+<h1 class="title h1"><span class="number">12.5</span> Manual vs. Automatic Transactions</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can manually group embedded SQL and XDS events by using two custom attributes:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">jdbc:transaction-type</span>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <span class="literal">jdbc:transaction-id</span>
+          </p></li></ul></div>
+
+<h4 class="bridgehead" id="b9fxmyp">jdbc:transaction-type</h4>
+
+<p class="para">This attribute has two values: <span class="literal">manual</span> and <span class="literal">auto</span>. By default, most XDS events of interest (<span class="literal">&lt;add&gt;</span>, <span class="literal">&lt;modify&gt;</span>, and <span class="literal">&lt;delete&gt;</span>) are implicitly set to the manual transaction type. The manual setting enables XDS events to resolve to a transaction consisting of one or more SQL statement.</p>
+<p class="para">By default, embedded SQL events are set to auto transaction type because some SQL statements, such as DDL statements, cannot usually be included in a manual transaction. In the following example, the attribute is in bold text.</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr" <span class="strong">jdbc:transaction-type="auto"</span>&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+    &lt;/add&gt;
+    &lt;jdbc:statement&gt;
+        &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE
+                  idu = {$idu}&lt;/jdbc:sql&gt;
+    &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">This XML resolves to:</p><pre class="screen">SET AUTOCOMMIT ON
+INSERT INTO indirect.usr(lname) VALUES('Doe');
+-- implicit commit
+UPDATE indirect.usr SET fname = 'John' WHERE idu = 1;
+-- implicit commit</pre>
+<h4 class="bridgehead" id="b9fxmyq">jdbc:transaction-id</h4>
+
+<p class="para">The Subscriber channel ignores this attribute unless the elementâs <span class="literal">jdbc:transaction-type</span> attribute value defaults to or is explicitly set to <span class="literal">manual</span>. The following XML shows an example of a manual transaction. The attribute is in bold text.</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr"<span class="strong"> jdbc:transaction-id="0"</span>&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+    &lt;/add&gt;
+     &lt;jdbc:statement <span class="strong">jdbc:transaction-type="manual"                      jdbc:transaction-id="0"</span>&gt;
+           &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE
+                     idu = {$idu}&lt;/jdbc:sql&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">This XML resolves to:</p><pre class="screen">SET AUTOCOMMIT OFF
+INSERT INTO indirect.usr(lname) VALUES('Doe');
+UPDATE indirect.usr SET fname = 'John' WHERE idu = 1;
+COMMIT; -- explicit commit</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

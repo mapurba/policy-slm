@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="bfmn9rs,bcgicacb,anhms6o,chdcejie,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Performance Tuning - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bfmn9rs">
+
+<h1 class="title h1"><span class="number">5.4</span> Performance Tuning</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Fan-Out Driver provides a unique Identity Management solution by extending its services to many clients both simultaneously and among mixed environments. This section describes best practices for ensuring optimal performance in the Core Driver Shimâs ability to deliver this functionality.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="bfmp6n3">
+
+<h2 class="title h2"><span class="number">5.4.1</span> Secondary Drivers</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Adding secondary Drivers can provide your Fan-Out platform clients with failover and load balancing. If you have multiple eDirectory servers and plan to deploy the Fan-Out Platform Services to many different systems, itâs recommended that you install and deploy the Fan-Out driver to more than one server.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bfmpaiq">
+
+<h2 class="title h2"><span class="number">5.4.2</span> Platform Operation Modes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Fan-Out Platform Receiver, the component that connects to the Core Driver to receive events from Identity Manager, can be configured to run in five different operation modes (see <a href="babdcabj.html#babfijbb" class="xref">Modes of Operation</a>). Three of these modes, in particular, may have an impact on the performance of the Core Driver Shim, as described in <a href="bfmn9rs.html#bfmptu5" class="xref">Table 5-1</a>.</p>
+<div class="table" id="bfmptu5"><p class="title"><em class="num">Table 5-1 </em>Effect of Operation Modes on Core Driver performance.</p>
+<table class="topbot" width="100%"><col width="14%" /><col width="36%" /><col width="51%" />
+                
+<tr class="headerrow" id="bfmpre3"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Mode</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Function</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Effect on Performance</p></th>
+</tr>
+              
+<tr class="oddrow" id="bfmpre4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Persistent</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The Platform Receiver connects and remains connected to the Fan-Out Driver to receive events in real-time, which is desirable if it is necessary for your platform to receive events as they occur in the Identity Vault.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Maintaining the open connection and its resources does carry an overhead in both memory and CPU usage for the Driver Shim.</p></td>
+</tr>
+<tr class="evenrow" id="bfmpre5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Polling</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The Platform Receiver connects to the Fan-Out Driver on configurable intervals to catch up on events since its last poll.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Positive: Can allow the Driver Shim to release its connection and free up resources. Because each and every event will not be delivered to the Platform immediately, this mode will deliver a single event with all of the needed provisioning information to the Polling platform, making the delivery more efficient.</p>
+<p class="para">Negative: Can also cause delayed event delivery and, depending on the polling interval, you may see the same memory issues if you have too many platforms connecting too frequently.</p></td>
+</tr>
+<tr class="oddrow" id="bfmpre6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Scheduled</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Very similar to Polling mode with one exception: it only runs once. Allows the system to decide when to launch the Platform Receiver using another facility, such as a cron.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Can provide your systems with nightly or weekly updates and also allow you to stagger the event deliveries, which safeguards against overloading your Fan-Out Driver with too many requests at once.</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

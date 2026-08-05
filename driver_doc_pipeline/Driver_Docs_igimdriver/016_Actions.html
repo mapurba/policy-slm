@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="July 31 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="rest-apis-exposed-by-netiq-igim-driver,understanding-rest-apis-exposed-by-the-netiq-idm-igim-driver,common-response-parameters-for-rest-apis-exposed-by-netiq-idm-igim-driver,legal,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Actions - NetIQ Identity Manager Driver for Identity Gateway Integration Module Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="rest-apis-exposed-by-netiq-igim-driver">
+
+<h1 class="title h1"><span class="number">3.2</span> Actions</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following actions are supported:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#add-a-consumer-rest-api-exposed-by-idm-igim-driver" class="xref">Add a Consumer</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#fetch-details-of-registered-consumers-rest-api-exposed-by-idm-igim-driver" class="xref">Get the Registered Consumers</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#obtain-consumer-details-rest-api-exposed-by-idm-igim-driver" class="xref">Get a Consumerâs Details</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#modify-consumer-details-rest-api-exposed-by-idm-igim-driver" class="xref">Modify a Consumer</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#delete-a-consumer-rest-api-exposed-by-idm-igim-driver" class="xref">Delete a Consumer</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#get-events-rest-api-exposed-by-idm-igim-driver" class="xref">Get Events</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#delete-all-events-rest-api-exposed-by-idm-igim-driver" class="xref">Flush All Events</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#delete-events-for-a-consumer-rest-api-exposed-by-idm-igim-driver" class="xref">Flush Events for a Consumer</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#delete-a-cached-page-event-for-a-consumer-rest-api-exposed-by-idm-igim-driver" class="xref">Flush Events on a Page for a Consumer</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#get-the-driver-filter-details-for-a-consumer-rest-api-exposed-by-idm-igim-driver" class="xref">Obtain the Driver Filter</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#get-driver-filter-details-for-an-object-class-rest-api-exposed-by-idm-igim-driver" class="xref">Get the Driver Attribute Filter for an Object Class</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="rest-apis-exposed-by-netiq-igim-driver.html#restart-the-driver-rest-api-exposed-by-idm-igim-driver" class="xref">Restart the Driver</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="add-a-consumer-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.1</span> Add a Consumer</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">POST</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="filename">/idv/driver/consumer</span>
+              </p></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="filename">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/consumer</span>
+              </p></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Adds a consumer.</p>
+<p class="listitem">A consumer represents a view in the application. For example, Identity Governance. You can add multiple consumers for the same set of object classes or attributes. The driver filter is constructed from the classes or attributes registered for each consumer. Direct update to the filter is not available.</p>
+<p class="listitem">To eliminate the need for issuing multiple REST calls for flushing events and restarting the driver, specify the following parameters in the request payload:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="literal">purgeParam</span>: Purges the cached events of all or specific consumers.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="literal">restartParam:</span> Restarts the driver automatically after the duration specified for the parameter. This is a mandatory parameter because the changes will not be applied to the consumer until the driver is restarted.</p></li></ul></div>
+</dd>
+
+          
+<dt class="term">Sample1 Request</dt>
+<dd class="listitem"><pre class="screen">POST https://192.168.0.1:7708/idv/driver/consumer
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs
+Content-Type: application/json
+{
+"consumer": {
+"consumerName": "Acme",
+"filter": [{
+"className": "inetorgperson",
+"attributes": [
+"cn",
+"sn",
+"givenname"
+]
+}]
+}
+}</pre></dd>
+
+          
+<dt class="term">Sample1 Response</dt>
+<dd class="listitem"><pre class="screen">200 OK
+Content-Type: application/json
+Date: Wed, 10 Oct 2018 08:26:44 GMT
+Server: Jetty(9.4.z-SNAPSHOT)
+Transfer-Encoding: chunked
+{
+"consumerName": "Acme",
+"consumerId": "2119f87e-899a-4e91-97e0-c7c4e28daf09",
+"filter": [{
+"className": "inetorgperson",
+"attributes": ["cn", "sn", "givenname"]
+}]
+}</pre></dd>
+
+          
+<dt class="term">Sample2 Request</dt>
+<dd class="listitem"><pre class="screen">POST https://192.168.0.1:7708/idv/driver/consumer
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs
+Content-Type: application/json
+{  
+   "consumer":{
+      "consumerName":"LooneyCorporation",
+      "filter":[
+         {
+            "className":"inetorgperson",
+            "attributes":[
+               "cn",
+               "fullName",
+               "title"
+            ]
+         }
+      ]
+   },
+   "restartParam":{ 
+"initialDelay":5000
+},
+   "purgeParam":{"purgeConsumers":["2119f87e-899a-4e91-97e0-c7c4e28daf09"]
+   }         
+}</pre>
+<div class="note"><p class="title">NOTE:</p>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The <span class="literal">purgeConsumers</span> parameter accepts the set of consumer IDs for which all the cached events are purged. To purge all cached events for all consumers, specify the <span class="literal">purgeParam</span> parameter in the request payload in the following syntax:</p><pre class="screen">
+                      <span class="filename">"purgeParam":{ "purgeAll":true}</span>
+                    </pre></li>
+<li class="listitem">
+<p class="listitem">The <span class="literal">restartParam</span> parameter uses the value of <span class="literal">initialDelay</span> in milliseconds after that the driver is restarted.</p></li></ul></div>
+</div>
+</dd>
+
+          
+<dt class="term">Sample2 Response</dt>
+<dd class="listitem"><pre class="screen">200 OK
+Content-Type: application/json
+Server: Jetty(9.4.z-SNAPSHOT)
+Transfer-Encoding: chunked
+{
+"consumerName": "LooneyCorporation",
+"consumerId": "6c0f26da-c83e-4c1f-a90d-7f8de2ff3129",
+"filter": [
+        {
+            "className": "inetorgperson",
+            "attributes": [
+                "cn",
+                "fullName",
+                "title"
+            ]
+        }
+    ]
+}</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">400 - Bad Request, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="fetch-details-of-registered-consumers-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.2</span> Get the Registered Consumers</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">GET</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="filename">/idv/driver/consumer</span>
+              </p></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="filename">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/consumer</span>
+              </p></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Obtains the details of registered consumers.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">GET https://192.168.0.1:7708/idv/driver/consumer</pre><pre class="screen">Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs
+</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">200 OK
+Content-Type: application/json
+Date: Wed, 10 Oct 2018 08:30:17 GMT
+Server: Jetty(9.4.z-SNAPSHOT)
+Transfer-Encoding: chunked
+{
+"consumers": [{
+"consumerName": "Acme",
+"consumerId": "2119f87e-899a-4e91-97e0-c7c4e28daf09",
+"filter": [{
+"className": "inetorgperson",
+"attributes": ["cn", "sn", "givenname"]
+}]
+}, {
+"consumerName": "LooneyCorporation",
+"consumerId": "6c0f26da-c83e-4c1f-a90d-7f8de2ff3129",
+"filter": [{
+"className": "inetorgperson",
+"attributes": ["cn", "fullName", "title"]
+}]
+}]
+}</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">400 - Bad Request, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="obtain-consumer-details-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.3</span> Get a Consumerâs Details</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">GET</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">
+                <span class="command">/idv/driver/consumer/{consumerId}</span>
+              </pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/consumer/{consumerId}</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Obtains the details of a consumer.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">GET https://192.168.0.1:7708/idv/driver/consumer/2119f87e-899a-4e91-97e0-c7c4e28daf09
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">200 OK
+Content-Type: application/json
+Date: Wed, 10 Oct 2018 08:30:57 GMT
+Server: Jetty(9.4.z-SNAPSHOT)
+Transfer-Encoding: chunked
+{
+"consumerName": "Acme",
+"consumerId": "2119f87e-899a-4e91-97e0-c7c4e28daf09",
+"filter": [{
+"className": "inetorgperson",
+"attributes": ["cn", "sn", "givenname"]
+}]
+}</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">400 - Bad Request, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="modify-consumer-details-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.4</span> Modify a Consumer</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">PUT</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">
+                <span class="command">/idv/driver/consumer</span>
+              </pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/consumer</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Updates a consumer.</p>
+<p class="listitem">To eliminate the need for issuing multiple REST calls for flushing events and restarting the driver, specify the following parameters in the request payload:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="literal">purgeParam</span>: Purges the cached events of all or specific consumers.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="literal">restartParam:</span> Restarts the driver automatically after the duration specified for the parameter. This is a mandatory parameter because the changes will not be applied to the consumers until the driver is restarted.</p></li></ul></div>
+</dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">PUT https://192.168.0.1:7708/idv/driver/consumer
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs
+Content-Type: application/json
+{  
+   "consumer":{
+      "consumerName":"Acme",
+      "filter":[
+         {"className":"inetorgperson",
+            "attributes":["givenname"]
+         }
+      ]
+   },
+   "restartParam":{ 
+"initialDelay":5000
+   },
+   "purgeParam":{"purgeConsumers":["2119f87e-899a-4e91-97e0-c7c4e28daf09"]
+   }         
+}</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">200 OK
+Content-Type: application/json
+Server: Jetty(9.4.z-SNAPSHOT)
+Transfer-Encoding: chunked
+{
+"consumerName": "Acme",
+"consumerId": "2119f87e-899a-4e91-97e0-c7c4e28daf09",
+"filter": [
+        {
+            "className": "inetorgperson",
+            "attributes": ["givenname"]
+        }
+    ]
+}</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">400 - Bad Request, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="delete-a-consumer-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.5</span> Delete a Consumer</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">DELETE</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">
+                <span class="command">/idv/driver/consumer/{consumerId}</span>
+              </pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/consumer/{consumerId}</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Deletes a consumer.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">DELETE https://192.168.0.1:7708/idv/driver/consumer/2119f87e-899a-4e91-97e0-c7c4e28daf09
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">204 No Content
+Content-Type: application/json
+Date: Wed, 10 Oct 2018 08:54:11 GMT
+Server: Jetty(9.4.z-SNAPSHOT)</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">400 - Bad Request, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="get-events-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.6</span> Get Events</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">GET</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="filename">/idv/events/{consumerId}</span>
+              </p></dd>
+
+          
+<dt class="term">Query Parameters</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="literal">pageSize</span>
+              </p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="literal">Default:</span> 25</p></li>
+<li class="listitem">
+<p class="listitem"><span class="literal">Min</span>: 1</p></li>
+<li class="listitem">
+<p class="listitem"><span class="literal">Max</span>: 500</p></li></ul></div>
+</dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/events/{consumerId}</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Obtains a page of cached events for the specified consumer. If you are registering a consumer, it returns a <span class="literal">consumerId</span> for the consumer.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">GET https://192.168.0.1:7708/idv/events/6c0f26da-c83e-4c1f-a90d-7f8de2ff3129
+
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">200 OK
+Content-Type: application/json
+Date: Thu, 11 Oct 2018 08:11:22 GMT
+Server: Jetty(9.4.z-SNAPSHOT)
+Transfer-Encoding: chunked
+{
+"events": [{
+"eventType": "modify",
+"objectClass": "inetorgperson",
+"srcDn": "CN=ab4,OU=engg,OU=users,O=data",
+"association": "uv8QJqFRUkSxObr\/ECahUQ==",
+"attributes": {
+"cn": {
+"removeAllValues": true,
+"addValue": ["ab4"]
+},
+"fullName": {
+"removeAllValues": true,
+"addValue": ["ab4 ab4"]
+},
+"title": {
+"removeAllValues": true
+}
+}
+}, {
+"eventType": "move",
+"objectClass": "inetorgperson",
+"srcDn": "CN=ab4,OU=engg,OU=users,O=data",
+"cachedTime": "20171012042831.471Z",
+"oldSrcDn": "CN=ab4,OU=users,O=data",
+"association": "uv8QJqFRUkSxObr\/ECahUQ==",
+"parent": {
+"srcDn": "OU=engg,OU=users,O=data"
+}
+}],
+"size": 2,
+"hasMore": false,
+"pageId": "a763bf7d-6b3b-4f5f-8881-ecad91483f50"
+}</pre>
+<p class="listitem">In <span class="literal">Manual</span> flush mode, the cached events are cleaned up by the Flush API. The API returns an empty response in absence of change events.</p></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">400 - Bad Request, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="delete-all-events-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.7</span> Flush All Events</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">DELETE</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="filename">/idv/events</span>
+              </p></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem">
+<p class="listitem">
+                <span class="filename">https://&lt;hostname&gt;:&lt;port&gt;/idv/events</span>
+              </p></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Deletes all cached events.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">DELETE http://192.168.0.1:7708/idv/events
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample2 Response</dt>
+<dd class="listitem"><pre class="screen">204 No Content
+Content-Type: application/json
+Date: Wed, 12 Sep 2018 08:55:50 GMT
+Server: Jetty(9.4.z-SNAPSHOT)</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="delete-events-for-a-consumer-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.8</span> Flush Events for a Consumer</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">DELETE</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">/idv/events/{consumerId}</pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/events/{consumerId}</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Deletes all cached events for a consumer.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">DELETE http://192.168.0.1:7708/idv/events/6c0f26dac83e-4c1f-a90d-7f8de2ff3129
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">204 No Content
+Content-Type: application/json
+Date: Wed, 10 Oct 2018 09:28:12 GMT
+Server: Jetty(9.4.z-SNAPSHOT)</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="delete-a-cached-page-event-for-a-consumer-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.9</span> Flush Events on a Page for a Consumer</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">DELETE</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">/idv/events/{consumerId}/{pageId}</pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/events/{consumerId}/{pageId}</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Deletes a cached event page for a consumer.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">DELETE http://192.168.0.1:7708/idv/events/6c0f26dac83e-4c1f-a90d-7f8de2ff3129/bf4dcbf8-31a8-4701-a9e4-4fc2ad7d40d4
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">204 No Content
+Content-Type: application/json
+Date: Wed, 12 Sep 2018 08:54:39 GMT
+Server: Jetty(9.4.z-SNAPSHOT)</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="get-the-driver-filter-details-for-a-consumer-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.10</span> Obtain the Driver Filter</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">GET</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">/idv/driver/filter</pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/filter</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Obtains details of the driver filter.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">GET http://192.168.0.1:7708/idv/driver/filter
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">{
+    "objectClasses": {
+        "className": "inetorgperson",
+        "attributes": [
+"cn","fullName","title"
+        ]
+    }
+}</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="get-driver-filter-details-for-an-object-class-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.11</span> Get the Driver Attribute Filter for an Object Class</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">GET</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">/idv/driver/filter/{objectclass}</pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/filter/{objectclass}</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Obtains details of attribute filter of an object class.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">GET
+http://192.168.0.1:7708/idv/driver/filter/inetorgperson
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">{
+    "className": "inetorgperson",
+    "attributes": [
+"cn","fullName","title"
+        ]
+}</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">204 - No response, OK</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">404 - Not Found, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="restart-the-driver-rest-api-exposed-by-idm-igim-driver">
+
+<h2 class="title h2"><span class="number">3.2.12</span> Restart the Driver</h2>
+
+<div class="content_wrapper">
+
+<div class="variablelist">
+          
+<dl class="variablelist">
+<dt class="term">Request Type</dt>
+<dd class="listitem">
+<p class="listitem">PUT</p></dd>
+
+          
+<dt class="term">API</dt>
+<dd class="listitem"><pre class="screen">/idv/driver/restart</pre></dd>
+
+          
+<dt class="term">Sample URL</dt>
+<dd class="listitem"><pre class="screen">https://&lt;hostname&gt;:&lt;port&gt;/idv/driver/restart</pre></dd>
+
+          
+<dt class="term">Description</dt>
+<dd class="listitem">
+<p class="listitem">Restarts the driver.</p></dd>
+
+          
+<dt class="term">Sample Request</dt>
+<dd class="listitem"><pre class="screen">PUT http://192.168.0.1:7708/idv/driver/restart
+Authorization: Basic Y249YWRtaW4sb3U9c2Esbz1zeXN0ZW06bm92ZWxs
+Content-Type: application/json
+{
+"initialDelay":10000
+}</pre></dd>
+
+          
+<dt class="term">Sample Response</dt>
+<dd class="listitem"><pre class="screen">200 OK
+Content-Type: application/json
+Date: Mon, 10 Sep 2018 08:22:54 GMT
+Server: Jetty(9.4.z-SNAPSHOT)
+Transfer-Encoding: chunked
+{
+"submitted": true
+}</pre></dd>
+
+          
+<dt class="term">Authentication</dt>
+<dd class="listitem">
+<p class="listitem">Yes</p></dd>
+
+          
+<dt class="term">Error Codes</dt>
+<dd class="listitem">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">200 - OK</p></li>
+<li class="listitem">
+<p class="listitem">401 - Authentication Failure, ERROR</p></li>
+<li class="listitem">
+<p class="listitem">500 - Driver Error, ERROR</p></li></ul></div>
+</dd>
+
+        </dl></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

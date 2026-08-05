@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 17 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4azuzp4pnau,t4avmq79x4ee,t4azuzl7f6qn,t4avmq79xc47,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing the Driver Files - NetIQ SAP HANA Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4azuzp4pnau">
+
+<h1 class="title h1"><span class="number">2.3</span> Installing the Driver Files</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The SAP HANA driver is a Java-based driver and can be run on the Identity Manager engine or on a Remote Loader server. It works only with Java Remote Loader.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="t4azuzp4pnau.html#t4dsciq3uvqu" class="xref">Installing the Driver Files as a Root User</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4azuzp4pnau.html#t4dscj2smtnz" class="xref">Installing the Driver Files as a Non-Root User</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4azuzp4pnau.html#t4azv02eedmk" class="xref">Configuring Remote Loader for the Driver Instance</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4dsciq3uvqu">
+
+<h2 class="title h2"><span class="number">2.3.1</span> Installing the Driver Files as a Root User</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You must install the driver files manually. The SAP HANA driver files are installed on the Identity Manager server at the same time as the Identity Manger engine. The installation program extends the Identity Vaultâs schema and installs the driver shim and the driver configuration file, but does not create the driver in the Identity Vault or upgrade an existing driverâs configuration. For information about creating the driver, see <a href="t4avmq79xc47.html" class="xref">Creating the Driver Object</a>.</p>
+<p class="para">To install the dependent <span class="filename">jar</span> files, perform the following actions on your platform as applicable:</p>
+<div class="procedure" id="t4pac048vti1">
+<ol class="steps">
+<li class="step">
+<p class="para">Login as root on the server where you want apply the driver jar file.</p></li>
+<li class="step">
+<p class="para">Navigate to the extracted <span class="filename">IDM_SAPHanaDriver_1.0.0.zip</span> directory and perform one of the following actions for your platform:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">For Linux:</p>
+<p class="listitem">Install the new <span class="filename">netiq-DXMLSAPHana-1.0.0.0000-1.noarch.rpm</span> in your driver installation directory by running the following command in a terminal window. If you are installing the binary, run the below command:</p><pre class="screen">
+                  <span class="command">rpm -ivh (binaries-path)/netiq-DXMLSAPHana-1.0.0.0000-1.noarch.rpm</span>
+                </pre></li></ul></div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">For Windows:</p>
+<p class="listitem">Copy the <span class="filename">saphanashim.jar</span> file to your driver installation folder. For example, <span class="filename">&lt;InstallLocation_Drive&gt;\NetIQ\IdentityManager\NDS</span> (local installation) or <span class="filename">&lt;InstallLocation_Drive&gt;\Novell\RemoteLoader\64bit</span> (remote installation).</p></li></ul></div>
+</li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>It is mandatory,</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">For Windows:</span> Identity Manager engine must contain the <span class="filename">ngdbc-2.16.11.jar</span> (available in <a href="https://repo1.maven.org/maven2/com/sap/cloud/db/jdbc/ngdbc/2.16.11/" class="ulink">Maven Repository</a>) in <span class="filename">&lt;InstallLocation_Drive&gt;\NetIQ\IdentityManager\NDS\lib</span> and Windows RL path <span class="literal">&lt;InstallLocation_Driver&gt;\NetIQ\IDM\RemoteLoader\64bit\lib</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">For Linux:</span> Identity Manager engine must contain the <span class="filename">ngdbc-2.16.11.jar</span> (available in <a href="https://repo1.maven.org/maven2/com/sap/cloud/db/jdbc/ngdbc/2.16.11/" class="ulink">Maven Repository</a>) in <span class="literal">/opt/novell/eDirectory/lib/dirxml/classes</span>.</p></li></ul></div>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4dscj2smtnz">
+
+<h2 class="title h2"><span class="number">2.3.2</span> Installing the Driver Files as a Non-Root User</h2>
+
+<div class="content_wrapper">
+
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Verify that the <span class="strong"><span class="filename">/rpm</span></span>directory exists and contains the <span class="strong"><span class="filename">_db.*</span></span> file.</p></li>
+          
+<li class="listitem">
+<p class="listitem">The<span class="strong"><span class="filename">_db.*</span></span> file is created during a non-root installation of the Identity Manager engine. The absence of this file indicates that the Identity Manager is not installed properly. In such a case, reinstall the Identity Manager to correctly place the file in the mentioned directory.</p></li>
+          
+<li class="listitem">
+<p class="listitem">To set the root directory to the location of non-root in Identity Manager, enter the following command in the command prompt:</p>
+<p class="listitem">
+              <span class="strong">
+                <span class="command">ROOTDIR=&lt;non-root eDirectory location&gt;</span>
+              </span>
+            </p>
+<p class="listitem">This will set the environmental variables to the directory where Identity Manager is installed as a non-root user.</p></li>
+          
+<li class="listitem">
+<p class="listitem">For example, to install the SAP HANA driver rpm, use this command:</p>
+<p class="listitem">
+              <span class="strong">
+                <span class="command">rpm --dbpath $ROOTDIR/rpm -ivh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory --relocate=/etc=$ROOTDIR/etc --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml --relocate=/var=$ROOTDIR/var --badreloc --nodeps --replacefiles /home/user/netiq-DXMLSAPHana-1.0.0.0000-1.noarch.rpm</span>
+              </span>
+            </p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In the above command <span class="strong"><span class="filename">/opt/novell/eDirectory</span></span> is the location where non-root Identity Manager is installed, and <span class="strong"><span class="filename">/home/user/</span></span> is the home directory of the non-root user.</p></div>
+</li>
+        </ol></div>
+
+<p class="para">You must configure the driver to use an SSL connection between the Remote Loader and the Identity Manager server. For more information, see <a href="../../../identity-manager-48/driver_admin/data/b18xta1v.html#t461ov2hxlp7" class="ulink">Creating a Secure Connection to the Identity Manager Engine</a> in the <span class="citetitle"><a href="../../../identity-manager-48/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span>.</p>
+<p class="para">For more information on configuring the Remote Loader, see <a href="t4azuzp4pnau.html#t4azv02eedmk" class="xref">Configuring Remote Loader for the Driver Instance</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4azv02eedmk">
+
+<h2 class="title h2"><span class="number">2.3.3</span> Configuring Remote Loader for the Driver Instance</h2>
+
+<div class="content_wrapper">
+
+<p class="para">For more information about specifying values for these parameters, see <a href="../../../identity-manager-48/driver_admin/data/b18xta1v.html#b18xta1v" class="ulink">Configuring the Remote Loader and Drivers</a> in the <span class="citetitle"><a href="../../../identity-manager-48/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span>.</p>
+<p class="para">Below is an example of a Linux configuration file with some sample values.</p><pre class="screen">-description "SAP HANA Driver"
+-commandport 8000
+-connection "port=8090"
+-trace 3
+-tracefile "/opt/netiq/SAP HANAdriver.log" (or "C:\novell\remoteloader\64bit\SAP HANADriver-Trace.log" on Windows)
+-tracefilemax 100M
+-class "com.netiq.dirxml.driver.saphana.SAPHanaDriverShim"</pre>
+<p class="para">Once the driver instance is running, you can use the command line on Linux or Remote Loader Console on Windows to instruct the Remote Loader to perform a function. For example, turn the trace on or off on Windows or stop the driver instance.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

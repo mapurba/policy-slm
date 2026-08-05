@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="jdbc-event-types,what-is-event-log-table-in-jdbc-driver,jdbc-event-log-columns,embed-sql-statements-in-xds-events-for-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Event Types - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="jdbc-event-types">
+
+<h1 class="title h1"><span class="number">11.2</span> Event Types</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following table describes each event type:</p>
+<div class="table" id="b87s66r"><p class="title"><em class="num">Table 11-3 </em>Event Types</p>
+<table class="topbot" width="95%"><col width="23%" /><col width="77%" />
+            
+<tr class="headerrow" id="b87s66s"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Event Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Interpretation</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s66t"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">insert field</p></td>
+</tr>
+<tr class="evenrow" id="b87s66u"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update field</p></td>
+</tr>
+<tr class="oddrow" id="b87s66v"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update field (remove all values)</p></td>
+</tr>
+<tr class="evenrow" id="b87s66w"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">delete row</p></td>
+</tr>
+<tr class="oddrow" id="b87s66x"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">insert row (query-back)</p></td>
+</tr>
+<tr class="evenrow" id="b87s66y"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">6</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update row (query-back)</p></td>
+</tr>
+<tr class="oddrow" id="b87s66z"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">insert field (query-back)</p></td>
+</tr>
+<tr class="evenrow" id="b87s670"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update field (query-back)</p></td>
+</tr></table>
+</div>
+
+<p class="para">Event types are in four major categories. Some categories overlap. The following table describes each category and indicates which event types are members:</p>
+<div class="table" id="b87s671"><p class="title"><em class="num">Table 11-4 </em>Event Categories and Types</p>
+<table class="topbot" width="95%"><col width="29%" /><col width="71%" />
+            
+<tr class="headerrow" id="b87s672"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Event Category</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Event Types</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s673"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Per-field (attribute)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1, 2, 3, 7, 8</p></td>
+</tr>
+<tr class="evenrow" id="b87s674"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Per-row (object)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4, 5, 6</p></td>
+</tr>
+<tr class="oddrow" id="b87s675"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Non-query-back</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1, 2, 3, 4</p></td>
+</tr>
+<tr class="evenrow" id="b87s676"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Query-back</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5, 6, 7, 8</p></td>
+</tr>
+<tr class="oddrow" id="b87s677"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Per-field, non-query-back</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1, 2, 3</p></td>
+</tr>
+<tr class="evenrow" id="b87s678"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Per-field, query-back</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">7, 8</p></td>
+</tr>
+<tr class="oddrow" id="b87s679"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Per-row, non-query-back</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4</p></td>
+</tr>
+<tr class="evenrow" id="b87s67a"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Per-row, query-back</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5, 6</p></td>
+</tr></table>
+</div>
+
+<p class="para">In general, a combination of event types from each category yields the best trade-off in terms of space, time, implementation complexity, and performance.</p>
+<p class="para">Per-field event types are more granular, require more space, and are more complex to implement than per-row event types. Per-row events are less granular, require less space, and are easier to implement than per-field event types.</p>
+<p class="para">Query-back event types use less space but require more time to process than non-query-back event types. Non-query-back event types use more space but require less time to process than query-back event types.</p>
+<p class="para">Query-back event types take precedence over their non-query-back counterparts. Non-query-back events are ignored if a query-back event is logged for the same field or object. For example, if an event of type 2 (update-field, non-query-back) and 8 (update-field, query-back) are logged on the same field, the type 2 event is ignored in favor of the type 8 event.</p>
+<p class="para">Furthermore, query-back row event types take precedence over query-back field event types. For example, if an event type 8 (update field, query-back) and a event type 6 (update row query-back) are logged on the same object, the type 8 event is ignored in favor of the type 6 event.</p>
+<p class="para">Query-back events are ignored by the Publisher if the database object no longer exists. They are dependent upon the database object still being available at processing time. Therefore, logged query-back adds and modifies (event types 5, 6, 7, 8) have no effect once the database object they refer to is deleted.</p>
+<p class="para">The following table shows the basic correlation between publication event types and the XDS XML generated by the Publisher channel.</p>
+<div class="table" id="b87s67b"><p class="title"><em class="num">Table 11-5 </em>Basic Correlation of Publication Event Types</p>
+<table class="topbot" width="95%"><col width="26%" /><col width="74%" />
+            
+<tr class="headerrow" id="b87s67c"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Event Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Resulting XDS</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s67d"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">insert</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;add&gt;</p></td>
+</tr>
+<tr class="evenrow" id="b87s67e"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;modify&gt;</p></td>
+</tr>
+<tr class="oddrow" id="b87s67f"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">delete</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;delete&gt;</p></td>
+</tr></table>
+</div>
+
+<p class="para">The following example illustrates XML that the Publisher channel generates for events logged on the <span class="literal">usr</span> table for each possible event type.</p><pre class="screen">CREATE TABLE indirect.usr
+(
+    idu   INTEGER  NOT NULL,
+    fname VARCHAR2(64),
+    photo LONGRAW,
+    --...
+    CONSTRAINT pk_usr_idu PRIMARY KEY(idu)
+);</pre>
+<p class="para">The following table shows the initial contents of <span class="literal">usr</span> after a new row has been inserted:</p>
+<div class="table" id="b87s67g"><p class="title"><em class="num">Table 11-6 </em>An Inserted Row in the <span class="literal">usr</span> Table</p>
+<table class="topbot" width="95%"><col width="17%" /><col width="20%" /><col width="17%" /><col width="46%" />
+            
+<tr class="headerrow" id="b87s67h"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">idu</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">fname</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">lname</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">photo</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s67i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Jack</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Frost</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">0xAAAA</p></td>
+</tr></table>
+</div>
+
+<p class="para">The following table shows the current contents of <span class="literal">usr</span> after the row has been updated:</p>
+<div class="table" id="b87s67j"><p class="title"><em class="num">Table 11-7 </em>An Updated Row in the <span class="literal">usr</span> Table</p>
+<table class="topbot" width="95%"><col width="22%" /><col width="22%" /><col width="23%" /><col width="32%" />
+            
+<tr class="headerrow" id="b87s67k"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">idu</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">fname</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">lname</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">photo</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s67l"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">John</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Doe</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">0xBBBB</p></td>
+</tr></table>
+</div>
+
+<h4 class="bridgehead" id="b87s67m">Insert Field</h4>
+
+<p class="para">The table below shows the contents of the event log table after a new row is inserted into table <span class="literal">usr</span>. The value for column <span class="literal">photo</span> has been Base64-encoded. The Base64-encoded equivalent of 0xAAAA is qqo=.</p>
+<div class="table" id="b87s67n"><p class="title"><em class="num">Table 11-8 </em>Event Log Table: Insert Field</p>
+<table class="topbot" width="95%"><col width="17%" /><col width="17%" /><col width="17%" /><col width="17%" /><col width="17%" /><col width="17%" />
+            
+<tr class="headerrow" id="b87s67o"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s67p"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Jack</p></td>
+</tr>
+<tr class="evenrow" id="b87s67q"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">lname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Frost</p></td>
+</tr>
+<tr class="oddrow" id="b87s67r"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">photo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">qqo=</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML:</p><pre class="screen">&lt;add class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;
+    &lt;add-attr attr-name="fname"&gt;
+        &lt;value type="string"&gt;Jack&lt;/value&gt;
+    &lt;/add-attr&gt;
+    &lt;add-attr attr-name="lname"&gt;
+        &lt;value type="string"&gt;Frost&lt;/value&gt;
+    &lt;/add-attr&gt;
+    &lt;add-attr attr-name="photo"&gt;
+        &lt;value type="octet"&gt;qqo=&lt;/value&gt;
+    &lt;/add-attr&gt;
+&lt;/add&gt;</pre>
+<h4 class="bridgehead" id="b87s67s">Update Field</h4>
+
+<p class="para">The following table shows the contents of the event log table after the row in table <span class="literal">usr</span> has been updated. The values for column <span class="literal">photo</span> has been Base64-encoded. The Base64-encoded equivalent of 0xBBBB is u7s=.</p>
+<div class="table" id="b87s67t"><p class="title"><em class="num">Table 11-9 </em>Event Log Table: Update Field</p>
+<table class="topbot" width="95%"><col width="17%" /><col width="17%" /><col width="17%" /><col width="17%" /><col width="17%" /><col width="17%" />
+            
+<tr class="headerrow" id="b87s67u"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s67v"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Jack</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">John</p></td>
+</tr>
+<tr class="evenrow" id="b87s67w"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">lname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Frost</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Doe</p></td>
+</tr>
+<tr class="oddrow" id="b87s67x"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">photo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">qqo=</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">u7s=</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML:</p><pre class="screen">&lt;modify class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;
+    &lt;modify-attr attr-name="fname"&gt;
+        &lt;remove-value&gt;
+            &lt;value type="string"&gt;Jack&lt;/value&gt;
+        &lt;/remove-value&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;John&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="lname"&gt;
+        &lt;remove-value&gt;
+            &lt;value type="string"&gt;Frost&lt;/value&gt;
+        &lt;/remove-value&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;Doe&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="photo"&gt;
+        &lt;remove-value&gt;
+            &lt;value type="octet"&gt;qqo=&lt;/value&gt;
+        &lt;/remove-value&gt;
+        &lt;add-value&gt;
+            &lt;value type="octet"&gt;u7s=&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+&lt;/modify&gt;</pre>
+<h4 class="bridgehead" id="b87s67y">Update Field (Remove-All-Values)</h4>
+
+<p class="para">The following table shows the contents of the event log table after the row in table <span class="literal">usr</span> has been updated. The value for column <span class="literal">photo</span> has been Base64-encoded.</p>
+<div class="table" id="b87s67z"><p class="title"><em class="num">Table 11-10 </em>Event Log Table: Update Field (Remove-All-Values</p>
+<table class="topbot" width="95%"><col width="16%" /><col width="16%" /><col width="16%" /><col width="20%" /><col width="16%" /><col width="16%" />
+            
+<tr class="headerrow" id="b87s680"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s681"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Jack</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">John</p></td>
+</tr>
+<tr class="evenrow" id="b87s682"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">lname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Frost</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Doe</p></td>
+</tr>
+<tr class="oddrow" id="b87s683"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">photo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">qqo=</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">u7s=</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML:</p><pre class="screen">&lt;modify class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;
+    &lt;modify-attr attr-name="fname"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;John&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="lname"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;Doe&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="photo"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="octet"&gt;u7s=&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+&lt;/modify&gt;</pre>
+<h4 class="bridgehead" id="b87s684">Delete Row</h4>
+
+<p class="para">The table below shows the contents of the event log table after the row in table <span class="literal">usr</span> has been deleted.</p>
+<div class="table" id="b87s685"><p class="title"><em class="num">Table 11-11 </em>Event Log Table: Delete Row</p>
+<table class="topbot" width="95%"><col width="15%" /><col width="13%" /><col width="18%" /><col width="18%" /><col width="18%" /><col width="18%" />
+            
+<tr class="headerrow" id="b87s686"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s687"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML:</p><pre class="screen">&lt;delete class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;   
+&lt;/delete&gt;</pre>
+<h4 class="bridgehead" id="b87s688">Insert Row (Query-Back)</h4>
+
+<p class="para">The following table shows the contents of the event log table after a new row is inserted into table <span class="literal">usr</span>.</p>
+<div class="table" id="b87s689"><p class="title"><em class="num">Table 11-12 </em>Event Log Table: Insert Row (Query-Back)</p>
+<table class="topbot" width="95%"><col width="13%" /><col width="14%" /><col width="18%" /><col width="18%" /><col width="18%" /><col width="18%" />
+            
+<tr class="headerrow" id="b87s68a"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s68b"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML. The values reflect the current contents of table <span class="literal">usr</span>, not the initial contents.</p><pre class="screen">&lt;add class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;
+    &lt;add-attr attr-name="fname"&gt;
+        &lt;value type="string"&gt;John&lt;/value&gt;
+    &lt;/add-attr&gt;
+    &lt;add-attr attr-name="lname"&gt;
+        &lt;value type="string"&gt;Doe&lt;/value&gt;
+    &lt;/add-attr&gt;
+    &lt;add-attr attr-name="photo"&gt;
+        &lt;value type="octet"&gt;u7s=&lt;/value&gt;
+    &lt;/add-attr&gt;
+&lt;/add&gt;</pre>
+<h4 class="bridgehead" id="b87s68c">Update Row (Query-Back)</h4>
+
+<p class="para">The table below shows the contents of the event log table after the row in table <span class="literal">usr</span> has been updated.</p>
+<div class="table" id="b87s68d"><p class="title"><em class="num">Table 11-13 </em>Event Log Table: Update Row (Query-Back)</p>
+<table class="topbot" width="95%"><col width="13%" /><col width="15%" /><col width="18%" /><col width="18%" /><col width="18%" /><col width="18%" />
+            
+<tr class="headerrow" id="b87s68e"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s68f"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">6</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML. The values reflect the current contents of table <span class="literal">usr</span>, not the initial contents.</p><pre class="screen">&lt;modify class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;
+    &lt;modify-attr attr-name="fname"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;John&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="lname"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;Doe&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="photo"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="octet"&gt;u7s=&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+&lt;/modify&gt;</pre>
+<h4 class="bridgehead" id="b87s68g">Insert Field (Query-Back)</h4>
+
+<p class="para">The following table shows the contents of the event log table after a new row is inserted into table <span class="literal">usr</span>. Old and new values are omitted because they are not used.</p>
+<div class="table" id="b87s68h"><p class="title"><em class="num">Table 11-14 </em>Event Log Table: Insert Field (Query-Back)</p>
+<table class="topbot" width="95%"><col width="14%" /><col width="15%" /><col width="18%" /><col width="18%" /><col width="18%" /><col width="18%" />
+            
+<tr class="headerrow" id="b87s68i"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s68j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr>
+<tr class="evenrow" id="b87s68k"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">lname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr>
+<tr class="oddrow" id="b87s68l"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">photo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML. The values reflect the current contents of table <span class="literal">usr</span>, not the initial contents.</p><pre class="screen">&lt;add class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;
+    &lt;add-attr attr-name="fname"&gt;
+        &lt;value type="string"&gt;John&lt;/value&gt;
+    &lt;/add-attr&gt;
+    &lt;add-attr attr-name="lname"&gt;
+        &lt;value type="string"&gt;Doe&lt;/value&gt;
+    &lt;/add-attr&gt;
+    &lt;add-attr attr-name="photo"&gt;
+        &lt;value type="octet"&gt;u7s=&lt;/value&gt;
+    &lt;/add-attr&gt;
+&lt;/add&gt;</pre>
+<h4 class="bridgehead" id="b87s68m">Update Field (Query-Back)</h4>
+
+<p class="para">The following table shows the contents of the event log table after the row in table <span class="literal">usr</span> has been updated. Old and new values are omitted because they are not used.</p>
+<div class="table" id="b87s68n"><p class="title"><em class="num">Table 11-15 </em>Event Log Table: Update Field (Query-Back)</p>
+<table class="topbot" width="95%"><col width="13%" /><col width="15%" /><col width="18%" /><col width="18%" /><col width="18%" /><col width="18%" />
+            
+<tr class="headerrow" id="b87s68o"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">event_type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">table_key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">column_name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">old_value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">new_value</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s68p"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr>
+<tr class="evenrow" id="b87s68q"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">lname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr>
+<tr class="oddrow" id="b87s68r"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">usr</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">idu=1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">photo</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NULL</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Publisher channel generates the following XML. The values reflect the current contents of table <span class="literal">usr</span>, not the initial contents.</p><pre class="screen">&lt;modify class-name="usr"&gt;
+    &lt;association&gt;idu=1,table=usr,schema=indirect
+    &lt;/association&gt;
+    &lt;modify-attr attr-name="fname"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;John&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="lname"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="string"&gt;Doe&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+    &lt;modify-attr attr-name="photo"&gt;
+        &lt;remove-all-values/&gt;
+        &lt;add-value&gt;
+            &lt;value type="octet"&gt;u7s=&lt;/value&gt;
+        &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+&lt;/modify&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

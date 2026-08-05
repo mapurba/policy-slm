@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3wvpsh,b3r8p5u,b3r8p5u,b3wx9up,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Architecture - NetIQ ACF2 Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3wvpsh">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Architecture</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver synchronizes information between the Identity Vault on the Identity Manager platform and ACF2 on the connected z/OS system.</p>
+<p class="para">When Identity Manager detects relevant changes to identities in its Identity Vault, it uses the Subscriber channel to process and communicate the updates to all connected systems. Events are received by the Subscriber component of the ACF2 driver, which runs as a started task on the z/OS host system. This Subscriber component securely passes the information to customizable REXX execs that carry out the updates to ACF2.</p>
+<p class="para">When changes to passwords and other items relevant to Identity Manager are made at the local ACF2 installation, two security system exit routines are used to capture the changes and place them in a cross memory queue. The change log, another z/OS started task, moves events from the memory queue to the change log data set, where they are stored for processing. At configurable intervals, the Publisher component of the driver polls the change log for events and submits them to Identity Manager, where they are processed for posting to the Identity Vault.</p>
+<p class="para"><a href="b3wvpsh.html#b6n4rqe" class="xref">Figure 1-1</a> illustrates the driverâs architecture.</p>
+<div class="figure" id="b6n4rqe"><p class="title"><em class="num">Figure 1-1 </em>ACF2 Driver Architecture</p>
+            <img src="../graphics/bi_acf2_archx.png" alt="" />
+          </div>
+
+<p class="para">The following topics describe the driver architecture in more detail:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#blin0t9" class="xref">Component Summary</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#blk5lb8" class="xref">Component Discussion</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="blin0t9">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Component Summary</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Most components of the bidirectional ACF2 driver can be associated with one of the two channels of communicationâSubscriber and Publisherâused by the driver and Identity Manager in general.</p>
+<div class="formalpara" id="blinkh7">
+          <p class="title"><em class="title">Subscriber Channel</em>
+          Represents data flowing from Identity Manager to the driver on the connected z/OS system, then on to its final destination in ACF2. In this way, ACF2 functions as a <span class="emphasis">subscriber</span> to Identity Manager events, receiving any updates from the central Identity Vault via the Subscriber channel.</p>
+        </div>
+
+<div class="formalpara" id="blinmjc">
+          <p class="title"><em class="title">Publisher Channel</em>
+          Represents data flowing from ACF2, through the driver on the host z/OS system, and on to Identity Manager. In this way, ACF2 functions as a <span class="emphasis">publisher</span> of events to Identity Manager, sending any updates from its individual ACF2 installation to the central Identity Vault via the Publisher channel.</p>
+        </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The term âchannel,â within the context of Identity Manager data flow, should not be confused with the same term used in mainframe nomenclature to describe a physical cable or connection.</p></div>
+
+<p class="para">Given this general organization, <a href="b3wvpsh.html#blj6dnb" class="xref">Table 1-1</a> provides a summary description for each of the driverâs main components, including the data channel it relates to.</p>
+<div class="table" id="blj6dnb"><p class="title"><em class="num">Table 1-1 </em>Summary of Driver Components</p>
+<table class="topbot" width="100%"><col width="16%" /><col width="23%" /><col width="62%" />
+              
+<tr class="headerrow" id="blj6dnc"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Data Channel</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Component</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+            
+<tr class="oddrow" id="blj6dnd"><td align="left" valign="top" colspan="1" rowspan="3">
+<p class="para">Subscriber</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Schema Map</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Provides a reference to the hierarchy of objects and attributes available in ACF2. The driver reads the schema map, usually at startup. Itâs also used by Identity Managerâs Policy Editor to map the schema of the Identity Vault to the schema for ACF2.</p></td>
+</tr>
+<tr class="evenrow" id="blj6dne"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Include/Exclude File</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Optional configuration file for listing local ACF2 identities that you wish to be included or excluded from the central Identity Vault. Allows local system policy to enforce which objects receive provisioning through the Subscriber channel.</p></td>
+</tr>
+<tr class="oddrow" id="blj6dng"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">REXX Execs</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Mainframe scripts that apply the schema map and standard TSO commands to issue changes to ACF2 accountsâincluding adds, modifies, deletes, and renamesâfor User objects, and to handle password synchronization. Can be extended to support other object types and events.</p></td>
+</tr>
+<tr class="evenrow" id="blj6dnh"><td align="left" valign="top" colspan="1" rowspan="5">
+<p class="para">Publisher</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDXPOST</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Exit routine that detects changes to the ACF2 Logonid database. These changes are written to the cross memory queue; the change log started task is notified each time an event is placed in the memory queue.</p></td>
+</tr>
+<tr class="oddrow" id="blj6dni"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDXNPXIT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Exit routine that detects password changes to ACF2. These changes are written to the cross memory queue; the change log started task is notified each time an event is placed in the memory queue.</p></td>
+</tr>
+<tr class="evenrow" id="b13r0o4g"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDXNPHXT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Exit routine that detects password phrase changes to ACF2. These changes are written to the cross memory queue; the change log started task is notified each time an event is placed in the memory queue.</p></td>
+</tr>
+<tr class="oddrow" id="blj6dnj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDXLOGR</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">z/OS started task that responds to events stored in the cross memory queue by writing them to the change log data set. The exit routines <span class="command">LDXPOST</span> and <span class="command">LDXNPXIT</span> notify <span class="command">LDXLOGR</span> of each event added to the memory queue.</p></td>
+</tr>
+<tr class="evenrow" id="blj6dnk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Change Log</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">z/OS data-set representing the final location where updates are placed in the driverâs portion of the Publisher channel before sending to Identity Manager. The driverâs Publisher component removes events from the change log at configurable intervals and submits them to Identity Manager.</p></td>
+</tr>
+<tr class="oddrow" id="blj6dnl"><td align="left" valign="top" colspan="1" rowspan="6">
+<p class="para">Both</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ACF2DRV (Driver Shim)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">z/OS started task that encapsulates the Remote Loader, Subscriber and Publisher channels. It maintains the network connectivity between the ACF2 system and the Identity Vault; it delivers event data to the REXX scriptable framework, where it is used to modify the ACF2 database; it retrieves event data from the ACF2 change log to be published to the Identity Vault.</p></td>
+</tr>
+<tr class="evenrow" id="blk66k4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Remote Loader</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Enables communication between Identity Manager and ACF2 as if they were running in a common environment. Identity Manager has no specific knowledge of the Remote Loader. For improved efficiency, the ACF2 driver has its own embedded remote loader, which is used in place of the standard version bundled with Identity Manager.</p></td>
+</tr>
+<tr class="oddrow" id="blk66k5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Subscriber Component</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Translates XDS event data from the Identity Vault into REXX variables, which are processed by the REXX execs. This component also replies to the Metadirectory engine with XDS status documents.</p></td>
+</tr>
+<tr class="evenrow" id="blk66k6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Publisher Component</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Polls the change log for new event data and sends it to the Metadirectory engine for processing. It also clears each event entry from the change log after it has been processed.</p></td>
+</tr>
+<tr class="oddrow" id="blj6dnm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDXSERV</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Custom, APF-authorized, TSO command providing two key services for the driver:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">When updates are passed to ACF2 in the Subscriber channel, <span class="command">LDXSERV</span> is called (with the <span class="command">NOLOG</span> parameter) to flag those items with a token in the Publisher event address space. The tokenâs presence causes the exit routines to ignore the updates. This prevents redundant loopback to Identity Manager for any changes made through the Subscriber channel.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="command">LDXSERV</span> can also be executed manually (with the <span class="command">STATUS</span> parameter) to display information in the change log data set.</p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow" id="b12z9kur"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ACFQUERY</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Tool used by both channels to query the ACF2 Logonid database for records and fields.</p></td>
+</tr>
+<tr class="oddrow" id="blj6dnn"><td align="left" valign="top" colspan="1" rowspan="3">
+<p class="para">None (z/OS Components)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ACF2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">(Access Control Facility) CA product option for z/OS security system requirement.</p></td>
+</tr>
+<tr class="evenrow" id="blj6ip7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Token Address Space</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">z/OS system memory space used to process changes detected by ACF2 exit routines. Can be flagged with tokens by <span class="command">LDXSERV</span> for changes initiated through Subscriber channel to prevent loopback to Identity Manager.</p></td>
+</tr>
+<tr class="oddrow" id="blj6dno"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Cross Memory Queue</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The memory queue is an encrypted, in-storage buffer used to record events sequentially. Events are added to the memory queue by the ACF2 exit routines, and are removed from the queue by the <span class="command">LDXLOGR</span> started task. The memory queue is located in Subpool 231 (fetch-protected ECSA).</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="blk5lb8">
+
+<h2 class="title h2"><span class="number">1.1.2</span> Component Discussion</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This section discusses each of the driver components in more detail.</p>
+<div class="container sect3" id="blk5qhh">
+
+<h3 class="title h3">Driver Shim Started Task</h3>
+
+<p class="para">The driver shim, <span class="command">ACF2DRV</span>, runs as a started task. Only one system that shares the security system database runs the driver shim started task. The driver shim started task must be started as part of your normal z/OS system initialization procedure and stopped during normal system shutdown.</p>
+</div>
+
+<div class="container sect3" id="blk5lvj">
+
+<h3 class="title h3">Subscriber Channel Components</h3>
+
+<p class="para">The Subscriber channel of the driver shim started task receives XDS command documents from the Metadirectory engine, stores them using z/OS name/token callable services, then calls the appropriate REXX execs to handle the command.</p>
+<p class="para">The Subscriber shim calls the <span class="command">LDXSERV</span> command on startup to identify itself to the security system exit routines for loopback detection. This prevents the exit routines from generating events for commands issued by the Subscriber shim.</p>
+<div class="container sect4" id="blk5mg0">
+
+<h4 class="title h4">REXX Execs</h4>
+
+<p class="para">REXX Execs are essentially scripts that are designed to run on a mainframe. The provided REXX execs support adds, modifies, deletes, and renames for User objects, and handle password synchronization. The REXX execs use standard TSO commands to apply the changes. You can extend the REXX execs to support other object types and events. The REXX execs have secure access to the original XDS command data using the <span class="command">IDMGETV</span> command. <span class="command">IDMGETV</span> accesses z/OS name/token callable services and places the data in REXX variables.</p>
+</div>
+
+<div class="container sect4" id="blk5s3e">
+
+<h4 class="title h4">Scriptable Framework</h4>
+
+<p class="para">The interface between the security system and the driver shim uses customizable REXX execs. You can extend the execs that are provided with the driver to support other applications and databases.</p>
+<p class="para">Several utility execs and helper commands are provided with the driver to enable communication with the driver shim and the change log. An extensible connected system schema file allows you to add your own objects and attributes to those already supported by the driver.</p>
+<p class="para">For more information about the REXX execs and the scriptable framework, see <a href="b410u7u.html" class="xref">The Scriptable Framework</a>.</p>
+</div>
+
+<div class="container sect4" id="blk5sgz">
+
+<h4 class="title h4">Schema File</h4>
+
+<p class="para">The configuration of class and attribute definitions for the connected system is specified using the schema file. You can modify and extend this file to include new objects and attributes. For details about configuring the schema file, see <a href="b3xxapt.html" class="xref">The Connected System Schema File</a>.</p>
+<p class="para">The driver uses the keywords of the ACF2 administrative commands to define the schema. The schema includes one class: Logonid. This corresponds to ACF2 Logonid records.</p>
+<p class="para">Some items in the schema refer to keywords used to create and modify ACF2 Logonids, but cannot be queried or synchronized. These attributes can be used only by Identity Manager policies to make event-time decisions that affect the behavior of the ACF2 administrative command. The auxiliary schema used to extend eDirectory does not include these attributes.</p>
+</div>
+
+<div class="container sect4" id="blk5sy2">
+
+<h4 class="title h4">Include/Exclude File</h4>
+
+<p class="para">The include/exclude file allows local system policies to enforce which objects are included or excluded from provisioning by the Subscriber channel. This allows for administrative rules to be set and enforced locally rather than having processing decisions made by the Metadirectory engine. For details about using the include/exclude file, see <a href="b3xxit1.html" class="xref">The Connected System Include/Exclude File</a>.</p>
+<p class="para">To control which objects are processed by the Publisher channel, use policies. For details about customizing policies, see the <a href="https://www.netiq.com/documentation/identity-manager-48/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect3" id="blk5o3c">
+
+<h3 class="title h3">Publisher Channel Components</h3>
+
+<p class="para">The Publisher shim periodically examines the change log for events. When the Publisher shim finds events in the change log, it decrypts, processes, and sends them to the Metadirectory engine over a Secure Sockets Layer (SSL) network link. The Metadirectory engine applies policies, takes appropriate actions, and posts the events to the Identity Vault.</p>
+<div class="container sect4" id="blk5odz">
+
+<h4 class="title h4">Security System Exit Routines</h4>
+
+<p class="para">ACF2 provides two exit interfaces. The driver uses these exits to detect activities of interest and to place events in the memory queue. When the driver exit routines place an event in the memory queue, they notify the change log started task. The change log started task then moves the event information to the change log data set. Each system that shares the security system database must run these exit routines provided by the driver in modules <span class="command">LDXPOST</span>, <span class="command">LDXNPXIT</span> and <span class="command">LDXNPHXT</span>.</p>
+<p class="para">The driver exit routines perform the following tasks:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Monitor password changes from the local security system and record user and password information in the memory queue.</p></li>
+<li class="listitem">
+<p class="listitem">Monitor security system administrative commands entered by users, either directly from the TSO command line, or as generated by the administrative panels. The exit routines record these commands and related information, such as the issuer and time stamp, in the memory queue.</p></li></ul></div>
+
+</div>
+
+<div class="container sect4" id="blk5or6">
+
+<h4 class="title h4">Memory Queue</h4>
+
+<p class="para">The memory queue is an encrypted, in-storage buffer that holds events. Events are added to the memory queue by the security system exit routines, and are removed from the queue by the change log started task. The memory queue is located in Subpool 231 (fetch-protected ECSA).</p>
+</div>
+
+<div class="container sect4" id="blk5p21">
+
+<h4 class="title h4">Change Log Started Task</h4>
+
+<p class="para">The change log started task is notified of events added to the memory queue by the driver exit routines and moves them to the change log data set.</p>
+<p class="para">Each system that shares a security system database must run the change log started task. The change log started task must be started as part of your normal z/OS system initialization procedure and stopped during normal system shutdown.</p>
+</div>
+
+<div class="container sect4" id="blk5pb4">
+
+<h4 class="title h4">Change Log Data Set</h4>
+
+<p class="para">The change log started task removes encrypted events from the memory queue and stores them in the change log data set for processing by the Publisher shim. The Publisher shim removes events from the change log at configurable intervals and submits them to the Metadirectory engine. If communication with the Metadirectory engine is temporarily lost, events remain in the change log until communication becomes available again.</p>
+<p class="para">The change log data set is a standard z/OS direct access (DSORG=DA) data set. There is one change log data set for the set of systems that share the security system database. The change log data set must reside on a shared device unless the security system database is not shared.</p>
+</div>
+
+</div>
+
+<div class="container sect3" id="bmgio04">
+
+<h3 class="title h3">LDXSERV Command</h3>
+
+<p class="para"><span class="command">LDXSERV</span> is an APF-authorized, TSO command used in both the Publisher and Subscriber channels.</p>
+<p class="para">When updates are passed to ACF2 in the Subscriber channel, <span class="command">LDXSERV</span> is called (with the <span class="command">NOLOG</span> parameter) to flag those items with a token in the Publisher event address space. The tokenâs presence causes the exit routines to ignore the updates. This prevents redundant loopback to Identity Manager for any changes made through the Subscriber channel.</p>
+<p class="para"><span class="command">LDXSERV</span> can also be executed manually (with the <span class="command">STATUS</span> parameter) to display information in the change log data set. To use the command, you must include the driver load library in the logon procedure <span class="command">STEPLIB</span> concatenation.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

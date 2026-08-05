@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b8n6prd,b8n5bw5,b8n6pr6,b8n6prs,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>The Connected System Include/Exclude File - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b8n6prd">
+
+<h1 class="title h1"><span class="number">5.3</span> The Connected System Include/Exclude File</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can use an optional include/exclude file on the connected system to control which identities are or are not synchronized between the Identity Vault and the connected system. Create a text file named <span class="filename">include-exclude.conf</span> and save it in the <span class="filename">conf</span> directory under your driver installation directory.</p>
+<p class="para">The file is read when the driver shim starts. If you make changes to it, you must restart the driver shim.</p>
+<p class="para">The include/exclude file can contain include rules and exclude rules. To ensure optimal performance, each include/exclude file should contain no more than 50 entries total.</p>
+<p class="para">You can use the include/exclude file to phase in your deployment of the Scripting driver, excluding most users and groups at first, and then adding more as you gain confidence and experience.</p>
+<p class="para">Topics in this section include</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n6prd.html#b8n6pre" class="xref">Include/Exclude Processing</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n6prd.html#b8n6prf" class="xref">Include/Exclude File Syntax</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8n6prd.html#b8n6pro" class="xref">Example Include/Exclude Files</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n6pre">
+
+<h2 class="title h2"><span class="number">5.3.1</span> Include/Exclude Processing</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Identity Vault events for identities that match an exclude rule are discarded by the Subscriber shim. Connected system events for identities that match an exclude rule are not sent to the Metadirectory engine by the Publisher shim.</p>
+<p class="para">Included identities are treated normally by the Subscriber and Publisher shims.</p>
+<p class="para">Identities that do not match an include rule or an exclude rule in the file are included.</p>
+<p class="para">Identities are matched in the following priority:</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Channel-specific (Publisher or Subscriber) exclude rules</p></li>
+          
+<li class="listitem">
+<p class="listitem">Channel-specific include rules</p></li>
+          
+<li class="listitem">
+<p class="listitem">General exclude rules</p></li>
+          
+<li class="listitem">
+<p class="listitem">General include rules</p></li>
+        </ol></div>
+
+<p class="para">Within each level of this matching priority, identities are matched against rules in the order that the rules appear in the file. The first rule that matches determines whether the identity is included or excluded.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n6prf">
+
+<h2 class="title h2"><span class="number">5.3.2</span> Include/Exclude File Syntax</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Except for class names, attribute names, and the values to match, the contents of the include/exclude file are case insensitive.</p>
+<p class="para">The include/exclude file can contain any number of include sections, exclude sections, and single-line rules.</p>
+<p class="para">Include sections and exclude sections can contain class matching rules, and class matching rules can contain attribute matching rules. Include sections and exclude sections can also contain association matching rules.</p>
+<p class="para">Include and exclude sections can be contained in subscriber and publisher sections to limit their scope to the specified channel.</p>
+<p class="para">Class and attribute names used in the include/exclude file must correspond to the names specified in the schema file. For details about the schema file, see <a href="b8n6pr6.html" class="xref">The Connected System Schema File</a>.</p>
+<div class="container sect3" id="b8n6prg">
+
+<h3 class="title h3">Comments</h3>
+
+<p class="para">Lines that begin with an octothorpe (#) are comments.</p><pre class="screen"># This is a comment.</pre>
+</div>
+
+<div class="container sect3" id="b8n6prh">
+
+<h3 class="title h3">Subscriber and Publisher Sections</h3>
+
+<p class="para">Subscriber and publisher sections limit the include and exclude sections they contain to the specified channel.</p>
+<p class="para">A subscriber section begins with a subscriber line and ends with an <span class="literal">ENDSUBSCRIBER</span> line.</p><pre class="screen">SUBSCRIBER
+.
+.
+.
+ENDSUBSCRIBER</pre>
+<p class="para">A publisher section begins with a publisher line and ends with an <span class="literal">ENDPUBLISHER</span> line.</p><pre class="screen">PUBLISHER
+.
+.
+.
+ENDPUBLISHER</pre>
+<p class="para">Each subscriber and publisher section can contain include and exclude sections.</p>
+</div>
+
+<div class="container sect3" id="b8n6pri">
+
+<h3 class="title h3">Include and Exclude Sections</h3>
+
+<p class="para">Include and exclude sections provide rules to specify which objects are to be included or excluded from synchronization.</p>
+<p class="para">An include section begins with an include line and ends with an <span class="literal">ENDINCLUDE</span> line.</p><pre class="screen">INCLUDE
+.
+.
+.
+ENDINCLUDE</pre>
+<p class="para">An exclude section begins with an exclude line and ends with an <span class="literal">ENDEXCLUDE</span> line.</p><pre class="screen">EXCLUDE
+.
+.
+.
+ENDEXCLUDE</pre>
+<p class="para">You can use class matching rules and association matching rules within an include section and an exclude section.</p>
+</div>
+
+<div class="container sect3" id="b8n6prj">
+
+<h3 class="title h3">Class Matching Rules</h3>
+
+<p class="para">Use a class matching rule within an include section or an exclude section to specify the name of a class of objects to include or exclude.</p>
+<p class="para">A class matching rule is defined by a class line that specifies the name of the class and ends with an <span class="literal">ENDCLASS</span> line.</p><pre class="screen">CLASS className
+.
+.
+.
+ENDCLASS</pre>
+<p class="para">You can use attribute matching rules within a class matching rule.</p>
+</div>
+
+<div class="container sect3" id="b8n6prk">
+
+<h3 class="title h3">Attribute Matching Rules</h3>
+
+<p class="para">You can use attribute matching rules within a class matching rule to limit the objects that are included or excluded. If no attribute matching rules are specified for a class, all objects of the specified class are included or excluded.</p>
+<p class="para">An attribute matching rule comprises an attribute name, an equals sign (=), and an expression. The expression can be an exact value, or it can use limited regular expressions. For details about limited regular expressions, see <a href="b8n6prd.html#b8n6prn" class="xref">Limited Regular Expressions</a>.</p>
+<p class="para">
+            <span class="literal">attributeName=expression</span>
+          </p>
+<p class="para">Multiple attribute matching rules can be specified for a given class.</p>
+<p class="para">Attribute matching rules within a class matching rule are logically ANDed together. To logically OR attribute matching rules for a class, specify multiple class matching rules. For example, the following include/exclude file excludes both user01 and user02:</p><pre class="screen"># Exclude the User object if its loginName is user01 or user02.
+EXCLUDE
+CLASS User
+    loginName=user01
+ENDCLASS
+CLASS User
+    loginName=user02
+ENDCLASS
+ENDEXCLUDE</pre>
+</div>
+
+<div class="container sect3" id="b8n6prl">
+
+<h3 class="title h3">Association Matching Rules</h3>
+
+<p class="para">You can specify association matching rules in an include or exclude section. Association matching rule expressions can specify an exact association or a limited regular expression. For details about limited regular expressions, see <a href="b8n6prd.html#b8n6prn" class="xref">Limited Regular Expressions</a>.</p>
+<p class="para">The way associations are formed can be customized for an implementation. (See <a href="b8n5d0x.html" class="xref">Scripting Driver Data Definition</a> for more information.)</p>
+<p class="para">This example works for associations that are a concatenation of the object name and class name. To exclude the root user, specify the following:</p><pre class="screen">EXCLUDE
+  rootUser
+ENDEXCLUDE</pre>
+</div>
+
+<div class="container sect3" id="b8n6prm">
+
+<h3 class="title h3">Single-Line Rules</h3>
+
+<p class="para">[SUBSCRIBER|PUBLISHER] INCLUDE|EXCLUDE [className] objectSelection</p>
+<p class="para">Where objectSelection can be</p>
+<p class="para">{associationMatch | attributeName=expression}</p>
+<p class="para">Single-line rules can specify the Subscriber or Publisher channel at the start of the rule. If a channel is specified, the rule applies only to that channel. Otherwise it applies to both channels.</p>
+<p class="para">You must specify whether the rule is to include or exclude the objects it matches.</p>
+<p class="para">You can specify a class name to limit matches to only objects of that class.</p>
+<p class="para">You must specify either an association or an attribute matching expression. The syntax of the association and attribute matching expression is the same as that of association matching rules and attribute matching rules previously described. For details, see <a href="b8n6prd.html#b8n6prl" class="xref">Association Matching Rules</a> and <a href="b8n6prd.html#b8n6prk" class="xref">Attribute Matching Rules</a>.</p>
+<p class="para">For example, to ignore events from the ADMIN user in the Identity Vault, code:</p><pre class="screen"># Do not subscribe to events for the ADMIN user.
+SUBSCRIBER EXCLUDE adminUser</pre>
+</div>
+
+<div class="container sect3" id="b8n6prn">
+
+<h3 class="title h3">Limited Regular Expressions</h3>
+
+<p class="para">A limited regular expression is a pattern used to match a string of characters.</p>
+<p class="para">Character matching is case sensitive.</p>
+<p class="para">Any literal character matches that character.</p>
+<p class="para">A period (.) matches any single character.</p>
+<p class="para">A bracket expression is a set of characters enclosed by left ([) and right (]) brackets that matches any listed character. Within a bracket expression, a range expression is a pair of characters separated by a hyphen, and is equivalent to listing all of the characters that sort between the given characters, inclusive. For example, [0-9] matches any single digit.</p>
+<p class="para">An asterisk (*) indicates that the preceding item is matched zero or more times.</p>
+<p class="para">A plus sign (+) indicates that the preceding item is matched one or more times.</p>
+<p class="para">A question mark (?) indicates that the preceding item is matched zero or one times.</p>
+<p class="para">You can use parentheses to group multiple expressions into a single item. For example, (abc)+ matches abc, abcabc, abcabcabc, etc. Nesting of parentheses is not supported.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8n6pro">
+
+<h2 class="title h2"><span class="number">5.3.3</span> Example Include/Exclude Files</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b8n6prd.html#b8n6prp" class="xref">Example 1</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8n6prd.html#b8n6prq" class="xref">Example 2</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b8n6prd.html#b8n6prr" class="xref">Example 3</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b8n6prp">
+
+<h3 class="title h3">Example 1</h3>
+<pre class="screen"># Exclude users whose names start with temp
+EXCLUDE
+    CLASS User
+        loginName=temp.*
+    ENDCLASS
+ENDEXCLUDE</pre>
+</div>
+
+<div class="container sect3" id="b8n6prq">
+
+<h3 class="title h3">Example 2</h3>
+<pre class="screen"># Exclude usera and userb
+# Because attribute rules are ANDed, these must be in separate
+# CLASS sections.
+EXCLUDE
+    CLASS User
+        loginName=usera
+    ENDCLASS
+    CLASS User
+        loginName=userb
+    ENDCLASS
+ENDEXCLUDE</pre>
+</div>
+
+<div class="container sect3" id="b8n6prr">
+
+<h3 class="title h3">Example 3</h3>
+<pre class="screen"># Exclude all users except those whose names start with idm
+# This works because channel-specific matching takes precedence
+# over general matching.
+EXCLUDE
+    CLASS User
+    ENDCLASS
+ENDEXCLUDE
+
+SUBSCRIBER INCLUDE User loginName=idm.*
+PUBLISHER INCLUDE User loginName=idm.*</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

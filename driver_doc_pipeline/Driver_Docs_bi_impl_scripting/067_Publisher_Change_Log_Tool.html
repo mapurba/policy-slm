@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b8nrft0,b8nr6vp,b8nrawu,b8nrgni,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Publisher Change Log Tool - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b8nrft0">
+
+<h1 class="title h1"><span class="number">D.3</span> Publisher Change Log Tool</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The publisher channel might submit events to be published, using the change log tool usclh (on UNIX) or idmevent.exe (on Windows). These tools will create an event, which will be picked up by the driver shim on a polling interval and published to the Identity Manager engine, where it can be processed by Policy. The change log tool can be invoked at anytime on the application system. One commonly-used technique is to call the changelog tool from the polling script, which is executed on the polling interval as well. In such a scenario, the polling script can determine what changed and submit the changes to the change log to be processed immediately after the polling script terminates. However, if you wish to invoke the change log tool from another mechanism, events will be queued in the changelog and published on intervals when necessary.</p>
+<p class="para">The syntax for the change log tool on UNIX, usclh, is as follows:</p><pre class="screen">usclh -t &lt;type&gt;
+        [-c class]
+        [-e event-id]
+        [-a association]
+        [-s src-dn]
+        [-o old-src-dn]
+        [-p password]
+        [-w old-password]
+        [-n new-name]
+        [-r]
+        [-y old-association]
+        [-z new-association]
+        [-l status-level]
+        [-m status-message]
+        [-1 | -2]
+        [-?]</pre>
+<p class="para">Where each option is described in the following table:</p>
+<div class="table" id="bcbe0f6"><p class="title"><em class="num">Table D-3 </em>Options</p>
+<table class="topbot" width="100%"><col width="34%" /><col width="66%" />
+            
+<tr class="headerrow" id="bcbe0f7"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+          
+<tr class="oddrow" id="bcbe0f8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The command type, which could be one of the following: <span class="literal">add</span>, <span class="literal">delete</span>, <span class="literal">modify</span>, <span class="literal">modify-password</span>, <span class="literal">rename</span>, <span class="literal">modify-association</span>, <span class="literal">status</span>, <span class="literal">xds</span>. When using the <span class="literal">xds</span> type, a raw XML document can be passed to the tool to be published as is.</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0f9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">event-id</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The event-id of the document to be published. Typically, this is a timestamp or a counter. If none is specified, a default timestamp will be used.</p></td>
+</tr>
+<tr class="oddrow" id="bcbe0fa"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">association</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The association string value for which the event being published describes.</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0fb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">src-dn</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The source distinguished name of the object being published, if this object resides in a hierarchical directory structure.</p></td>
+</tr>
+<tr class="oddrow" id="bcbe0fc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">old-src-dn</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">If the published event is a move or rename, the old-src-dn specifies the old distinguished name before the move or rename event.</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0fd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">password</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The new password of the object being published. This is only valid for add or modify-password events.</p></td>
+</tr>
+<tr class="oddrow" id="bcbe0fe"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">old-password</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The old password of the object being published. This is only valid for modify-password events.</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0ff"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">new-name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The new name of an object being published during a rename event.</p></td>
+</tr>
+<tr class="oddrow" id="bcbe0fg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">-r</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">If specified, instructs the event to remove the old name during a rename event.</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0fh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">old-association</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the name of the old association value, during a modify-association event.</p></td>
+</tr>
+<tr class="oddrow" id="bcbe0fi"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">new-association</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the name of the new association value, during a modify-association event.</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0fj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">status-level</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the status level for a status message. Valid levels are: success, error, warning, retry, fatal.</p></td>
+</tr>
+<tr class="oddrow" id="bcbe0fk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">status-message</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the text messages that should be included for a status document.</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0fl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">-1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies that the event should be put on hold (do not publish), until a release is issued.</p></td>
+</tr>
+<tr class="oddrow" id="bcbe0fm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">-2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies that all events on hold should be released (publishable).</p></td>
+</tr>
+<tr class="evenrow" id="bcbe0fn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">-?</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This help menu.</p></td>
+</tr></table>
+</div>
+
+<p class="para">When invoked, the changelog utility waits for input on standard input until an EOF (end of file) character is received. If entered on the command-line, you can terminate it with the Ctl-d meta character. Additional name/value pairs can then be passed to this tool to supply additional event information such as attribute values being added or removed.</p>
+<p class="para">When invoked from a script, you can use a âhere-isâ document format to pass standard input to the changelog tool. When passing input to a command-line utility through standard input, you have the advantage that the information is protected from the environment, adding security to your publisher. When using command-line arguments, these options will appear in cleartext to the outside environment with tools such as âpsâ.</p>
+<p class="para">Examples from a script:</p><pre class="screen">usclh -t add -c User -a bob &lt;&lt;EOF
+ADD_CN=bob
+ADD_Login Disabled=true
+EOF
+
+usclh -t modify -c User -a bob &lt;&lt;EOF
+ADD_CN=bob
+ADD_Login Disabled=true
+EOF
+
+usclh -t modify-password -c User -a bob &lt;&lt;EOF
+OLD_PASSWORD=secret
+PASSWORD=newsecret
+EOF
+
+usclh -t rename -c User -a bob -n bob2 -r &lt;&lt;EOF
+
+EOF</pre>
+<p class="para">Examples from a command line:</p><pre class="screen">usclh -t add -c User -a bob
+ADD_CN=bob
+ADD_Login Disabled=true
+^d
+
+usclh -t delete -c User -a bob
+^d 
+
+usclh -t modify-password -c User -a bob -w secret -p newsecret
+^d
+
+# ./usclh -t xds
+&lt;nds dtdversion="1.1" ndsversion="8.6"&gt;
+&lt;input&gt;
+&lt;modify class-name="User" event-id="12345"&gt;
+  &lt;association&gt;bob&lt;/association&gt;
+  &lt;modify-attr attr-name="MyAttr"&gt;
+    &lt;remove-all-values/&gt;
+    &lt;add-value&gt;
+      &lt;value&gt;some new value&lt;/value&gt;
+    &lt;/add-value&gt;
+  &lt;/modify-attr&gt;
+&lt;/modify&gt;
+&lt;/input&gt;
+&lt;/nds&gt;
+^d</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

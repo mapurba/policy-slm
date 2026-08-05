@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="August 05 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="buf1xwx,peoplesoft-troubleshooting,ae5x9lm,b8twgrh,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>SQL Error When Saving âSample Personâ Records - NetIQ Identity Manager Driver for PeopleSoft Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="buf1xwx">
+
+<h1 class="title h1"><span class="number">8.14</span> SQL Error When Saving âSample Personâ Records</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Error text example:</p><pre class="screen">SQL error.Function: SQLExec
+Error Position:  0
+ Return:  8601 - [Microsoft][ODBC SQL Server Driver][SQL Server]FOR
+ UPDATE cannot be specified on a READ ONLY cursor.</pre>
+<p class="para">The DirXML_DERIVED.DIRXML_DRIVER.FieldFormula PeopleCode contains an SQLExec command that performs an exclusive lock on selected rows returned from a query for the current sequential transaction number in the DIRXML_TRANSNXT table. The command line is:</p><pre class="screen">SQLExec("Select DIRXML_INST from DIRXML_TRANSXT Where DIRXML_DRIVER =:1 
+FOR UPDATE", &amp;Driver, &amp;InstanceID);</pre>
+<p class="para">The âFOR UPDATEâ locking clause is not valid for all flavors of SQL (such as SQL Server.) The clause can be safely removed to allow the PSA to function. However, if there is a possibility of simultaneous administrative access to the Transaction row creation functionality, the code should be modified by a qualified DBMS/PeopleSoft Database administrator to appropriately serialize the âSelectâ and âInsert or Updateâ of the DIRXML_TRANSNXT table.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

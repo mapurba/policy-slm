@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xzdtn,b3r8uai,b3r8uai,b3yee7z,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Status and Diagnostic Files - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xzdtn">
+
+<h1 class="title h1"><span class="number">A.1</span> Driver Status and Diagnostic Files</h1>
+
+<div class="content_wrapper">
+
+<p class="para">There are several log files that you can view to examine driver operation.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xzdtn.html#b3xzhok" class="xref">The System Log</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xzdtn.html#b3xzpa5" class="xref">The Trace File</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xzdtn.html#b3ye15d" class="xref">The Script Output File</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xzdtn.html#b3ye3ty" class="xref">DSTRACE</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xzdtn.html#b3yeaix" class="xref">The Status Log</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xzdtn.html#b3yecj2" class="xref">The PAM Trace File</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3xzhok">
+
+<h2 class="title h2"><span class="number">A.1.1</span> The System Log</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The system log is used by the driver shim to record urgent, informational, and debug messages. Examining these should be foremost in your troubleshooting efforts. For detailed message documentation, see <a href="b3r8v2p.html" class="xref">Section B.0, System and Error Messages</a>.</p>
+<p class="para">The location for the system log varies from system to system and is generally configured through <span class="filename">/etc/syslog.conf</span>. The amount of information that is logged by the driver can also be configured through this system log configuration file. The following is a sample fragment from <span class="filename">/etc/syslog.conf</span>:</p><pre class="screen"># sample /etc/syslog.conf
+#
+*.err;kern.notice;auth.notice                   /dev/sysmsg
+*.err;kern.debug;daemon.notice;mail.crit        /var/adm/messages
+
+*.alert;kern.err;daemon.err                     operator
+*.alert                                         root</pre>
+<p class="para">The options in the first column determine which messages are logged. The options in the second column specify the destination file or user to send the log output to. For example, specifying <span class="literal">*.err</span> logs all messages with a priority of err or above. For more information about syslog priorities, view your system documentation using the <span class="command">man syslog</span> command.</p>
+<p class="para">Messages from the Linux and UNIX driver shim and messages from the scripts are logged with various priorities as shown in <a href="b3xzdtn.html#b465vhf" class="xref">Table A-1</a>. The information that is recorded depends on your syslog configuration.</p>
+<div class="table" id="b465vhf"><p class="title"><em class="num">Table A-1 </em>Message Priorities</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+              
+<tr class="headerrow" id="b465w8h"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Message Topic</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Priority</p></th>
+</tr>
+            
+<tr class="oddrow" id="b465w8i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Script being called</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DEBUG</p></td>
+</tr>
+<tr class="evenrow" id="b465w8j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Successful Linux or UNIX command execution</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">INFO</p></td>
+</tr>
+<tr class="oddrow" id="b465w8k"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Publication events</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">INFO</p></td>
+</tr>
+<tr class="evenrow" id="b465w8l"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Failures</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ERR</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3xzpa5">
+
+<h2 class="title h2"><span class="number">A.1.2</span> The Trace File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The default trace file exists on the connected Linux and UNIX system at <span class="filename">/usr/local/nxdrv/logs/trace.log</span>. A large amount of debug information can be written to this file. Use the trace level setting in <span class="filename">/etc/nxdrv.conf</span> to control what is written to the file. For details about <span class="filename">/etc/nxdrv.conf</span>, see <a href="b4baik6.html" class="xref">The Driver Shim Configuration File</a>.</p>
+<div class="table" id="b4571j2"><p class="title"><em class="num">Table A-2 </em>Driver Shim Trace Levels</p>
+<table class="topbot" width="100%"><col width="18%" /><col width="82%" />
+              
+<tr class="headerrow" id="b3xzq94"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Trace Level</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+            
+<tr class="oddrow" id="b3xzq95"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">0</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">No debugging.</p></td>
+</tr>
+<tr class="evenrow" id="b3xzq96"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1â3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Identity Manager messages. Higher trace levels provide more detail.</p></td>
+</tr>
+<tr class="oddrow" id="b3xzq97"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus Remote Loader, driver, driver shim, and driver connection messages.</p></td>
+</tr>
+<tr class="evenrow" id="b3xzq98"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5â7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus change log and loopback messages. Higher trace levels provide more detail.</p></td>
+</tr>
+<tr class="oddrow" id="b3xzq99"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus driver status log, driver parameters, driver command line, driver security, driver Web server, driver schema, driver encryption, driver PAM, driver SOAP API, and driver include/exclude file messages.</p></td>
+</tr>
+<tr class="evenrow" id="b3xzq9a"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">9</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus low-level networking and operating system messages.</p></td>
+</tr>
+<tr class="oddrow" id="b3xzq9b"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">10</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Previous level plus maximum low-level program details (all options).</p></td>
+</tr></table>
+</div>
+
+<p class="para">The following is an example <span class="filename">/etc/nxdrv.conf</span> line to set the trace level:</p><pre class="screen">-trace 9</pre>
+<div class="procedure" id="b3xzegx">
+<p class="para">To view the trace file:</p>
+<ol class="steps">
+<li class="step" id="b3xzegy">
+<p class="para">Use a Web browser to access the driver shim at <span class="literal">https://<span class="replaceable">driver-address</span>:8091</span>. Substitute the DNS name or IP address of your driver for <span class="replaceable">driver-address</span>.</p></li>
+<li class="step" id="b3xzgrb">
+<p class="para">Authenticate by using any user name and the password that you specified as the Remote Loader password.</p></li>
+<li class="step" id="b47mt4f">
+<p class="para">Click <span class="guimenu">Trace</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ye15d">
+
+<h2 class="title h2"><span class="number">A.1.3</span> The Script Output File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">By default, script output is written to <span class="filename">/usr/local/nxdrv/logs/script-trace.log</span> on the connected system. This file captures the standard error output from all scripts executed by the driver shim. The location of the script output file is set in the <span class="filename">globals.sh</span> script.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ye3ty">
+
+<h2 class="title h2"><span class="number">A.1.4</span> DSTRACE</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can view Identity Manager information using the DSTRACE facility on the Metadirectory server. Use iManager to set the tracing level. For example, trace level 2 shows Identity Vault events in XML documents, and trace level 5 shows the results of policy execution. Because a high volume of trace output is produced, we recommend that you capture the trace output to a file. For details about using DSTRACE, see the <span class="citetitle">NetIQÂ® Identity Manager 4.8 Administration Guide</span> on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yeaix">
+
+<h2 class="title h2"><span class="number">A.1.5</span> The Status Log</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The status log is a condensed summary of the events that have been recorded on the Subscriber and Publisher channels. This file exists on the connected system at <span class="filename">/usr/local/nxdrv/logs/dirxml.log</span>. You can also view the status log in iManager on the Driver Overview page. You can change the log level to specify what types of events to log. For details about using the status log, see the <span class="citetitle">NetIQ Identity Manager 4.8 Administration Guide</span>.</p>
+<div class="procedure" id="b401bch">
+<p class="para">To view the status log:</p>
+<ol class="steps">
+<li class="step" id="b401bci">
+<p class="para">Use a Web browser to access the driver shim at <span class="literal">https://<span class="replaceable">driver-address</span>:8091</span>. Substitute the DNS name or IP address of your driver for <span class="replaceable">driver-address</span>.</p></li>
+<li class="step" id="b401bcj">
+<p class="para">Authenticate by using any user name and the password that you specified as the Remote Loader password.</p></li>
+<li class="step" id="b47mtdg">
+<p class="para">Click <span class="guimenu">Status</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yecj2">
+
+<h2 class="title h2"><span class="number">A.1.6</span> The PAM Trace File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To log PAM trace messages to <span class="filename">/usr/local/nxdrv/logs/pam_nxdrv.log</span>, specify the <span class="option">debug=*</span> command line option for the driver PAM module in your PAM configuration file. This file is implementation dependent. For details, see your systemâs PAM documentation. For details about the driver PAM module command line options, see <a href="b3yj5z9.html#b4igolf" class="xref">Table C-4, Linux and UNIX Driver PAM Module Command Line Options</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

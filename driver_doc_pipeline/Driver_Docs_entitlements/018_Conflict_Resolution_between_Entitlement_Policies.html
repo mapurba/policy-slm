@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="July 11 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="bnxmlz5,troubleshooting-role-based-entitlements,am46suj,driver-properties,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Conflict Resolution between Entitlement Policies - NetIQ Identity Manager Entitlements Service Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bnxmlz5">
+
+<h1 class="title h1"><span class="number">9.2</span> Conflict Resolution between Entitlement Policies</h1>
+
+<div class="content_wrapper">
+
+<p class="para">When you are creating entitlement policies, itâs possible that the policies that affect a particular user might conflict in assigning entitlements to that user. The following sections provide information to help you if conflicts are not being resolved the way you expect:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="bnxmlz5.html#bpbnrxl" class="xref">Conflict Overview</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="bnxmlz5.html#bnxnkt9" class="xref">Changing the Conflict Resolution Method for an Individual Entitlement</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="bnxmlz5.html#bnxngnt" class="xref">Prioritizing Entitlement Policies</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bpbnrxl">
+
+<h2 class="title h2"><span class="number">9.2.1</span> Conflict Overview</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following list describes how conflicts are resolved. For some entitlements, you can change the conflict resolution.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bnxmxuq">
+              <p class="title"><em class="title">Entitlements that donât have values are additive.</em>
+              In most cases an account entitlement doesnât have values. If a user is granted an account on a connected system by any entitlement policy, the user receives an account on that system. It does not matter whether another entitlement policy is in conflict; the result is additive.</p>
+            </div>
+
+<p class="listitem">This method of conflict resolution for granting accounts cannot be changed.</p>
+<p class="listitem">For example, if the Manager entitlement policy grants Jean Chandler an Exchange account, but Jean Chandler is excluded from the Mail Room Employees entitlement policy that also grants Exchange accounts, Jean still gets an Exchange account.</p></li>
+<li class="listitem">
+<div class="formalpara" id="bnxn8xk">
+              <p class="title"><em class="title">Entitlements that have values are additive by default, but you can choose to resolve by priority.</em>
+              Entitlements, such as group membership, have a list of group names for the values, or have an attribute with a value. By default, these kinds of entitlements are also additive.</p>
+            </div>
+
+<p class="listitem">You can change the conflict resolution for these kinds of entitlements, if desired.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bnxo8j8">
+                  <p class="title"><em class="title">conflict-resolution=âunionâ:Â </em>
+                  A value of âunionâ means that the entitlements are additive. A user is granted all the entitlements that he or she is assigned by membership in any policy. The differing entitlement values are simply added together and the user gets them all.</p>
+                </div>
+
+<p class="listitem">For example, if Jameel is a member of the Trade Show Contractors policy that grants membership in a GroupWise e-mail distribution list named Trade Show Mailing List, and he is excluded from membership in the Trade Show Managers policy that also assigns the e-mail distribution list named Trade Show Mailing List, he still receives membership in the e-mail distribution list.</p>
+<p class="listitem">As another example, if Consuela is granted membership in the Active Directory group named Mailroom Staff by the Mailroom policy, and also granted membership in the Active Directory group named Emergency Response by the Emergency Volunteers policy, she is granted membership in both groups in Active Directory.</p>
+<p class="listitem">With this setting, the order of an entitlement policy in the list of policies is not important for the entitlement.</p></li>
+<li class="listitem">
+<div class="formalpara" id="bnxo8j9">
+                  <p class="title"><em class="title">conflict-resolution=âpriorityâ:Â </em>
+                  A value of âpriorityâ means that if the values in two different policies conflict, or if one policy includes the user and another excludes the user, the entitlements granted to the user are only those in the entitlement policy that is listed higher in the list of Entitlement policies.</p>
+                </div>
+
+<p class="listitem">The previous examples would have a different result with this setting.</p>
+<p class="listitem">In the example above for Jameel, if the GroupWise e-mail distribution list entitlement had a value of âpriority,â and the Trade Show Managers policy was higher in the list than the Trade Show Contractors policy, Jameel would not be granted membership in the Trade Show Mailing List.</p>
+<p class="listitem">In the example above for Consuela, if the Active Directory NOS group membership entitlement had a value of âpriority,â and the Mailroom policy was higher in the list than the Emergency Volunteers policy, Consuela would be granted membership only in the Mailroom Staff group. She would not be granted membership in the Emergency Response group because the conflict resolution is by priority, not additive.</p>
+<p class="listitem">This functionality is useful if, for example, you configure your environment to use role-based entitlements to place users in a hierarchical structure on another system. You would want the user to be placed in either one place or another, not in two places at the same time.</p>
+<p class="listitem">Keep in mind that the setting is independent for each entitlement offered by each driver.</p>
+<p class="listitem">As a general rule, if you use the âpriorityâ setting, you should place administrator or manager policies higher in the list than policies for end users or individual contributors. You should put groups with narrower membership higher than groups with broader membership.</p></li></ul></div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bnxnkt9">
+
+<h2 class="title h2"><span class="number">9.2.2</span> Changing the Conflict Resolution Method for an Individual Entitlement</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b10j718">
+<ol class="steps">
+<li class="step" id="bnxns5h">
+<p class="para">Log in to Identity Console and select <span class="guimenu">IDM Administration</span> under Identity Manager. Select a driver set.</p></li>
+<li class="step" id="bnxnw8h">
+<p class="para">Click <img src="../graphics/action_menu.png" alt="List of Entitlement Policies" title="List of Entitlement Policies" class="inline" /> button, then select <span class="guimenu">Stop driver.</span></p></li>
+<li class="step" id="bnxnsjm">
+<p class="para">Click the driver icon for the driver that offers the entitlement you want to change.</p></li>
+<li class="step" id="bbx4kes">
+<p class="para">On the Driver Overview page, click the <span class="guimenu">Advanced</span> tab, then click <span class="guimenu">Entitlements</span>.</p></li>
+<li class="step" id="bnxntf0">
+<p class="para">Click the entitlement name to edit the entitlement in the XML viewer.</p></li>
+<li class="step" id="bnxntqo">
+<p class="para">Select the check box for <span class="guimenu">Enable XML editing</span>.</p></li>
+<li class="step" id="bnxnu4g">
+<p class="para">In the XML, find the definition of the entitlement you want to change.</p>
+<p class="para">Hereâs an example of the line you should look for:</p><pre class="screen">&lt;entitlement conflict-resolution="union" description="Grants membership to GroupWise Distribution lists" display-name="GroupWise Distribution Lists" name="gwDistLists"&gt;</pre></li>
+<li class="step" id="bnxnukk">
+<p class="para">Change the <span class="literal">conflict-resolution</span> value. The two possible values are the following:</p><pre class="screen">conflict-resolution="union"</pre><pre class="screen">conflict-resolution="priority"</pre>
+<p class="para">For information about these values, see <a href="bnxmlz5.html" class="xref">Conflict Resolution between Entitlement Policies</a>.</p></li>
+<li class="step" id="bbx4lyc">
+<p class="para">Click <span class="guimenu">OK</span> to save the changes and restart the driver.</p></li>
+<li class="step" id="bbx4mc7">
+<p class="para">Click <span class="guimenu">IDM Administration</span> to browse to and restart the Entitlements Service driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bnxngnt">
+
+<h2 class="title h2"><span class="number">9.2.3</span> Prioritizing Entitlement Policies</h2>
+
+<div class="content_wrapper">
+
+<p class="para">By default, the order of the list of Entitlement Policies does not matter. This is because the driver configurations shipped with Identity Manager have <span class="literal">conflict-resolution="union"</span> as the method of conflict resolution for each entitlement.</p>
+<p class="para">If you change any of the entitlements to <span class="literal">conflict-resolution="priority,"</span> then the order of the list of Entitlement Policies matters, but only for those entitlements you changed. For information about these values, see <a href="bnxmlz5.html" class="xref">Conflict Resolution between Entitlement Policies</a>.</p>
+<div class="procedure" id="b10j719">
+<ol class="steps">
+<li class="step" id="bnxnqdq">
+<p class="para">In Identity Console, click <span class="guimenu">Role-Based Entitlements &gt; Role-Based Entitlements</span>.</p></li>
+<li class="step" id="bnxnqhw">
+<p class="para">Search for and select a driver set.</p>
+<p class="para">A page appears with a list of the Entitlement policies.</p></li>
+<li class="step" id="bnxnqjj">
+<p class="para">Change the priority of the Entitlement policies by selecting a policy and using the arrow buttons to move it up and down in the list.</p>
+<p class="para">Moving an entitlement policy higher in the list gives it a higher priority.</p></li>
+<li class="step" id="bnxokzr">
+<p class="para">Click <span class="guimenu">Close</span> to restart the driver.</p>
+<p class="para">Changes in priority donât take effect until the driver is restarted. </p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

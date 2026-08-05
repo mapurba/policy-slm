@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-start-jdbc-fan-out-agent,how-to-configure-fan-out-agent,how-to-generate-the-default-configuration-file,how-to-manage-jdbc-fan-out-agent,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Starting the Fanout Agent - NetIQ Identity Manager Driver for JDBC Fanout Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-start-jdbc-fan-out-agent">
+
+<h1 class="title h1"><span class="number">3.2</span> Starting the Fanout Agent</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can start the Fanout agent by passing the <span class="command">startAgent</span> command in the command prompt or by using the startup script, which enables the agent as a startup service.</p>
+<p class="para">Before starting the Fanout agent, ensure that your server meets the following requirements:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ActiveMQ is running.</p>
+<p class="listitem">This allows the Fanout agent to initialize the required queues in ActiveMQ when the agent starts. If ActiveMQ is not running, the agent returns an error and does not start properly.</p></li>
+<li class="listitem">
+<p class="listitem">The Java and Curl tool are included in the system path of your operating system.</p>
+<p class="listitem">You use Java and Curl tool to manage the Fanout agent. If Curl is not present in your environment, download the SSL version of the Curl binary from <a href="http://curl.haxx.se/download.html" class="ulink">Curl Releases and Downloads</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Copy the appropriate third-party JDBC connector to the <span class="filename">lib</span> directory of the Fanout agent default installation folder. For example, <span class="filename">ojdbc6.jar.</span> For more information, see the <a href="https://www.netiq.com/documentation/idm45drivers/jdbc/data/b667eza.html" class="ulink">Supported Third Party JDBC Drivers</a> in the <a href="https://www.netiq.com/documentation/idm45drivers/jdbc/data/bookinfo.html" class="ulink"><span class="citetitle">NetIQ Identity Manager Driver for JDBC Implementation Guide</span></a>.</p></li></ul></div>
+
+<div class="procedure" id="t41pr1us6t44"><p class="title">To start the Fanout Agent in the command prompt:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">Open a command prompt.</p></li>
+<li class="step">
+<p class="para">Run the <span class="command">startAgent</span> command and pass the default configuration file name as a parameter in the command.</p>
+<p class="para">
+            <span class="command">startAgent âconfig &lt;FanoutAgent Installation Location&gt;/config/<span class="replaceable">fanoutagent-config.properties</span></span>
+          </p>
+<p class="para">The installation path will vary depending on the Fanout agent version you are running.</p></li>
+<li class="step">
+<p class="para">(Optional) To change the agent and the shim passwords, use the <span class="command">setPassword</span> command.</p>
+<p class="para">The default passwords are <span class="guimenu">netiq</span>. For more information, see <a href="how-to-manage-jdbc-fan-out-agent.html" class="xref">Managing the Fanout Agent</a>.</p></li>
+<li class="step">
+<p class="para">(Optional) To change the keystore password, use the <span class="command">setKSPassword</span> command.</p>
+<p class="para">The default password for the keystore is <span class="guimenu">netiq123</span>.</p></li>
+<li class="step">
+<p class="para">(Optional) To change the encryption key, use the <span class="command">setEncryptionKey</span> command.</p>
+<p class="para">The default value for the key is <span class="guimenu">netiq</span>.</p></li>
+<li class="step">
+<p class="para">(Optional) Establish a secure connection between the Fanout agent and ActiveMQ. For more information, see <a href="how-to-establish-ssl-communication-between-identity-manager-and-jdbc-fan-out-driver.html" class="xref">Section 6.0, Securing Fanout Driver Communication</a>.</p></li></ol>
+</div>
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Ensure that you specify the same values for these parameters during Fanout driver configuration.</p></div>
+
+<p class="para">To enable the Fanout agent service to automatically start when the system starts, perform the following actions for your platform:</p>
+<div class="procedure" id="t41pr1us70tx"><p class="title">Linux:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">Set the <span class="filename">JAVA_HOME</span> environment variable.</p></li>
+<li class="step">
+<p class="para">Copy the <span class="filename">fanoutdxml</span> file from <span class="filename">/opt/novell/dirxml/fanoutagent/bin</span> to <span class="filename">/etc/init.d</span>.</p></li>
+<li class="step">
+<p class="para">Run the <span class="filename">fanoutAgentAddSvc</span> file from <span class="filename">/opt/novell/dirxml/fanoutagent/bin</span> by executing the following command:</p>
+<p class="para">
+            <span class="command">
+              <span class="replaceable">./fanoutAgentAddSvc</span>
+            </span>
+          </p></li>
+<li class="step">
+<p class="para">Start the Fanout agent service by executing the following command:</p>
+<p class="para">
+            <span class="filename">/etc/init.d/fanoutdxml start</span>
+          </p></li></ol>
+</div>
+
+<p class="para">To stop the Fanout agent service, execute the following command:</p>
+<p class="para">
+        <span class="filename">/etc/init.d/fanoutdxml stop</span>
+      </p>
+<div class="procedure" id="t41pr1us78jq"><p class="title">Windows:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">Set the <span class="filename">JAVA_HOME</span> environment variable.</p></li>
+<li class="step">
+<p class="para">Run <span class="filename">vcredist_x64.exe</span> file from <span class="filename">C:\NetIQ\IdentityManager\FanoutAgent\bin</span>.</p></li>
+<li class="step">
+<p class="para">Install the Fanout agent service by executing the following command:</p><pre class="screen">C:\NetIQ\IdentityManager\FanoutAgent\bin\FanoutAgentSvc.exe âi</pre>
+<p class="para">The display name of the service is <span class="guimenu">Fanout Agent Service</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If both ActiveMQ and Fanout agent services are running on the same server, ensure that ActiveMQ service starts before the Fanout agent service. To set the Fanout agent service to a delayed start, run the following command on Windows:</p><pre class="screen">sc config FanoutAgent start= delayed-auto</pre></div>
+</li>
+<li class="step">
+<p class="para">Start the Fanout agent service.</p></li></ol>
+</div>
+
+<p class="para">To remove the Fanout agent service on Windows, execute the following command:</p>
+<p class="para">
+        <span class="filename">C:\NetIQ\IdentityManager\FanoutAgent\bin\FanoutAgentSvc.exe âu</span>
+      </p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>You can run only one Fanout agent instance on a specific server as a service. However, if you run a Fanout agent as an application, Identity Manager allows you to run multiple instances of the Fanout agent on the same server by using separate configuration files.</p>
+<p class="para">The Fanout agent service loads the configuration properties only from C:\NetIQ\IdentityManager\FanoutAgent\<span class="filename">config</span> path. Ensure that the configuration properties file name is <span class="filename">fanoutagent-config.properties</span> (default file name).</p>
+<p class="para">A Fanout agent instance that is started as a service must be stopped as a service only. This means that you should not stop the agent using the stopAgent command or REST endpoint if it is started as a service.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

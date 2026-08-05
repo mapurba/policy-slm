@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="direct-synchronization,schema-mapping,indirect-synchronization,synchronize-primary-key-columns-for-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Direct Synchronization - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="direct-synchronization">
+
+<h1 class="title h1"><span class="number">9.4</span> Direct Synchronization</h1>
+
+<div class="content_wrapper">
+
+<p class="para">In a direct synchronization model, the driver maps the following:</p>
+<div class="table" id="b87s0b5"><p class="title"><em class="num">Table 9-4 </em>Mappings in Direct Synchronization</p>
+<table class="topbot" width="95%"><col width="33%" /><col width="67%" />
+            
+<tr class="headerrow" id="b87s0b6"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Object</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Database Object</p></th>
+</tr>
+          
+<tr class="oddrow" id="b87s0b7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Classes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Views</p></td>
+</tr>
+<tr class="evenrow" id="b87s0b8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Attributes</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">View Columns</p></td>
+</tr>
+<tr class="oddrow" id="b87s0b9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Class</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">View</p></td>
+</tr>
+<tr class="evenrow" id="b87s0ba"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Single-value attribute</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">View Column</p></td>
+</tr>
+<tr class="oddrow" id="b87s0bb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Multivalue attribute</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">View Column</p></td>
+</tr></table>
+</div>
+
+<p class="para">The update capabilities of views vary between databases. Most databases allow views to be updated when they are comprised of a single base table. (That is, they do not join multiple tables.) If views are read-only, they cannot be used for subscription. Some databases allow update logic to be defined on views in instead-of-triggers, which allow a view to join multiple base tables and still be updateable.</p>
+<p class="para">For a list of databases that support instead-of-triggers, see <a href="characteristics-of-databases.html#bvowloe" class="xref">Database Features</a>. Instead-of-trigger logic can be simulated, regardless of database capability using embedded SQL. See <a href="set-virtual-triggers-for-jdbc-drivers.html" class="xref">Virtual Triggers</a>.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="direct-synchronization.html#b87s0bc" class="xref">View Column Meta-Identifiers</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="direct-synchronization.html#b87s0bs" class="xref">Primary Key Columns</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="direct-synchronization.html#b87s0bt" class="xref">Schema Mapping</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0bc">
+
+<h2 class="title h2"><span class="number">9.4.1</span> View Column Meta-Identifiers</h2>
+
+<div class="content_wrapper">
+
+<p class="para">A view is a logical table. Unlike tables, views do not physically exist in the database. As such, views usually cannot have traditional primary key/foreign key constraints. To simulate these constructs, the JDBC driver embeds constraints and other metadata in view column names. The difference between these constraints and traditional ones is that the former are not enforced at the database level. They are an application-level construct.</p>
+<p class="para">For example, to identify to the driver which fields to use when constructing association values, place a primary key constraint on a parent table. The corollary to this for a view is to prefix one or more column names with <span class="literal">pk</span>_ (case-insensitive).</p>
+<p class="para">The following table lists the constraint prefixes that can be embedded in view column names.</p>
+<div class="table" id="b87s0bd"><p class="title"><em class="num">Table 9-5 </em>Constraint Prefixes</p>
+<table class="topbot" width="95%"><col width="37%" /><col width="63%" />
+              
+<tr class="headerrow" id="b87s0be"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Constraint Prefixes (case-insensitive)</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Interpretation</p></th>
+</tr>
+            
+<tr class="oddrow" id="b87s0bf"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">pk_</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">primary key</p></td>
+</tr>
+<tr class="evenrow" id="b87s0bg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fk_</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">foreign key</p></td>
+</tr>
+<tr class="oddrow" id="b87s0bh"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">sv_</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">single-value</p></td>
+</tr>
+<tr class="evenrow" id="b87s0bi"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">mv_</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">multivalue</p></td>
+</tr></table>
+</div>
+
+<p class="para">The following example views contain all of these constraint prefixes. These are examples and not the actual samples. Therefore, they should not be used in the driver implementation. The real samples are bundled with the Identity Manager media.</p><pre class="screen">CREATE VIEW direct.view_usr 
+(
+    pk_idu,Â Â Â Â Â Â Â Â Â Â Â Â -- primary key column; implicitly single-valued
+    sv_fname,Â Â Â Â Â Â Â Â Â Â -- single-valued column
+    mv_phoneno,Â Â Â Â Â Â Â Â -- multi-valued column
+    fk__idu__manager,Â Â -- self-referential foreign key column; refers
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â --   to primary key column idu in view_usr;
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â --   implicitly single-valued
+    fk_mv__idg__mbr_of -- extra-referential foreign key column; refers
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â --   to primary key column idg in view_grp;
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â --   multi-valued
+)
+AS
+-- ...</pre><pre class="screen">CREATE VIEW direct.view_grp
+(
+    pk_idg,            -- primary key column; implicitly single-valued
+    fk_mv__idu__mbr    -- extra-referential foreign key column; refers
+                       --   to primary key column idu in view_usr;
+                       --   multi-valued
+)
+AS
+-- ...</pre>
+<h4 class="bridgehead" id="b87s0bj">BNF</h4>
+
+<p class="para">The BNF (Backus Naur Form) notation for view column meta-identifiers:</p><pre class="screen">&lt;view-column-name&gt; ::= [&lt;meta-info&gt;] &lt;column-name&gt;
+
+&lt;column-name&gt; ::= &lt;legal-unquoted-database-identifier&gt;
+&lt;meta-info&gt; ::= &lt;referential&gt; | &lt;non-referential&gt;
+
+&lt;non-referential&gt; ::= [&lt;single-value&gt; | &lt;multiple-value&gt;]
+
+&lt;single-value&gt; ::= "sv_"
+
+&lt;multiple-value&gt; ::= "mv_"
+
+&lt;referential&gt; ::= &lt;primary-key&gt; | &lt;foreign-key&gt;
+
+&lt;primary-key&gt; ::= "pk_" [&lt;single-value&gt;] [&lt;column-group-id&gt;] 
+                  [&lt;referenced-column-name&gt;]</pre><pre class="screen">&lt;column-group-id&gt; ::= &lt;non-negative-integer&gt; "_"
+
+&lt;referenced-column-name&gt; ::= "_" &lt;column-name&gt; "__"
+
+&lt;foreign-key&gt; ::= "fk_" [&lt;non-referential&gt;] [&lt;column-group-id&gt;]
+                  &lt;referenced-column-name&gt;</pre>
+<h4 class="bridgehead" id="b87s0bk">Normalized Forms</h4>
+
+<p class="para">By default, all view column names are single-valued. Therefore, explicitly specifying the <span class="literal">sv_</span> prefix in a view column name is redundant. For example, <span class="literal">sv_fname</span> and <span class="literal">fname</span> are equivalent forms of the same column name.</p>
+<p class="para">Also, primary key column names implicitly refer to themselves. Therefore, it is redundant to specify the referenced column name. For example, <span class="literal">pk_idu</span> is equivalent to <span class="literal">pk__idu__idu</span>.</p>
+<p class="para">The JDBC driver uses two normalized forms of view meta-identifiers:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Database native form</p>
+<p class="listitem">Database native form is the column name as declared in the database. This form is usually much more verbose than schema mapping form, and contains all necessary meta information.</p></li>
+<li class="listitem">
+<p class="listitem">Schema mapping form</p>
+<p class="listitem">Schema mapping form is returned when the driver returns the application schema. This form is much more concise than database native form because much of the meta information included in database native form is represented in XDS XML and not in the identifier.</p>
+<p class="listitem">The referential prefixes <span class="literal">pk_</span> and <span class="literal">fk_</span> are the only meta information preserved in schema mapping form. This limitation ensures backward compatibility.</p></li></ul></div>
+
+<p class="para">The following table provides examples of each form:</p>
+<div class="table" id="b87s0bl"><p class="title"><em class="num">Table 9-6 </em>Example Normalized Forms of View Meta-Identifiers</p>
+<table class="topbot" width="95%"><col width="50%" /><col width="50%" />
+              
+<tr class="headerrow" id="b87s0bm"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Database Native Form</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Schema Mapping Form</p></th>
+</tr>
+            
+<tr class="oddrow" id="b87s0bn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">pk_idu</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">pk_idu</p></td>
+</tr>
+<tr class="evenrow" id="b87s0bo"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">sv_fname</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fname</p></td>
+</tr>
+<tr class="oddrow" id="b87s0bp"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">mv_phoneno</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">phoneno</p></td>
+</tr>
+<tr class="evenrow" id="b87s0bq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fk_mv__idg__mbr_of</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fk_mbr_of</p></td>
+</tr></table>
+</div>
+
+<h4 class="bridgehead" id="b87s0br">Equivalent Forms</h4>
+
+<p class="para">A view column name without meta information is called its âeffectiveâ name, which is similar to a directory objectâs âeffectiveâ rights. For the driver, view column name equivalency is determined without respect to meta information by default. For example, <span class="literal">pk_idu</span> is equivalent to <span class="literal">idu</span>, and <span class="literal">fk_mv__idg__mbr_of</span> is equivalent to <span class="literal">mbr_of</span>. Any variant form of a view meta column identifier can be passed to the driver at runtime. For backward compatibility reasons, meta information can be treated as part of the effective view column name. See <a href="configure-jdbc-driver-specific-parameters.html#b1pu3ni" class="xref">Enable Meta-Identifier Support?</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0bs">
+
+<h2 class="title h2"><span class="number">9.4.2</span> Primary Key Columns</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Primary key column names must be unique among all views in the synchronization schema.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87s0bt">
+
+<h2 class="title h2"><span class="number">9.4.3</span> Schema Mapping</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Schema mapping conventions for views and view columns are equivalent to that used for parent tables and parent table columns.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

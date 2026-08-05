@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="August 05 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="change-data-schema-interface,customize-driver,customize-psa-trigger-transactions,modify-driver-policies,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Changing the Data Schema Component Interface - NetIQ Identity Manager Driver for PeopleSoft Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="change-data-schema-interface">
+
+<h1 class="title h1"><span class="number">6.2</span> Changing the Data Schema Component Interface</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver is preconfigured to use the Component Interfaces (CIs) defined in the PSA. The APIs for these CIs have been compiled and combined into the <span class="filename">dirxmlcomps.jar</span> file. At run time, the driver imports the interfaces required to interact with the appropriate CI.</p>
+<p class="para">If the driver is configured to use different data schema CIs, the Java APIs for these CIs also need to be built, compiled, and archived into a .<span class="filename">jar</span> file. The directions for building the CI APIs is documented in the <span class="guimenu">PeopleBooks &gt; PeopleSoft Component Interfaces &gt; Programming Component Interfaces in Java &gt; Building APIs in Java</span> section of the PeopleTools documentation. (It is not necessary to rebuild all of the Java CI APIs, just those that are associated with your new schema CI.) The compiled and archived <span class="filename">.jar</span> file should be placed in the DirXML <span class="filename">/lib</span> subdirectory with the <span class="filename">psoftshim.jar</span> file.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="change-data-schema-interface.html#bt36j57" class="xref">Building the PeopleSoft Java Component Interface API</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="change-data-schema-interface.html#bt36nvd" class="xref">Compiling the Java CI API</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="change-data-schema-interface.html#bt36pzn" class="xref">Building the CI API JAR File</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bt36j57">
+
+<h2 class="title h2"><span class="number">6.2.1</span> Building the PeopleSoft Java Component Interface API</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b8q1zz">
+<ol class="steps">
+<li class="step" id="bt36jno">
+<p class="para">In the PeopleTools Application Designer, select the Schema CI you want to build.</p></li>
+<li class="step" id="bt36jqe">
+<p class="para">Click <span class="guimenu">Build &gt; PeopleSoft APIs</span>. In this example, the <span class="guimenu">DirXML_SCHEMA01 CI</span> is used.</p>
+<div class="informalfigure">
+                  <img src="../graphics/peoplesoft-api-build.jpg" alt="Building the PeopleSoft Java CI API" title="Building the PeopleSoft Java CI API" />
+                </div>
+</li>
+<li class="step" id="bt36kyf">
+<p class="para">In the Build PeopleSoft API Bindings dialog box, select the <span class="guimenu">build</span> option for the Java classes.</p></li>
+<li class="step" id="bt36l6v">
+<p class="para">Select a target directory for the Java CI APIs (For our example, <span class="filename">C:\newci</span>).</p></li>
+<li class="step" id="bt36lgr">
+<p class="para">For the <span class="guimenu">Select APIs to Build</span> prompt, click <span class="guimenu">None</span> to deselect all CIs.</p></li>
+<li class="step" id="bt36lq8">
+<p class="para">Using the scroll area, select the CIs for which you wish to generate an API. Make sure you select all CIs that begin with the name of the desired interface. This example uses CompIntfc.DIRXML_SCHEMA01 and CompIntfc.DIRXML_SCHEMA01Collection.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>In addition to your schema CIs, you must always select the CompIntfc.CompIntfcPropertyInfo and CompIntfc.CompIntfcPropertyInfoCollection APIs. They are required in order to compile the schema APIs.</p></div>
+</li>
+<li class="step" id="bt36mtf">
+<p class="para">Click <span class="guimenu">OK</span> to generate the CI APIs. You might be prompted to create the target directory you specified.</p>
+<div class="informalfigure">
+                  <img src="../graphics/peoplesoft-api-bindings.jpg" alt="Build PeopleSoft API Bindings" title="Build PeopleSoft API Bindings" />
+                </div>
+
+<p class="para">The Application Designer status window should show a <span class="literal">Generating API Wrappers</span> message with the selected CIs, and then a <span class="literal">Done</span> message.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bt36nvd">
+
+<h2 class="title h2"><span class="number">6.2.2</span> Compiling the Java CI API</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After the APIs are generated, they must be compiled. The files are in <span class="filename">C:\newci\PeopleSoft\Generated\CompIntfc</span>. For our example, there should be eight Java files in this directory, including the four selected CI API files and four associated Java Interface files. Change directories to the file location and compile the Java files, using an appropriate JVM with a classpath argument specifying the PeopleTools <span class="filename">psjoa.jar</span> file.</p>
+<p class="para">An example command line is:</p>
+<p class="para">
+          <span class="command">javac -classpath c:\psoft\pt84\class\psjoa.jar *.java</span>
+        </p>
+<p class="para">After a successful compile, there is a .<span class="filename">class</span> file for each <span class="filename">.java</span> file in the directory.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bt36pzn">
+
+<h2 class="title h2"><span class="number">6.2.3</span> Building the CI API JAR File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The final step of the build process is the generation of a .<span class="filename">jar</span> file containing the compiled <span class="filename">.class</span> files. It is important that the full class path be generated with the JAR file, so the process must begin at the root of the CI API directory, <span class="filename">C:\newci</span>. From this directory, use the following command line:</p>
+<p class="para">
+          <span class="command">jar cvf0M newci.jar PeopleSoft/Generated/CompIntfc/*.class</span>
+        </p>
+<p class="para">This command builds a JAR file called <span class="filename">newci.jar</span> that is comprised of the previously compiled <span class="filename">.class</span> files and contains the full class paths. The contents of the file can be verified by using WinZIP or another appropriate tool.</p>
+<div class="figure" id="b1gh3p5"><p class="title"><em class="num">Figure 6-1 </em>Building a New .jar File</p>
+              <img src="../graphics/ps50image6_a.png" alt="" />
+            </div>
+
+<p class="para">If the driver is currently running, it must be stopped. If you are using the Remote Loader, the driver must be shut down. If you are using a local driver, it is also necessary to shut down eDirectory.</p>
+<p class="para">Copy the new JAR file to the same lib location with the driver components <span class="filename">psoftshim.jar</span>, <span class="filename">dirxmlcomps.jar</span>, and <span class="filename">psjoa.jar</span>. Restart eDirectory (if required) and the driver and Remote Loader.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

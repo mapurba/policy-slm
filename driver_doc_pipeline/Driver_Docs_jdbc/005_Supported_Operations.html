@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="supported-operations-on-jdbc-driver,introduction-to-identity-manager-jdbc-driver,how-jdbc-driver-works,prerequisite-to-install-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Supported Operations - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="supported-operations-on-jdbc-driver">
+
+<h1 class="title h1"><span class="number">1.4</span> Supported Operations</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="supported-operations-on-jdbc-driver.html#b94bcef" class="xref">Supported Databases</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="supported-operations-on-jdbc-driver.html#b1iivfrh" class="xref">Supported Third Party JDBC Drivers</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="supported-operations-on-jdbc-driver.html#b94bceh" class="xref">Support for Password Synchronization</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="supported-operations-on-jdbc-driver.html#afexaon" class="xref">Supported Data Synchronization Models</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="supported-operations-on-jdbc-driver.html#bvldqov" class="xref">Triggerless vs. Triggered Publication</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b94bcef">
+
+<h2 class="title h2"><span class="number">1.4.1</span> Supported Databases</h2>
+
+<div class="content_wrapper">
+
+<p class="para">For information on supported databases, see<a href="supported-databases-for-jdbc-driver.html" class="xref">Supported Databases</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1iivfrh">
+
+<h2 class="title h2"><span class="number">1.4.2</span> Supported Third Party JDBC Drivers</h2>
+
+<div class="content_wrapper">
+
+<p class="para">For information on supported third-party JDBC drivers, see <a href="third-party-jdbc-driver-interoperability.html" class="xref">Third-Party JDBC Driver Interoperability</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b94bceh">
+
+<h2 class="title h2"><span class="number">1.4.3</span> Support for Password Synchronization</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The JDBC driver supports password set and check on the Subscriber channel. The driver does not support bidirectional password synchronization.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="afexaon">
+
+<h2 class="title h2"><span class="number">1.4.4</span> Supported Data Synchronization Models</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The JDBC driver supports two data synchronization models: direct and indirect. Both terms are best understood with respect to the final destination of the data being synchronized.</p>
+<div class="informaltable">
+<table class="topbot" width="95%"><col width="14%" /><col width="33%" /><col width="53%" />
+              
+<tr class="headerrow" id="b10y1f6"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Model</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Association</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+            
+<tr class="oddrow" id="b10y1f8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Indirect</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Usually associated with tables</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Target database tables probably donât match the structure required by the driver. Therefore, itâs usually necessary to create intermediate staging tables that do match the structure that the driver requires.</p></td>
+</tr>
+<tr class="evenrow" id="b10y1f7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Direct</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Usually associated with views</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Views provide the abstraction mechanism that best facilitates integration with the target database tables.</p></td>
+</tr></table>
+</div>
+
+<p class="para">The following sections describe how direct and indirect synchronization work on both the Subscriber and Publisher channels.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="supported-operations-on-jdbc-driver.html#aescgok" class="xref">Indirect Synchronization</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="supported-operations-on-jdbc-driver.html#aesce87" class="xref">Direct Synchronization</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="aescgok">
+
+<h3 class="title h3">Indirect Synchronization</h3>
+
+<p class="para">Indirect synchronization uses intermediate staging tables to synchronize data between the Identity Vault and a database. You can have one or more customer tables and intermediate staging tables.</p>
+<div class="variablelist">
+            
+<dl class="variablelist">
+<dt class="term">Subscriber Channel</dt>
+<dd class="listitem">
+<p class="listitem">The Subscriber channel updates the intermediate staging tables in the synchronization schema. This action triggers an update to customer tables elsewhere in the database.</p>
+<div class="informalfigure">
+                      <img src="../graphics/jdbc_indirsyncsub_a.png" alt="" />
+                    </div>
+</dd>
+
+          </dl></div>
+
+<div class="variablelist">
+            
+<dl class="variablelist">
+<dt class="term">Publisher Channel</dt>
+<dd class="listitem">
+<p class="listitem">Synchronization triggers update the intermediate staging tables when target database tables are updated. Publication triggers then insert one or more rows into the event log table. The Publisher channel then reads the inserted rows and updates the Identity Vault.</p>
+<p class="listitem">Depending on the contents of the rows read from the event log table, the Publisher channel might need to retrieve additional information from the intermediate tables before updating the Identity Vault. After updating the Identity Vault, the Publisher channel then deletes or marks the rows as processed.</p>
+<div class="informalfigure">
+                      <img src="../graphics/jdbc_indirsyncpub_a.png" alt="" />
+                    </div>
+</dd>
+
+          </dl></div>
+
+</div>
+
+<div class="container sect3" id="aesce87">
+
+<h3 class="title h3">Direct Synchronization</h3>
+
+<p class="para">Direct synchronization typically uses views to synchronize data between Identity Manager and a database. You can use tables if they conform to the structure that the JDBC driver requires. You can have one or more customer views or tables.</p>
+<div class="variablelist" id="aewxdo0">
+            
+<dl class="variablelist">
+<dt class="term">Subscriber Channel</dt>
+<dd class="listitem">
+<p class="listitem">Updates existing customer tables through a view in the synchronization schema.</p>
+<p class="listitem">Direct synchronization without a view is possible only if the target database tables match the structure that the JDBC driver requires. For additional information, see <a href="indirect-synchronization.html" class="xref">Indirect Synchronization</a>.</p>
+<div class="informalfigure">
+                      <img src="../graphics/jdbc_dirsyncsub_a.png" alt="" />
+                    </div>
+</dd>
+
+            
+<dt class="term">Publisher Channel</dt>
+<dd class="listitem">
+<p class="listitem">When a target database table is updated, publication triggers insert rows into the event log table. The Publisher channel then reads the inserted rows and updates the Identity Vault.</p>
+<div class="informalfigure">
+                      <img src="../graphics/jdbc_dirsyncpub_a.png" alt="" />
+                    </div>
+
+<p class="listitem">Depending on the contents of the rows read from the event log table, the Publisher channel might need to retrieve additional information from the view before updating the Identity Vault. After updating the Identity Vault, the Publisher channel then deletes or marks the rows as processed.</p></dd>
+
+          </dl></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bvldqov">
+
+<h2 class="title h2"><span class="number">1.4.5</span> Triggerless vs. Triggered Publication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Triggers are not required to log events for the Publisher channel. In situations where triggers cannot be used to capture granular events, the Publisher channel can derive database changes by inspecting database data.</p>
+<p class="para">Triggerless publication is particularly useful when support contracts forbid the use of triggers on database application tables or for rapid prototyping.</p>
+<p class="para">However, triggerless publication is less efficient than triggered publication. With triggered publication, what changed is already known. With triggerless publication, change calculation must occur before events can be processed.</p>
+<p class="para">Triggerless publication, unlike triggered publication, does not preserve event order. It only guarantees that, by the end of a polling cycle, objects in the database and the Identity Vault are in sync.</p>
+<p class="para">Triggerless publication, unlike triggered publication, does not provide historical data such as old values. It provides information on the current state of an object, not the previous state.</p>
+<p class="para">Triggerless publication does have the advantage of being much simpler because it reduces database-side dependencies. Writing database triggers can be complicated and requires extensive knowledge of database-specific SQL syntaxes.</p>
+<p class="para">The following figure illustrates direct triggerless publication:</p>
+<div class="figure" id="b1j3r5v"><p class="title"><em class="num">Figure 1-2 </em>Direct Triggerless Publication</p>
+              <img src="../graphics/jdbc_dirsyncpub_notrigg_a.png" alt="" />
+            </div>
+
+<p class="para">The following figure illustrates indirect triggerless publication:</p>
+<div class="figure" id="b1j3r5w"><p class="title"><em class="num">Figure 1-3 </em>Indirect Triggerless Publication</p>
+              <img src="../graphics/jdbc_indirsyncpub_notrigg_a.png" alt="" />
+            </div>
+
+<p class="para">If you move the driver without moving the state files, the driver must build up new state files by resynchronizing. For information on this situation, see <a href="configure-jdbc-driver-specific-parameters.html#b1pu3ju" class="xref">State Directory</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

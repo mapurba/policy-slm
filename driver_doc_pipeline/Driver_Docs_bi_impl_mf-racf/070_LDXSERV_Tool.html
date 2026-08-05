@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="bmoaep5,b3r8ulu,b6uukxe,bmn9uvw,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>LDXSERV Tool - NetIQ RACF Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bmoaep5">
+
+<h1 class="title h1"><span class="number">C.3</span> LDXSERV Tool</h1>
+
+<div class="content_wrapper">
+
+<p class="para">LDXSERV is a TSO command tool that serves several functions. For the driver shim, it allows the started task to set a loopback token in its address space memory in order to prevent the Exit routines from logging its activity to the change log. From the user's perspective, LDXSERV can be used as a verification tool to investigate whether the Exits are in place correctly. It can also be used to query information from the change log queue and even modify the queue, if necessary.</p>
+<p class="para">The syntax for LDXSERV is as follows:</p><pre class="screen">  LDXSERV &lt; STATUS | GETNEXT | [MARKDONE &lt;EVENT(event-id)&gt;] &gt;</pre>
+</div>
+
+<div class="container sect2 expanding expanded" id="bmoazgx">
+
+<h2 class="title h2"><span class="number">C.3.1</span> STATUS</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The STATUS operand reports back to the user an XML document describing the installed Event Subsystem. It provides several pieces of information, including the build date and version of each component, the state of each Exit, the number of events queued through each Exit, and the size and location of the log file.</p><pre class="screen">  ldxserv status
+  &lt;ldx&gt;
+    &lt;source&gt;
+      &lt;product build="20210103" instance="ldxserv" version="4.83"&gt;
+        Novell IDM RACF Driver Version 4.8.3.0
+      &lt;/product&gt;
+      &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+    &lt;/source&gt;
+    &lt;output&gt;
+      &lt;status level="success"&gt;
+        &lt;exit name="LDXRIX02" state="enabled" version="4.83" build-date="20210103"
+          times-called="584" events-queued="2" info="ok"/&gt;
+        &lt;exit name="LDXEVX01" state="enabled" version="4.83" build-date="20210103"
+          times-called="20" events-queued="7" info="ok"/&gt;
+        &lt;queue version="4.83" state="active" created-by="LDXRIX02" entries="0"/&gt;
+        &lt;logger version="4.83" state="active" taskid="LDXLOGRP"
+          logfilename="LDX.LOGFILE"/&gt;
+        &lt;logfile name="LDX.LOGFILE" state="0% used"/&gt;
+      &lt;/status&gt;
+    &lt;/output&gt;
+  &lt;/ldx&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmob79x">
+
+<h2 class="title h2"><span class="number">C.3.2</span> GETNEXT</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The GETNEXT operand reports back to the user an XML document describing the first event in the change log queue. Inside the XML document, you may view the type of event and details about the event, including the user that issued the event, the date and time of the event.</p><pre class="screen">  ldxserv getnext
+  &lt;ldx&gt;
+    &lt;source&gt;
+      &lt;product build="20210103" instance="ldxserv" version="4.83"&gt;
+        Novell IDM RACF Driver Version 4.8.3.0
+      &lt;/product&gt;
+      &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+    &lt;/source&gt;
+    &lt;output&gt;
+      &lt;modify-password date="2021-01-15" time=" 7:18" event-id="7006"&gt;
+        &lt;association&gt;USER\JAVIER&lt;/association&gt;
+        &lt;password&gt;********&lt;/password&gt;
+      &lt;/modify-password&gt;
+      &lt;status level="success"&gt;
+        &lt;description&gt;ok&lt;/description&gt;
+      &lt;/status&gt;
+    &lt;/output&gt;
+  &lt;/ldx&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmob7n2">
+
+<h2 class="title h2"><span class="number">C.3.3</span> MARKDONE</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The MARKDONE operand instructs LDXSERV to remove the event in the queue, described by the EVENTID operand. The event-id must match the event-id found by the GETNEXT command. When complete, it reports back an XML document describing the success or error of the instruction.</p><pre class="screen">  ldxserv markdone event(7006)
+  &lt;ldx&gt;
+    &lt;source&gt;
+      &lt;product build="20210103" instance="ldxserv" version="4.83"&gt;
+        Novell IDM RACF Driver Version 4.8.3.0
+      &lt;/product&gt;
+      &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+    &lt;/source&gt;
+    &lt;output&gt;
+      &lt;status level="success"&gt;
+        &lt;description&gt;ok&lt;/description&gt;
+      &lt;/status&gt;
+    &lt;/output&gt;
+  &lt;/ldx&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

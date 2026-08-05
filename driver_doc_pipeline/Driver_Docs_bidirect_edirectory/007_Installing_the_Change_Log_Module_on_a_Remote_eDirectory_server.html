@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="installing-the-change-log-module-on-remote-edirectory-server,preparing-the-connected-system,preventing-loopback-on-the-publisher-channel,removing-the-driver-from-a-remote-edir-server,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing the Change-Log Module on a Remote eDirectory server - NetIQ Driver for Bidirectional eDirectory Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="installing-the-change-log-module-on-remote-edirectory-server">
+
+<h1 class="title h1"><span class="number">3.2</span> Installing the Change-Log Module on a Remote eDirectory server</h1>
+
+<div class="content_wrapper">
+
+<p class="para">For the Bidirectional eDirectory driver to work, you must install the change-log module on the remote eDirectory server. The change-log enables the driver to recognize changes that require publication from the remote eDirectory to the Identity Vault. The change-log module is supported on the following eDirectory version 9.2.x and later.</p>
+<div class="note"><p class="title">NOTE:</p>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the driver is running on an engine prior to Identity Manager 4.5.4, the driver will connect to Suite B enabled LDAP service on the connected eDirectory only if you enable <span class="guimenu">Always Accept Server Certificate</span> under the driver settings. For more information see, <a href="driver-configuration.html#bsdm0xp" class="xref">Driver Settings</a>.</p></li>
+<li class="listitem">
+<p class="listitem">When you configure eDirectory modules in a Suite B mode, they include support for ECDSA certificates and enforce the use of TLS 1.2 and Suite B ciphers as specified in RFC 6460. For more information on configuring eDirectory in Suite B modes, see <a href="https://www.netiq.com/documentation/edirectory-9/edir_admin/data/b1i4rmmx.html" class="ulink">NetIQ eDirectory Administration Guide</a>.</p></li>
+<li class="listitem">
+<p class="listitem">When you upgrade to driver version 4.0.2 or later, ensure that there are no encrypted attribute events in the change cache.</p></li></ul></div>
+</div>
+
+<p class="para">The change-log module is provided on the Identity Manager media for 64-bit platforms. Copy the change-log module from <span class="filename">/IDM/packages/Dirxml-Changelog</span> directory of your installation folder and install it on the connected eDirectory server.</p>
+<p class="para">The following sections provide instructions to install the change-log module on Linux and Windows platforms:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-the-change-log-module-on-remote-edirectory-server.html#b1kbi2ln" class="xref">Extending the Remote eDirectory Schema</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-the-change-log-module-on-remote-edirectory-server.html#cchefejh" class="xref">Installing and Upgrading the Change-Log Module on Linux</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-the-change-log-module-on-remote-edirectory-server.html#cchjchhh" class="xref">Installing and Upgrading the Change-Log Module on Windows</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1kbi2ln">
+
+<h2 class="title h2"><span class="number">3.2.1</span> Extending the Remote eDirectory Schema</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Before installing or upgrading to change-log or driver version 402 or later, you need to manually extend the connected remote eDirectory schema to introduce a new attribute <span class="filename">DirXMLServerKeys</span>. You must perform an eDirectory health check to ensure that the tree is ready to accept the new schema.</p>
+<p class="para">To extend the <span class="filename">clschema.sch</span> schema file, use the <a href="https://www.netiq.com/documentation/edirectory-9/edir_admin/data/a5hgmnu.html" class="ulink"><span class="filename">ice</span> utility</a>.</p>
+<p class="para">For example:</p>
+<p class="para">
+          <span class="literal">ice -S SCH -f clschema.sch -D LDAP -s &lt;remote eDirectory server&gt; -d &lt;Admin DN&gt; -w &lt;password&gt;</span>
+        </p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="cchefejh">
+
+<h2 class="title h2"><span class="number">3.2.2</span> Installing and Upgrading the Change-Log Module on Linux</h2>
+
+<div class="content_wrapper">
+
+<p class="para">On Open Enterprise Server 11 SP3, RHEL 7.x Server, and SUSE Linux Enterprise Server (SLES) 11 SP4 servers running eDirectory 8.8.8.8, the change-log 4.0.5 and later, the module requires libstdc++.so.6 package with GLIBCXX_3.4.20.</p>
+<p class="para">To verify which libstdc++.so.6 version is installed on your server, run the strings /usr/lib64/libstdc++.so.6 | grep GLIBCXX command. Ensure the GLIBCXX_3.4.20 appears.</p>
+<p class="para">To install the latest libstdc++.so.6 RPM, use the SLES 11 SP4 update channel and then restart ndsd.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>On SUSE Linux Enterprise Server (SLES) 12.x and Red Hat Enterprise Linux (RHEL) 7.x platforms, Identity Manager supports change-log module version 4.0.2 or later.</p></div>
+
+<div class="container sect3" id="installing-changelog-module-as-a-root-user">
+
+<h3 class="title h3">Installing and Upgrading as a Root User</h3>
+
+<div class="procedure" id="b10qaau6">
+<ol class="steps">
+<li class="step">
+<p class="para">Create a remote eDirectory schema file <span class="filename">(clschema.sch)</span> with the following content:</p><pre class="screen">NDSSchemaExtensions DEFINITIONS ::=
+BEGIN
+
+"DirXML-ServerKeys" ATTRIBUTE ::=
+{
+        Operation               ADD,
+        Flags                   {DS_READ_ONLY_ATTR, DS_HIDDEN_ATTR},
+        SyntaxID                SYN_OCTET_STRING,
+        ASN1ObjID               {2 16 840 1 113719 1 14 4 1 65}
+}
+
+END</pre></li>
+<li class="step">
+<p class="para">Extend <span class="filename">clschema.sch</span> schema. For more information on extending the remote eDirectory schema, see <a href="installing-the-change-log-module-on-remote-edirectory-server.html#b1kbi2ln" class="xref">Extending the Remote eDirectory Schema</a>.</p></li>
+<li class="step" id="b10qaau7">
+<p class="para">Stop eDirectory.</p></li>
+<li class="step" id="b10qaawa">
+<p class="para">Navigate to the directory containing the change-log RPM and perform one of the following actions:</p></li>
+<li class="step" id="b10qaawg">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">To install the change-log RPM, run the following command:</p>
+<p class="listitem">
+                    <span class="command">rpm -ivh &lt;rpm name&gt;.rpm</span>
+                  </p>
+<p class="listitem">Example: <span class="command">rpm -ivh ./novell-DXMLChlgx.rpm</span></p></li>
+<li class="listitem">
+<p class="listitem">To upgrade the change-log RPM, run the following command:</p>
+<p class="listitem">
+                    <span class="command">rpm -Uvh --noscripts ./novell-DXMLChlgx.rpm</span>
+                  </p></li>
+<li class="listitem">
+<p class="listitem">To upgrade the change-log version prior to 4.0.5 (4.0.2, 4.0.3, and 4.0.4) on OES 2018, run the following command:</p>
+<p class="listitem">
+                    <span class="filename">rpm -Uvh &lt;rpm name&gt;.rpm --force</span>
+                  </p>
+<p class="listitem">For example: <span class="filename">rpm -Uvh /home/novell-DXMLChlgx*.rpm --force</span></p></li></ul></div>
+</li>
+<li class="step" id="b10qaawt">
+<p class="para">Start eDirectory.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="installing-changelog-module-as-a-non-root-user">
+
+<h3 class="title h3">Installing as a Non-root User</h3>
+
+<p class="para">If eDirectory is installed as a non-root user, you must install the Change-Log module as a non-root user. The Change-Log files are included in the driver RPM. To install the Change-Log module, install the driver RPM.</p>
+<div class="procedure" id="b1fga4y9">
+<ol class="steps">
+<li class="step" id="b1fga65e">
+<p class="para">Set the <span class="literal">root</span> directory to non-<span class="literal">root</span> eDirectory location by entering the following command in the command prompt:</p><pre class="screen">ROOTDIR=<span class="replaceable">&lt;non-root eDirectory location&gt;</span></pre>
+<p class="para">This will set the environmental variables to the directory where eDirectory is installed as a non-<span class="literal">root</span> user.</p>
+<p class="para">For example, <span class="filename">ROOTDIR="/local/home/<span class="replaceable">nruser</span>/base/bshappl/edir</span>, where <span class="filename"><span class="replaceable">nruser</span></span> is the non-root user.</p>
+<p class="para">Note that this location is specified in the example script in Step 2.</p>
+<p class="para">Alternatively, set the <span class="literal">root</span> directory by directly editing the script in a text editor before running the script in Step 2.</p></li>
+<li class="step" id="b1fga65g">
+<p class="para">Install the Change-Log module by running the following script in a command prompt:</p><pre class="screen">***************************************************************
+#!/bin/sh
+#set -x
+#Â© 2017 NetIQ Corporation and its affiliates. All Rights Reserved
+
+clear
+
+echo "======================================================================"
+echo " Installing packages... "
+echo "======================================================================"
+
+if [ "$1" == "" ] ; then
+        exit
+fi
+
+pkgfile=$1
+ROOTDIR="/local/home/<span class="replaceable">nruser</span>/base/bshappl/edir"
+RPMDB=$ROOTDIR/rpm
+
+if [ ! -d "$RPMDB" ] ; then
+        mkdir $RPMDB
+fi
+        # create rpm database if it doesn't exist
+        if [ ! -f $RPMDB/__db.000 ]
+        then
+#                mkdir -p $RPMDB
+                rpm --dbpath "$RPMDB" --initdb
+        fi
+
+ 
+RPM_FLAGS="--dbpath $RPMDB -Uvh --relocate=/etc=$ROOTDIR/etc --relocate=/opt=$ROOTDIR/opt --relocate=/opt/novell/eDirectory/lib64=$ROOTDIR/opt/novell/eDirectory/lib64 --relocate=/var=$ROOTDIR/var --badreloc --nodeps --replacefiles --force"
+
+rpm $RPM_FLAGS $pkgfile</pre></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="cchjchhh">
+
+<h2 class="title h2"><span class="number">3.2.3</span> Installing and Upgrading the Change-Log Module on Windows</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b10qadzg">
+<ol class="steps">
+<li class="step">
+<p class="para">Create a remote eDirectory schema file <span class="filename">(clschema.sch)</span> with the following content:</p><pre class="screen">NDSSchemaExtensions DEFINITIONS ::=
+BEGIN
+
+"DirXML-ServerKeys" ATTRIBUTE ::=
+{
+        Operation               ADD,
+        Flags                   {DS_READ_ONLY_ATTR, DS_HIDDEN_ATTR},
+        SyntaxID                SYN_OCTET_STRING,
+        ASN1ObjID               {2 16 840 1 113719 1 14 4 1 65}
+}
+
+END</pre></li>
+<li class="step">
+<p class="para">Extend <span class="filename">clschema.sch</span> schema. For more information on extending the remote eDirectory schema, see <a href="installing-the-change-log-module-on-remote-edirectory-server.html#b1kbi2ln" class="xref">Extending the Remote eDirectory Schema</a>.</p></li>
+<li class="step" id="b10qadzh">
+<p class="para">Shutdown the eDirectory service.</p></li>
+<li class="step" id="b10qadzx">
+<p class="para">Navigate to the 64-bit folder containing the following DLLs and copy them to the eDirectory installation location. The default install location is <span class="filename">C:\Novell\NDS</span>.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">dirxmllib.dll</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">dxevent.dll</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">xclldap.dll</span>
+                </p></li></ul></div>
+</li>
+<li class="step" id="b10qae00">
+<p class="para">Start the eDirectory service.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

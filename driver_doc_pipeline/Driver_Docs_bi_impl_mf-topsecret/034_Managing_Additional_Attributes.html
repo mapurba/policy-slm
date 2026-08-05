@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xywb2,b3r8tim,b3xxit1,b102asza,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Managing Additional Attributes - NetIQ Top Secret Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xywb2">
+
+<h1 class="title h1"><span class="number">6.4</span> Managing Additional Attributes</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can add additional attributes to the driver for both the Publisher and Subscriber channels. These attributes can be accessed by the REXX execs for all event types.</p>
+<p class="para">To publish or subscribe to additional attributes, you must add them to the filter and add support for them into the REXX execs.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xywb2.html#b45fdpp" class="xref">Modifying the Filter</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xywb2.html#b45fsjx" class="xref">Modifying the Rexx Execs for New Attributes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xywb2.html#b6acpv9" class="xref">Modifying the Publisher Channel for Additional Top Secret Fields</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b45fdpp">
+
+<h2 class="title h2"><span class="number">6.4.1</span> Modifying the Filter</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b45fph9">
+<ol class="steps">
+<li class="step" id="b45fpha">
+<p class="para">On the iManager Driver Overview page for the driver, click the <span class="guimenu">Filter</span> icon on either the Publisher or Subscriber channel. It is the same object.</p></li>
+<li class="step" id="b45fphb">
+<p class="para">In the Filter Edit dialog box, click the class containing the attribute to be added.</p></li>
+<li class="step" id="b45fphc">
+<p class="para">Click <span class="guimenu">Add Attribute</span>, then select the attribute from the list.</p></li>
+<li class="step" id="b45fphd">
+<p class="para">Select the flow of this attribute for the Publisher and Subscriber channels.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b45fphe">
+                  <p class="title"><em class="title">Synchronize:</em>
+                  Changes to this object are reported and automatically synchronized.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b45fphf">
+                  <p class="title"><em class="title">Ignore:</em>
+                  Changes to this object are not reported and not automatically synchronized.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b45fphg">
+                  <p class="title"><em class="title">Notify:</em>
+                  Changes to this object are reported, but not automatically synchronized.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b45fphh">
+                  <p class="title"><em class="title">Reset:</em>
+                  Resets the object value to the value specified by the opposite channel. (You can set this value on either the Publisher or Subscriber channel, but not both.)</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step" id="b45fqgw">
+<p class="para">Click <span class="guimenu">Apply</span>.</p></li></ol>
+</div>
+
+<p class="para">If you want to map this attribute to an existing attribute in the connected system schema file, modify the Schema Mapping policy for the driver.</p>
+<p class="para">For complete details about managing filters and Schema Mapping policies, see the policy documentation on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b45fsjx">
+
+<h2 class="title h2"><span class="number">6.4.2</span> Modifying the Rexx Execs for New Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">In the Subscriber channel, a specific REXX exec is called to take the appropriate action for each type of event. For example, if the additional attribute is required for adds and modifies of users, modify <span class="filename">IDMADDU</span> and <span class="filename">IDMMODU</span> to process the additional attribute.</p>
+<p class="para">Publishing additional attributes requires that you act on changes made in the source application.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6acpv9">
+
+<h2 class="title h2"><span class="number">6.4.3</span> Modifying the Publisher Channel for Additional Top Secret Fields</h2>
+
+<div class="content_wrapper">
+
+<p class="para">New field names can be added to the Top Secret Field Descriptor Table (FDT). This table also allows installations to remap existing fields to additional data, supplied by the customer. For more information about the FDT, see your Top Secret documentation.</p>
+<p class="para">The Publisher channel makes use of Java classes and XSLT to help you publish new field names for a customized Top Secret installation.</p>
+<p class="para">TSO commands, such as <span class="command">TSS</span>, are sent from the change log to the Identity Manager Input Transformation Policies as the original command that was entered by the user, including all keywords and operand values that were supplied. A set of helper functions, written in Java, helps you to parse these keywords appropriately with XSLT, through the use of XSLT Java extension calls.</p>
+<p class="para">The default Input Transformation is named <span class="literal">TSO (TSS) Input Transformation</span>, and is the first policy to act on data for the Publisher channel. This policy is implemented as an XSLT script. When invoked by the processor, the script retrieves a parser that is created once per lifetime of the Identity Manager JVM<sup class="superscript">*</sup> instance and is unique to this particular driver instance and command instance. The parser registers known keywords, and you can register custom keywords. After being registered, the parser is invoked to parse the command image and produces a node set containing a single XML document that represents the command image. This document can then be transformed into XDS documents for event types processed by the Metadirectory engine.</p>
+<p class="para">The following table describes the Java classes and methods.</p>
+<div class="table" id="b6act48"><p class="title"><em class="num">Table 6-3 </em>Java Classes and Methods</p>
+<table class="topbot" width="100%"><col width="24%" /><col width="38%" /><col width="38%" />
+              
+<tr class="headerrow" id="b6actct"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Java Class</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Java Method</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+            
+<tr class="oddrow" id="b6actcu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommandParser</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">static TSOCommandParser registerParser(String name, String driver)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Static method that creates a new TSOCommandParser object with a uniquely specified name and driver string</p></td>
+</tr>
+<tr class="evenrow" id="b6acvn3"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommandParser</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">static boolean hasParser(String name, String driver)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Static method that returns true if a parser is available or false if one is not</p></td>
+</tr>
+<tr class="oddrow" id="b6acvn4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommandParser</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">static TSOCommandParser getParser(String name, String driver)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Static method that returns the parser that has been registered previously</p></td>
+</tr>
+<tr class="evenrow" id="b6acvn5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommandParser</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void registerCommand(String cmd)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Registers a TSO command with this parser instance</p></td>
+</tr>
+<tr class="oddrow" id="b6acvn6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommandParser</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NodeSet parse(String cmd)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Parses the TSO command and returns a NodeSet that can be used for XSLT processing</p></td>
+</tr>
+<tr class="evenrow" id="b6adfql"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommand</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommand(String name)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Constructor method to create a new TSO command with a case-insensitive command string prefix</p></td>
+</tr>
+<tr class="oddrow" id="b6adfqm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommand</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void registerKeyword(TSOKeyword keyword)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Registers a keyword to be associated with this TSOCommand instance</p></td>
+</tr>
+<tr class="evenrow" id="b6adfqn"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOCommand</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void registerPositional(TSOPositional pos)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Registers a positional parameter to be associated with this TSOCommand instance</p></td>
+</tr>
+<tr class="oddrow" id="b6adiv7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword(String name)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Constructor method to create a new TSO keyword instance with a case-insensitive keyword string value</p></td>
+</tr>
+<tr class="evenrow" id="b6adiv8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void registerKeyword(TSOKeyword keyword)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Registers a sub-keyword for this TSOKeyword instance</p></td>
+</tr>
+<tr class="oddrow" id="b6adiv9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void registerPositional(TSOPositional pos)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Registers a positional parameter to be associated with this TSOCommand instance</p></td>
+</tr>
+<tr class="evenrow" id="b6adiva"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void setDefaultValue(String v)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Assigns a default value for a keyword that contains a value during parsing</p></td>
+</tr>
+<tr class="oddrow" id="b6adivb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void setImpliedName(String n)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Assigns a name to be used to describe the keyword in lieu of its string name</p></td>
+</tr>
+<tr class="evenrow" id="b6adivc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void mapValue(String key, String value)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Assigns a mapped value to the key string when found during parsing</p></td>
+</tr>
+<tr class="oddrow" id="b6adivd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TSOKeyword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">void sensitive()</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sets this keyword to be case sensitive by using the XML attribute <span class="literal">is-sensitive=true</span></p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

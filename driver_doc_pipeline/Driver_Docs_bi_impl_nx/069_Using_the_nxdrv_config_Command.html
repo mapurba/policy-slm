@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b4339kg,b3r8ulu,b3r8ulu,b4dwo69,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Using the nxdrv-config Command - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b4339kg">
+
+<h1 class="title h1"><span class="number">C.1</span> Using the nxdrv-config Command</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can use <span class="command">/usr/sbin/nxdrv-config</span> to change the driver shim configuration. When you run this command, you are prompted for the function to perform.</p><pre class="screen">&gt; nxdrv-config
+Which configuration do you want to perform?
+1) Set the Remote Loader and Driver object passwords
+2) Configure the driver for Secure Sockets Layer (SSL)
+3) Configure the driver to allow for remote client publishing,
+   such as NIS or NIS+ clients
+4) Extend the schema for Identity Manager (must be run on a
+   Metadirectory server)
+5) Configure PAM for publishing password changes
+6) Configure LAM for publishing password changes
+Select one configuration option [q/?]: </pre>
+<p class="para">Enter the number of the function you want to configure, then respond to the prompts as discussed in the following topic:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b4339kg.html#b4aazqy" class="xref">Setting the Remote Loader and Driver Object Passwords</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b4339kg.html#b4ab1fy" class="xref">Configuring the Driver for SSL</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b4339kg.html#b4ab1fz" class="xref">Configuring Remote Client Publishing</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b4339kg.html#b4ab1g1" class="xref">Configuring PAM</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b4339kg.html#b4ab215" class="xref">Configuring LAM</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b4aazqy">
+
+<h2 class="title h2"><span class="number">C.1.1</span> Setting the Remote Loader and Driver Object Passwords</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="command">nxdrv-config</span> command prompts you to enter and confirm the Remote Loader password and the Driver object password.</p><pre class="screen">Enter Remote Loader password:
+Confirm Remote Loader password:
+Enter Driver object password:
+Confirm Driver object password:</pre>
+<p class="para">The Remote Loader password is used by the Metadirectory engine to authenticate itself to the driver shim (embedded Remote Loader). The Driver object password is used by the driver shim to authenticate itself to the Metadirectory engine.</p>
+<p class="para">The Remote Loader and Driver object passwords set by <span class="command">nxdrv-config</span> are stored on the connected system. The Remote Loader and Driver object passwords set for the driver using iManager are stored in the Identity Vault. Each password on the connected system must exactly match its counterpart in the Identity vault.</p>
+<div class="procedure" id="b4c8hug">
+<p class="para">To change the passwords after driver installation:</p>
+<ol class="steps">
+<li class="step" id="b4c8huj">
+<p class="para">In iManager, navigate to the Driver Overview for the driver.</p></li>
+<li class="step" id="b4c8huk">
+<p class="para">Click the driver icon.</p></li>
+<li class="step" id="b4c8g6d">
+<p class="para">Specify the Driver object password.</p></li>
+<li class="step" id="b4c8f2f">
+<p class="para">Specify the Remote Loader password.</p>
+<p class="para">The Remote Loader password is below the Authentication heading.</p></li>
+<li class="step" id="b4c8gei">
+<p class="para">Click <span class="guimenu">Apply</span>.</p></li>
+<li class="step" id="b4c8ggq">
+<p class="para">Restart the driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b4ab1fy">
+
+<h2 class="title h2"><span class="number">C.1.2</span> Configuring the Driver for SSL</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="command">nxdrv-config</span> command prompts you to enter the LDAP server host address and port, then displays the Certificate Authority for that server and asks you if you accept it.</p><pre class="screen">You are about to connect to the eDirectory LDAP server to retrieve
+the eDirectory Tree Trusted Root public certificate.
+
+Enter the LDAP Server Host Address [localhost]: sr.digitalairlines.com
+Enter the LDAP Server Port [636]:
+
+Certificate Authority:
+   Subject:       ou=Organizational CA,o=TREENAME
+   Not Before:    20150321144845Z
+   Not After:     20250321144845Z
+Do you accept the Certificate Authority? (Y/N) y</pre>
+<p class="para">Enter the host name or IP address and TCP port number of an LDAP server for your Identity Vault. The LDAP server must be configured for SSL, and it must be listening on the SSL port. The default SSL port is 636.</p>
+<p class="para">The driver shim connects to the specified server and displays information about the Certificate Authority. If you accept the Certificate Authority, the driver shim saves it to the local file system.</p>
+<p class="para">If you do not have LDAP configured for SSL, you can use a manual process to configure the driver for SSL. For details, see <a href="b3yee7z.html#b3ygrta" class="xref">Driver Certificate Setup Failure</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b4ab1fz">
+
+<h2 class="title h2"><span class="number">C.1.3</span> Configuring Remote Client Publishing</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="command">nxdrv-config</span> command generates a new certificate and key, used to authenticate remote publishing clients, such as NIS and NIS+ clients.</p><pre class="screen">New certificate authority keys were generated:
+
+  Subject:       /CN=soap api certificate authority
+  Serial Number: 0
+  Valid From:    20160411002823Z
+  Valid To:      20260409002823Z</pre>
+<p class="para">The keys are 2048-bit, Base64-encoded, RSA public/private key pairs. They are written to <span class="filename">/usr/local/nxdrv/keys/soap-ca-cert.pem</span> (public certificate) and <span class="filename">/usr/local/nxdrv/keys/soap-ca-key.pem</span> (private key). These keys are used to issue and sign certificates for remote publishing when you configure PAM on a remote client. The default time duration for the certificate authority is 10 years. You can change the time duration and other remote publisher parameters in the configuration file <span class="filename">/usr/local/nxdrv/conf/remote-publisher.conf</span>. For details about the configuration file, see <a href="b4dwo69.html" class="xref">The Remote Publisher Configuration File</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b4ab1g1">
+
+<h2 class="title h2"><span class="number">C.1.4</span> Configuring PAM</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="command">nxdrv-config</span> command asks you if you are configuring PAM on a remote client.</p>
+<p class="para">If you are configuring PAM on a remote client, the <span class="command">nxdrv-config</span> command does the following:</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Prompts you for the host name or IP address and port number of the Linux or UNIX connected system.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Calls the command to mint a security certificate for the remote client. This command requires you to enter the Remote Loader password.</p></li>
+          
+<li class="listitem">
+<p class="listitem">Sets up the PAM configuration file.</p></li>
+        </ol></div>
+
+<p class="para">If you are configuring PAM on the connected system, the <span class="command">nxdrv-config</span> command sets up the PAM configuration file.</p><pre class="screen">Are you configuring PAM from a remote NIS client? (Y/N) [N]
+Configuring PAM...
+Using PAM configuration file: [/etc/pam.conf]
+Inserting line [/usr/lib/security/pam_nxdrv.so.1 mechanism=api]
+original PAM file backed up to /etc/pam.conf.nxdrv.04152006151641</pre>
+<p class="para">The <span class="command">nxdrv-config</span> command locates the PAM configuration file, makes a backup copy, and inserts a line for the Linux and UNIX driver PAM module.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b4ab215">
+
+<h2 class="title h2"><span class="number">C.1.5</span> Configuring LAM</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="command">nxdrv-config</span> command makes a backup copy of the <span class="filename">/usr/lib/security/methods.cfg</span> file, then appends the stanza for the Linux and UNIX driver to the <span class="filename">methods.cfg</span> file.</p><pre class="screen">original methods.cfg backed up to 
+/usr/lib/security/methods.cfg.nxdrv.04152006154047</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

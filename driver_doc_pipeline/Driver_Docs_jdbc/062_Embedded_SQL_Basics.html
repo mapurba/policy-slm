@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="basics-of-embedded-sql-for-jdbc-driver,embed-sql-statements-in-xds-events-for-jdbc-driver,use-of-embedded-sql-for-jdbc-driver,token-substitution-for-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Embedded SQL Basics - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="basics-of-embedded-sql-for-jdbc-driver">
+
+<h1 class="title h1"><span class="number">12.2</span> Embedded SQL Basics</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="basics-of-embedded-sql-for-jdbc-driver.html#b9fxkvb" class="xref">Elements</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="basics-of-embedded-sql-for-jdbc-driver.html#b9fxkvc" class="xref">Namespaces</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="basics-of-embedded-sql-for-jdbc-driver.html#b9fxkvd" class="xref">Embedded SQL Example</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b9fxkvb">
+
+<h2 class="title h2"><span class="number">12.2.1</span> Elements</h2>
+
+<div class="content_wrapper">
+
+<p class="para">SQL is embedded in XDS events through the <span class="literal">&lt;jdbc:statement&gt;</span> and <span class="literal">&lt;jdbc:sql&gt;</span> elements. The <span class="literal">&lt;jdbc:statement&gt;</span> element can contain one or more <span class="literal">&lt;jdbc:sql&gt;</span> elements.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b9fxkvc">
+
+<h2 class="title h2"><span class="number">12.2.2</span> Namespaces</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The namespace prefix <span class="literal">jdbc</span> used throughout this section is implicitly bound to the namespace <span class="literal">urn:dirxml:jdbc</span> when referenced outside of an XML document.</p>
+<p class="para">You must use namespace-prefixed embedded SQL elements and attributes. Otherwise, the driver does not recognize them. In all examples in this section, the prefix used is <span class="literal">jdbc</span>. In practice, the prefix can be whatever you want it to be, as long as it is bound to the namespace value urn:dirxml:jdbc.</p>
+<p class="para">The following XML example illustrates how to use and properly namespace-prefix embedded SQL elements. In the following example, the namespace declaration and namespace prefixes are bolded:</p><pre class="screen">&lt;input <span class="strong">xmlns:jdbc="urn:dirxml:jdbc"</span>&gt;
+     &lt;add class-name="usr"&gt;
+         &lt;add-attr name="lname"&gt;
+             &lt;value&gt;Doe&lt;/value&gt;
+         &lt;/add-attr&gt;
+     &lt;/add&gt;
+     &lt;<span class="command">jdbc:statement&gt;</span>
+         &lt;<span class="command">jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John'          &lt;/jdbc:sql&gt;</span>
+     &lt;<span class="command">/jdbc:statement</span>&gt;
+&lt;/input&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b9fxkvd">
+
+<h2 class="title h2"><span class="number">12.2.3</span> Embedded SQL Example</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following XML example illustrates how to use the <span class="literal">&lt;jdbc:statement&gt;</span> and <span class="literal">&lt;jdbc:sql&gt;</span> elements and their interpretation. In the following example, embedded SQL elements are bolded:</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+     &lt;add class-name="usr"&gt;
+         &lt;add-attr name="lname"&gt;
+             &lt;value&gt;Doe&lt;/value&gt;
+         &lt;/add-attr&gt;
+     &lt;/add&gt;
+     &lt;<span class="strong">jdbc:statement</span>&gt;
+         &lt;<span class="strong">jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John'          &lt;/jdbc:sql</span>&gt;
+     &lt;<span class="strong">/jdbc:statement</span>&gt;
+&lt;/input&gt;</pre>
+<p class="para">Because the Subscriber channel resolves <span class="literal">&lt;add&gt;</span> events to one or more <span class="literal">INSERT</span> statements, the XML shown above resolves to:</p><pre class="screen">SET AUTOCOMMIT OFF
+INSERT INTO indirect.usr(lname)VALUES('Doe');
+COMMIT; --explicit commit
+UPDATE indirect.usr SET fname = 'John';
+COMMIT; --explicit commit</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

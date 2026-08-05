@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3wx9up,b3r8p5u,b3wvpsh,b3r8rjm,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuration Overview - NetIQ ACF2 Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3wx9up">
+
+<h1 class="title h1"><span class="number">1.2</span> Configuration Overview</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section discusses driver configuration details specific to the Identity Manager driver for ACF2. For basic configuration information, see the <span class="citetitle">Identity Manager 4.8 Administration Guide</span> on the <a href="https://www.netiq.com/documentation/identity-manager-48/" class="ulink">Identity Manager 4.8 Documentation Web site</a>. For detailed information about configuring the driver, see <a href="b3r8t50.html" class="xref">Section 5.0, Configuring the ACF2 Driver</a>.</p>
+<p class="para">The following topics include each Designer ACF2 Package available for configuration:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wx9up.html#b3wxdf3" class="xref">ACF2 Base</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wx9up.html#b685bxb" class="xref">ACF2 Default Configuration</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wx9up.html#bmn6zec" class="xref">ACF2 Entitlements</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wx9up.html#b3wyopl" class="xref">ACF2 Password Synchronization</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wx9up.html#b12zb180" class="xref">ACF2 Account Tracking</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wx9up.html#b12zb8hl" class="xref">ACF2 Managed System Information</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wxdf3">
+
+<h2 class="title h2"><span class="number">1.2.1</span> ACF2 Base</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The ACF2 Base provides the policies and settings necessary to provide a basic functioning ACF2 Driver.</p>
+<p class="para">The ACF2 Base Package includes the following Global Configuration Variables:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b3wxeh6">
+              <p class="title"><em class="title">Remote Loader:</em>
+              A boolean true/false value indicating whether or not to use the Remote Loader service. For this driver, this value should always be set to true.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b3wxfyq">
+              <p class="title"><em class="title">Host Name:</em>
+              The physical DNS hostname or IP address for the ACF2 system to connect to.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b3wxgm8">
+              <p class="title"><em class="title">Port:</em>
+              The TCP/IP port of the remote loader running on the ACF2 system (default 8090).</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12z9x5m">
+              <p class="title"><em class="title">KMO:</em>
+              The SSL KMO object to use for secure communication.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12z9x5n">
+              <p class="title"><em class="title">Remote Password:</em>
+              The remote loader password.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12z9x5o">
+              <p class="title"><em class="title">Driver Password:</em>
+              The driver object password.</p>
+            </div>
+</li></ul></div>
+
+<p class="para">The ACF2 Base Package provides the following Identity Manager policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12z9z9d">
+              <p class="title"><em class="title">NOVLACF2BASE-ot-AppendACF2CMD:</em>
+              This output transform converts XDS documents from the Subscriber channel into ACF2 commands that will be executed by the ACF2 driver shim.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12z9z9e">
+              <p class="title"><em class="title">NOVLACF2BASE-it-ChangeLog:</em>
+              This input transform converts ACF2 ChangeLog events into XDS that can be interpreted by the rest of the Publisher channel.</p>
+            </div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b685bxb">
+
+<h2 class="title h2"><span class="number">1.2.2</span> ACF2 Default Configuration</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The ACF2 Default Configuration provides a set of configuration settings to begin synchronizing ACF2 Logonid records with Identity Vault users.</p>
+<p class="para">The ACF2 Default Configuration Package includes the following Global Configuration Variables (GCVs):</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b6b8poa">
+              <p class="title"><em class="title">User Base Container:</em>
+              A DN value that represents a container in the Identity Vault from which Subscriber events are restricted from and new and matched User objects are created under on the Publisher channel.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b6b8ub2">
+              <p class="title"><em class="title">Subscriber Passphrase Synchronization:</em>
+              A boolean true/false value indicating whether to synchronize Vault passwords with ACF2 passphrases.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b6b8ub3">
+              <p class="title"><em class="title">Publisher Passphrase Synchronization:</em>
+              A boolean true/false value indicating whether to synchronize ACF2 passphrases with Vault passwords.</p>
+            </div>
+</li></ul></div>
+
+<p class="para">The ACF2 Default Configuration Package provides the following Identity Manager policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12za4dg">
+              <p class="title"><em class="title">NOVLACF2DCFG-pub-cp:</em>
+              This Publisher Create Policy provides a default Surname using either the Full Name field or Association value from the add event.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12za9lo">
+              <p class="title"><em class="title">NOVLACF2DCFG-pub-mp:</em>
+              This Publisher Matching Policy attempts to match Users by the CN attribute within the User Base Container GCV.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12za9lp">
+              <p class="title"><em class="title">NOVLACF2DCFG-pub-pp:</em>
+              This Publisher Placement Policy sets the target DN for new users to be the concatenation of the User Base Container GCV and the lowercase value of the CN attribute.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12za9lq">
+              <p class="title"><em class="title">NOVLACF2DCFG-sub-cp:</em>
+              This Subscriber Create Policy requires the CN and Password and reformats the CN value to be uppercase.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12za9lr">
+              <p class="title"><em class="title">NOVLACF2DCFG-sub-et:</em>
+              This Subscriber Event Transform vetoes events not in the User Base Container and also renames and moves.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12za9ls">
+              <p class="title"><em class="title">NOVLACF2DCFG-sub-mp:</em>
+              This Subscriber Matching Policy queries ACF2 for Users that match the CN attribute.</p>
+            </div>
+</li></ul></div>
+
+<p class="para">The ACF2 Default Configuration Package provides the <span class="strong">NOVLACF2DCFG-smp</span> schema mapping policy and the <span class="strong">NOVLACF2DCFG-filter</span> filter policy. See <a href="b13qy5am.html" class="xref">Default ACF2 Schema</a> for details.</p>
+<div class="table" id="b456yf7"><p class="title"><em class="num">Table 1-2 </em>Default Schema Mapping and Filter</p>
+<table class="topbot" width="100%"><col width="23%" /><col width="30%" /><col width="23%" /><col width="23%" />
+              
+<tr class="headerrow" id="b3wym2e"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">eDirectory Class</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">eDirectory Attribute</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">ACF2 Record</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">ACF2 Field</p></th>
+</tr>
+            
+<tr class="oddrow" id="b3wym2f"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">CN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Logonid</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LID</p></td>
+</tr>
+<tr class="evenrow" id="b685gpk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Login Disabled</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Logonid</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SUSPEND</p></td>
+</tr>
+<tr class="oddrow" id="b685gpl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">nspmDistributionPassword</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Logonid</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PASSWORD</p></td>
+</tr>
+<tr class="evenrow" id="b6uv85d"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Full Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Logonid</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">NAME</p></td>
+</tr>
+<tr class="oddrow" id="b685gpm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Telephone Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Logonid</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PHONE</p></td>
+</tr></table>
+</div>
+
+<p class="para">In addition, the remaining ACF2 fields are automatically mapped to corresponding attributes in the ACF2 Auxiliary Schema. For a complete list, see <a href="bmn9uvw.html#bqkp2ae" class="xref">Table C-5</a>. Each additional auxiliary attribute in the filter is intentionally set to ignore on both channels by default, so they can be conveniently configured otherwise if necessary.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmn6zec">
+
+<h2 class="title h2"><span class="number">1.2.3</span> ACF2 Entitlements</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The ACF2 Entitlements Package provides a basic entitlement for an ACF2 Logonid record. This package leverages the DirXML-EntitlementsRef attribute, set by the Role Based Entitlements Driver. When entitlements are granted or revoked, you can take the appropriate action in ACF2 by creating, suspending or deleting the Logonid record.</p>
+<p class="para">The ACF2 Entitlements Package provides the following Identity Manager policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zaisq">
+              <p class="title"><em class="title">NOVLACF2ENT-pub-et-DisallowDeletes:</em>
+              When this Publisher Event Transformation detects a user is deleted from ACF2, it removes the userâs Vault association and vetoes the event.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zapea">
+              <p class="title"><em class="title">NOVLACF2ENT-sub-cp-EntitlementsImpl:</em>
+              This Subscriber Create Policy blocks account creation when an Entitlement is not granted.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zapeb">
+              <p class="title"><em class="title">NOVLACF2ENT-sub-ct-EntitlementsImpl:</em>
+              When this Subscriber Command Transformation detects a removed entitlement, it results in a delete or suspension. It is based upon the on-account-remove GCV.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zapec">
+              <p class="title"><em class="title">NOVLACF2ENT-sub-mp-EntitlementsImpl:</em>
+              When this Subscriber Matching Policy detects an ACF2 User account managed by entitlements, it vetoes the matching existing account.</p>
+            </div>
+</li></ul></div>
+
+<p class="para">The ACF2 Entitlements Package also provides a filter that includes the User attribute DirXML-EntitlementsRef. This attribute, configured for notification on the Subscriber channel, is set outside the driver whenever a process grants or removes an entitlement for a User.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wyopl">
+
+<h2 class="title h2"><span class="number">1.2.4</span> ACF2 Password Synchronization</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The ACF2 Password Synchronization Package leverages the Common Password Synchronization policies to provide email notifications for failed password synchronization and configuration options for Universal Passwords.</p>
+<p class="para">The ACF2 Password Synchronization Package provides the following Identity Manager policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zayux">
+              <p class="title"><em class="title">NOVLPWDSYNC-pub-ctp-AddPwdPayload:</em>
+              Publish password payloads.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayuy">
+              <p class="title"><em class="title">NOVLPWDSYNC-pub-ctp-CheckPwdGCV:</em>
+              Publish password changes.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayuz">
+              <p class="title"><em class="title">NOVLPWDSYNC-pub-ctp-DefaultPwd:</em>
+              On User add, provide default password if none exists.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv0">
+              <p class="title"><em class="title">NOVLPWDSYNC-pub-ctp-PublishDistPwd:</em>
+              Publish passwords to NMAS distribution password.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv1">
+              <p class="title"><em class="title">NOVLPWDSYNC-pub-ctp-PublishNDSPwd:</em>
+              Publish passwords to NDS password.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv2">
+              <p class="title"><em class="title">NOVLPWDSYNC-sub-ctp-AddPwdPayload:</em>
+              Payloads for subscribe to password changes.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv3">
+              <p class="title"><em class="title">NOVLPWDSYNC-sub-ctp-CheckPwdGCV:</em>
+              Subscribe to password changes.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv4">
+              <p class="title"><em class="title">NOVLPWDSYNC-sub-ctp-DefaultPwd:</em>
+              On User add, provide default password of Surname if no password exists.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv5">
+              <p class="title"><em class="title">NOVLPWDSYNC-sub-ctp-TransformDistPwd:</em>
+              Transform NMAS attribute to password elements.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv6">
+              <p class="title"><em class="title">NOVLPWDSYNC-itp-EmailOnFailedPwdSub:</em>
+              Email notifications for failed password subscriptions.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zayv7">
+              <p class="title"><em class="title">NOVLPWDSYNC-otp-EmailOnFailedPwdPub:</em>
+              Email notifications for failed password publications.</p>
+            </div>
+</li></ul></div>
+
+<p class="para">The ACF2 Password Synchronization Package includes the following Global Configuration Variables (GCVs):</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zaul4">
+              <p class="title"><em class="title">Connected System or Driver Name:</em>
+              The name of the connected system, application or Identity Manager driver. This value is used by the e-mail notification templates.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zaul5">
+              <p class="title"><em class="title">Application accepts passwords from Identity Manager:</em>
+              Option to allow passwords to flow from the Identity Manager vault to the connected system.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zaul6">
+              <p class="title"><em class="title">Identity Manager accepts passwords from application:</em>
+              Option to allow passwords to flow from the connected system to the Identity Manager data store.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zaul7">
+              <p class="title"><em class="title">Publish passwords to NDS password:</em>
+              Use the password from the connected system to set the non-reversible NDS password in eDirectory.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zaul8">
+              <p class="title"><em class="title">Publish passwords to Distribution Password:</em>
+              Use the password from the connected system to set the NMAS Distribution Password used for Identity Manager password synchronization.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zaul9">
+              <p class="title"><em class="title">Require password policy validation before publishing passwords:</em>
+              Option to apply the NMAS password policies during password operations on the Publisher channel. The password is not written to the data store if it does not comply.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zaula">
+              <p class="title"><em class="title">Reset userâs external system password to the Identity Manager password on failure:</em>
+              Attempt to reset the password in the connected system by using the Distribution Password from the Identity Vault when a publish Distribution Password failure occurs.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zaulb">
+              <p class="title"><em class="title">Notify the user of password synchronization failure via e-mail:</em>
+              Notify the user of a password synchronization failure via email.</p>
+            </div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b12zb180">
+
+<h2 class="title h2"><span class="number">1.2.5</span> ACF2 Account Tracking</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The ACF2 Account Tracking Package allows the driver to track the accounts and identities of each user in your system.</p>
+<p class="para">The ACF2 Account Tracking Package (with the prerequisite Data Collection Common and Account Tracking Common packages) provides the following Identity Manager policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zb181">
+              <p class="title"><em class="title">NOVLATRKBASE-itp-Publish</em>
+              </p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb182">
+              <p class="title"><em class="title">NOVLATRKBASE-itp-WriteAccounts</em>
+              </p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb183">
+              <p class="title"><em class="title">NOVLATRKBASE-otp-Subscribe</em>
+              </p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb184">
+              <p class="title"><em class="title">NOVLDATACOLL-itp-DataCollectionQuerySupport:</em>
+              Convert selected attributes to a form most commonly used in the Identity Vault.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb185">
+              <p class="title"><em class="title">NOVLDATACOLL-smp-SkipSchemaMapping</em>
+              </p>
+            </div>
+</li></ul></div>
+
+<p class="para">The ACF2 Account Tracking Package (with the prerequisite Data Collection Common and Account Tracking Common packages) includes the following Global Configuration Variables (GCVs):</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zb18c">
+              <p class="title"><em class="title">Enable account tracking:</em>
+              If true, account tracking policies are enabled. If false, account tracking policies are not executed.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb18d">
+              <p class="title"><em class="title">Realm:</em>
+              Name of realm. The realm must be set to the ACF2 DNS name (Example: acf2.yourcompany.org).</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb18e">
+              <p class="title"><em class="title">Object class:</em>
+              Add the object class to track. Class names must be in the application namespace.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb18f">
+              <p class="title"><em class="title">Identifiers:</em>
+              Add the account identifier attributes. Attribute names must be in the application namespace.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb18g">
+              <p class="title"><em class="title">Status attribute:</em>
+              Name of the attribute in the application namespace to represent the account status.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb18h">
+              <p class="title"><em class="title">Status active value:</em>
+              Value of the status attribute that represents an active state.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb18i">
+              <p class="title"><em class="title">Status inactive value:</em>
+              Value of the status attribute that represents an inactive state.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb18j">
+              <p class="title"><em class="title">Subscription default status:</em>
+              Default status the policies will assume when an object is subscribed to the application and the status attribute is not set in the identity vault.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb5v8">
+              <p class="title"><em class="title">Publication default status:</em>
+              Default status the policies will assume when an object is published to the identity vault and the status attribute is not set in the application.</p>
+            </div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b12zb8hl">
+
+<h2 class="title h2"><span class="number">1.2.6</span> ACF2 Managed System Information</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The ACF2 Managed System Information Package provides settings that help the Identity Reporting Module generate reports.</p>
+<p class="para">The ACF2 Managed System Information Package includes the following Global Configuration Variables (GCVs):</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zb8hm">
+              <p class="title"><em class="title">General Information</em>
+              </p>
+            </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zbb0q">
+                  <p class="title"><em class="title">Name:</em>
+                  Descriptive name for the ACF2 connected system. This name is displayed in the reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbeac">
+                  <p class="title"><em class="title">Description:</em>
+                  Brief description of this connected ACF2 system. This description is displayed in the reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbead">
+                  <p class="title"><em class="title">Location:</em>
+                  The physical location of this connected ACF2 system. This location is displayed in the reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbeae">
+                  <p class="title"><em class="title">Vendor:</em>
+                  The vendor of this connected ACF2 system (Computer Associates). This information is displayed in the reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbeaf">
+                  <p class="title"><em class="title">Version:</em>
+                  The version of this connected ACF2 system. This version information is displayed in the reports.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbeag">
+              <p class="title"><em class="title">System Ownership</em>
+              </p>
+            </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zbeah">
+                  <p class="title"><em class="title">Business Owner</em>
+                  </p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbeai">
+                  <p class="title"><em class="title">Application Owner</em>
+                  </p>
+                </div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbeaj">
+              <p class="title"><em class="title">System Classification</em>
+              </p>
+            </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b12zbeak">
+                  <p class="title"><em class="title">Classification</em>
+                  </p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zbeal">
+                  <p class="title"><em class="title">Environment</em>
+                  </p>
+                </div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b12zb8hn">
+              <p class="title"><em class="title">Connection and miscellaneous Information:</em>
+              This options is always set to hide so that you donât make changes to these options. These options are system options that are necessary for reporting to work. If you make any changes, reporting stops working.</p>
+            </div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

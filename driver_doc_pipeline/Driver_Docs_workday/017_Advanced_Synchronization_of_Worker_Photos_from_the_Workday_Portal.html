@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4dhw8clmwa0,t4avmq79x4ee,t4avmq7a0c5h,custom_wd_driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Advanced Synchronization of Worker Photos from the Workday Portal - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4dhw8clmwa0">
+
+<h1 class="title h1"><span class="number">2.13</span> Advanced Synchronization of Worker Photos from the Workday Portal</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The photo synchronization between Workday and the driver happens once in every 24-hours. If any Organization has a large number of worker base, the driver takes longer than usual to fetch all the workerâs photo. Sometimes in such cases, the process might fail due to timeout.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>It is highly recommended to use the photo change business process to fetch worker photos from Workday. The following procedure to synchronize worker photos from the Workday is not recommended as this functionality might be deprecated in the near future.</p></div>
+
+<p class="para">The Workday system stores the date/time value of each change in workerâs photo. These date/time values can be used via calculated fields and custom reports (created using the calculated fields) to improve driverâs performance while performing photo synchronization. The Workday driver uses this custom report to compare the photo related details based on the last date/time value of the workerâs photo since the previous polling.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The following configuration is not mandatory and only recommended to improve the driverâs performance.</p></div>
+
+<p class="para">Perform the following steps to create calculated fields and custom report in the Workday portal:</p>
+<div class="procedure" id="t4dhwmdqzatk">
+<ol class="steps">
+<li class="step">
+<p class="para" id="calculated-field-custom-report">Create the following calculated fields using the <span class="guimenu">Create Calculated Field</span> option in the Workday portal:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Create a calculated field. For example, weâve created a field named <span class="guimenu">CF_TF_RPT_Is Action Event Photo Change</span>.</p>
+<div class="informalfigure">
+                    <img src="../graphics/calc-field-1-1.png" alt="" />
+                  </div>
+</li>
+<li class="step">
+<p class="para">Create another calculated field using the field created in the previous step as a <span class="guimenu">Condition</span>. For example, weâve created the second field with the name <span class="guimenu">CF_ESI_RPT Latest Photo Change Event</span>.</p>
+<div class="informalfigure">
+                    <img src="../graphics/calc-field-2.png" alt="" />
+                  </div>
+</li>
+<li class="step" id="calc-field">
+<p class="para">Create a third calculated field using the field created in previous step as a <span class="guimenu">Lookup Field</span>. For example, we have created the field named <span class="guimenu">CF_LRV_RPT Completion Date and Time of Latest Photo Event</span>.</p>
+<div class="informalfigure">
+                    <img src="../graphics/calc-field-3.png" alt="" />
+                  </div>
+</li></ol>
+</div>
+</li>
+<li class="step" id="custom-report">
+<p class="para">Create a custom report using the <span class="guimenu">Create Custom Report</span> option in Workday portal. You must ensure that the integration user has access to this report or the report is created as an integration user.</p>
+<p class="para">Create a custom report with the following mandatory fields:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Employee ID</p></li>
+<li class="listitem">
+<p class="listitem">Worker is Contingent Worker</p></li>
+<li class="listitem">
+<p class="listitem">The calculated field created (<span class="guimenu">CF_LRV_RPT Completion Date and Time of Latest Photo Event</span>) in <a href="t4dhw8clmwa0.html#calc-field" class="xref">Step 1.c</a>.</p></li></ul></div>
+
+<p class="para">Note down the calculated field name appearing under <span class="guimenu">Column Heading Override XML Alias</span> as shown in the below image and specify the same in the <span class="guimenu">Photo Update Calculated Field</span> in Designer while configuring the driver.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>You can add additional fields as per your requirement.</p></div>
+
+<div class="informalfigure">
+                <img src="../graphics/cust-reprt-1-2.png" alt="" />
+              </div>
+</li>
+<li class="step">
+<p class="para">Click on the <span class="guimenu">Sort</span> tab to enable <span class="guimenu">Sorting Field</span> for the newly created custom report based on alphabetical descending order. This helps to display the latest changes at the top of the report.</p>
+<div class="informalfigure">
+                <img src="../graphics/cust-reprt-2-1.png" alt="" />
+              </div>
+</li>
+<li class="step">
+<p class="para">Create prompts for the report under the <span class="guimenu">Prompts</span> tab.</p>
+<p class="para">Provide default values for <span class="guimenu">Worker Types</span> as <span class="guimenu">Contingent Worker</span> and <span class="guimenu">Employee</span>. This will ensure that both types of Workers are included in the report.</p>
+<div class="informalfigure">
+                <img src="../graphics/cust-reprt-3-2.png" alt="" />
+              </div>
+</li>
+<li class="step" id="namespace">
+<p class="para" id="namespace-custom-report">Enable the report as Web Service under the <span class="guimenu">Advanced</span> tab.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Note down the <span class="guimenu">Namespace</span> value and specify the same in the <span class="guimenu">Photo Report Namespace</span> field in Designer while configuring the driver.</p></div>
+
+<div class="informalfigure">
+                <img src="../graphics/cust-reprt-4-1.png" alt="" />
+              </div>
+</li>
+<li class="step">
+<p class="para">Click on <span class="guimenu">Actions</span> &gt; <span class="guimenu">Web Service</span> &gt; <span class="guimenu">View URLs</span> to get the Web Service URL of the report.</p>
+<div class="informalfigure">
+                <img src="../graphics/cust-reprt-5.png" alt="" />
+              </div>
+</li>
+<li class="step" id="web-service-url-custom-report">
+<p class="para">Copy the URL for <span class="guimenu">Workday XML</span> &gt; <span class="guimenu">WSDL</span> option and save it. You need to specify this URL in the <span class="guimenu">Photo Update Report URL</span> field in Designer while configuring the driver.</p>
+<div class="informalfigure">
+                <img src="../graphics/cust-reprt-6-1.png" alt="" />
+              </div>
+</li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

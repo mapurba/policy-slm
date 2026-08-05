@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="customizing-the-publisher-channel,customizing-the-drivers,customizing-the-drivers,customizing-the-subscriber-channel,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Customizing the Publisher Channel - NetIQ Identity Manager Driver for Oracle E-Business Suite (User Management, HR, and TCA) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="customizing-the-publisher-channel">
+
+<h1 class="title h1"><span class="number">C.1</span> Customizing the Publisher Channel</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Publisher channel of the Oracle EBS drivers is enabled by default. To change the default driver configuration, use Designer.</p>
+<p class="para">The following sections provide information about customizing the Publisher channel to synchronize additional attributes from the different Oracle modules with which the drivers synchronize attributes.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="customizing-the-publisher-channel.html#b1ftxibe" class="xref">Using the Oracle E-Business Events</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="customizing-the-publisher-channel.html#b1fx4da6" class="xref">Polling the Oracle EBS System Tables</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="customizing-the-publisher-channel.html#b1fxjh6h" class="xref">Verifying the Changes</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ftxibe">
+
+<h2 class="title h2"><span class="number">C.1.1</span> Using the Oracle E-Business Events</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Publisher channel of the driver is enabled by default unless you change this setting during driver configuration in Designer. The driver starts when the Oracle EBS system starts and internally starts the HTTP jetty server and listens on the specified port for the Publisher events from the Oracle EBS system. The PL/SQL script securely transports the events to the <span class="literal">http://&lt;driver IP address&gt;:&lt;Port&gt;</span> URL, then the driver submits the XML documents to the Identity Manager engine to publish the XML documents in the Identity Vault.</p>
+<p class="para">The following are sample XML documents for User Add and Modify operations supported in the Publisher channel. You can customize them to suit your environment.</p>
+<div class="example" id="t42hg6qhx5y8">
+          <p class="title"><em class="num">Example C-1 </em> <span class="strong">Publisher XML Request for a User Add Event</span> </p>
+          <pre class="screen">&lt;EBS_EVENT&gt;
+         &lt;EVENT_NAME&gt;oracle.apps.fnd.user.insert&lt;/EVENT_NAME&gt;
+         &lt;EVENT_KEY&gt;$user id&lt;/EVENT_KEY&gt;
+         &lt;OBJECT type="user"&gt;
+                 &lt;USER_NAME&gt;&lt;/USER_NAME&gt;
+                 &lt;EMAIL_ADDRESS&gt;&lt;/EMAIL_ADDRESS&gt;
+                 &lt;DESCRIPTION&gt;&lt;/DESCRIPTION&gt;
+                         .
+                         .
+                         .
+                         .
+                 &lt;LOGIN_DISABLED&gt;false&lt;/LOGIN_DISABLED&gt;
+         &lt;/OBJECT&gt;
+&lt;/EBS_EVENT&gt;</pre>
+        </div>
+
+<div class="example" id="t42hg6qi0ibk">
+          <p class="title"><em class="num">Example C-2 </em> <span class="strong">Publisher XML Request for a User Modify Event</span> </p>
+          <pre class="screen">&lt;EBS_EVENT&gt;
+   &lt;EVENT_NAME&gt;oracle.apps.fnd.user.update&lt;/EVENT_NAME&gt;
+   &lt;EVENT_KEY&gt;$user id&lt;/EVENT_KEY&gt;
+   &lt;OBJECT type="user"&gt;
+       &lt;USER_NAME&gt;&lt;/USER_NAME&gt;
+       &lt;EMAIL_ADDRESS&gt;&lt;/EMAIL_ADDRESS&gt;
+       &lt;DESCRIPTION&gt;&lt;/DESCRIPTION&gt;
+          .
+          .
+          .
+          .
+       &lt;LOGIN_DISABLED&gt;false&lt;/LOGIN_DISABLED&gt;
+   &lt;/OBJECT&gt;
+   &lt;OLD_OBJECT type="user"&gt;
+       &lt;USER_NAME&gt;&lt;/USER_NAME&gt;
+       &lt;EMAIL_ADDRESS&gt;&lt;/EMAIL_ADDRESS&gt;
+       &lt;DESCRIPTION&gt;&lt;/DESCRIPTION&gt;
+          .
+          .
+          .
+          .
+          .
+          .
+          .
+        &lt;LOGIN_DISABLED&gt;false&lt;/LOGIN_DISABLED&gt;
+   &lt;/OLD_OBJECT&gt;
+&lt;/EBS_EVENT&gt;</pre>
+        </div>
+
+<p class="para">The Oracle E-Business events post the user attribute changes from the Oracle EBS system to the driver. Subscribe to these events to add or modify the users in the Identity Vault. You can write specific PL/SQL methods and then subscribe to the business events for receiving user information modifications. Otherwise, modify the PL/SQL scripts shipped with the driver.</p>
+<p class="para">By default, the driver can synchronize all attributes from the <span class="literal">FND_USER, ER_ALL_PEOPLE_F</span> and <span class="literal">HZ_PARTIES</span> tables. You need not modify the PL/SQL scripts to add new attributes. However, you need to modify the <span class="literal">IDM_DRIVER.PUBLISH_EVENT_TO_ IDM PL/SQL</span> script to synchronize attributes from the different tables in the Oracle EBS system.</p>
+<p class="para">NetIQ recommends that you add the new attributes as XML tags under the <span class="literal">&lt;OBJECT&gt;</span> tag and also add them to the driver Schema Mapping policy in the Identity Manager.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1fx4da6">
+
+<h2 class="title h2"><span class="number">C.1.2</span> Polling the Oracle EBS System Tables</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Another way of synchronizing the columns of other tables from the Oracle EBS system is to create a new PL/SQL procedure in the IDMDRIVER package, then modify the XML document and add it to the newly created PL/SQL procedure.</p>
+<div class="procedure" id="t42hg6qi3uow"><p class="title">To synchronize an attribute from the PER_ADDRESSES table with Identity Manager, perform the following actions:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">Construct the driver understandable XML document by creating a new <span class="literal">FIND_PER_ADDRESSES_ADD_EVENTS</span> procedure.</p>
+<p class="para">This procedure should be similar to the <span class="literal">FIND_EMPLOYEE_ADD_EVENTS</span> procedure.</p></li>
+<li class="step">
+<p class="para">Post the XML document to the driver.</p></li>
+<li class="step">
+<p class="para">Call the new PL/SQL method as part of the driver polling cycle by adding the <span class="literal">FIND_PER_ADDRESSES_ADD_EVENTS</span> procedure in the <span class="literal">IDMDRIVER.SYNCH_EVENTS_WITH_IDM</span> procedure.</p></li>
+<li class="step">
+<p class="para">Modify the schema mapping policy for the driver to add the new attributes in Identity Manager.</p></li>
+<li class="step">
+<p class="para">Restart the driver.</p></li></ol>
+</div>
+
+<p class="para">
+          <span class="strong">Sample XML code for the Publisher Channel</span>
+        </p>
+<div class="procedure" id="t42hg6qi7728">
+<ol class="steps">
+<li class="step">
+<p class="para">Create a temporary table <span class="literal">IDMUSRMGT.IDM_PER_ADDRESSES</span> in the Oracle EBS system.</p></li>
+<li class="step">
+<p class="para">Identify the differences in the value between the temporary table and the Oracle EBS table using the below SQL query:</p><pre class="screen">sql&gt;CREATE TABLE IDMUSRMGT.IDM_ PER_ADDRESSES 
+  AS (SELECT * 
+         FROM PER_ADDRESSES 
+         WHERE ADDRESS_ID&lt; 0); </pre></li>
+<li class="step">
+<p class="para">Create a new procedure to read the user address.</p><pre class="screen">PROCEDURE FIND_PER_ADDRESSES_ADD_EVENTS 
+ 
+IS 
+  HR_EVENT_DOC CLOB := NULL; 
+  clob_locator CLOB; 
+  v_person_id NUMBER(15) :=100; 
+  CURSOR PER_ADDRESSES_CUR 
+  IS 
+    SELECT * 
+    FROM ( 
+      (SELECT unique PERSON_ID 
+      FROM PER_ADDRESSES 
+      WHERE CREATED_BY!=-1 
+      AND CREATION_DATE BETWEEN (SELECT START_DATE FROM IDMUSRMGT.IDM_SYNC_START_DATE) AND SYSDATE 
+    MINUS 
+    SELECT PERSON_ID FROM IDMUSRMGT.IDM_PER_ADDRESSES 
+      )); 
+    PER_ALL_PEOPLE_REC PER_ADDRESSES_CUR%rowtype; 
+  BEGIN 
+    OPEN PER_ADDRESSES_CUR; 
+    LOOP 
+      FETCH PER_ADDRESSES_CUR INTO PER_ALL_PEOPLE_REC; 
+      EXIT 
+    WHEN PER_ADDRESSES_CUR%NOTFOUND; 
+      v_person_id    := PER_ALL_PEOPLE_REC.PERSON_ID; 
+      HR_EVENT_DOC :='&lt;EBS_EVENT&gt;&lt;EVENT_NAME&gt;oracle.apps.fnd.user.insert&lt;/EVENT_NAME&gt;&lt;OBJECT type="user"&gt;&lt;LOGIN_DISABLED&gt;false&lt;/LOGIN_DISABLED&gt;&lt;/OBJECT&gt;&lt;/EBS_EVENT&gt;'; 
+      SELECT dbms_xmlquery.getxml('SELECT * FROM PER_ADDRESSES where PERSON_ID=' 
+        ||v_person_id,10) 
+      INTO clob_locator 
+      FROM DUAL; 
+      DBMS_LOB.COPY(HR_EVENT_DOC, to_clob('&lt;EMPLOYEE&gt;&lt;/EMPLOYEE&gt;'), 21 ,INSTR(HR_EVENT_DOC,'&lt;/EBS_EVENT&gt;', -1), 1); 
+      DBMS_LOB.COPY(HR_EVENT_DOC, CLOB_LOCATOR, INSTR(CLOB_LOCATOR,'&lt;/ROW&gt;',                                -1)- INSTR(CLOB_LOCATOR,'&lt;ROW num="1"&gt;')-14 ,INSTR(HR_EVENT_DOC,'&lt;/EMPLOYEE&gt;', -1), INSTR(CLOB_LOCATOR,'&lt;ROW num="1"&gt;')+14); 
+      DELETE FROM IDMUSRMGT.IDM_PER_ADDRESSES WHERE PERSON_ID=v_person_id; 
+      INSERT INTO IDMUSRMGT.IDM_PER_ADDRESSES 
+      SELECT * FROM PER_ADDRESSES WHERE PERSON_ID=v_person_id; 
+      HR_EVENT_DOC:=HR_EVENT_DOC||'&lt;/EMPLOYEE&gt;&lt;/EBS_EVENT&gt;'; 
+      PERSISTS_EVENT( 'oracle.apps.fnd.user.insert','EMPLOYEE_ADD',NULL,HR_EVENT_DOC,NULL,'NEW',SYSDATE); 
+      commit; 
+      END LOOP; 
+  END; </pre></li>
+<li class="step">
+<p class="para">Add the newly created procedure to the existing method.</p><pre class="screen">PROCEDURE SYNCH_EVENTS_WITH_IDM( 
+    request IN VARCHAR2 ) 
+IS 
+BEGIN 
+  FIND_EMPLOYEE_ADD_EVENTS(); 
+     : 
+     : 
+     : 
+     : 
+     : 
+     : 
+  FIND_PER_ADDRESSES_ADD_EVENTS(); 
+  PUBLISH_EVENTS(); 
+END; </pre></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1fxjh6h">
+
+<h2 class="title h2"><span class="number">C.1.3</span> Verifying the Changes</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="t42hg6qiajfk">
+<ol class="steps">
+<li class="step">
+<p class="para">Create a user/employee in the Oracle EBS system with the recently added attributes.</p></li>
+<li class="step">
+<p class="para">Modify the attributes.</p></li>
+<li class="step">
+<p class="para">Verify if the attributes are synchronised with the Identity Manager.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

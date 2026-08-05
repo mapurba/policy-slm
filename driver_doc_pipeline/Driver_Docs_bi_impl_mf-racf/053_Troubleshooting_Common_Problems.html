@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3yee7z,b3r8uai,b3xzdtn,b3r8v2p,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Troubleshooting Common Problems - NetIQ RACF Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3yee7z">
+
+<h1 class="title h1"><span class="number">A.2</span> Troubleshooting Common Problems</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yexuy" class="xref">Driver Shim Installation Failure</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yfj1c" class="xref">Driver Rules Installation Failure</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yfkmw" class="xref">Schema Update Failure</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3ygrta" class="xref">Driver Certificate Setup Failure</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3ygzqd" class="xref">Driver Start Failure</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yh50t" class="xref">Driver Shim Startup or Communication Failure</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yh9yg" class="xref">Users or Groups Are Not Provisioned to the Connected System</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yhfcq" class="xref">Users or Groups Are Not Provisioned to the Identity Vault</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yhfkf" class="xref">Identity Vault User Passwords Are Not Provisioned to the Connected System</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yhkd1" class="xref">Connected System User Passwords Are Not Provisioned to the Identity Vault</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b3yin8u" class="xref">Users or Groups Are Not Modified, Deleted, Renamed, or Moved</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3yee7z.html#b6aqr0h" class="xref">Change Log Errors</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yexuy">
+
+<h2 class="title h2"><span class="number">A.2.1</span> Driver Shim Installation Failure</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Ensure that you use binary mode to FTP the driver samples library, load library, and REXX exec library XMT files to the target system.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yfj1c">
+
+<h2 class="title h2"><span class="number">A.2.2</span> Driver Rules Installation Failure</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Ensure that you use a version of iManager compatible with your version of Identity Manager.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yfkmw">
+
+<h2 class="title h2"><span class="number">A.2.3</span> Schema Update Failure</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the log file at <span class="filename">/var/nds/schema.log</span>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that you specify the correct parameters (host name, Admin FDN in dotted format, and password).</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that you have network connectivity to the Metadirectory server.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ygrta">
+
+<h2 class="title h2"><span class="number">A.2.4</span> Driver Certificate Setup Failure</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To set up certificates, the driver shim communicates with the Metadirectory server using the LDAP secure port (636).</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Ensure that eDirectoryâ¢ is running LDAP with SSL enabled. For details about configuring eDirectory, see the <span class="citetitle">NetIQ eDirectory Administration Guide</span>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the connected system has network connectivity to the Metadirectory server.</p></li></ul></div>
+
+<p class="para">You can use the driver REXX exec library member <span class="filename">SETCERT</span> to configure the certificate at any time.</p>
+<div class="procedure" id="b3ygwwy">
+<p class="para">If you cannot configure SSL using LDAP, you can install the certificate manually.</p>
+<ol class="steps">
+<li class="step" id="b3ygwwz">
+<p class="para">In iManager, browse the Security container to locate your treeâs certificate authority (typically named <span class="literal"><span class="replaceable">treeName</span> CA</span>).</p></li>
+<li class="step" id="b4dejhi">
+<p class="para">Click the certificate authority object.</p></li>
+<li class="step" id="b4dejo6">
+<p class="para">Click <span class="guimenu">Modify Object</span>.</p></li>
+<li class="step" id="b3ygx84">
+<p class="para">Select the <span class="guimenu">Certificates</span> tab.</p></li>
+<li class="step" id="b3ygxe9">
+<p class="para">Click <span class="guimenu">Public Key Certificate</span>.</p></li>
+<li class="step" id="b3ygxlr">
+<p class="para">Click <span class="guimenu">Export</span>.</p></li>
+<li class="step" id="b3ygxr8">
+<p class="para">Select <span class="guimenu">No</span> to export the certificate without the private key, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="b3ygy4n">
+<p class="para">Select <span class="guimenu">Base64 format</span>, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="b3ygycu">
+<p class="para">Click <span class="guimenu">Save the exported certificate to a file</span>, then specify a location to save the file.</p></li>
+<li class="step" id="b3ygyyi">
+<p class="para">Use FTP or another method to store the file on the connected system as <span class="filename">/opt/novell/racfdrv/keys/ca.pem</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ygzqd">
+
+<h2 class="title h2"><span class="number">A.2.5</span> Driver Start Failure</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b3yeaix" class="xref">status log</a> and <a href="b3xzdtn.html#b3ye3ty" class="xref">DSTRACE</a> output.</p></li>
+<li class="listitem">
+<p class="listitem">The driver must be specified as a Remote Loader driver. You can set this option in the iManager Driver Edit Properties window.</p></li>
+<li class="listitem">
+<p class="listitem">You must activate both Identity Manager and the driver within 90 days. The Driver Set Overview page in iManager shows when Identity Manager requires activation. The Driver Overview page shows when the driver requires activation.</p>
+<p class="listitem">For details about activating NetIQ Identity Manager Products, see the <span class="citetitle">Identity Manager 4.8 Installation Guide</span> on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a> .</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the driver load library is APF-authorized.</p>
+<p class="listitem">You can use the <span class="command">DISPLAY PROG,APF</span> operator command to display your APF-authorized libraries.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the <span class="command">LDXSERV</span> and <span class="command">SAFQUERY</span> commands are listed as authorized TSO commands in your active <span class="filename">IKJTSO<span class="replaceable">xx</span></span> member.</p>
+<p class="listitem">You can use the <span class="command">DISPLAY IKJTSO,AUTHCMD</span> operator command to display authorized TSO commands.</p></li></ul></div>
+
+<p class="para">For more information about troubleshooting Identity Manager engine errors, see the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yh50t">
+
+<h2 class="title h2"><span class="number">A.2.6</span> Driver Shim Startup or Communication Failure</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b3xzpa5" class="xref">trace file</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the connected systemâs operating system and security system versions are supported. For a list of supported operating systems, see <a href="b3xccfu.html#b3xcf2n" class="xref">Connected System Requirements</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Apply all maintenance for your operating system and security system.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the Remote Loader and Driver object passwords that you specified while setting up the driver on the Metadirectory server match the passwords stored with the driver shim.</p>
+<p class="listitem">To update these passwords on the connected system, use the <span class="filename">SETPWDS</span> REXX exec. The passwords are stored under <span class="filename">/opt/novell/racfdrv/keys</span> in encrypted files <span class="filename">dpwdlf40</span> (Driver object password) and <span class="filename">lpwdlf40</span> (Remote Loader password).</p>
+<p class="listitem">To update these passwords on the Metadirectory server, use iManager to update the driver configuration. For details, see <a href="b3xub84.html#b4d9ehs" class="xref">Driver Configuration Page</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the correct host name and port number of the connected system are specified in the Driver Configuration Remote Loader connection parameters. You can change the port number (default 8090) in the driver shim configuration file.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the driver shim started task has been set up properly. For details, see <a href="b3xehpq.html#b6gwofm" class="xref">Setting Up the Started Tasks</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that only one system in a complex that shares the security system database is running the driver shim started task.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yh9yg">
+
+<h2 class="title h2"><span class="number">A.2.7</span> Users or Groups Are Not Provisioned to the Connected System</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b3yeaix" class="xref">status log</a>, <a href="b3xzdtn.html#b3ye3ty" class="xref">DSTRACE</a> output, <a href="b3xzdtn.html#b3xzpa5" class="xref">trace file</a>, and <a href="b3xzdtn.html#b3ye15d" class="xref">REXX exec output file</a>.</p></li>
+<li class="listitem">
+<p class="listitem">To be provisioned, users and groups must be in the appropriate base container. You can view and change the base containers in iManager on the Global Configuration Values page of the Driver Edit Properties window. For more details, see <a href="b3xub84.html#b4d9yhs" class="xref">Global Configuration Values Page</a>.</p></li>
+<li class="listitem">
+<p class="listitem">To provision identities from the Identity Vault to the connected system, the driver Data Flow property must be set to Bidirectional or Identity Vault to Application. To change this value, re-import the driver rules file over your existing driver.</p></li>
+<li class="listitem">
+<p class="listitem">The user that the driver is security equivalent to must have rights to read information from the base container. For details about the rights required, see <a href="b484ok2.html#b4exk92" class="xref">Table 2-2, Base Container Rights Required by the Driver Security-Equivalent User</a>.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yhfcq">
+
+<h2 class="title h2"><span class="number">A.2.8</span> Users or Groups Are Not Provisioned to the Identity Vault</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b3yeaix" class="xref">status log</a>, <a href="b3xzdtn.html#b3ye3ty" class="xref">DSTRACE</a> output, and <a href="b3xzdtn.html#b3xzpa5" class="xref">trace file</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Examine the <span class="guimenu">User Base Container</span> and <span class="guimenu">Group Base Container</span> GCV values. For more details, see <a href="b3xub84.html#b4d9yhs" class="xref">Global Configuration Values Page</a>.</p></li>
+<li class="listitem">
+<p class="listitem">To provision identities from the connected system to the Identity Vault, the driver Data Flow property must be set to Bidirectional or Application to Identity Vault. To change this value, re-import the driver rules file over your existing driver.</p></li>
+<li class="listitem">
+<p class="listitem">The user that the driver is security equivalent to must have rights to update the base container. For details about the rights required, see <a href="b484ok2.html#b4exk92" class="xref">Table 2-2, Base Container Rights Required by the Driver Security-Equivalent User</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the security system exit has been installed, that LLA has been refreshed, and that the exit has been activated. For details, see <a href="b3xehpq.html#cegbjdbc" class="xref">Installing the Driver Security System Exits</a>.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yhfkf">
+
+<h2 class="title h2"><span class="number">A.2.9</span> Identity Vault User Passwords Are Not Provisioned to the Connected System</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b3yeaix" class="xref">status log</a>, <a href="b3xzdtn.html#b3ye3ty" class="xref">DSTRACE</a> output, and <a href="b3xzdtn.html#b3ye15d" class="xref">REXX exec output file</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Several password management properties are available in iManager on the Global Configuration Values page of the Driver Edit Properties window. Ensure that the connected system accepts passwords from the Identity Vault. To determine the right settings for your environment, view the help for the options, or see the <span class="citetitle">NetIQ Identity Manager 4.8 Administration Guide</span> on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the userâs container has an assigned Universal Password policy and that the <span class="guimenu">Synchronize Distribution Password When Setting Universal Password</span> option is set for this policy.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yhkd1">
+
+<h2 class="title h2"><span class="number">A.2.10</span> Connected System User Passwords Are Not Provisioned to the Identity Vault</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b3yeaix" class="xref">status log</a>, <a href="b3xzdtn.html#b3ye3ty" class="xref">DSTRACE</a> output, and the <a href="b3xzdtn.html#b3xzpa5" class="xref">trace file</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Several password management properties are available in iManager on the Global Configuration Values page of the Driver Edit Properties window. Ensure that at least one of the following options is set:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="guimenu">The Identity Vault Accepts Passwords from the RACF Connected System</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="guimenu">The Identity Vault Accepts Administrative Password Resets from the RACF Connected System</span>
+                </p></li></ul></div>
+
+<p class="listitem">To determine the right settings for your environment, view the help for the options, or see the <span class="citetitle">NetIQ Identity Manager 4.8 Administration Guide</span> on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p></li>
+<li class="listitem">
+<p class="listitem">If the <span class="guimenu">Require Password Policy Validation before Publishing Passwords</span> GCV is set, the userâs password must satisfy the password rules in the password policy assigned to the user container.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the change log started task is running on all systems that share the security system database.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the security system exit has been installed, that LLA has been refreshed, and that the exit has been activated. For details, see <a href="b3xehpq.html#cegbjdbc" class="xref">Installing the Driver Security System Exits</a>.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3yin8u">
+
+<h2 class="title h2"><span class="number">A.2.11</span> Users or Groups Are Not Modified, Deleted, Renamed, or Moved</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b3yeaix" class="xref">status log</a>, <a href="b3xzdtn.html#b3ye3ty" class="xref">DSTRACE</a> output, <a href="b3xzdtn.html#b3xzpa5" class="xref">trace file</a>, and <a href="b3xzdtn.html#b3ye15d" class="xref">REXX exec output file</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Examine the driver Data Flow setting to verify the authoritative source for identities.</p></li>
+<li class="listitem">
+<p class="listitem">Identity Vault and connected system identities must be associated before events are synchronized. To view an identityâs associations, use Modify User/Group in iManager and click the <span class="guimenu">Identity Manager</span> tab. You can migrate identities to establish associations. For details, see <a href="b3xxotz.html" class="xref">Migrating Identities</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Identity Vault move events can remove the identity from the base container monitored by the driver to a container that is not monitored by the driver. This makes the move appear to be a delete.</p></li>
+<li class="listitem">
+<p class="listitem">Moving a user or group is not supported by RACF.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6aqr0h">
+
+<h2 class="title h2"><span class="number">A.2.12</span> Change Log Errors</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Examine the <a href="b3xzdtn.html#b6m584r" class="xref">change log started task messages</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the change log started task is running on all systems that share the security system database.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the change log started task has been set up properly. For details, see <a href="b3xehpq.html#b6gwofm" class="xref">Setting Up the Started Tasks</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that you initialized the change log data set during installation. For details about initializing the change log data set, see <a href="b3xehpq.html#b689r3r" class="xref">Allocating and Initializing the Change Log Data Set</a>.</p></li>
+<li class="listitem">
+<p class="listitem">You can use the <span class="command">LDXSERV</span> TSO command to display information about the change log data set. Enter the following TSO command:</p><pre class="screen">  LDXSERV STATUS</pre>
+<p class="listitem">To use the <span class="command">LDXSERV</span> command, you must include the driver load library in your STEPLIB concatenation.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

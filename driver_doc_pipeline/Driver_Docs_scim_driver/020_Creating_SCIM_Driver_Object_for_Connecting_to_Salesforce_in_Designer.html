@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="February 17 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="create_scim_driv_obj_slsfrce,t4cfey7g3sej,salesforce_create_connect_app,gcv_sls_force,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Creating SCIM Driver Object for Connecting to Salesforce in Designer - NetIQ SCIM Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="create_scim_driv_obj_slsfrce">
+
+<h1 class="title h1"><span class="number">5.2</span> Creating SCIM Driver Object for Connecting to Salesforce in Designer</h1>
+
+<div class="content_wrapper">
+
+<p class="para">To begin with the configuration, you need to set up the SCIM driver object in the designer, and configure the SCIM driver with the specific parameters to connect to Salesforce application.</p>
+<p class="para">The generic steps to set up a driver object and the configuration parameters is shown below. If you already have the driver object setup in designer, you can skip to <a href="create_scim_driv_obj_slsfrce.html#config_subs_opt" class="xref">Step 20</a> to proceed with Salesforce specific configuration.</p>
+<div class="procedure" id="brmudeu1">
+<ol class="steps">
+<li class="step" id="brn9fjl1">
+<p class="para">Open Designer.</p></li>
+<li class="step" id="brmudev1">
+<p class="para">In the toolbar, click <span class="guimenu">Help</span> &gt; <span class="guimenu">Check for Package Updates</span>.</p></li>
+<li class="step" id="brmuek51">
+<p class="para">Select the required versions of the SCIM Base and SCIM Default packages as mentioned below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM Base Package</span>:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Package Name</span>: NETQSCIMBASE</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Version</span>: 1.0.0</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Date</span>: 20201117</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Number</span>: 124957</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM Default Package</span>:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Package Name</span>: NETQSCIMDCFG</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Version</span>: 1.0.0</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Date</span>: 20201113</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Number</span>: 132234</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM JSON Package</span> (Optional):</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Package Name</span>: NETQSCIMJSON</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Version</span>: 1.0.0</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Date</span>: 20200721</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Number</span>: 184051</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM Entitlements</span> (Mandatory)</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Package Name</span>: NETQSCIMENT</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Version</span>: 1.0.0</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Date</span>: 20201113</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Number</span>: 141225</p></li></ul></div>
+</li></ul></div>
+</li>
+<li class="step">
+<p class="para">Click <span class="guimenu">OK</span> to update the packages.</p></li>
+<li class="step" id="brmuhjf1">
+<p class="para">In the Outline view, right-click the <span class="guimenu">Package Catalog</span>.</p></li>
+<li class="step" id="brmuicg1">
+<p class="para">Click <span class="guimenu">Import Package</span> and scroll to find the <span class="guimenu">SCIM Salesforce Configuration</span> package.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">SCIM Salesforce Configuration Package</span> (Mandatory):</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Package Name</span>: NETQSCIMSFCG</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Version</span>: 1.0.0</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Date</span>: 20200721</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Build Number</span>: 184139</p></li></ul></div>
+</li></ul></div>
+</li>
+<li class="step" id="brmujep1">
+<p class="para">Click <span class="guimenu">OK</span> to import the selected packages, then click <span class="guimenu">OK</span> in the successfully imported packages message. The designer is now updated with the selected package.</p></li>
+<li class="step" id="brtiuc21">
+<p class="para">In <span class="guimenu">Designer &gt; Outline</span> view, open your project.</p></li>
+<li class="step" id="brtiuc31">
+<p class="para">Right click project &gt; <span class="guimenu">New</span> &gt; <span class="guimenu">Identity Vault</span>, or drag and drop <span class="guimenu">Identity Vault</span> from the <span class="guimenu">Palette</span> to <span class="guimenu">Modeler</span> window.</p></li>
+<li class="step" id="brtiuc41">
+<p class="para">In the <span class="guimenu">Add Server Association</span> screen, select the following field values and click <span class="guimenu">OK</span>.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Server DN</p></li>
+<li class="listitem">
+<p class="listitem">Identity Manager Version</p></li>
+<li class="listitem">
+<p class="listitem">Identity Manager Edition</p></li></ul></div>
+
+<p class="para">The Identity Vault Credentials window appears.</p></li>
+<li class="step">
+<p class="para">In Identity Vault Credentials window, enter:</p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="29%" /><col width="71%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Field</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Host</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The IP address of the Identity Vault's host machine.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Username</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The name of the user.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Password</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The password of the user to login to the identity vault.</p></td>
+</tr></table>
+</div>
+</li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Save Password</span>, if you want to save your password for easy logins in the future.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">OK</span>.</p>
+<p class="para">The Identity Vault with the Driver Set appears in the <span class="guimenu">Modeler</span> window.</p></li>
+<li class="step">
+<p class="para">In the right pane, drag and drop the <span class="guimenu">SCIM</span> driver icon from the <span class="guimenu">Tools</span> tab in the <span class="guimenu">Modeler</span> window, to the Identity Vault.</p></li>
+<li class="step">
+<p class="para">In the <span class="guimenu">Driver Configuration Wizard</span>, select <span class="guimenu">SCIM Base Package</span> (Contains the base functionality for a driver. You must install a driver base configuration package first), and click <span class="guimenu">Next</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>You can only select one base package.</p></div>
+</li>
+<li class="step">
+<p class="para">In the <span class="guimenu">Select Mandatory Features</span> page, select the <span class="guimenu">SCIM Default Package</span>, and click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">(Optional) In the <span class="guimenu">Select Optional Features</span> page, select <span class="guimenu">SCIM JSON Package</span>, and click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">Verify if the required <span class="guimenu">Important Note</span> items are met, and click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">On the <span class="guimenu">Driver Information</span> page, specify a name for the driver, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="config_subs_opt">
+<p class="para">Select <span class="guimenu">OAuth 2.0</span> in the Authentication Method field, as the SCIM driver should be configured to connect to Salesforce with <span class="guimenu">OAuth 2.0</span> as the authentication method.</p></li>
+<li class="step">
+<p class="para">In the <span class="guimenu">OAuth2.0 Authorization Token</span> field<span class="guimenu">,</span> select the option as required. The available options are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Bearer</span>: To configure SCIM Driver with new bearer token, see <a href="create_scim_driv_obj_slsfrce.html#t4d7ifo4gwj6" class="xref">Configuring SCIM Driver with Bearer Token</a>.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">JWT</span>: To configure SCIM Driver using <span class="guimenu">JWT</span>, see <a href="create_scim_driv_obj_slsfrce.html#t4d7ig0aereu" class="xref">Configuring SCIM Driver with JWT</a></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Manual</span>: To configure SCIM Driver using an available bearer token, see <a href="create_scim_driv_obj_slsfrce.html#t4d7ig4fwtnb" class="xref">Configuring SCIM Driver Manually with an Available Token</a></p></li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Configuring a <span class="strong">JWT</span> is recommended as it is more secured with a digital server certificate.</p></div>
+
+<div class="segment" id="t4d7ifo4gwj6">
+<h4 class="title">Configuring SCIM Driver with Bearer Token</h4>
+
+<p class="para"><span class="guimenu">Bearer</span> is an access token issued by servers (Salesforce) to achieve multi-server authentication.</p>
+<div class="informalfigure">
+                  <img src="../graphics/scim_bearer_a.png" alt="" />
+                </div>
+
+<p class="para">If you select <span class="guimenu">Bearer</span>, the following fields appear. Enter the values as shown in the following table.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>For any operation performed on the Salesforce application using OAuth 2.0, an access token is sent for authorization of the user from Salesforce. The access token expires post the session idle time set for Salesforce, or in case of a system restart. Salesforce displays Unauthorized Access error or an Invalid Session error for any request initiated with an expired access token. The presence of a refresh token helps to re-establish the failed session internally by generating a new access token without userâs intervention.</p></div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                  
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Field</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample Field Value</p></th>
+</tr>
+                
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">Access Token URL</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="filename">
+                          <span class="replaceable">&lt;https://login.salesforce.com/services/oauth2/token&gt;</span>
+                        </span>
+                      </p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">User Name</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The user name to login to Salesforce.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">Password</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The password to login to Salesforce.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Query Options</span>: The following fields appear.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">grant_type</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">client_id</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">issuer</span>
+                            </span>
+                          </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">grant_type</span></span>: <span class="filename">password</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">client_id</span></span>: <span class="filename"><span class="replaceable">&lt;3MVG97quAmFZJfVwk3ylU.8elhRYBqG9h25m3TWewozjKnFIY0HrhOEJl7LMET9HHocaHnTB1k04kophr1CgW&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">issuer</span></span>: <span class="filename"><span class="replaceable">&lt;https://login.Salesforce.com&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">username</span></span>: <span class="filename"><span class="replaceable">&lt;username to login to Salesforce&gt;</span></span></p></li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In case of a driver upgrade, the <span class="strong"><span class="filename">issuer</span></span> field does not auto populate the earlier configured value. You must enter the issuer field manually.</p></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Secret Query Options</span>: The values specified in these options are hidden for security purposes.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">refresh_token</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">client_secret</span>
+                            </span>
+                          </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">refresh_token</span></span>: <span class="filename">5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">client_secret</span></span>: <span class="filename">E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">password</span></span>: <span class="filename"><span class="replaceable">&lt;password to login to Salesforce&gt;</span></span></p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">Header Fields</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Name</span>: <span class="filename">Content-Type</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Value</span>: <span class="filename">application/x-www-form-urlencoded</span></p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow" id="common_conn_params_scim_slsfrce"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Common fields in Connection Parameters</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The fields mentioned in the below rows are common for OAuth2.0 and Basic Authentication.</p></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Application Truststore File</span>: The path and the name of the keystore file that contains the trusted certificates for the remote server to achieve SSL handshake.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>For <span class="guimenu">Bearer</span>, add the public certificate to <span class="filename">cacerts</span>, present in the path <span class="filename">/opt/netiq/common/jre/lib/security</span>.</p></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="filename">
+                          <span class="replaceable">&lt;/root/scim_configuration/trustSalesforce/Salesforce&gt;</span>
+                        </span>
+                      </p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Create the truststore file in <span class="filename">.jks</span> format for the connected application. For more information on how to create the truststore file, see <a href="../../../identity-manager-48/driver_admin/data/t4d85ztex67n.html#t4d86gc0bqud" class="ulink">Configuring the Subscriber Channel</a> in <q class="quote"><span class="citetitle"><a href="../../../identity-manager-48/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span></q>.</p></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">Mutual Authentication</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not supported in Salesforce</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">Proxy Authentication</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Proxy host name and port</span>: <span class="replaceable">&lt;192.168.0.0:port&gt;</span>. Choose an unused port number on the proxy server.</p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="guimenu">Username</span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="guimenu">Password</span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="guimenu">Re-enter Password</span>
+                          </p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">HTTPS Connection Timeout</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The timeout value must be greater than 0.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The driver waits for the time specified (in minutes) and terminates the HTTPS connection displaying the error codes that are configured in the <span class="guimenu">Subscriber Options &gt; HTTPS error codes for retry</span> field.</p></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">SCIM 2.0 URL</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="filename">
+                          <span class="replaceable">&lt;https://salesforce.com/api/rest/scim/v2/339216517038085&gt;</span>
+                        </span>
+                      </p></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="segment" id="t4d7ig0aereu">
+<h4 class="title">Configuring SCIM Driver with JWT</h4>
+
+<p class="para">The JSON Web token is an access request token in the JSON Web Token (JWT) format. It is an encrypted data string consisting of a header, payload, and a signature, and is used to transfer authorization data in client-server applications to authenticate the identity of the resource.</p>
+<div class="informalfigure">
+                  <img src="../graphics/scim_jwt_a.png" alt="" />
+                </div>
+
+<p class="para">If you select <span class="guimenu">JWT,</span> the following fields appear:</p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                  
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Field</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample Field Value</p></th>
+</tr>
+                
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Query Options</span>: The following fields appear:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">client_id</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">subject</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">issuer</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">client_auth_type</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">recipient_keystore</span>
+                            </span>
+                          </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">client_id</span></span>: <span class="filename"><span class="replaceable">&lt;3MVG97quAmFZJfVwk3ylU.8elhRYBqG9h25m3TWewozjKnFIY0HrhOEJl7LMET9HHocaHnTB1k04kophr1CgW&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">subject</span></span>:<span class="filename"><span class="replaceable">&lt;username@microfocus.com&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">issuer</span></span>: <span class="filename"><span class="replaceable">&lt;https://login.salesforce.com&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">client_auth_type</span></span>: <span class="filename">private_key_jwt</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">recipient_keystore</span></span>: <span class="filename"><span class="replaceable">&lt;/Soft/Certs/recipient.jks&gt;</span></span></p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Secret Query Options</span>: The values specified in these options are hidden for security purposes.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">recipient_storepass</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">recipient_keypass</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">refresh_token</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">client_secret</span>
+                            </span>
+                          </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">recipient_storepass</span></span>: <span class="filename"><span class="replaceable">&lt;novell&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">recipient_keypass</span></span>: <span class="filename"><span class="replaceable">&lt;novell&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">refresh_token</span></span>: <span class="filename">5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">client_secret</span></span>: <span class="filename">E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87</span></p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">For the other common fields such as Application Truststore File, Mutual Authentication, Proxy Authentication, HTTPS connection Timeout, and SCIM 2.0 URL, see <a href="create_scim_driv_obj_slsfrce.html#common_conn_params_scim_slsfrce" class="xref">Common fields in Connection Parameters                                                The fields mentioned in the below rows are common for OAuth2.0 and Basic Authentication.</a></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="segment" id="t4d7ig4fwtnb">
+<h4 class="title">Configuring SCIM Driver Manually with an Available Token</h4>
+
+<p class="para">Select <span class="guimenu">Manual</span> if you already have an access token available or created by an external application.</p>
+<div class="informalfigure">
+                  <img src="../graphics/scim_manual_token_a.png" alt="" />
+                </div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="33%" /><col width="67%" />
+                  
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Field</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample Field Value</p></th>
+</tr>
+                
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="strong">Token</span>
+                      </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="filename">
+                          <span class="replaceable">&lt;00D2v000002mBdQ!ARQAQAzAXhpgilDpcvN3RDgCkrfh4pyzCOv2G1Iq5kEMh0TRi&gt;</span>
+                        </span>
+                      </p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Query Options</span>: The following fields appear.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">client_id</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">issuer</span>
+                            </span>
+                          </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">client_id</span></span>: <span class="filename"><span class="replaceable">&lt;3MVG97quAmFZJfVwk3ylU.8elhRYBqG9h25m3TWewozjKnFIY0HrhOEJl7LMET9HHocaHnTB1k04kophr1CgW&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">issuer</span></span>: <span class="filename"><span class="replaceable">&lt;https://login.Salesforce.com&gt;</span></span></p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Secret Query Options</span>: The values specified in these options are hidden for security purposes.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">refresh_token</span>
+                            </span>
+                          </p></li>
+<li class="listitem">
+<p class="listitem">
+                            <span class="strong">
+                              <span class="filename">client_secret</span>
+                            </span>
+                          </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">refresh_token</span></span>: <span class="filename">5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong"><span class="filename">client_secret</span></span>: <span class="filename">E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87</span></p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">For the other common fields such as Application Truststore File, Mutual Authentication, Proxy Authentication, HTTPS connection Timeout, and SCIM 2.0 URL, see <a href="create_scim_driv_obj_slsfrce.html#common_conn_params_scim_slsfrce" class="xref">Common fields in Connection Parameters                                                The fields mentioned in the below rows are common for OAuth2.0 and Basic Authentication.</a></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr></table>
+</div>
+
+</div>
+</li>
+<li class="step" id="usecase_continue_config_step">
+<p class="para">In the <span class="guimenu">Install SCIM Base</span> page, specify the <span class="guimenu">Subscriber Options</span> and <span class="guimenu">Publisher Options</span>, and click <span class="guimenu">Next</span>.</p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="32%" /><col width="68%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Field</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample Field Value</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="strong">Subscriber Options</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="guimenu">HTTPS error codes for retry</span>: <span class="replaceable">&lt;307 408 503 504&gt;</span></p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The operation is retried if these errors are encountered.</p></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="strong">Publisher Options</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Enable Publisher Channel</span>: Select <span class="guimenu">Yes</span> to enable the Publisher channel.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Polling interval in minutes</span>: <span class="replaceable">&lt;10&gt;</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Heartbeat interval in minutes</span>: <span class="replaceable">&lt;10&gt;</span></p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em><span class="guimenu">Polling Resource Options</span>: After configuring the driver, double click the connector line in the modeler window and navigate to <span class="guimenu">Driver Configuration &gt; Publisher Options</span> tab to specify the polling resource options. Select the option as required:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Configured Resources</span>: to poll all resources that are configured as part of the schema settings.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Custom Resources</span>: Click <img src="../graphics/icon_plus_green_n.png" alt="" class="inline" /> to configure customized polling <span class="guimenu">Resource ID</span> and <span class="guimenu">Resource URL</span>, as shown below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">For User:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource ID</span>: Example, <span class="filename">urn:ietf:params:scim:schemas:core:2.0:User</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource URL</span>: Example, <span class="filename">https://ap16.salesforce.com/services/scim/v2/Users?startIndex=1&amp;count=100</span></p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">For Group:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource ID</span>: Example, <span class="filename">urn:ietf:params:scim:schemas:core:2.0:Group</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource URL</span>: Example, <span class="filename">https://ap16.salesforce.com/services/scim/v2/Groups?startIndex=1&amp;count=100</span></p></li></ul></div>
+</li></ul></div>
+</li></ul></div>
+</div>
+</li></ul></div>
+</td>
+</tr></table>
+</div>
+</li>
+<li class="step">
+<p class="para">In the <span class="guimenu">Install SCIM Base</span> page, specify the parameters as shown in the following table, and click <span class="guimenu">Next</span>.</p>
+<div class="table" id="t4cuytws2jp7"><p class="title"><em class="num">Table 5-1 </em>Schema Settings</p>
+<table class="topbot" width="100%"><col width="31%" /><col width="69%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Field</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample Field Value</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="guimenu">Refresh Schema on Driver Startup</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Defaults to <span class="guimenu">No</span>, specify <span class="guimenu">Yes</span> if you want to refresh the schema.</p>
+<p class="para">For more information on schema, see <a href="t4d2m59259wh.html" class="xref">Section 6.0, SCIM Schema Utility</a>.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="guimenu">Schema Options</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Select the option as required, the default value is <span class="guimenu">SCIM 2.0</span>.</p>
+<p class="para">The available options are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                          <span class="guimenu">SCIM 2.0</span>
+                        </p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Application URL</span>: <span class="filename"><span class="replaceable">&lt;https://ap17.salesforce.com/services/scim/v2/Schemas&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Import JSON File</span>: Import the user defined schema JSON file from the local file system.</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="guimenu">Resource Type</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource ID:</span> Resource ID in URN Format. For example, <span class="filename">urn:ietf:params:scim:schemas:core:2.0:Users</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource Endpoint</span>: The resource endpoint for the Resource ID. For example, <span class="filename">Users</span>.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Modify Method Operation</span>: Select <span class="guimenu">PUT</span> when you want to modify a resource in Salesforce.</p></li></ul></div>
+
+<p class="para">Similarly for Groups:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource ID</span>: Example, <span class="filename">urn:ietf:params:scim:schemas:core:2.0:Group</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Resource Endpoint</span>: <span class="filename">Groups</span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Modify Method Operation</span>: Select <span class="guimenu">PUT</span>.</p></li></ul></div>
+</td>
+</tr></table>
+</div>
+
+<div class="table" id="t4cuytws3em9"><p class="title"><em class="num">Table 5-2 </em>Modifier Settings</p>
+<table class="topbot" width="100%"><col width="31%" /><col width="69%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Field</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample Field Value</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="guimenu">Custom Java Class</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Defaults to <span class="guimenu">Hide</span>, select <span class="guimenu">Show</span> to configure Modifiers.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="guimenu">Document Handling</span>: Defaults to <span class="guimenu">No</span>, select <span class="guimenu">Yes</span>.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Class</span>: <span class="filename"><span class="replaceable">com.example.MyNewClass</span></span></p></li>
+<li class="listitem">
+<p class="listitem"><span class="guimenu">Init Parameter</span>: Specify the parameters in string format that you want to pass to the init() method of your class.</p></li></ul></div>
+</td>
+</tr></table>
+</div>
+</li>
+<li class="step">
+<p class="para">In the <span class="guimenu">Remote Loader</span> page, if you are configuring the driver with a remote loader select <span class="guimenu">yes</span>, else select <span class="guimenu">no</span>. Click <span class="guimenu">Next</span>.</p>
+<p class="para">For more information about installing Remote Loader, see <a href="../../../identity-manager-48/driver_admin/data/t461objwsz6a.html#t461objwsz6a" class="ulink">Deciding Whether to Use the Remote Loader</a> in <q class="quote"><span class="citetitle"><a href="../../../identity-manager-48/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span></q>.</p></li>
+<li class="step">
+<p class="para">Review the summary of tasks, and click <span class="guimenu">Finish</span>. The configured driver appears in the designer screen.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="bmn9sxw,b3r9hzv,bmn9pto,b3r8t50,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Upgrading from the Java-Based RACF Driver - NetIQ RACF Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bmn9sxw">
+
+<h1 class="title h1"><span class="number">4.2</span> Upgrading from the Java-Based RACF Driver</h1>
+
+<div class="content_wrapper">
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Please read carefully all points in this section regarding changes that need to be considered on systems running previous versions of the Identity Manager bidirectional driver for RACF.</p></div>
+
+<p class="para">The RACF driver for Identity Manager 4.8 introduces significant architectural changes over previous releases. The RACF driver that was provided with Identity Manager 3.6.1 and earlier releases employed a Java-based architecture, which leveraged the TELNET/TSO interface to interact with the RACF system.</p>
+<p class="para">The new RACF driver provides the same functionality through an improved design that is more efficient and easier to configure. To learn more about the new architecture, see <a href="b3r8p5u.html" class="xref">Section 1.0, Overview</a>.</p>
+<p class="para">Given these changes, systems using previous versions of the driver require several adjustments before the new driver can be fully implemented. Some key components require removal and others will need to be migrated. Be sure to review and consider all points in this section as you decide on appropriate changes to both the Identity Vault and your RACF system.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="bmnt0d7">
+
+<h2 class="title h2"><span class="number">4.2.1</span> Upgrading the RACF Event Subsystem</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Your current RACF Event Subsystem is a collection of tasks, JCLs and TSO commands that were packaged as TRANSMIT archives named <span class="filename">idmload.xmt</span> and <span class="filename">samplib.xmt</span>. In past installations, the contents of these archives were added to the z/OS RACF system to provide the RACF driver with hooks into the RACF database for both Subscribing and Publishing events.</p>
+<p class="para">To use the new release of the driver, you will need to ensure that all of these components are replaced with their latest versions, including any that bear the same file names.</p>
+<p class="para">Copy and unpack the new archives, <span class="filename">idmload.xmt</span>, <span class="filename">samplib.xmt</span> and <span class="filename">racfexec.xmt</span>, to your RACF system, using the instructions provided in <a href="b3xehpq.html#b686w3q" class="xref">Setting Up the Libraries on Your z/OS System</a>.</p>
+<p class="para">Although you might replace your existing <span class="filename">LOAD</span> and <span class="filename">SAMPLIB</span> libraries with the updated versions, NetIQ recommends that you unpack the archives to new physical locations to avoid name and version confusion. Then, once the new driver is setup and running, you can remove the older <span class="filename">LOAD</span> and <span class="filename">SAMPLIB</span> data sets from your system.</p>
+<div class="container sect3" id="bmpur4r">
+
+<h3 class="title h3">HFS File System Structure</h3>
+
+<p class="para">To use this release of the RACF driver, you need to prepare a location in the HFS file system. To assist you in this task, the <span class="literal">SAMPLIB</span> data set includes a Job Card named <span class="filename">HFSINST</span>.</p>
+<p class="para">Edit the paths in this file as appropriate to your local environment and submit it as a Job Card to create your default HFS path, located at <span class="filename">/opt/novell/racfdrv</span>. If you decide to change this path, you will also need to change the <span class="literal">DRVCONF</span> member to reflect the install path.</p>
+</div>
+
+<div class="container sect3" id="bmnt1bu">
+
+<h3 class="title h3">New Password Exit</h3>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you do not wish to synchronize RACF password phrases, you can skip this step.</p></div>
+
+<p class="para">The new RACF driverâs password exit routine, <span class="literal">LDXRIX02</span>, supports the ability to capture changes in RACF password phrases, which is new to z/OS 1.10.</p>
+<p class="para">To install the <span class="literal">ICHRIX02</span> exit, follow step 2 in <a href="b3xehpq.html#cegbjdbc" class="xref">Installing the Driver Security System Exits</a>.</p>
+</div>
+
+<div class="container sect3" id="bmntb3u">
+
+<h3 class="title h3">Remote Loader Task</h3>
+
+<p class="para">The Remote Loader from the previous RACF driver is a job named <span class="literal">LDXDRVRP</span> that runs Java in the Open Edition environment. Since it is no longer needed you will need to stop <span class="literal">LDXDRVRP</span> and remove it from your systemâs startup routines.</p>
+<p class="para">The new embedded remote loader is included in the new RACF Driver Shim, <span class="filename">RACFDRV</span>, which runs as a native z/OS started task.</p>
+<p class="para">To install this new Driver Shim, follow the instructions in <a href="b3xehpq.html#b6gwofm" class="xref">Setting Up the Started Tasks</a>. You will need to customize the <span class="filename">RACFDRV</span> JCL to include</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The DSN to locate the <span class="literal">LOAD</span>, <span class="literal">SAMPLIB</span>, and <span class="literal">EXEC</span> data sets, specified by <span class="literal">RACFDSN</span></p></li>
+<li class="listitem">
+<p class="listitem">The location of your existing change log data set, specified by <span class="literal">LOGFILE</span></p></li>
+<li class="listitem">
+<p class="listitem">The appropriate cod page, if necessary; see <a href="bmn95bn.html" class="xref">International Considerations</a></p></li></ul></div>
+
+<p class="para">Next, you will need to configure the Driver Shim started task with an SSL certificate for secure communication between the Identity Vault and RACF systems. Even if you have completed this once for the previous release of the RACF driver, you will need to repeat the task due to a difference in certificate formats. For instructions, see <a href="b3xehpq.html#b6a6dt2" class="xref">Securing the Driver Shim with SSL</a>.</p>
+<p class="para">Finally, you will need to set passwords for the Remote Loader and the RACF driver. If you have done this with the previous version of the RACF driver, you can migrate those passwords to the new location by copying the <span class="filename">lpwd1f40</span> and <span class="filename">dpwd1f40</span> files to <span class="filename">/opt/novell/racfdrv/keys</span> directory. If you have not, you will need to customize and run the <span class="filename">SETPWDS</span> script, included in the <span class="literal">SAMPLIB</span> data set. Ensure the file permissions on these two files are protected. By default, these permissions are set to owner(0) with read permissions only by owner (600). To assign a user ID to the <span class="literal">RACFDRV</span> started task with these UNIX permissions, see step 5 in <a href="b3xehpq.html#b6gwofm" class="xref">Setting Up the Started Tasks</a>.</p>
+</div>
+
+<div class="container sect3" id="bmntb3v">
+
+<h3 class="title h3">TSO Administrative RACF ID</h3>
+
+<p class="para">This RACF ID was used in the previous version to log on to the RACF system and issue commands. In this release, the Remote Loader directly executes commands using the <span class="literal">IKJEFTSR</span> service routine interface. Therefore, this ID is no longer needed and can be removed from the RACF system.</p>
+</div>
+
+<div class="container sect3" id="bmntb3w">
+
+<h3 class="title h3">Change Log Started Task</h3>
+
+<p class="para">The change log started task, <span class="literal">LDXLOGR</span>, has not changed from the previous release, however it is recommended that you use the version that shipped with the updated <span class="literal">LOAD</span> library. Customize the <span class="literal">LDXLOGRP</span> JCL to include the latest <span class="literal">LOAD</span> library in its <span class="literal">STEPLIB</span>.</p>
+</div>
+
+<div class="container sect3" id="bmpvuvd">
+
+<h3 class="title h3">Publisher Change Log</h3>
+
+<p class="para">The RACF driver now supports a new data event type for RACF password phrases. However, all of your existing events that might be queued in the change log will be processed, as is, by the new driver. You do not need to do anything to your existing change log.</p>
+<p class="para">However, please do not run the <span class="literal">LOGINIT</span> job, as this will clear all events in your existing change log data set.</p>
+</div>
+
+<div class="container sect3" id="bmpvuve">
+
+<h3 class="title h3">APF Authorization</h3>
+
+<p class="para">The new <span class="literal">LOAD</span> library location, which includes <span class="filename">LDXSERV</span> and <span class="filename">SAFQUERY</span>, will need to be added to your APF list.</p>
+<p class="para">Use the <span class="literal">PARMLIB</span> IEAAPFxx or PROGxx member as appropriate. If you use the dynamic APF facility, you can use the <span class="command">SET PROG</span> command to activate your changes. Otherwise, you must IPL for the change to take effect.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmnt48q">
+
+<h2 class="title h2"><span class="number">4.2.2</span> Upgrading the Identity Vault Components</h2>
+
+<div class="content_wrapper">
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Before starting the upgrade, stop the existing RACF driver using iManager.</p></div>
+
+<div class="container sect3" id="bmnt4wh">
+
+<h3 class="title h3">Java Utility Library</h3>
+
+<p class="para">Previous versions of the RACF driver used methods contained in <span class="filename">RACF.jar</span> to convert XDS to RACF commands and RACF commands to XDS documents. This Java archive also provided Telnet routines for connecting to the RACF system and executing commands through the TSO interface. This archive needs to be removed from your Identity Vaultâs system path and replaced with the latest version, now named <span class="filename">zOS.jar</span>.</p>
+<p class="para">Depending on your operating system, remove the old RACF driver Java code as follows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If you are running Linux or AIX, enter</p><pre class="screen">  rpm -e novell-DXMLracf</pre></li>
+<li class="listitem">
+<p class="listitem">If you are running Windows, locate and remove RACF.jar from</p><pre class="screen">  \novell\nds\lib</pre></li></ul></div>
+
+<p class="para">Depending on your operating system, install the updated version as follows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If you are running Linux, enter</p><pre class="screen">  rpm -ivh novell-DXMLracf-4.8-3.rpm</pre></li>
+<li class="listitem">
+<p class="listitem">If you are running windows, copy <span class="filename">zOS.jar</span> to</p><pre class="screen">  \novell\nds\lib</pre></li></ul></div>
+
+<p class="para">Verify that <span class="filename">RACF.jar</span> has been removed and a later copy of <span class="filename">zOS.jar</span> has been installed.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Please be certain you have installed the latest version of <span class="filename">zOS.jar,</span>especially if you have ever used the CA-Top Secret* driver for Identity Manager. This driver includes an older version of <span class="filename">zOS.jar</span> that is not compatible with the RACF Driver.</p></div>
+
+<p class="para">Once you have replaced <span class="filename">RACF.jar</span> with the new <span class="filename">zOS.jar</span>, you will need to restart eDirectory to refresh the Metadirectory engineâs Java classes.</p>
+</div>
+
+<div class="container sect3" id="bmnt9v8">
+
+<h3 class="title h3">RACF Driver Configuration Import</h3>
+
+<p class="para">The RACF driver configuration file is an XML file containing policies and installation options for the Driver object that is deployed in the Identity Vault. The new XML configuration file contains some new options for configuring TSO and OMVS segments, as well as options for using RACF password phrases. Neither of these new options are required, however, there are new policies that must be installed into your existing RACF driver instance to properly convert data to and from the new RACF driver.</p>
+<div class="container sect4" id="bmqv9ns">
+
+<h4 class="title h4">New Required Policies</h4>
+
+<p class="para">Three new polices were added to the Publisher Input Policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">TSO (RACF) Input Transform</p></li>
+<li class="listitem">
+<p class="listitem">RACF Back Patch Transform</p></li>
+<li class="listitem">
+<p class="listitem">Final TSO Input Transform</p></li></ul></div>
+
+<p class="para">Each of these XSLT policies is required for the Publisher channel to properly convert the RACF change log event data into XDS-formatted events that the Publisher channel can operate on.</p>
+<p class="para">One new policy was added to the Subscriber Output Transformation Policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Subscriber Append RACFCMD</p></li></ul></div>
+
+<p class="para">This new policy is required to convert the XDS document into a RACF command, which can then be processed by the new REXX scripts framework.</p>
+</div>
+
+<div class="container sect4" id="bmqv9w6">
+
+<h4 class="title h4">Importing as a New Driver</h4>
+
+<p class="para">You can import the new XML configuration to create a brand new RACF Driver object and avoid having to update individual policies. However, if you choose this method, you will need to copy policies from your old driver that are needed for your provisioning guidelines. Furthermore, all associations made through the old driver object will now be invalid. NetIQ recommends you import and update your existing RACF driver.</p>
+</div>
+
+<div class="container sect4" id="bmqva08">
+
+<h4 class="title h4">Importing and Updating the Existing RACF Driver</h4>
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Some policies in the new RACF driver have been updated. If you have customized any of the default policies that came with previous versions of the RACF driver, be sure to rename your policies so the upgrade process does not replace them.</p></div>
+
+<p class="para">When you import the new XML configuration, it will prompt you for a new driver name or allow you to select an existing driver to update. Follow these steps:</p>
+<div class="procedure" id="bqk86o3">
+<ol class="steps">
+<li class="step" id="bqk86o4">
+<p class="para">Select your existing RACF driver from the <span class="guimenu">Existing drivers</span> drop-down box.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The new RACF driver requires a Remote Loader configurationâeven if you are not using the Remote Loader task with your existing RACF driver. Importing the new driver initiates a series of prompts.</p></div>
+</li>
+<li class="step" id="bqk87d2">
+<p class="para">When prompted for a remote host and port, enter the IP or DNS host address for the RACF system where the driver shim started task will be running. The default port is 8090.</p></li>
+<li class="step" id="bqk87hf">
+<p class="para">Enter the driver object password when prompted.</p></li>
+<li class="step" id="bqk87la">
+<p class="para">Enter the Remote Loader password when prompted.</p></li>
+<li class="step" id="bqk87p8">
+<p class="para">Respond to any remaining prompts according to how you intend to use the new rules and policies provided with the new RACF driver.</p></li>
+<li class="step" id="bqk87qo">
+<p class="para">Once you have finished responding to these prompts, click <span class="guimenu">Next</span>.</p>
+<p class="para">You will be prompted to choose any policies you wish to update.</p></li>
+<li class="step" id="bqk87qy">
+<p class="para">Select, at least, the following new and required policies:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                      <span class="guimenu">TSO (RACF) Input Transform</span>
+                    </p></li>
+<li class="listitem">
+<p class="listitem">
+                      <span class="guimenu">RACF Back Patch Transform</span>
+                    </p></li>
+<li class="listitem">
+<p class="listitem">
+                      <span class="guimenu">Final TSO Input Transform</span>
+                    </p></li>
+<li class="listitem">
+<p class="listitem">
+                      <span class="guimenu">Subscriber Append RACFCMD</span>
+                    </p></li></ul></div>
+</li>
+<li class="step" id="bqk87r5">
+<p class="para">Click <span class="guimenu">Next</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>At this point, you might receive a <span class="literal">-613</span> error from the iManager plug-ins. If this occurs, you can ignore the message and proceed.</p></div>
+</li>
+<li class="step" id="b107u7og">
+<p class="para">Click <span class="guimenu">Finish</span> to complete the upgrade.</p></li></ol>
+</div>
+
+<p class="para">You also will need to restore any custom RACF driver policies you have written. To do this:</p>
+<div class="procedure" id="bqk88eo">
+<ol class="steps">
+<li class="step" id="bqk88ep">
+<p class="para">Return to the <span class="guimenu">Driver Overview</span> page.</p></li>
+<li class="step" id="bqk88gn">
+<p class="para">Select the Policy Set from which you wish to restore custom policies.</p></li>
+<li class="step" id="bqk88gz">
+<p class="para">Click <span class="guimenu">Insert</span> &gt; <span class="guimenu">Use an existing policy</span> to browse for the name of the custom policy.</p></li>
+<li class="step" id="bqk88h8">
+<p class="para">Repeat steps 2-4 for each custom policy you wish to restore.</p></li></ol>
+</div>
+
+<p class="para">If you received a <span class="literal">-613</span> error in Step 8 above, you will need to link the required policies manually. To do this:</p>
+<div class="procedure" id="b102szby">
+<ol class="steps">
+<li class="step" id="b102szbz">
+<p class="para">Return to the <span class="guimenu">Driver Overview</span> page.</p></li>
+<li class="step" id="b102szc0">
+<p class="para">Select the <span class="guimenu">Input Transform</span> policies.</p></li>
+<li class="step" id="b107uare">
+<p class="para">Select <span class="guimenu">Publisher Input Transformation</span> and click <span class="guimenu">Insert</span> to insert the new required input transformation policies.</p></li>
+<li class="step" id="b107uboa">
+<p class="para">Select <span class="guimenu">Use an existing policy option</span>, then select <span class="guimenu">Final TSO Input Transform</span>.</p></li>
+<li class="step" id="b107ucc6">
+<p class="para">Repeat Step 4 for <span class="guimenu">RACF Back Patch Transform</span> and <span class="guimenu">TSO (RACF) Input Transform</span>.</p></li>
+<li class="step" id="b107ud68">
+<p class="para">Select, then remove, <span class="guimenu">Input Transformation</span> and <span class="guimenu">Input Transformation Script</span>.</p>
+<p class="para">The remaining Input Transform policies should display as follows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                      <span class="guimenu">TSO (RACF) Input Transform</span>
+                    </p></li>
+<li class="listitem">
+<p class="listitem">
+                      <span class="guimenu">RACF Back Patch Transform</span>
+                    </p></li>
+<li class="listitem">
+<p class="listitem">
+                      <span class="guimenu">Final TSO Input Transform</span>
+                    </p></li></ul></div>
+</li>
+<li class="step" id="b107ug1b">
+<p class="para">Update <span class="guimenu">Subscriber Output Transformation Policies</span> and follow the same steps to insert <span class="guimenu">Subscriber Append RACFCMD</span> as the first policy in the list.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

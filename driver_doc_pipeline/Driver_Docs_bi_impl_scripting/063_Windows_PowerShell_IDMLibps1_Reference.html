@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="bf20v4l,b8npkix,b8nqqta,b8nr6vp,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Windows PowerShell (IDMLib.ps1) Reference - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="bf20v4l">
+
+<h1 class="title h1"><span class="number">C.5</span> Windows PowerShell (IDMLib.ps1) Reference</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The scripts are written using Windows PowerShell. They are located in the <span class="filename">scripts\powershell</span> folder below the folder where the driver was installed (<span class="filename">C:\Program Files\Novell\WSDriver</span> by default).</p>
+<p class="para">Subscriber events are submitted to <span class="filename">Subscriber.ps1</span>, which then calls the script for the event. Modify the ps1 file corresponding to the event type: <span class="filename">Add.ps1,</span> <span class="filename">Modify.ps1</span>, <span class="filename">ModifyPassword.ps1</span>, <span class="filename">Delete.ps1</span>, Move.ps1, <span class="filename">Rename.ps1.</span> Queries of the external system should be handled in <span class="filename">Query.ps1</span>.</p>
+<p class="para">The Publisher calls <span class="filename">Poll.ps1</span> periodically. The frequency of the poll is determined by the Polling Interval driver parameter (60 seconds by default). Edit <span class="filename">Poll.ps1</span> to allow the driver to respond to events in the external account management system.</p>
+<p class="para">The Publisher calls <span class="filename">Heartbeat.ps1</span> periodically to determine whether the external account management system is responding correctly.</p>
+<p class="para">Topics discussing the built-in functions in <span class="filename">IDMLib.ps1</span> are categorized as follows:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="bf20v4l.html#bf20v4m" class="xref">General Functions</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="bf20v4l.html#bf20v4x" class="xref">Subscriber Functions</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="bf20v4l.html#bf20v56" class="xref">Publisher Functions</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="bf20v4l.html#bf20v5d" class="xref">Query Functions</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="bf20v4l.html#bf20v5u" class="xref">Heartbeat Functions</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bf20v4m">
+
+<h2 class="title h2"><span class="number">C.5.1</span> General Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4n" class="xref">function idm_getdriverparam($paramname)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4o" class="xref">function idm_trace($message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4r" class="xref">function idm_status($level, $message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4s" class="xref">function idm_statussuccess($message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4t" class="xref">function idm_statuswarning($message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4u" class="xref">function idm_statusretry($message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4v" class="xref">function idm_statuserror($message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4w" class="xref">function idm_statusfatal($message)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bf20v4n">
+
+<h3 class="title h3">function idm_getdriverparam($paramname)</h3>
+
+<p class="para">Returns the string value for the Driver parameter specified by the string $paramname.</p>
+</div>
+
+<div class="container sect3" id="bf20v4o">
+
+<h3 class="title h3">function idm_trace($message)</h3>
+
+<p class="para">Appends the specified message to the user-defined trace file.</p>
+</div>
+
+<div class="container sect3" id="bf20v4r">
+
+<h3 class="title h3">function idm_status($level, $message)</h3>
+
+<p class="para">Set the status level and message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="bf20v4s">
+
+<h3 class="title h3">function idm_statussuccess($message)</h3>
+
+<p class="para">Set the status success message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="bf20v4t">
+
+<h3 class="title h3">function idm_statuswarning($message)</h3>
+
+<p class="para">Set the status warning message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="bf20v4u">
+
+<h3 class="title h3">function idm_statusretry($message)</h3>
+
+<p class="para">Set the status retry message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="bf20v4v">
+
+<h3 class="title h3">function idm_statuserror($message)</h3>
+
+<p class="para">Set the status error message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+<div class="container sect3" id="bf20v4w">
+
+<h3 class="title h3">function idm_statusfatal($message)</h3>
+
+<p class="para">Set the status fatal message to return to the Identity Manager engine when the script completes.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bf20v4x">
+
+<h2 class="title h2"><span class="number">C.5.2</span> Subscriber Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4y" class="xref">function idm_getsubscriberparam($paramname)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v4z" class="xref">function idm_setcommand($command)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v50" class="xref">function idm_geteventvalues($name)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v51" class="xref">function idm_geteventvalue($name)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v52" class="xref">function idm_geteventvaluenames</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bfcczk6" class="xref">function idm_geteventattrnames</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v53" class="xref">function idm_writevalues($name, $values)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v54" class="xref">function idm_writevalue($name, $value)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v55" class="xref">function idm_subgetnamedpassword($name)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bf20v4y">
+
+<h3 class="title h3">function idm_getsubscriberparam($paramname)</h3>
+
+<p class="para">Returns the string value for the Subscriber parameter specified by the string $paramname.</p>
+</div>
+
+<div class="container sect3" id="bf20v4z">
+
+<h3 class="title h3">function idm_setcommand($command)</h3>
+
+<p class="para">Sets the command that the Subscriber returns to the Identity Manager engine. This function must be called before using idm_writevalue functions. If only a status needs to be returned, use one of the idm_status functions (see above).</p>
+</div>
+
+<div class="container sect3" id="bf20v50">
+
+<h3 class="title h3">function idm_geteventvalues($name)</h3>
+
+<p class="para">Returns an array of string values for the item specified by $name. If no values exist, $null is returned.</p>
+</div>
+
+<div class="container sect3" id="bf20v51">
+
+<h3 class="title h3">function idm_geteventvalue($name)</h3>
+
+<p class="para">Returns the string value for the item specified by $name. If no values exist, $null is returned.</p>
+</div>
+
+<div class="container sect3" id="bf20v52">
+
+<h3 class="title h3">function idm_geteventvaluenames</h3>
+
+<p class="para">Returns an array containing each value name for the event. This function can be used to iterate over every value.</p>
+</div>
+
+<div class="container sect3" id="bfcczk6">
+
+<h3 class="title h3">function idm_geteventattrnames</h3>
+
+<p class="para">Returns an array containing each attribute item for the event. This includes ADD_<span class="replaceable">attrname</span>, REMOVE_<span class="replaceable">attrname</span> and PASSWORD values.</p>
+</div>
+
+<div class="container sect3" id="bf20v53">
+
+<h3 class="title h3">function idm_writevalues($name, $values)</h3>
+
+<p class="para">Sets an array of string values for the item specified by $name to be returned to the driver engine when the script completes. You must call idm_setcommand or one of the idm_status functions before calling this function.</p>
+</div>
+
+<div class="container sect3" id="bf20v54">
+
+<h3 class="title h3">function idm_writevalue($name, $value)</h3>
+
+<p class="para">Sets a single string value for the item specified by $name to be returned to the driver engine when the script completes. You must call idm_setcommand or one of the idm_status functions before calling this function.</p>
+</div>
+
+<div class="container sect3" id="bf20v55">
+
+<h3 class="title h3">function idm_subgetnamedpassword($name)</h3>
+
+<p class="para">Returns a named password specifed by $name from the Identity Manager engine. The value $null is returned if no such password exists.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bf20v56">
+
+<h2 class="title h2"><span class="number">C.5.3</span> Publisher Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v57" class="xref">function idm_getpublisherparam($paramname)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v58" class="xref">function idm_publishinit($command)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v59" class="xref">function idmpublishvalues($name, $values)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5a" class="xref">function idm_publishvalue($name, $value)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5b" class="xref">function idm_publish</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5c" class="xref">function idm_pubgetnamedpassword($name)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bf20v57">
+
+<h3 class="title h3">function idm_getpublisherparam($paramname)</h3>
+
+<p class="para">Returns the string value for the Publisher parameter specified by the string $paramname.</p>
+</div>
+
+<div class="container sect3" id="bf20v58">
+
+<h3 class="title h3">function idm_publishinit($command)</h3>
+
+<p class="para">Sets the Publisher command specified by $command to return to the driver engine when idm_publish is called.</p>
+</div>
+
+<div class="container sect3" id="bf20v59">
+
+<h3 class="title h3">function idmpublishvalues($name, $values)</h3>
+
+<p class="para">Sets an array of string values for the item specified by $name to be returned to the driver engine when idm_publish is called.</p>
+</div>
+
+<div class="container sect3" id="bf20v5a">
+
+<h3 class="title h3">function idm_publishvalue($name, $value)</h3>
+
+<p class="para">Sets a single string values for the item specified by $name to be returned to the driver engine when idm_publish is called.</p>
+</div>
+
+<div class="container sect3" id="bf20v5b">
+
+<h3 class="title h3">function idm_publish</h3>
+
+<p class="para">Submit the command and item values specified above to the driver engine for Publication to the identity vault.</p>
+</div>
+
+<div class="container sect3" id="bf20v5c">
+
+<h3 class="title h3">function idm_pubgetnamedpassword($name)</h3>
+
+<p class="para">Returns a named password specified by $name from the Identity Manager engine. The value $null is returned if no such password exists.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bf20v5d">
+
+<h2 class="title h2"><span class="number">C.5.4</span> Query Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5e" class="xref">function idm_queryinit</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5f" class="xref">function idm_querysetassociation($association)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5g" class="xref">function idm_querysetsearchroot($searchroot)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5h" class="xref">function idm_queryaddsearchattr($name, $value)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5i" class="xref">function idm_queryaddreadattr($name)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5j" class="xref">function idm_querysetreadparent($readparent)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5k" class="xref">function idm_doquery</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5l" class="xref">function idm_getqueryinstanceassociation</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5m" class="xref">function idm_getqueryinstancedn</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5n" class="xref">function idm_getqueryinstanceclass</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5o" class="xref">function idm_getqueryinstanceparentassociation</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5p" class="xref">function idm_getqueryinstanceparentDN</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5q" class="xref">function idm_getqueryinstanceattrnames</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5r" class="xref">function idm_getqueryinstanceattrcount</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5s" class="xref">function idm_getqueryinstanceattrvalues($attrname)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5t" class="xref">function idm_getqueryinstanceattrvalue($attrname)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bf20v5e">
+
+<h3 class="title h3">function idm_queryinit</h3>
+
+<p class="para">Initializes a query to be submitted to the identity vault with the idm_doquery call. NOTE: Currently only queries that query a single object are supported.</p>
+</div>
+
+<div class="container sect3" id="bf20v5f">
+
+<h3 class="title h3">function idm_querysetassociation($association)</h3>
+
+<p class="para">Specifies the association of the identity vault object to query.</p>
+</div>
+
+<div class="container sect3" id="bf20v5g">
+
+<h3 class="title h3">function idm_querysetsearchroot($searchroot)</h3>
+
+<p class="para">Specifies the DN of the identity vault object to query. Either the objectâs association or DN must be specified. If both are specified, the association value is used by the Identity Manager engine.</p>
+</div>
+
+<div class="container sect3" id="bf20v5h">
+
+<h3 class="title h3">function idm_queryaddsearchattr($name, $value)</h3>
+
+<p class="para">Specifies a search condition to be used for the query, of the form $name=$value. $name specifies an attribute, and $value specifies a value it must match. The query will return only objects matching all specified conditions.</p>
+</div>
+
+<div class="container sect3" id="bf20v5i">
+
+<h3 class="title h3">function idm_queryaddreadattr($name)</h3>
+
+<p class="para">Specifies an attribute name whose values should be returned by the query. By default, all attributes are returned.</p>
+</div>
+
+<div class="container sect3" id="bf20v5j">
+
+<h3 class="title h3">function idm_querysetreadparent($readparent)</h3>
+
+<p class="para">Specifies whether the association and DN of the parent of the queried object should be returned ($readparent is boolean). The default is $False.</p>
+</div>
+
+<div class="container sect3" id="bf20v5k">
+
+<h3 class="title h3">function idm_doquery</h3>
+
+<p class="para">Executes the query with the parameters specified by idm_querysetXXX calls. The function returns $True if an object (called an instance) is returned.</p>
+</div>
+
+<div class="container sect3" id="bf20v5l">
+
+<h3 class="title h3">function idm_getqueryinstanceassociation</h3>
+
+<p class="para">Returns the association for the returned instance.</p>
+</div>
+
+<div class="container sect3" id="bf20v5m">
+
+<h3 class="title h3">function idm_getqueryinstancedn</h3>
+
+<p class="para">Returns the DN for the returned instance. The DN is in slash format, for example: <span class="literal">\ACME\Users\Bob</span>.</p>
+</div>
+
+<div class="container sect3" id="bf20v5n">
+
+<h3 class="title h3">function idm_getqueryinstanceclass</h3>
+
+<p class="para">Returns the class name for the returned instance.</p>
+</div>
+
+<div class="container sect3" id="bf20v5o">
+
+<h3 class="title h3">function idm_getqueryinstanceparentassociation</h3>
+
+<p class="para">Returns the association for instanceâs parent object, if the $readparent flag was specified.</p>
+</div>
+
+<div class="container sect3" id="bf20v5p">
+
+<h3 class="title h3">function idm_getqueryinstanceparentDN</h3>
+
+<p class="para">Returns the DN for instanceâs parent object, if the $readparent flag was specified.</p>
+</div>
+
+<div class="container sect3" id="bf20v5q">
+
+<h3 class="title h3">function idm_getqueryinstanceattrnames</h3>
+
+<p class="para">Returns an array containing the names of the attributes retrieved for the instance. Returns $null if no attributes were retrieved.</p>
+</div>
+
+<div class="container sect3" id="bf20v5r">
+
+<h3 class="title h3">function idm_getqueryinstanceattrcount</h3>
+
+<p class="para">Returns the number of attributes retrieved for the instance.</p>
+</div>
+
+<div class="container sect3" id="bf20v5s">
+
+<h3 class="title h3">function idm_getqueryinstanceattrvalues($attrname)</h3>
+
+<p class="para">Returns an array of values for the attribute with the specified $attrname. Returns $null if no values are available.</p>
+</div>
+
+<div class="container sect3" id="bf20v5t">
+
+<h3 class="title h3">function idm_getqueryinstanceattrvalue($attrname)</h3>
+
+<p class="para">Returns a string value for the attribute with the specified $attrname. If multiple values are available for the attribute, the first one is returned. If no values are available, $null is returned.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bf20v5u">
+
+<h2 class="title h2"><span class="number">C.5.5</span> Heartbeat Functions</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5v" class="xref">function idmheartbeatsuccess($message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5w" class="xref">function idmheartbeaterror($message)</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="bf20v4l.html#bf20v5x" class="xref">function idmheartbeatwarning($message)</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bf20v5v">
+
+<h3 class="title h3">function idmheartbeatsuccess($message)</h3>
+
+<p class="para">Use this function in the <span class="filename">heartbeat.ps1</span> script to indicate a success status of the external application.</p>
+</div>
+
+<div class="container sect3" id="bf20v5w">
+
+<h3 class="title h3">function idmheartbeaterror($message)</h3>
+
+<p class="para">Use this function in the <span class="filename">heartbeat.ps1</span> script to indicate an error status of the external application.</p>
+</div>
+
+<div class="container sect3" id="bf20v5x">
+
+<h3 class="title h3">function idmheartbeatwarning($message)</h3>
+
+<p class="para">Use this function in the <span class="filename">heartbeat.ps1</span> script to indicate a warning status of the external application.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

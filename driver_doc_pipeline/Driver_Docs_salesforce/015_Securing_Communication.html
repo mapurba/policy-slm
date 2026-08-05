@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="secure-communication,driver-for-salesforce,upgrade-driver,manage-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Securing Communication - NetIQ Identity Manager Driver for Salesforce.com Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container chapter expanding expanded" id="secure-communication">
+
+<h1 class="title h1"><span class="number">6.0</span> Securing Communication</h1>
+
+<div class="content_wrapper">
+
+<p class="para">If the remote Web service you are accessing allows HTTPS connections, you can configure the driver to take advantage of this increased security.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em> Only certificates from Java keystore are accepted. So, make sure that the keystore of the certificates is a Java keystore.</p></div>
+
+<p class="para">The Subscriber channel sends information from the Identity Vault to Salesforce.com. To establish a secure connection for the Subscriber channel, you need a trust store containing a certificate issued by the certificate authority that signed the serverâs certificate.</p>
+<p class="para">Import this certificate into a trust store using Javaâs keytool. For more information on keytool, see <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/keytool.html" class="ulink">Keytool - Key and Certificate Management Tool</a>.</p>
+<div class="procedure" id="b8qusb">
+<ol class="steps">
+<li class="step" id="bw1k6n2">
+<p class="para">Import the certificate into your trust store or create a new trust store by entering the following command at the command prompt:</p><pre class="screen">keytool -import -file <span class="replaceable">name_of_cert_file</span> -trustcacerts -noprompt -keystore <span class="replaceable">filename</span> -storepass <span class="replaceable">password</span>        </pre>
+<p class="para">For example:</p><pre class="screen">keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell</pre></li>
+<li class="step" id="bw1k8hv">
+<p class="para">Configure the Subscriber channel to use the trust store you created in <a href="secure-communication.html#bw1k6n2" class="xref">Step 1</a>:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1kswt">
+<p class="para">In Identity Console, click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step" id="bw1kswu">
+<p class="para">On the Driver Dashboard, click the driverâs icon.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Configuration</span> &gt; <span class="guimenu">Driver Settings</span>.</p></li>
+<li class="step" id="bw1kswv">
+<p class="para">In the <span class="guimenu">Truststore file</span> field, specify the path to the trust store you created in <a href="secure-communication.html#bw1k6n2" class="xref">Step 1</a>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1kup8">
+<p class="para">Save.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

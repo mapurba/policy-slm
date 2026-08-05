@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="br3ne7b,babheghf,babheghf,babdhgie,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuration Planning - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="br3ne7b">
+
+<h1 class="title h1"><span class="number">4.1</span> Configuration Planning</h1>
+
+<div class="content_wrapper">
+
+<p class="para">There are a number of issues to resolve in planning for your deployment of the Identity Manager Fan-Out Driver. Considering these issues now will make your installation go more smoothly.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Decide how you will deploy the use of the driver throughout your enterprise.</p>
+<p class="listitem">Do you want to start with a small subset of your platform systems? Do you want to start with a small subset of your user community?</p>
+<p class="listitem">Platforms can operate with Include/Exclude lists to control which users the driver handles for authentication, and which users the driver defers to the native authentication mechanism. Platforms can also operate with Include/Exclude lists to control which user accounts the driver manages using provisioning events and which user accounts are managed locally. For more information, see <a href="bexh6ay.html" class="xref">Section III, Platform Services Planning</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Decide who will administer your driver configuration.</p>
+<p class="listitem">The Web interface is used to monitor and administer the driver. Make it available to these persons and ensure that they have the necessary rights to use it. For details about the rights needed for administrative functions, see <a href="chdijbdi.html#bfnnjh3" class="xref">Rights Required for Web Application Use</a></p></li>
+<li class="listitem">
+<p class="listitem">Decide which eDirectoryâ¢servers in your network will run Core Drivers.</p>
+<p class="listitem">A writable replica of the partition holding the ASAM System container must reside on the LDAP host server used by a Core Driver.</p>
+<p class="listitem">Each object that is covered by a Census Search object must be present in a replica (full or filtered) on the system that hosts the primary Core Driver.</p></li>
+<li class="listitem">
+<p class="listitem">Will you install additional Core Drivers to provide redundancy for Authentication Services?</p>
+<p class="listitem">The Platform Services Process includes load balancing and failover support to provide for continued processing should a Core Driver become unavailable.</p></li>
+<li class="listitem">
+<p class="listitem">Will you install additional Core Drivers to provide redundancy for Identity Provisioning?</p>
+<p class="listitem">The Platform Receiver includes failover support to provide for continued processing if the Core Driver it normally uses for Identity Provisioning becomes unavailable.</p></li>
+<li class="listitem">
+<p class="listitem">Decide where in your eDirectory tree the ASAM System container and ASAM Master User objects should go. Creating a special container for them is a good practice.</p>
+<p class="listitem">Make sure you set password policies appropriate for the ASAM Master User object.</p>
+<p class="listitem">For more information about requirements for the ASAM Master User, see <a href="chdfddgg.html#br3n4sp" class="xref">ASAM Master User Security</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Decide upon your Census parameters.</p>
+<p class="listitem">Which objects in your eDirectory tree will be used as the source of Enterprise Users and Enterprise Groups? This depends on how you place User and Group objects in your directory.</p>
+<p class="listitem">When do you want to run a Census Trawl? Because the Census is maintained in real time using provisioning events, Trawls are used primarily to verify the consistency of the Census. Once a day is reasonable for most cases.</p>
+<p class="listitem">Do you want Enterprise Users whose User objects have been deleted from eDirectory to be automatically removed from the Census? They can be removed after remaining inactive for a specified number of days, or you can choose to manage inactive users manually.</p>
+<p class="listitem">Do you want to delay user password expiration until the end of the day of expiration? This can result in smoother operation for users on platforms with third-party systems that cache and reuse passwords during the day.</p>
+<p class="listitem">Do you want to immediately delete users and groups from platforms when they are deleted from eDirectory or are no longer covered by a Search object, or do you want to provide a grace period to recover from accidental changes?</p>
+<p class="listitem">For information about setting these parameters, see <a href="br3n4tb.html#chdfigcf" class="xref">Configuring the Census</a>.</p></li>
+<li class="listitem">
+<p class="listitem">How will you resolve naming exceptions?</p>
+<p class="listitem">For more information, see <a href="br3n4tb.html#brzmejc" class="xref">Reviewing Naming Exceptions</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Decide which systems in your network will run Platform Services.</p>
+<p class="listitem">User names, passwords, and group names must conform to the character set and length restrictions imposed by the platform operating system in order to participate in Authentication Services and Identity Provisioning on that platform. Determine how you will handle those that do not meet the restrictions.</p></li>
+<li class="listitem">
+<p class="listitem">Decide how you will organize your Platform Sets. Each platform belongs to exactly one Platform Set. A Platform Set provides the relationship between a group of platforms and the Search objects that define their user and group population.</p></li>
+<li class="listitem">
+<p class="listitem">Users and Groups have the same UID number and GID number on each Linux/UNIX platform in a Platform Set.</p>
+<p class="listitem">What UID and GID numbers do you want to reserve for local administrator use on Linux/UNIX platforms?</p>
+<p class="listitem">Will you use the RFC2307 posixAccount and posixGroup auxiliary object classes for enterprise-wide UID and GID assignments?</p></li>
+<li class="listitem">
+<p class="listitem">Will any of your platforms use password replication? If so, you must ensure that the driver is notified of changes to passwords.</p>
+<p class="listitem">If your eDirectory is configured to fully support Universal Password, the driver is notified of password changes in eDirectory.</p>
+<p class="listitem">If you do not use Universal Password, you must install and configure the appropriate password intercepts.</p>
+<p class="listitem">For more information, see <a href="babffihg.html#babdaedd" class="xref">Password Replication Requirements</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Platforms configured to use password replication do not normally receive provisioning events for user accounts until the passwords for these accounts are known to the driver.</p>
+<p class="listitem">The driver uses Universal Password to collect password information. Users must either change their passwords where these are installed and configured, or authenticate on a driver platform before they can be populated onto a platform that uses password replication (Permit Password Replication specified as Yes for the Platform object in the Web interface).</p>
+<p class="listitem">By planning a staged deployment of the Fan-Out Driver to the platforms in your enterprise so that most users have authenticated using other platforms first, you ensure the availability of these users to password replication platforms when you are ready to deploy the driver on them.</p></li>
+<li class="listitem">
+<p class="listitem">Consider how your own applications could benefit from the use of the Authentication Services (AS) Client API.</p>
+<p class="listitem">Using the AS Client API is simple and straightforward. For more information about using the Client API, see <a href="bexh68d.html" class="xref">Section V, API Development</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Will any of your Platform Receiver scripts need attributes other than those configured in the driver by default?</p>
+<p class="listitem">For a list of the attributes configured by default, see <a href="babffihg.html#br3ne7j" class="xref">Core Driver Requirements</a>.</p>
+<p class="listitem">To configure additional attributes, you must add them to the Event Subsystem Subscriber filter. For details about adding attributes to the Subscriber filter, see the <span class="citetitle">Identity Manager Administration Guide</span>.</p>
+<p class="listitem">The attribute names that you use in the Subscriber filter must be the eDirectory names.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

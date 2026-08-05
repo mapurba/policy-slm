@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-add-group-to-an-instance,troubleshooting-jdbc-fan-out-driver-issues,clean-state-file-for-jdbc,driver-does-not-start,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Adding a Group To a Specific Instance - NetIQ Identity Manager Driver for JDBC Fanout Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-add-group-to-an-instance">
+
+<h1 class="title h1"><span class="number">7.10</span> Adding a Group To a Specific Instance</h1>
+
+<div class="content_wrapper">
+
+<p class="para">To add a group to a specific instance perform the following actions:</p>
+<div class="orderedlist">
+        
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">You can either map an existing attribute or you can extend the schema to add new attribute for reading <span class="filename">connection-dns</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The policy is written assuming that the created attribute name as <span class="filename">conn-dn</span>. You need to modify the policy as per the created attribute name.</p></div>
+</li>
+        
+<li class="listitem">
+<p class="listitem">Click <span class="guimenu">Filter</span> and add the created or existing attribute from the list of attributes.</p>
+<div class="orderedlist">
+            
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Click <span class="guimenu">OK</span>.</p></li>
+            
+<li class="listitem">
+<p class="listitem">Select the created or existing attribute and the <span class="guimenu">Subscriber</span> option as <span class="guimenu">Notify</span>.</p></li>
+          </ol></div>
+</li>
+        
+<li class="listitem">
+<p class="listitem">Add the policy under <span class="guimenu">Event Transformation Policies</span>:</p><pre class="screen">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;policy&gt;
+    &lt;rule&gt;
+        &lt;description&gt;Check for GroupAdd With ConnDn&lt;/description&gt;
+        &lt;conditions&gt;
+            &lt;and&gt;
+                &lt;if-class-name mode="nocase" op="equal"&gt;Group&lt;/if-class-name&gt;
+                &lt;if-operation mode="nocase" op="equal"&gt;add&lt;/if-operation&gt;
+                &lt;if-op-attr name="conn-dn" op="available"/&gt;
+            &lt;/and&gt;
+        &lt;/conditions&gt;
+        &lt;actions&gt;
+                &lt;do-set-local-variable name="conn-dn" scope="policy"&gt;
+                    &lt;arg-node-set&gt;
+                        &lt;token-xpath expression="add-attr[@attr-name='conn-dn']/value"/&gt;
+                    &lt;/arg-node-set&gt;
+                &lt;/do-set-local-variable&gt;
+                &lt;do-strip-op-attr name="conn-dn"/&gt;
+                &lt;do-for-each&gt;
+                    &lt;arg-node-set&gt;
+                        &lt;token-local-variable name="conn-dn"/&gt;
+                    &lt;/arg-node-set&gt;
+                    &lt;arg-actions&gt;
+              &lt;do-set-local-variable name="addDoc" scope="policy"&gt;
+                    &lt;arg-node-set&gt;
+                                &lt;token-xml-parse&gt;
+                                    &lt;token-text xml:space="preserve"&gt;&amp;lt;add&gt;&amp;lt;/add&gt;&lt;/token-text&gt;
+                                &lt;/token-xml-parse&gt;
+                    &lt;/arg-node-set&gt;
+                            &lt;/do-set-local-variable&gt;
+                            &lt;do-clone-xpath dest-expression="$addDoc/add" src-expression="@*"/&gt;
+                            &lt;do-set-xml-attr expression="$addDoc/add" name="connection-dn"&gt;
+                                    &lt;arg-string&gt;
+                                        &lt;token-xpath expression="$current-node/text()"/&gt;
+                                    &lt;/arg-string&gt;
+                            &lt;/do-set-xml-attr&gt;
+                            &lt;do-clone-xpath dest-expression=".." src-expression="$addDoc/node()"/&gt;
+                    &lt;/arg-actions&gt;
+                &lt;/do-for-each&gt;
+                &lt;do-strip-xpath expression="."/&gt;
+        &lt;/actions&gt;
+    &lt;/rule&gt;
+&lt;/policy&gt;</pre></li>
+        
+<li class="listitem">
+<p class="listitem">Restart the driver.</p></li>
+        
+<li class="listitem">
+<p class="listitem">Add a group using the <span class="command">ldapadd</span> command.</p>
+<p class="listitem">The following is a sample ldif file for group add:</p><pre class="screen">dn: cn=group_sync_inst,ou=groups,o=data
+objectClass: groupOfNames
+conn-dn: instance1
+conn-dn: instance2
+description: group is a collection of users</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>By using this <span class="filename">ldif</span> file, the group (<span class="filename">group_sync_1inst</span>) is synchronised with the instances <span class="filename">(instance1</span> and <span class="filename">instance2)</span>.</p></div>
+</li>
+      </ol></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

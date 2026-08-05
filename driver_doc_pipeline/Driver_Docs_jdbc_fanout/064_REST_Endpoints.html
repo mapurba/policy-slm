@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="the-jdbc-fan-out-rest-endpoints,netiq-identity-manager-for-jdbc-fan-out-driver-implementation-guide,set-jdbc-fan-out-trace-levels,legal,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>REST Endpoints - NetIQ Identity Manager Driver for JDBC Fanout Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container appendix expanding expanded" id="the-jdbc-fan-out-rest-endpoints">
+
+<h1 class="title h1"><span class="number">D.0</span> REST Endpoints</h1>
+
+<div class="content_wrapper">
+
+<p class="para"><a href="the-jdbc-fan-out-rest-endpoints.html#b1i8cys6" class="xref">Table D-1</a> lists the endpoints that the Fanout agent exposes for performing basic monitoring and management tasks.</p>
+<div class="table" id="b1i8cys6"><p class="title"><em class="num">Table D-1 </em>REST endpoints</p>
+<table class="topbot" width="100%"><col width="25%" /><col width="25%" /><col width="25%" /><col width="25%" />
+          
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Path</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Parameter(s)</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+        
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/config</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{âKEYâ:âVALUEâ,â¦}</p>
+<p class="para">Key-value pair of the parameters received through the GET method call to this endpoint (refer (3))</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Used to set or update the parameter values for the Fanout agent.</p>
+<p class="para">Clients to this endpoint should provide the changed/modified value pairs only.</p>
+<p class="para">Password updates cannot be done through this endpoint. Due to the alternate handling of sensitive data, different endpoints are available for password updates.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/config</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{}None</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Provides the current configuration values of the Fanout agent.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/config/setpassword</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{âOLD_SHIM_PASSWDâ:â...â,âNEW_SHIM_PASSWDâ:â...â,âOLD_AGENT_PASSWDâ:ââ,âNEW_AGENT_PASSWDâ:ââ}All the values must be provided</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Used to set the agent and the shim password on the Fanout agent.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Both the password pairs must be provided. Otherwise, the agent might be locked down that can result in an error at startup. This is because one of the passwords is used for encrypting the other and hence the dependency.</p></div>
+
+<p class="para">There are no endpoints for fetching the password.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/config/setkspassword</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{âPASSWORDâ:â...â}</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sets the keystore password for the command server.</p>
+<p class="para">The keystore contains a self-signed certificate created by the Fanout agent at the initial startup.</p>
+<p class="para">A user provided keystore with a certificate can also be used.</p>
+<p class="para">The certificate is used for securing the endpoint transport. An option exists to disable the SSL, which is not the recommended/default option.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/service</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{}None</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Retrieves the list of connected system services (shims) in the Fanout agent. Both running and stopped shims are reported in the response of this endpoint.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/service/{state}</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{}NonePossible values for state are RUNNING or STOPPED</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Provides the list of connected system services (shims) in the Fanout agent based on the service state.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Legal values are <span class="strong">RUNNING</span> and <span class="strong">STOPPED</span>.</p></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/service/cmd/stop/{serviceId}</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{}NoneServiceId returned by the GET service endpoint</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Used to start a currently stopped service.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/service/cmd/start/{serviceId}</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{}NoneServiceId returned by the GET service endpoint</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Used to start a currently stopped service.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                <span class="filename">/fanoutagent/shutdown</span>
+              </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">{}None</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Used to shutdown a Fanout agent instance.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>When this endpoint is invoked, the agent instance will shutdown.</p></div>
+
+<p class="para">This means that all further communication with the agent will cease. Further communication will resume only after the agent is started by logging into the computer hosting the agent.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">/<span class="filename">config/setEncryptionkey</span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

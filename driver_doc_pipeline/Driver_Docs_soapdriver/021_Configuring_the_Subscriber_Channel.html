@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="configure-subscriber-channel,secure-communication,configure-publisher-channel,manage-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring the Subscriber Channel - NetIQ Identity Manager Driver for SOAP Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="configure-subscriber-channel">
+
+<h1 class="title h1"><span class="number">6.2</span> Configuring the Subscriber Channel</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel sends information from the Identity Vault to the Web service. To establish a secure connection for the Subscriber channel, you need a trust store containing a certificate issued by the certificate authority that signed the serverâs certificate. See <a href="configure-publisher-channel.html" class="xref">Configuring the Publisher Channel</a> for an example.</p>
+<div class="procedure" id="b8qusb">
+<ol class="steps">
+<li class="step" id="bs9f2lf">
+<p class="para">Make sure you have a server certificate signed by a certificate authority.</p></li>
+<li class="step" id="bw1k6n2">
+<p class="para">Import the certificate into your trust store or create a new trust store by entering the following command at the command prompt:</p><pre class="screen">keytool -import -file <span class="replaceable">name_of_cert_file</span> -trustcacerts -noprompt -keystore <span class="replaceable">filename</span> -storepass <span class="replaceable">password</span>        </pre>
+<p class="para">For example:</p><pre class="screen">keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell</pre>
+<p class="para">For more information on keytool, see <a href="https://docs.oracle.com/javase/7/docs/technotes/tools/windows/keytool.html" class="ulink">Keytool - Key and Certificate Management Tool</a>.</p></li>
+<li class="step" id="bw1k8hv">
+<p class="para">Configure the Subscriber channel to use the trust store you created in <a href="configure-subscriber-channel.html#bw1k6n2" class="xref">Step 2</a>:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1kswt">
+<p class="para">In Identity Console, in the <span class="guimenu">Identity Manager</span> frame, click <span class="guimenu">IDM Administration</span>.</p></li>
+<li class="step" id="bw1kswu">
+<p class="para">Locate the driver set containing the SOAP driver, then click the driverâs icon to display the configuration page.</p></li>
+<li class="step" id="bw1kswv">
+<p class="para">Go to <span class="guimenu">Configuration</span> &gt; <span class="guimenu">Driver Parameters</span>, then go to <span class="guimenu">Subscriber Settings</span>.</p></li>
+<li class="step" id="bw1k9bh">
+<p class="para">In the <span class="guimenu">Keystore File</span>, specify the path to the trust store you created in <a href="configure-subscriber-channel.html#bw1k6n2" class="xref">Step 2</a>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1kup8">
+<p class="para">Click <span class="guimenu">Apply</span>, then click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>To use TLSv1 instead of SSLv3 in the HTTP client, change the JVM setting for the driver by using one of the following methods:</p>
+<p class="para">In <span class="guimenu">Designer</span>, right-click the <span class="guimenu">driver set</span> containing this driver. Click <span class="guimenu">Properties &gt;Java</span> and set the <span class="guimenu">JVM option</span> as Dhttps.protocols=TLSv1 in the window that opens up. Click <span class="guimenu">Apply</span> and then click <span class="guimenu">OK</span>.</p>
+<p class="para">In <span class="guimenu">Identity Console</span>, click <img src="../graphics/action_menu.png" alt="" class="inline" />, go to <span class="guimenu">Driver Set properties</span> page, click <span class="guimenu">Driver set configuration &gt; Java Environment Parameters</span> tab and set the <span class="guimenu">JVM option</span> as <span class="filename">Dhttps.protocols=TLSv1</span>.</p>
+<p class="para">If the driver is using the Remote Loader, set the -javaparam option to DHOST_JVM_OPTIONS=-Dhttps.protocols=TLSv1 in the configuration file.</p>
+<p class="para">A driver with this setting will always initiate a connection only through the TLSv1 protocol and will not connect to servers using SSlv3 protocol.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

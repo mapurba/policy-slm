@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-use-stored-procedures-and-modes-in-jdbc,sybase-chain-modes-and-identity-manager-jdbc-driver,list-of-error-codes-sybase-jdbc,jdbc-driver-properties,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Procedures and Modes - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-use-stored-procedures-and-modes-in-jdbc">
+
+<h1 class="title h1"><span class="number">N.2</span> Procedures and Modes</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-use-stored-procedures-and-modes-in-jdbc.html#b6tdxdp" class="xref">Using Stored Procedure sp_proxmode</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-use-stored-procedures-and-modes-in-jdbc.html#b6te18b" class="xref">Chained and Unchained Modes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-use-stored-procedures-and-modes-in-jdbc.html#b6tef86" class="xref">Managing Transactions in a Policy</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-use-stored-procedures-and-modes-in-jdbc.html#b6tegn4" class="xref">Useful Links</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6tdxdp">
+
+<h2 class="title h2"><span class="number">N.2.1</span> Using Stored Procedure sp_proxmode</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The preferred way to avoid errors 7112 and 7113 is to alter all stored procedures invoked directly or indirectly by the driver (via triggers, for example) to run in both chained and unchained mode. To alter a procedure, invoke the sp_procxmode procedure with two arguments:.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The procedure name</p></li>
+<li class="listitem">
+<p class="listitem">The mode</p></li></ul></div>
+
+<p class="para">The following example illustrates how to invoke the sp_procxmode procedure from the isql command line:</p>
+<p class="para">client:<span class="literal">sp_procxmode my_procedure, anymode go</span></p>
+<p class="para">Of course, not all customers are willing to alter stored procedure modes. Altering a procedure's mode might alter its runtime behavior, which could alter the behavior of other applications that invoke the procedure.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6te18b">
+
+<h2 class="title h2"><span class="number">N.2.2</span> Chained and Unchained Modes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Unchained mode is Sybase's native way of executing SQL. A second mode, chained mode, was later added to make the database compatible with SQL standards.</p>
+<div class="table" id="b6te241"><p class="title"><em class="num">Table N-1 </em>Modes and Compatibility</p>
+<table class="topbot" width="95%"><col width="22%" /><col width="78%" />
+              
+<tr class="headerrow" id="b6te60c"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Mode</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Compatibility</p></th>
+</tr>
+            
+<tr class="oddrow" id="b6te60d"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Chained</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SQL-compatible mode</p></td>
+</tr>
+<tr class="evenrow" id="b6te60e"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Unchained</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sybase native mode</p></td>
+</tr></table>
+</div>
+
+<p class="para">Sybase provides a third-party JDBC driver called jConnect. The default mode of jConnect is unchained. Whenever the method Connection.setAutoCommit(boolean autoCommit):void is invoked, jConnect switches modes. See <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/sql/Connection.html" class="ulink">java.sql Interface Connection</a>.</p>
+<div class="table" id="b6te60f"><p class="title"><em class="num">Table N-2 </em>Methods and Switches</p>
+<table class="topbot" width="95%"><col width="43%" /><col width="57%" />
+              
+<tr class="headerrow" id="b6te60g"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Effect</p></th>
+</tr>
+            
+<tr class="oddrow" id="b6te60h"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Connection.setAutoCommit(true)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Switches to unchained mode</p></td>
+</tr>
+<tr class="evenrow" id="b6te60i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Connection.setAutoCommit(false)</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Switches to chained mode</p></td>
+</tr></table>
+</div>
+
+<p class="para">If the <a href="configure-jdbc-driver-specific-parameters.html#b1pu3m7" class="xref">Use Manual Transactions?</a> parameter is set to <span class="guimenu">False</span>, the driver invokes Connection.setAutoCommit(true). That is, the driver enters unchained mode. This is the normal processing mode for SELECT statements and SQL embedded in a policy where the transaction type is set to <span class="literal">auto</span>. See <a href="manual-and-automatic-jdbc-transactions.html" class="xref">Manual vs. Automatic Transactions</a>. When the driver is in this state, any chained stored procedures invoked directly or indirectly by the driver yield the 7112 error.</p>
+<p class="para">If the <a href="configure-jdbc-driver-specific-parameters.html#b1pu3m7" class="xref">Use Manual Transactions?</a> parameter is set to <span class="guimenu">True</span>, the driver invokes Connection.setAutoCommit(false). That is, the driver enters chained mode. This is the normal processing mode for all statements except SELECT statements and SQL embedded in a policy where the transaction type is set to <span class="literal">manual</span>. See <a href="manual-and-automatic-jdbc-transactions.html" class="xref">Manual vs. Automatic Transactions</a>. When the driver is in this state, any unchained stored procedures invoked directly or indirectly by the driver yield the 7113 error.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6tef86">
+
+<h2 class="title h2"><span class="number">N.2.3</span> Managing Transactions in a Policy</h2>
+
+<div class="content_wrapper">
+
+<p class="para">For information on managing transactions in a policy, see <a href="manual-and-automatic-jdbc-transactions.html" class="xref">Manual vs. Automatic Transactions</a></p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6tegn4">
+
+<h2 class="title h2"><span class="number">N.2.4</span> Useful Links</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><a href="http://manuals.sybase.com/onlinebooks/group-as/asg1250e/sqlug/@Generic__BookTextView/55096;hf=0;pt=55096#X" class="ulink">Transaction modes and stored procedures</a> in the <span class="citetitle">Transact-SQL User's Guide</span></p></li>
+<li class="listitem">
+<p class="listitem"><a href="http://manuals.sybase.com/onlinebooks/group-as/asg1250e/sqlug/@Generic__BookTextView/53713;pt=53001" class="ulink">Selecting the transaction mode and isolation level</a> in the <span class="citetitle">Transact-SQL User's Guide</span></p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

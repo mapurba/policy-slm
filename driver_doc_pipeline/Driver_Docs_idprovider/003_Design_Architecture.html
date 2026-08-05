@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="design-architecture-of-id-provider-driver-for-identity-manager,introduction-to-identity-manager-id-provider,why-id-provider-driver-for-identity-manager,schema-architecture-of-id-provider-driver-for-identity-manager,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Design Architecture - NetIQ Driver for ID Provider Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="design-architecture-of-id-provider-driver-for-identity-manager">
+
+<h1 class="title h1"><span class="number">1.2</span> Design Architecture</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Identity Manager drivers listen for events and then apply the proper Identity Manager policies for the event. That information is then passed to the Identity Manager engine that executes the policies.</p>
+<p class="para">The ID Provider driver is different from all other Identity Manager drivers. It also listens for events, but it has two sets of policies: the Identity Manager policies and the ID Provider policies. The ID Provider policies allow the driver to generate and assign unique IDs to objects.</p>
+<p class="para">The driver has three major components:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bccwj5x">
+            <p class="title"><em class="title">ID Client:</em>
+            The ID client communicates with the ID Provider driver to obtain a unique ID. The client can be another Identity Manager driver (for example, the WorkOrder driver) or a standalone Java application.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="bccxx6c">
+            <p class="title"><em class="title">ID Provider Driver:</em>
+            The driver receives ID requests from clients, generates unique IDs that are stored in the Identity Vault, and passes the unique IDs back to the client. The driver uses LDAP to access the Identity Vault and uses Java RMI (Remote Method Invocation) to communicate with ID clients.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="bccxx6d">
+            <p class="title"><em class="title">Identity Vault:</em>
+            The Identity Vault provides the location for storing unique IDs and also contains the policies used to generate the IDs. All IDs and policies are stored in the ID Policy Container.</p>
+          </div>
+</li></ul></div>
+
+<p class="para">The ID Provider driver can be used in two different scenarios:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="design-architecture-of-id-provider-driver-for-identity-manager.html#bcg4j7d" class="xref">Scenario 1: Using the Identity Vault to Store the ID Provider Policies</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="design-architecture-of-id-provider-driver-for-identity-manager.html#bcg4jgj" class="xref">Scenario 2: Using an LDAP Database to Store the ID Provider Policies</a>
+          </p></li></ul></div>
+
+<h4 class="bridgehead" id="bcg4j7d">Scenario 1: Using the Identity Vault to Store the ID Provider Policies</h4>
+
+<p class="para">This is the most commonly used scenario for this driver. The ID Provider policies are created and stored in the Identity Vault when the driver is created and configured. <a href="design-architecture-of-id-provider-driver-for-identity-manager.html#bctvxbj" class="xref">Figure 1-1</a> shows how a unique ID is generated.</p>
+<div class="figure" id="bctvxbj"><p class="title"><em class="num">Figure 1-1 </em>Identity Vault Stores the ID Provider Policies</p>
+            <img src="../graphics/idm_sen1_edir_a.png" alt="" />
+          </div>
+
+<div class="orderedlist">
+        
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">A new User object is created in the Identity Vault, then the ID Provider driver picks up the Create event.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The ID Provider driver reads the last ID that was generated from the ID Provider policies in the Identity Vault and generates a new ID. The ID is then written back to the ID Provider policies in the Identity Vault to track the unique IDs.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The ID Provider driver then assigns the new ID to the new User object.</p></li>
+      </ol></div>
+
+<p class="para">All events are tracked and stored in the Identity Vault.</p>
+<h4 class="bridgehead" id="bcg4jgj">Scenario 2: Using an LDAP Database to Store the ID Provider Policies</h4>
+
+<p class="para">This scenario allows you to use an LDAP database to store the ID Provider policies instead of using the Identity Vault. <a href="design-architecture-of-id-provider-driver-for-identity-manager.html#bctvyau" class="xref">Figure 1-2</a> shows how a unique ID is generated with the LDAP database.</p>
+<div class="figure" id="bctvyau"><p class="title"><em class="num">Figure 1-2 </em>LDAP Database Stores the ID Provider Policies</p>
+            <img src="../graphics/idm_sen1_ldap_a.png" alt="" />
+          </div>
+
+<div class="orderedlist">
+        
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">A new User object is created in the Identity Vault, then the ID Provider driver picks up the Create event.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The ID Provider driver reads the last ID that was generated from the ID Provider policies in the LDAP database and generates a new ID. The ID is then written back to the ID Provider policies in the LDAP database to track the unique IDs.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The ID Provider driver then assigns the new ID to the new User object in the Identity Vault.</p></li>
+      </ol></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

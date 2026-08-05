@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="understanding-security-best-practices-for-identity-manager-sap-portal-driver,bookinfo,configuring-sap-system-for-identity-manager-sap-portal-driver,managing-identity-manager-sap-portal-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Security Best Practices - NetIQ Identity Manager Driver for SAP Portal Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container chapter expanding expanded" id="understanding-security-best-practices-for-identity-manager-sap-portal-driver">
+
+<h1 class="title h1"><span class="number">7.0</span> Security Best Practices</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section contains a description of the security parameters unique to the SAP Portal driver.</p>
+<p class="para">For additional information about securing your Identity Manager system, see the <a href="../../../identity-manager-48/security/data/identity-manager-security-guide.html#identity-manager-security-guide" class="ulink">NetIQ Identity Manager Security Guide</a>.</p>
+<p class="para">To increase security, use the following procedure to configure the SAP Portal driver to communicate over HTTPS, then create a secure connection for it to use.</p>
+<p class="para">To create a secure connection:</p>
+<div class="procedure" id="b8qusf">
+<ol class="steps">
+<li class="step" id="bw1k1td">
+<p class="para">Create a server certificate in Identity Console:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1k2qa">
+<p class="para">Click <span class="guimenu">Certificate Management</span> &gt; <span class="guimenu">Server Certificate Management</span>.</p></li>
+<li class="step" id="bw1k31m">
+<p class="para">Click <span class="guimenu">+</span> to create server certificate.</p></li>
+<li class="step" id="b1k4oxh">
+<p class="para">Specify the server and a certificate nickname.</p></li>
+<li class="step" id="bw1k369">
+<p class="para">Select <span class="guimenu">Standard</span> as the creation method, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bw1k3bx">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1k1wf">
+<p class="para">Export this self-signed certificate from the certificate authority in eDirectory.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1k3ix">
+<p class="para">Click <span class="guimenu">Certificate Management</span> &gt; <span class="guimenu">CA Management</span>.</p></li>
+<li class="step" id="bw1k3on">
+<p class="para">On the <span class="guimenu">Certificates</span> tab, select the check box for the certificate you have created.</p></li>
+<li class="step" id="bw1k3w8">
+<p class="para">Click <span class="guimenu">Export CA Certificate</span>.</p></li>
+<li class="step" id="bw1k479">
+<p class="para">Depending on the client to be accessing the Web service, select either the export format, <span class="guimenu">DER</span> or <span class="guimenu">Base64</span> for the certificate, then click <span class="guimenu">OK</span>.</p></li>
+<li class="step" id="bw1k4am">
+<p class="para">Click <span class="guimenu">Save the exported file</span>.</p></li>
+<li class="step" id="b1k4szb">
+<p class="para">Save the downloaded certificate to a known location in your computer.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1k21x">
+<p class="para">Import the self-signed certificate into the clientâs trust store:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1k5gw">
+<p class="para">Use the keytool executable that is included with any Java JDK.</p>
+<p class="para">For more information on keytool, see <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/keytool.html" class="ulink">Keytool - Key and Certificate Management Tool</a>.</p></li>
+<li class="step" id="bw1kz7n">
+<p class="para">Import the certificate into your trust store or create a new trust store by entering the following command at a command prompt:</p><pre class="screen">keytool -import -file <span class="replaceable">name_of_cert_file</span> -trustcacerts -noprompt 
+-keystore <span class="replaceable">filename</span> -storepass <span class="replaceable">password</span>        </pre>
+<p class="para">For example:</p><pre class="screen">keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell</pre></li></ol>
+</div>
+</li>
+<li class="step" id="bj24yq9">
+<p class="para">Configure the Subscriber channel to use the trust store you created in <a href="understanding-security-best-practices-for-identity-manager-sap-portal-driver.html#bw1k21x" class="xref">Step 3</a>:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bj24yqa">
+<p class="para">In Identity Console, click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step" id="bj24yqb">
+<p class="para">On the Driver Dashboard, click the driverâs icon.</p></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Configuration</span> &gt; <span class="guimenu">Subscriber Settings</span>.</p></li>
+<li class="step" id="bj24yqc">
+<p class="para">Specify the path to the trust store you created in <a href="understanding-security-best-practices-for-identity-manager-sap-portal-driver.html#bw1k21x" class="xref">Step 3</a> in the <span class="guimenu">Truststore file</span> field.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1kuwa">
+<p class="para">Save.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

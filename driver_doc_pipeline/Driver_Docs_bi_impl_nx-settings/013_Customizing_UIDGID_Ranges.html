@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3gdtex,b3fxjjl,b3gepk9,b3gfhyh,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Customizing UID/GID Ranges - NetIQ Linux and UNIX Settings Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3gdtex">
+
+<h1 class="title h1"><span class="number">5.2</span> Customizing UID/GID Ranges</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can assign UID and GID numbers from a style sheet in the driver. Alternatively, you can use the LUM Linux/UNIX Config object to assign UID and GID numbers. For details about using the LUM Linux/UNIX Config object, see the <span class="citetitle">Linux User Management Technology Guide</span>, which is available from the <a href="http://www.novell.com/documentation/oes/index.html" class="ulink">NetIQÂ® OES documentation Web site</a>.</p>
+<p class="para">UID and GID ranges are defined in the NxSettings style sheet. You can edit this style sheet to modify the ranges that UIDs and GIDs are allocated from.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ge7pg">
+
+<h2 class="title h2"><span class="number">5.2.1</span> Editing UID/GID Ranges</h2>
+
+<div class="content_wrapper">
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>The NxSettings style sheet holds the last assigned UID and GID number. Stop the driver before you edit this document. Failure to stop the driver before editing this document could result in the same UID or GID being assigned to multiple users or groups.</p></div>
+
+<div class="procedure" id="b3ge1u2">
+<p class="para">To edit the NxSettings style sheet:</p>
+<ol class="steps">
+<li class="step" id="b3ge1u3">
+<p class="para">Open iManager and navigate to the Driver Overview page for the Linux and UNIX Settings driver.</p></li>
+<li class="step" id="b3ge2kp">
+<p class="para">Click the <span class="guimenu">View All Policies</span> icon <img src="../graphics/viewallpoliciesicon_n.png" alt="" class="inline" /> to display the View All Policies dialog box.</p></li>
+<li class="step" id="b3ge5vf">
+<p class="para">Click the link to the NxSettings Stylesheet object under the <span class="guimenu">Identity Manager Driver</span> heading to display the NxSettings style sheet, then click <span class="guimenu">Enable XML editing</span>.</p></li>
+<li class="step" id="b3ge6xr">
+<p class="para">Make changes as desired. For details, see <a href="b3gdtex.html#b3ge7z6" class="xref">NxSettings Style Sheet Details</a>.</p></li>
+<li class="step" id="b3ge780">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ge7z6">
+
+<h2 class="title h2"><span class="number">5.2.2</span> NxSettings Style Sheet Details</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The initial NxSettings style sheet is similar to the following example:</p><pre class="screen">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;nxSettings&gt;
+  &lt;settings name="DefaultSet"&gt;
+    &lt;setting name="uid" type="range"&gt;
+      &lt;ranges last-used="0"&gt;
+        &lt;range end="1000" start="400"/&gt;
+      &lt;/ranges&gt;
+    &lt;/setting&gt;
+    &lt;setting name="gid" type="range"&gt;
+      &lt;ranges last-used="0"&gt;
+        &lt;range end="1000" start="400"/&gt;
+      &lt;/ranges&gt;
+    &lt;/setting&gt;
+  &lt;/settings&gt;
+&lt;/nxSettings&gt;</pre>
+<p class="para">You can change the start and end attributes of a range tag and the last-used attribute for the ranges tag. (Because the attributes are stored in alphabetical order, the end attribute of a range element is listed before the start attribute.)</p>
+<p class="para">You can add ranges by adding more range tags as shown in the following example:</p><pre class="screen">&lt;ranges last-used="0"&gt;
+  &lt;range end="1000" start="400"/&gt;
+  &lt;range end="2000" start="1001"/&gt;
+  &lt;range end="5000" start="3000"/&gt;
+&lt;/ranges&gt;</pre>
+<p class="para">Ranges do not need to be contiguous. If there are gaps, the driver skips over them. If the value of the last-used attribute falls outside of all ranges, then the next number is assigned from the range with the next start value. In the preceding example, the next number assigned is 400. The value assigned after 2000 is 3000.</p>
+<p class="para">You can also add more settings and setting tags to the style sheet for your own purposes. Do not reuse the setting name <span class="literal">DefaultSet</span>.</p>
+<p class="para">For details about retrieving values with a policy, see <a href="b3gy8qc.html" class="xref">Retrieving Values with a Policy</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="removing-the-driver-from-a-remote-edir-server,preparing-the-connected-system,installing-the-change-log-module-on-remote-edirectory-server,creating-a-new-driver-object,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Removing the Driver from a Remote eDirectory Server - NetIQ Driver for Bidirectional eDirectory Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="removing-the-driver-from-a-remote-edir-server">
+
+<h1 class="title h1"><span class="number">3.3</span> Removing the Driver from a Remote eDirectory Server</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver includes a new change-log utility, <span class="filename">clutil</span>. This utility allows you to remove change-log entries on a remote eDirectory server for bidirectional driver shims connected to it. Removing change-log entries removes the selected driver entry from the change-log in the remote eDirectory and removes the cache files.</p>
+<p class="para">On Linux, the Identity Manager install program installs this utility as a part of the <span class="filename">novell-DXMLChlgx.rpm</span> file. To configure it on an eDirectory server, locate the <span class="filename">clutil</span> script in the <span class="filename">/opt/novell/eDirectory/bin</span> location.</p>
+<p class="para">On Windows, this utility is provided with other deliverables for the <span class="filename">Dirxml-ChangeLog</span> file on the Identity Manager media. Create a <span class="filename">lib</span> directory in the location where eDirectory is installed (for example: <span class="filename">C:\Novell\NDS\</span>), and copy the <span class="filename">clutil.jar</span> file into it.</p>
+<p class="para">To run the utility, do the following:</p>
+<div class="procedure" id="b1bd1cve">
+<ol class="steps">
+<li class="step">
+<p class="para">Set PATH to a valid location where java is installed.</p>
+<p class="para">For example:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Linux:</em>
+                
+                  <span class="filename">/opt/novell/eDirectory/lib64/nds-modules/embox/jre/bin</span>
+                </p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Windows:</em>
+                
+                  <span class="filename">C:\novell\NDS\embox\jre\bin</span>
+                </p>
+              </div>
+</li></ul></div>
+</li>
+<li class="step" id="b1bd1cvf">
+<div class="formalpara" id="b1bjutyb">
+            <p class="title"><em class="title">On Linux:</em>
+            Provide the execute permission to the <span class="filename">clutil</span> file if not already provided, and run the <span class="filename">clutil</span> command.</p>
+          </div>
+
+<div class="formalpara" id="b1bjutyc">
+            <p class="title"><em class="title">On Windows:</em>
+            Browse to the eDirectory installation folder (For example, <span class="filename">C:\Novell\NDS\</span>) and run the <span class="filename">clutil.bat</span> file.</p>
+          </div>
+
+<p class="para">Running this utility displays the list of change-log driver entries configured for the eDirectory server. This list shows a mapping of the driver names to their respective driver entries.</p></li>
+<li class="step" id="b1bd1eqm">
+<p class="para">Stop the driver shim, then select the serial number corresponding to the change-log entry of the driver that you want to remove.</p></li>
+<li class="step" id="b1bdi48n">
+<p class="para">When prompted for credentials, enter the administrator user credentials in LDAP format and the password. This is the same administrator user account used during driver configuration.</p>
+<p class="para">This deletes the driver entry, TAO files, and updates the configuration.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>If the remote eDirectory server is installed on Windows, you must delete the TAO file manually after shutting down eDirectory. This is because <span class="filename">ndsd</span> process locks the TAO file and <span class="filename">clutil</span> utility cannot delete it. However, when the TAO file is deleted, you can no longer use the corresponding driver because the driver fails to establish a successful connection with the remote eDirectory.</p></div>
+</li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

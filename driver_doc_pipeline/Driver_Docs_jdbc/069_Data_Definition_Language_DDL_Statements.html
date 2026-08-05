@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-execute-ddl-statements-in-jdbc-driver,embed-sql-statements-in-xds-events-for-jdbc-driver,how-sql-queries-work-in-jdbc-driver,logical-operations-in-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Data Definition Language (DDL) Statements - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-execute-ddl-statements-in-jdbc-driver">
+
+<h1 class="title h1"><span class="number">12.9</span> Data Definition Language (DDL) Statements</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Generally, it is not possible to run a Data Definition Language (DDL) statement in a database trigger because most databases do not allow mixed DML and DDL transactions. Although virtual triggers do not overcome this transactional limitation, they do allow DDL statements to be executed as a side effect of an XDS event.</p>
+<p class="para">For example:</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr"&gt;
+        &lt;add-attr name="fname"&gt;
+            &lt;value&gt;John&lt;/value&gt;
+        &lt;/add-attr&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+    &lt;/add&gt;
+    &lt;<span class="strong">jdbc:statement</span>&gt;
+        &lt;<span class="strong">jdbc:sql&gt;CREATE USER jdoe IDENTIFIED BY novell&lt;/jdbc:sql</span>&gt;
+    &lt;<span class="strong">/jdbc:statement</span>&gt;
+&lt;/input&gt;    </pre>
+<p class="para">This XML resolves to:</p><pre class="screen">SET AUTOCOMMIT OFF
+INSERT INTO indirect.usr(fname, lname) VALUES('John', 'Doe');
+COMMIT; -- explicit commit
+SET AUTOCOMMIT ON
+CREATE USER jdoe IDENTIFIED BY novell;
+-- implicit commit</pre>
+<p class="para">Using the <span class="literal">jdbc:transaction-id</span> and <span class="literal">jdbc:transaction-type</span> attributes to group DML and DDL statements into a single transaction causes the transaction to be rolled back on most databases. Because DDL statements are generally executed as separate transactions, it is possible that the <span class="literal">insert</span> statement in the above example might succeed and the create user statement might roll back.</p>
+<p class="para">It is not possible, however, that the <span class="literal">insert</span> statement fails and the <span class="literal">create user</span> statement succeeds. The driver stops executing chained transactions at the point where the first transaction is rolled back.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

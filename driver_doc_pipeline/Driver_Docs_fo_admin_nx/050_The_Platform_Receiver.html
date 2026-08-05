@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="babdcabj,brf3jh7,babggagc,babfadac,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>The Platform Receiver - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="babdcabj">
+
+<h1 class="title h1"><span class="number">8.8</span> The Platform Receiver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Platform Receiver obtains provisioning events from the Event Journal Services component of the Core Driver. The Platform Receiver examines each event and the current status of users and groups on the platform. Then the Platform Receiver calls Receiver scripts as necessary to perform needed changes. On password replication platforms, the Platform Receiver also updates the local password store.</p>
+<p class="para">The Platform Receiver provides failover support for connections to Event Journal Services.</p>
+<p class="para">The Platform Receiver obtains configuration information, such as its mode of operation and the location of the Core Driver, from the platform configuration file. For additional information about the platform configuration file, see <a href="beibfiae.html" class="xref">Section 10.0, The Platform Configuration File</a>.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="babfijbb">
+
+<h2 class="title h2"><span class="number">8.8.1</span> Modes of Operation</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Platform Receiver can be configured to obtain and process provisioning events in five different modes.</p>
+<div class="container sect3" id="babhfgff">
+
+<h3 class="title h3">Full Sync Mode</h3>
+
+<p class="para">In Full Sync Mode, the Platform Receiver connects to Event Journal Services and requests a Full Sync. Event Journal Services provides, and the Platform Receiver processes, a complete set of provisioning events to populate the users and groups for the platform. Then the Platform Receiver ends.</p>
+<p class="para">The first time a Platform Receiver is run for a new platform, it automatically receives provisioning events for all users and groups for the platform. If this process is interrupted, processing resumes the next time the Platform Receiver is run. There is no need to run the Platform Receiver in Full Sync Mode during routine installation.</p>
+<p class="para">You can run the Platform Receiver in Full Sync Mode to recover from a disaster on the platform that affects the user or group population.</p>
+<p class="para">You can run the Platform Receiver in Full Sync Mode any other time as appropriate to ensure that the user and group population on the platform is consistent with eDirectory.</p>
+<p class="para">If a Full Sync operation is interrupted, the provisioning process resumes the next time the Platform Receiver is run in Persistent Mode, Polling Mode, or Scheduled Mode. Do not start the Platform Receiver in Full Sync Mode to recover from an interrupted Full Sync operation, because Full Sync processing starts from the beginning each time.</p>
+</div>
+
+<div class="container sect3" id="brf3j94">
+
+<h3 class="title h3">Check Mode</h3>
+
+<p class="para">Check Mode functions similarly to Full Sync Mode, except that Receiver scripts are invoked in Check Mode. In Check Mode, the base scripts take no actions to alter the user or group population on the platform.</p>
+<p class="para">If you extend the base scripts, take no actions that alter the user or group population while Check Mode is in effect.</p>
+<p class="para">Operation in Check Mode does not affect the queue of pending events maintained by Event Journal Services for the platform.</p>
+<p class="para">Check Mode is useful for testing your extensions to Receiver scripts.</p>
+<p class="para">You can use Check Mode at any time to verify that the user and group population on the platform is consistent with eDirectory.</p>
+</div>
+
+<div class="container sect3" id="brf3j95">
+
+<h3 class="title h3">Persistent Mode</h3>
+
+<p class="para">In Persistent Mode, the Platform Receiver connects to Event Journal Services, obtains queued provisioning events, and processes them. It then remains connected, processing additional events as they become available.</p>
+</div>
+
+<div class="container sect3" id="brf3j96">
+
+<h3 class="title h3">Polling Mode</h3>
+
+<p class="para">In Polling Mode, the Platform Receiver connects to Event Journal Services, obtains queued provisioning events, and processes them. The Platform Receiver then closes the connection, waits for five minutes, and repeats the process until you stop it. For details about specifying the interval between polling cycles, see <a href="beiffigc.html#brg3ye0" class="xref">POLLINT Statement</a> and <a href="beiffigc.html#bhf0ja6" class="xref">POLLRAND Statement</a>.</p>
+</div>
+
+<div class="container sect3" id="brf3j97">
+
+<h3 class="title h3">Scheduled Mode</h3>
+
+<p class="para">In Scheduled Mode, the Platform Receiver connects to Event Journal Services, obtains queued provisioning events, and processes them. It then closes the connection and ends. Scheduled Mode is designed for use with external job schedulers, such as the UNIX cron utility.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="babjheej">
+
+<h2 class="title h2"><span class="number">8.8.2</span> Selecting a Mode of Operation</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You specify the mode of operation for the Platform Receiver through the <span class="literal">RUNMODE</span> statement in the platform configuration file or through a command line parameter. For details about specifying the <span class="literal">RUNMODE</span> statement, see <a href="beiffigc.html#chdihjdd" class="xref">RUNMODE Statement</a>.</p>
+<p class="para">You can periodically run the Platform Receiver in Full Sync Mode to ensure that accounts on the platform are consistent with eDirectory.</p>
+<p class="para">For routine operations, we recommend that, unless you need the real-time processing of events provided by Persistent Mode, you run the Platform Receiver in Polling Mode or Scheduled Mode. This reduces the number of concurrent connections that must be serviced by the Core Driver host. The frequency of change activity in the population, the operating schedule of the platform, and the nature of the connection between the platform and the Core Driver should help you determine which of these modes to use.</p>
+<p class="para">You can use Check Mode for testing extensions to Receiver scripts.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

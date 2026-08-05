@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="modify-policies,customize-driver-using-policies-filters,modify-default-settings-policies-filter,setting-groupwise-client-options,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Modifying Policies - NetIQ Identity Manager Driver for GroupWise Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="modify-policies">
+
+<h1 class="title h1"><span class="number">5.3</span> Modifying Policies</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can modify the existing driver policies to perform additional functionality.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#ad8q7uj" class="xref">Specifying the GroupWise Post Office</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#ad8a401" class="xref">Configuring the GroupWise UserID</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#ad8svzj" class="xref">Creating Mappings for Additional Attributes</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#br4u4ut" class="xref">Getting a Record Count from a Query</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#ae01co4" class="xref">Creating a GroupWise Nickname</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#br586mk" class="xref">Creating a GroupWise Nickname Record</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#adn4u96" class="xref">Controlling Creation of GroupWise Accounts</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#adn4w5c" class="xref">Moving Users from One Post Office to Another Post Office</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#adstxu1" class="xref">Adding Additional Attributes to Be Synchronized</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#adn50u8" class="xref">Renaming Users</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#agg2agx" class="xref">Creating a Gateway Alias</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#b1kfnbsz" class="xref">Using the Wildcard Query</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#agg2dl1" class="xref">Querying for a Nickname</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#b1knuqh5" class="xref">Querying for a Email Address from a Nickname</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#agg2gtm" class="xref">Querying for a Gateway Alias</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#agg2hn2" class="xref">Querying for Internet Email Address</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#akxyufc" class="xref">Synchronizing GroupWise External Users</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#b4ua4el" class="xref">Verifying if an E-Mail Address or Gateway Alias Is Unique</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="modify-policies.html#b1ey3xc1" class="xref">Converting String Attributes to Structured Attributes</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="ad8q7uj">
+
+<h2 class="title h2"><span class="number">5.3.1</span> Specifying the GroupWise Post Office</h2>
+
+<div class="content_wrapper">
+
+<p class="para">By default, the GroupWise Subscriber Placement policy puts all new users in the same post office. The Placement policy can also determine the post office based on an attribute value or the Identity Vault user container.</p>
+<p class="para">The following example shows the policies needed to place users in the Sales container into PO1 and users in the Engineering container into PO2.</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Users in Sales container are placed in Post Office PO1&lt;/description&gt;
+  &lt;conditions&gt;
+   &lt;and&gt;
+    &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;if-src-dn op="in-container"&gt;data\users\Sales&lt;/if-src-dn&gt;
+   &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+   &lt;do-set-op-dest-dn&gt;
+    &lt;arg-dn&gt;
+     &lt;token-text xml:space="preserve"&gt;GWDomain.PO1&lt;/token-text&gt;
+    &lt;/arg-dn&gt;
+   &lt;/do-set-op-dest-dn&gt;
+   &lt;do-break/&gt;
+  &lt;/actions&gt;
+ &lt;/rule&gt;
+ &lt;rule&gt;
+  &lt;description&gt;Users in Engineering container are placed in Post Office PO2&lt;/description&gt;
+  &lt;conditions&gt;
+   &lt;and&gt;
+    &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;if-src-dn op="in-container"&gt;data\users\Engr&lt;/if-src-dn&gt;
+   &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+   &lt;do-set-op-dest-dn&gt;
+    &lt;arg-dn&gt;
+     &lt;token-text xml:space="preserve"&gt;GWDomain.PO2&lt;/token-text&gt;
+    &lt;/arg-dn&gt;
+   &lt;/do-set-op-dest-dn&gt;
+   &lt;do-break/&gt;
+  &lt;/actions&gt;
+ &lt;/rule&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="ad8a401">
+
+<h2 class="title h2"><span class="number">5.3.2</span> Configuring the GroupWise UserID</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The CN attribute in the Identity Vault is used to name the GroupWise account. You must include this in the Create policy as a required attribute. The CN value from the Identity Vault can be ignored in the Subscriber Create policy and a CN based on other attributes can be generated. An example of Create policy is shown below. If you make modifications to this policy, the modify events coming from the engine also need to be modified.</p>
+<p class="para">When an attribute used to construct the CN is modified, a GroupWise Rename event should be generated via the policies. The UserID must be unique within a post office. If UserID is used to generate Internet EMail Address, it must be unique in the entire GroupWise system. The UserID contains 1 to 256 characters, and cannot contain the ( ) @ . : , { } * " characters. The UserID must be unique within its namespace (UserID shares the same namespace as nicknames.) Do not use âmapiâ (reserved ID) for this value.</p>
+<p class="para">An Output Transformation or Event Transformation policy can monitor the attributes used to build the CN. If one of these attributes changes, a Rename event should also be generated. Any attributes used here need to be added to the list of required attributes. In this case, Rename events should still be forwarded to the driver with an empty <span class="literal">&lt;newname&gt;</span> element. See <a href="modify-policies.html#adn50u8" class="xref">Renaming Users</a> for more information.</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt; Use Given Name for GroupWise Account Name&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;!-- 'CN' and 'Given Name' must be present --&gt;
+    &lt;do-veto-if-op-attr-not-available name="CN"/&gt;
+    &lt;do-veto-if-op-attr-not-available name="Given Name"/&gt;
+    &lt;!-- replace current CN value with the 'Given Name' value --&gt;
+    &lt;do-reformat-op-attr name="CN"&gt;
+      &lt;arg-value type="string"&gt;
+        &lt;token-op-attr name="Given Name"/&gt;
+      &lt;/arg-value&gt;
+    &lt;/do-reformat-op-attr&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="ad8svzj">
+
+<h2 class="title h2"><span class="number">5.3.3</span> Creating Mappings for Additional Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can synchronize any attribute that can be represented as a string in the Identity Vault with one of twenty GroupWise generic attributes. You specify the Identity Vault attribute you want to map in the filter. In addition, the Identity Vault and GroupWise attribute names must be connected in the Schema Mapping policy.</p>
+<p class="para">The Schema Mapping rule code segment below connects the Identity Vault attribute Location with the GroupWise attribute 55003.</p><pre class="screen">&lt;attr-name class-name="User"&gt;
+     &lt;nds-name&gt;Location&lt;/nds-name&gt;
+     &lt;app-name&gt;55003&lt;/app-name&gt;
+&lt;/attr-name&gt;</pre>
+<p class="para">The twenty GroupWise attribute names are 50106 through 50115 and 55002 through 55011. Address book labels can be assigned to these GroupWise attributes through the GroupWise Web Console. You should configure the same mappings in GroupWise as you do in the driver mappings.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br4u4ut">
+
+<h2 class="title h2"><span class="number">5.3.4</span> Getting a Record Count from a Query</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following query, sent to the driver, returns the number of users in dom1.po1.</p><pre class="screen">&lt;nds dtdversion="2.0" ndsversion="8.x"&gt;
+       &lt;input&gt;
+                 &lt;query event-id="query-groupwise" scope="subtree"&gt;
+          &lt;search-class class-name="User"/&gt;
+
+                     &lt;!-- Referenced Domain Name --&gt;
+                     &lt;search-attr attr-name="50035"&gt;
+                            &lt;value&gt;dom1&lt;/value&gt;
+                     &lt;/search-attr&gt;
+
+                     &lt;!-- Referenced Post Office Name --&gt;
+          &lt;search-attr attr-name="50062"&gt;
+                              &lt;value&gt;po1&lt;/value&gt;
+                 &lt;search-attr&gt;
+
+                     &lt;!-- return Record Count--&gt;
+                     &lt;read-attr attr-name="Record Count"/&gt;
+                &lt;/query&gt;
+       &lt;/input&gt;
+&lt;/nds&gt;</pre>
+<p class="para">If you remove the post office <span class="literal">&lt;search-attr&gt;</span>, it returns the number of users in dom1. If you remove the domain <span class="literal">&lt;search attr&gt;</span>, it returns the number of users in the GroupWise system. This search can be altered to apply to other search criteria.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="ae01co4">
+
+<h2 class="title h2"><span class="number">5.3.5</span> Creating a GroupWise Nickname</h2>
+
+<div class="content_wrapper">
+
+<p class="para">GroupWise nicknames can be automatically created when an Identity Vault User is renamed or when a GroupWise account is moved. This is controlled in Identity Console on the driver through the Global Configuration Value page. When you set this option to <span class="guimenu">True</span>, nicknames are automatically created when an Identity Vault rename occurs or when a GroupWise account is moved. When you set this option to <span class="guimenu">False</span>, nicknames are not created.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br586mk">
+
+<h2 class="title h2"><span class="number">5.3.6</span> Creating a GroupWise Nickname Record</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following examples show two ways to create a nickname record. The first specifies the post office in which the nickname is created in the <span class="literal">&lt;dest-dn&gt;</span> attribute (this implies the domain). The second example uses <span class="literal">&lt;add-attr&gt;</span> nodes to specify the domain and post office.</p>
+<p class="para">The nickname can contain 1 to 256 characters, and cannot contain the ()@.:,{}*" characters. It must be unique within its namespace (nicknames share the same namespace as users.)</p>
+<div class="container sect3" id="bgxfvod">
+
+<h3 class="title h3">Example 1</h3>
+<pre class="screen">&lt;add class-name="GroupWise Nickname" dest-dn="domain.po" event-id="0" &gt;
+     &lt;!-- Domain of user this nickname refers to --&gt;
+       &lt;add-attr attr-name="50068" &gt;
+          &lt;value type="string"&gt;xmlDom&lt;/value&gt;
+       &lt;/add-attr&gt;
+     &lt;!-- Post Office of user this nickname refers to  --&gt;
+       &lt;add-attr attr-name="50069" &gt;
+          &lt;value type="string"&gt;xmlPO&lt;/value&gt;
+        &lt;/add-attr&gt;
+     &lt;!--  user this nickname refers to  --&gt;
+       &lt;add-attr attr-name="50070" &gt;
+          &lt;value type="string"&gt;Usern1&lt;/value&gt;
+       &lt;/add-attr&gt;
+     &lt;!-- name of nickname record --&gt;
+       &lt;add-attr attr-name="50073" &gt;
+          &lt;value type="string"&gt;nn1&lt;/value&gt;
+       &lt;/add-attr&gt;
+&lt;/add&gt;</pre>
+</div>
+
+<div class="container sect3" id="bgxfvst">
+
+<h3 class="title h3">Example 2</h3>
+<pre class="screen">&lt;add class-name="GroupWise Nickname" event-id="0" &gt;
+        &lt;!-- Domain of user this nickname refers to --&gt;
+          &lt;add-attr attr-name="50068" &gt;
+              &lt;value type="string"&gt;xmlDom&lt;/value&gt;
+          &lt;/add-attr&gt;
+        &lt;!-- Post Office of user this nickname refers to --&gt;
+          &lt;add-attr attr-name="50069" &gt;
+              &lt;value type="string"&gt;xmlPO&lt;/value&gt;
+          &lt;/add-attr&gt;
+        &lt;!-- user this nickname refers to --&gt;
+          &lt;add-attr attr-name="50070" &gt;
+              &lt;value type="string"&gt;Usern1&lt;/value&gt;
+          &lt;/add-attr&gt;
+        &lt;!-- Domain of nickname record --&gt;
+          &lt;add-attr attr-name="50035" &gt;
+             &lt;value type="string"&gt;xmlDom&lt;/value&gt;
+          &lt;/add-attr&gt;
+        &lt;!-- Post Office of nickname record --&gt;
+          &lt;add-attr attr-name="50062" &gt;
+             &lt;value type="string"&gt;xmlPO&lt;/value&gt;
+          &lt;/add-attr&gt;
+        &lt;!-- name of nickname record --&gt;
+          &lt;add-attr attr-name="50073" &gt;
+             &lt;value type="string"&gt;nn1&lt;/value&gt;
+          &lt;/add-attr&gt;
+&lt;/add&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="adn4u96">
+
+<h2 class="title h2"><span class="number">5.3.7</span> Controlling Creation of GroupWise Accounts</h2>
+
+<div class="content_wrapper">
+
+<p class="para">There might be situations where an Identity Vault user is created and you do not want to create a corresponding GroupWise account. In addition, not all Identity Vault users initially have a GroupWise account. You can use the driver to control the creation of GroupWise accounts.</p>
+<p class="para">NetIQ recommends that you use the UserAccount entitlement to control the creation of an account. When this entitlement is granted, the driver provides an enabled logon account. When this entitlement is revoked, the driver either disables or deletes the logon account, depending on the GCV configuration of entitlements.</p>
+<p class="para">Alternatively, you can control the creation of an account by triggering the account creation through an extended attribute such as createGroupWiseAccount.</p>
+<p class="para">The Identity Vault schema must be extended to include the createGroupWiseAccount attribute. When the createGroupWiseAccount attribute is set to <span class="guimenu">True</span>, the GroupWise account is created. When the createGroupWiseAccount attribute is set to <span class="guimenu">False</span>, the GroupWise account is not created. Changing the value from <span class="guimenu">False</span> to <span class="guimenu">True</span> causes the GroupWise account to be created.</p>
+<p class="para">The createGroupWiseAccount attribute must be added to the Create policy as a required attribute and also added to the Subscriber Filter.</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Require createGroupWiseAccount attribute&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-veto-if-op-attr-not-available name="createGroupWiseAccount"/&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;
+&lt;rule&gt;
+  &lt;description&gt;Check createGroupWiseAccount attribute&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+      &lt;if-op-attr name="createGroupWiseAccount" op="not-equal"&gt;true&lt;/if-op-attr&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-veto/&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="adn4w5c">
+
+<h2 class="title h2"><span class="number">5.3.8</span> Moving Users from One Post Office to Another Post Office</h2>
+
+<div class="content_wrapper">
+
+<p class="para">When the Output Transformation style sheet is configured to move GroupWise accounts, NetIQ recommends that user moves be made in the Identity Vault and that the driver assigns the object to a new post office in GroupWise. The DirXML script code segment for the Output Transformation policy is shown below. The dest-dn attribute on the parent element specifies the new post office.</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Move User to GW Post Office&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-operation op="equal"&gt;move&lt;/if-operation&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-if&gt;
+      &lt;arg-conditions&gt;
+        &lt;and&gt;
+          &lt;if-xpath op="true"&gt;parent/@src-dn="\GWDRIVERTREE\Novell\Users\Sales"&lt;/if-xpath&gt;
+        &lt;/and&gt;
+      &lt;/arg-conditions&gt;
+      &lt;arg-actions&gt;
+        &lt;do-set-xml-attr expression="parent" name="dest-dn"&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;GWDomain.salesPO&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/do-set-xml-attr&gt;
+      &lt;/arg-actions&gt;
+    &lt;/do-if&gt;
+    &lt;do-if&gt;
+      &lt;arg-conditions&gt;
+        &lt;and&gt;
+          &lt;if-xpath op="true"&gt;parent/@src-dn="\GWDRIVERTREE\Novell\Users\Engineering"&lt;/if-xpath&gt;
+        &lt;/and&gt;
+      &lt;/arg-conditions&gt;
+      &lt;arg-actions&gt;
+        &lt;do-set-xml-attr expression="parent" name="dest-dn"&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;GWDomain.engineeringPO&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/do-set-xml-attr&gt;
+      &lt;/arg-actions&gt;
+    &lt;/do-if&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+<p class="para">The following example shows how to move a user to a new post office based on an attribute change:</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Post Office Move&lt;/description&gt;
+  &lt;conditions&gt;
+   &lt;or&gt;
+    &lt;if-class-name mode="nocase" op="equal"&gt;User&lt;/if-class-name&gt;
+   &lt;/or&gt;
+   &lt;or&gt;
+    &lt;if-op-attr name="Description" op="changing-to"&gt;NYC&lt;/if-op-attr&gt;
+   &lt;/or&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+   &lt;do-move-dest-object class-name="User"&gt;
+    &lt;arg-dn&gt;
+     &lt;token-text xml:space="preserve"&gt;domain.po&lt;/token-text&gt;
+    &lt;/arg-dn&gt;
+   &lt;/do-move-dest-object&gt;
+  &lt;/actions&gt;
+ &lt;/rule&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="adstxu1">
+
+<h2 class="title h2"><span class="number">5.3.9</span> Adding Additional Attributes to Be Synchronized</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can map up to twenty user Identity Vault attributes to generic GroupWise attributes and display them in the address book. For these attributes, you use the ranges 50106-50115 and 55002-55011. You must add these Identity Vault attributes to the filter and Schema Mapping policy.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="adn50u8">
+
+<h2 class="title h2"><span class="number">5.3.10</span> Renaming Users</h2>
+
+<div class="content_wrapper">
+
+<p class="para">NetIQ recommends that you rename users by changing the naming attribute in the Identity Vault and letting the driver rename the GroupWise account. When CN is the naming attribute (this is the default), no special style sheet coding is required for a rename process. However, the GroupWise MailboxID can be built from attributes other than CN. When one of these attributes is modified, the GroupWise account should also be renamed.</p>
+<p class="para">In Example 1 below, the Identity Vault attribute Given Name is used to name the GroupWise account. When Given Name is modified, a GroupWise rename is generated. In Example 2 below, the Identity Vault User object is renamed. Even though the GroupWise account is not renamed, the rename event must pass to the driver.</p>
+<div class="container sect3" id="adn51n9">
+
+<h3 class="title h3">Example 1</h3>
+<pre class="screen">(placed in the subscriber event transform, or subscriber command transform)
+
+&lt;rule&gt;
+  &lt;description&gt;Rename User if Given Name is changing&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-operation op="equal"&gt;modify&lt;/if-operation&gt;
+      &lt;if-op-attr name="Given Name" op="changing"/&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-rename-dest-object&gt;
+      &lt;arg-string&gt;
+        &lt;token-op-attr name="Given Name"/&gt;
+      &lt;/arg-string&gt;
+    &lt;/do-rename-dest-object&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+<div class="container sect3" id="adn524i">
+
+<h3 class="title h3">Example 2</h3>
+<pre class="screen">(placed in the subscriber event transform)
+
+&lt;rule&gt;
+  &lt;description&gt;Veto Rename User operations&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-operation op="equal"&gt;rename&lt;/if-operation&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-veto/&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="agg2agx">
+
+<h2 class="title h2"><span class="number">5.3.11</span> Creating a Gateway Alias</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following DirXML Script code segment shows how to create a gateway alias in the Output Transformation policy. Your code is responsible for generating the value of attributes 50140 and 50077.</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Create GW Gateway Alias attribute for new user&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-operation op="equal"&gt;add&lt;/if-operation&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-add-dest-attr-value class-name="User" name="Gateway Alias"&gt;
+      &lt;arg-value type="structured"&gt;
+        &lt;arg-component name="50140"&gt;
+          &lt;token-text xml:space="preserve"&gt;SMTP&lt;/token-text&gt;
+        &lt;/arg-component&gt;
+        &lt;arg-component name="50077"&gt;
+          &lt;token-text xml:space="preserve"&gt;UserOne@novell.com&lt;/token-text&gt;
+        &lt;/arg-component&gt;
+      &lt;/arg-value&gt;
+    &lt;/do-add-dest-attr-value&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+<p class="para">where SMTP specifies the gateway alias type and UserOne@novell.com is the gateway alias address.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1kfnbsz">
+
+<h2 class="title h2"><span class="number">5.3.12</span> Using the Wildcard Query</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Wildcard (*) query is supported for all attributes except Internet Email Address and Email Address.</p>
+<div class="container sect3" id="b1kg59d0">
+
+<h3 class="title h3">Code Sample</h3>
+<pre class="screen">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+  &lt;source&gt;
+    &lt;product edition="Advanced" version="4.5.0.0"&gt;DirXML&lt;/product&gt;
+    &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+  &lt;/source&gt;
+&lt;input&gt;
+    &lt;query class-name="User" event-id="0" scope="subtree"&gt;
+      &lt;search-class class-name="User"/&gt;
+      &lt;search-attr attr-name="50089"&gt;
+        &lt;value type="string"&gt;AAA*&lt;/value&gt;
+      &lt;/search-attr&gt;
+      &lt;read-attr attr-name="50089"/&gt;
+    &lt;/query&gt;
+  &lt;/input&gt;
+&lt;/nds&gt;</pre>
+</div>
+
+<div class="container sect3" id="b1kg59d1">
+
+<h3 class="title h3">Result</h3>
+<pre class="screen">&lt;nds dtdversion="2.0" ndsversion="8.x"&gt;
+  &lt;source&gt;
+    &lt;product build="20160208_0216" instance="GroupWise REST Driver"version="4.0.2.0"&gt;DirXML Driver for GroupWise&lt;/product&gt;
+    &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+  &lt;/source&gt;
+&lt;output&gt;
+   &lt;instance class-name="User" event-id="0" src-dn="gwdomain.po1.user1"&gt;
+      &lt;association&gt;gwdomain.po1.user1{106}{B1D8F380-1429-0000-B673-757234396331}6012EC01-18B5-0000-8300-1F8D6C64A072&lt;/association&gt;
+      &lt;attr attr-name="OU"&gt;
+        &lt;value type="string"&gt;AAA-ENGINEERING&lt;/value&gt;
+      &lt;/attr&gt;
+    &lt;/instance&gt;
+    &lt;instance class-name="User" event-id="0" src-dn="gwdomain.po1.user2"&gt;
+      &lt;association&gt;gwdomain.po1.user2{106}{3AC06E00-1595-0000-B673-757234396331}6012EC01-18B5-0000-8300-1F8D6C64A072&lt;/association&gt;
+      &lt;attr attr-name="OU"&gt;
+        &lt;value type="string"&gt;AAA-SALES&lt;/value&gt;
+      &lt;/attr&gt;
+    &lt;/instance&gt;
+    &lt;status event-id="0" level="success"/&gt;
+  &lt;/output&gt;
+&lt;/nds&gt;</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Groupwise Rest API returns an error if the <span class="literal">search-attr</span> contains ?(question mark) or =(equals to) literals.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="agg2dl1">
+
+<h2 class="title h2"><span class="number">5.3.13</span> Querying for a Nickname</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following Output Transformation policy shows how to query for GroupWise nicknames. The search-attrs in this style sheet are optional. They are used to scope the search. When you specify a post office name (50069), you must also specify a domain name (50068). More than one nickname can be returned.</p>
+<p class="para">For example, User2a is renamed to User2b, then renamed to User2c. This creates two nickname records (User2a and User2b) that both reference User2c. The following DirXML Script sample code queries the User of the current event for nicknames.</p>
+<div class="container sect3" id="bgxgbaf">
+
+<h3 class="title h3">Code Sample</h3>
+<pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Query for User's GroupWise Nicknames&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-operation op="equal"&gt;modify&lt;/if-operation&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-set-local-variable name="gw-user-name"&gt;
+      &lt;arg-node-set&gt;
+        &lt;token-query class-name="User" scope="entry"&gt;
+          &lt;arg-association&gt;
+            &lt;token-association/&gt;
+          &lt;/arg-association&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50035&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50062&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50073&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/token-query&gt;
+      &lt;/arg-node-set&gt;
+    &lt;/do-set-local-variable&gt;
+    &lt;do-set-local-variable name="gw-nickname"&gt;
+      &lt;arg-node-set&gt;
+        &lt;token-query class-name="GroupWise Nickname"&gt;
+          &lt;arg-match-attr name="50068"&gt;
+            &lt;arg-value&gt;
+              &lt;token-xpath expression="$gw-user-name//attr[@attr-name='50035']/value"/&gt;
+            &lt;/arg-value&gt;
+          &lt;/arg-match-attr&gt;
+          &lt;arg-match-attr name="50069"&gt;
+            &lt;arg-value&gt;
+              &lt;token-xpath expression="$gw-user-name//attr[@attr-name='50062']/value"/&gt;
+            &lt;/arg-value&gt;
+          &lt;/arg-match-attr&gt;
+          &lt;arg-match-attr name="50070"&gt;
+            &lt;arg-value&gt;
+              &lt;token-xpath expression="$gw-user-name//attr[@attr-name='50073']/value"/&gt;
+            &lt;/arg-value&gt;
+          &lt;/arg-match-attr&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50035&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50062&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50073&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/token-query&gt;
+      &lt;/arg-node-set&gt;
+    &lt;/do-set-local-variable&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+<div class="container sect3" id="agg2fts">
+
+<h3 class="title h3">Result</h3>
+<pre class="screen">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+   &lt;output&gt;
+   &lt;instance class-name="GroupWise Nickname" event-id="0"&gt;
+        &lt;attr attr-name="50035"&gt;
+            &lt;value type="string"&gt;TaoDom&lt;/value&gt;
+        &lt;/attr&gt;
+        &lt;attr attr-name="50062"&gt;
+            &lt;value type="string"&gt;TaoPO&lt;/value&gt;
+        &lt;/attr&gt;
+        &lt;attr attr-name="50073"&gt;
+            &lt;value type="string"&gt;User2b&lt;/value&gt;
+          &lt;/attr&gt;
+    &lt;/instance&gt;
+    &lt;instance class-name="GroupWise Nickname" event-id="0"&gt;
+          &lt;attr attr-name="50035"&gt;
+            &lt;value type="string"&gt;TaoDom&lt;/value&gt;
+    &lt;/attr&gt;
+    &lt;attr attr-name="50062"&gt;
+        &lt;value type="string"&gt;TaoPO&lt;/value&gt;
+    &lt;/attr&gt;
+    &lt;attr attr-name="50073"&gt;
+        &lt;value type="string"&gt;User2a&lt;/value&gt;
+    &lt;/attr&gt;
+    &lt;/instance&gt;
+    &lt;status level="success"/&gt;
+    &lt;/output&gt;
+&lt;/nds&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1knuqh5">
+
+<h2 class="title h2"><span class="number">5.3.14</span> Querying for a Email Address from a Nickname</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following DirXML script code segment shows how to query the email address from a user nickname.</p>
+<div class="container sect3" id="b1knuqh6">
+
+<h3 class="title h3">Code Sample</h3>
+<pre class="screen">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+  &lt;source&gt;
+  &lt;product edition="Advanced" version="4.5.3.0"&gt;DirXML&lt;/product&gt;
+    &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+    &lt;/source&gt;
+  &lt;input&gt;
+    &lt;query class-name="User" event-id="0" scope="subtree"&gt;
+    &lt;search-class class-name="User"/&gt;
+  &lt;search-attr attr-name="Internet EMail Address"&gt;
+  &lt;value&gt;user@domain.com&lt;/value&gt;
+    &lt;/search-attr&gt;
+    &lt;read-attr attr-name="Internet EMail Address"/&gt;
+  &lt;read-attr attr-name="50073"/&gt;
+  &lt;/query&gt;
+  &lt;/input&gt;
+  &lt;/nds&gt;</pre>
+</div>
+
+<div class="container sect3" id="b1knuqh7">
+
+<h3 class="title h3">Result</h3>
+<pre class="screen">&lt;nds dtdversion="2.0" ndsversion="8.x"&gt;
+   &lt;source&gt;
+    &lt;product build="20160208_0216" instance="GroupWise REST Driver"version="4.0.2.0"&gt;DirXML Driver for GroupWise&lt;/product&gt;
+   &lt;contact&gt;NetIQ Corporation&lt;/contact&gt;
+   &lt;/source&gt;
+   &lt;output&gt;&lt;instance class-name="User" event-id="0" src-dn="gwdomain1.po1.user1"&gt;
+   &lt;association&gt;gwdomain1.po1.user1{106}{98A43B80-129F-0000-8A67-777838626530}1975BF80-18BE-0000-BA4E-0D7666A11154&lt;/association&gt;
+   &lt;attr attr-name="Internet EMail Address"&gt;
+   &lt;value type="string"&gt;user@domain.com&lt;/value&gt;
+    &lt;/attr&gt;
+    &lt;attr attr-name="CN"&gt;
+  &lt;value type="string"&gt;user&lt;/value&gt;&lt;/attr&gt;
+    &lt;/instance&gt;&lt;status event-id="0" level="success"/&gt;
+   &lt;/output&gt;
+  &lt;/nds&gt; </pre>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="agg2gtm">
+
+<h2 class="title h2"><span class="number">5.3.15</span> Querying for a Gateway Alias</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following DirXML Script code segment shows how to query in the Output Transformation policy for a gateway alias.</p>
+<div class="container sect3" id="bgxgbnc">
+
+<h3 class="title h3">Code Sample</h3>
+<pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Query for User's GroupWise Gateway Alias&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-operation op="equal"&gt;modify&lt;/if-operation&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+      &lt;if-association op="associated"/&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-set-local-variable name="gw-alias"&gt;
+      &lt;arg-node-set&gt;
+        &lt;token-query class-name="User" scope="entry"&gt;
+          &lt;arg-association&gt;
+            &lt;token-association/&gt;
+          &lt;/arg-association&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;Gateway Alias&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/token-query&gt;
+      &lt;/arg-node-set&gt;
+    &lt;/do-set-local-variable&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+<div class="container sect3" id="agg2hc7">
+
+<h3 class="title h3">Result</h3>
+<pre class="screen">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+    &lt;output&gt;
+         &lt;instance class-name="User" event-id="0" src-dn="TaoDom.TaoPO.User1{106}{640D4300-049C-0000-9F67-777433313534}50D4B180-061B-0000-9A29-2264EBF4B491"&gt;
+            &lt;association&gt;TaoDom.TaoPO.User1{106}{640D4300-049C-0000-9F67-777433313534}50D4B180-061B-0000-9A29-2264EBF4B491&lt;/association&gt;
+            &lt;attr attr-name="Gateway Alias"&gt;
+                 &lt;value type="structured"&gt;
+                     &lt;component name="50140"&gt;SMTP&lt;/component&gt;
+                     &lt;component name="50077"&gt;UserOne@novell.com&lt;/component&gt;
+                 &lt;/value&gt;
+            &lt;/attr&gt;
+         &lt;/instance&gt;
+         &lt;status level="success"/&gt;
+     &lt;/output&gt;
+&lt;/nds&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="agg2hn2">
+
+<h2 class="title h2"><span class="number">5.3.16</span> Querying for Internet Email Address</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following DirXML Script code segment shows how to query in the Output Transformation policy for the Internet Email Address generated by GroupWise.</p>
+<div class="container sect3" id="bgxgbvh">
+
+<h3 class="title h3">Code Sample</h3>
+<pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Query for User's GroupWise Internet E-mail Address&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-operation op="equal"&gt;modify&lt;/if-operation&gt;
+      &lt;if-class-name op="equal"&gt;User&lt;/if-class-name&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+
+  &lt;actions&gt;
+    &lt;do-set-local-variable name="gw-email-address"&gt;
+      &lt;arg-node-set&gt;
+        &lt;token-query class-name="User" scope="entry"&gt;
+          &lt;arg-association&gt;
+            &lt;token-association/&gt;
+          &lt;/arg-association&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;Internet EMail Address&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/token-query&gt;
+      &lt;/arg-node-set&gt;
+    &lt;/do-set-local-variable&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+<div class="container sect3" id="agg2ixi">
+
+<h3 class="title h3">Results</h3>
+<pre class="screen">&lt;nds dtdversion="4.0" ndsversion="8.x"&gt;
+    &lt;output&gt;
+       &lt;instance class-name="User" event-id="0" 
+          src-dn="TaoDom.TaoPO.User2{106}{640D4300-049C-0000-9F67-777433313534}50D4B180-061B-0000-9A29-2264EBF4B491"&gt;                              &lt;association&gt;TaoDom.TaoPO.User2{106}{640D4300-049C-0000-9F67-777433313534}50D4B180-061B-0000-9A29-2264EBF4B491&lt;/association&gt;
+            &lt;attr attr-name="Internet EMail Address"&gt;
+                  &lt;value type="string"&gt;User2@domain.com&lt;/value&gt;
+            &lt;/attr&gt;
+        &lt;/instance&gt;
+        &lt;status level="success"/&gt;
+    &lt;/output&gt;
+&lt;/nds&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="akxyufc">
+
+<h2 class="title h2"><span class="number">5.3.17</span> Synchronizing GroupWise External Users</h2>
+
+<div class="content_wrapper">
+
+<p class="para">In your business, you might have several different e-mail applications. Although not all employees have GroupWise e-mail accounts, you want the GroupWise address book to contain all employee information. The driver has the ability to create GroupWise external users, which enables the driver to obtain data from other e-mail systems (via the Identity Vault) and display it in the GroupWise address book. The users in the Identity Vault can be assigned to a GroupWise external post office.</p>
+<p class="para">To synchronize data between external e-mail systems and GroupWise, your implementation must meet the following conditions:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">External users must be assigned to or be created in an external post office. These users do not have a GroupWise mailbox.</p></li>
+<li class="listitem">
+<p class="listitem">External post offices must belong to a non-GroupWise domain.</p></li></ul></div>
+
+<p class="para">The following sections explain how to implement this functionality:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="modify-policies.html#akxyvi4" class="xref">Creating External Users</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="modify-policies.html#akxywo5" class="xref">Specifying an External Post Office in an Add Event</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="modify-policies.html#akxz989" class="xref">Creating External Post Offices</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="akxyvi4">
+
+<h3 class="title h3">Creating External Users</h3>
+
+<p class="para">There are three ways you can specify placement when creating external users:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">In the Placement rule, you can specify the DN of an Identity Vault object associated with the external post office. For additional information, refer to <a href="modify-policies.html#akxz989" class="xref">Creating External Post Offices</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Identify the external post office by <a href="modify-policies.html#akxywo5" class="xref">Specifying an External Post Office in an Add Event</a>.</p></li>
+<li class="listitem">
+<p class="listitem">Create a user in an organizational unit associated with the External GroupWise Post Office.</p></li></ul></div>
+
+<p class="para">When you create accounts in the Identity Vault for a non-GroupWise user, make sure that gw:classification=âexternalâ attribute is part of the Add event. The attribute can be used on the User object and on the Post Office object. If you have selected the options of <a href="global-configuration-values.html#bryot46" class="xref">Synchronize eDir OrgUnit to GroupWise External Post Office</a> during the configuration of the driver, the attribute is automatically part of the Add event.</p>
+<p class="para">You can modify the Schema Mapping policy or Output Transformation policy so that it modifies the class name of the user based on some criterion, such as the parent container name. The external users were formerly a separate class. The preferred method is to add the attributes instead of adding a new class. These two methods are mutually exclusive.</p>
+<p class="para">When a new GroupWise external user is added to GroupWise, the driver creates an association on the User object in the Identity Vault. If the non-GroupWise userâs information changes in the Identity Vault, the driver synchronizes those changes to GroupWise. If the association key is altered or deleted, the connection is broken, and the driver does not synchronize any changes made to the User object in the Identity Vault to GroupWise.</p>
+</div>
+
+<div class="container sect3" id="akxywo5">
+
+<h3 class="title h3">Specifying an External Post Office in an Add Event</h3>
+
+<p class="para">If you do not use the driver to create an external post office, you need to generate the following information in the XML Add event. You must replace the external post office name and non-GroupWise domain values with names specific to your system.</p><pre class="screen">&lt;!--   The external post office name to which the user belongs. --&gt;
+       &lt;add-attr attr-name="50062"&gt;
+               &lt;value type="string"&gt;&lt;![CDATA[External post office name]]&gt;&lt;/value&gt;
+     &lt;/add-attr&gt;</pre><pre class="screen">&lt;!-- The non-GroupWise domain name to which the external post office belongs. --&gt;
+       &lt;add-attr attr-name="50035"&gt;
+           &lt;value type="string"&gt;&lt;![CDATA[Non-GroupWise domain name]&gt;&lt;/value&gt;
+      &lt;/add-attr&gt;</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you include the additional XML in the Add event, the value in your Placement policy is overridden.</p></div>
+
+</div>
+
+<div class="container sect3" id="akxz989">
+
+<h3 class="title h3">Creating External Post Offices</h3>
+
+<p class="para">There are two ways you can create external post offices:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Let the driver create a GroupWise external post office and associate it to an Identity Vault object, such as an Organizational Unit (recommended). Select <a href="global-configuration-values.html#bryot46" class="xref">Synchronize eDir OrgUnit to GroupWise External Post Office</a> during the configuration of the driver.</p></li>
+<li class="listitem">
+<p class="listitem">Create an external post office through GroupWise Web administration console.</p></li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Before you can create an external post office, you must create a non-GroupWise domain.</p></div>
+
+<p class="para">To specify placement when creating external post offices, specify the name of the non-GroupWise domain in which to create the external post office in the Placement policy.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b4ua4el">
+
+<h2 class="title h2"><span class="number">5.3.18</span> Verifying if an E-Mail Address or Gateway Alias Is Unique</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The GroupWise driver has a special query that allows you to see if a proposed Internet e-mail address or gateway alias is unique. Use the following example to first query if an e-mail address is in use, then based on the query results, it tests if it was in use or not.</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt; Query to see if e-mail address is unique in GroupWise&lt;/description&gt;
+    &lt;actions&gt;
+    &lt;do-set-local-variable name="PROPOSED-EMAIL" scope="policy"&gt;
+      &lt;arg-string&gt;
+        &lt;token-text xml:space="preserve"&gt;Lee.Kristen@KristensRUs.com&lt;/token-text&gt;
+      &lt;/arg-string&gt;
+    &lt;/do-set-local-variable&gt;
+    &lt;do-set-local-variable name="EMAIL" scope="policy"&gt;
+      &lt;arg-node-set&gt;
+        &lt;token-query class-name="User"&gt;
+          &lt;arg-match-attr name="Internet EMail Address"&gt;
+            &lt;arg-value type="string"&gt;
+              &lt;token-local-variable name="PROPOSED-EMAIL"/&gt;
+            &lt;/arg-value&gt;
+          &lt;/arg-match-attr&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50035&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50062&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;50073&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/token-query&gt;
+      &lt;/arg-node-set&gt;
+    &lt;/do-set-local-variable&gt;
+    &lt;do-if&gt;
+      &lt;arg-conditions&gt;
+        &lt;and&gt;
+          &lt;if-xpath op="true"&gt;$EMAIL&lt;/if-xpath&gt;
+        &lt;/and&gt;
+      &lt;/arg-conditions&gt;
+      &lt;arg-actions&gt;
+        &lt;do-trace-message&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;Email address is in use by the user &lt;/token-text&gt;
+            &lt;token-xpath expression="$EMAIL/@src-dn"/&gt;
+          &lt;/arg-string&gt;
+        &lt;/do-trace-message&gt;
+      &lt;/arg-actions&gt;
+      &lt;arg-actions&gt;
+        &lt;do-trace-message&gt;
+          &lt;arg-string&gt;
+            &lt;token-text xml:space="preserve"&gt;Email address not found, you are free to use it.&lt;/token-text&gt;
+          &lt;/arg-string&gt;
+        &lt;/do-trace-message&gt;
+      &lt;/arg-actions&gt;
+    &lt;/do-if&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ey3xc1">
+
+<h2 class="title h2"><span class="number">5.3.19</span> Converting String Attributes to Structured Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">GroupWise supports some of the attributes only in the structured format. You need to convert them to the structured type that GroupWise supports. For example, attributes 50045. The attribute 50045 looks similar to the following in the JSON format:</p><pre class="screen">"internetDomainName":{
+
+  "inherited":false,
+
+  "value":"some value",
+
+  "exclusive":false
+
+}</pre>
+<p class="para">The <span class="literal">true</span> or <span class="literal">false</span> value for the <span class="literal">inherited</span> and <span class="literal">exclusive</span> components of this attribute depends on the configuration of the GroupWise system. For example,</p><pre class="screen">&lt;add-attr attr-name="50045"&gt;
+        &lt;value type="structured"&gt;
+          &lt;component name="inherited"&gt;true&lt;/component&gt;
+          &lt;component name="value"&gt;company.com&lt;/component&gt;
+          &lt;component name="exclusive"&gt;false&lt;/component&gt;
+        &lt;/value&gt;
+&lt;/add-attr&gt;</pre>
+<p class="para">For more information about how GroupWise handles these attributes, see <a href="https://www.novell.com/documentation/groupwise2014/gwsdk_gwadminweb/data/bookinfo.html" class="ulink"><span class="citetitle">GroupWise SDK: Administration REST API Guide</span></a>.</p>
+<p class="para">To transform a string attribute type to a structured type, create a Transformation policy similar to the example shown below and add it to the Output Transformation policy of the driver. Also, ensure that you add the structured attributes to the Schema Mapping policy and the Subscriber filter of the driver.</p>
+<p class="para">The following example converts the 50045 attribute from a string value to a structured value. To override the preferred Internet domain name that the post office has inherited from its domain, the component <span class="literal">inherited</span> is set to <span class="literal">false.</span></p><pre class="screen">&lt;rule&gt;
+   &lt;description&gt;Convert 50045 attribute from string to structured format&lt;/description&gt;
+            &lt;comment xml:space="preserve"&gt;The GroupWise REST interface requires this attribute in the structured format.&lt;/comment&gt;
+              &lt;conditions&gt;
+                  &lt;and&gt;
+                      &lt;if-op-attr name="50045" op="changing"/&gt;
+                      &lt;if-xpath op="true"&gt;node()[@attr-name='50045']//value/ @type='string'&lt;/if-xpath&gt;
+                  &lt;/and&gt;
+               &lt;/conditions&gt;
+                &lt;actions&gt;
+                  &lt;do-reformat-op-attr name="50045"&gt;
+                    &lt;arg-value type="structured"&gt;
+                       &lt;arg-component name="inherited"&gt;
+                          &lt;token-text xml:space="preserve"&gt;false&lt;/token-text&gt;
+                        &lt;/arg-component&gt;
+                        &lt;arg-component name="value"&gt;
+                           &lt;token-local-variable name="current-value"/&gt;
+                        &lt;/arg-component&gt;
+                        &lt;arg-component name="exclusive"&gt;
+                            &lt;token-text xml:space="preserve"&gt;false&lt;/token-text&gt;
+                         &lt;/arg-component&gt;
+                    &lt;/arg-value&gt;
+                   &lt;/do-reformat-op-attr&gt;
+                &lt;/actions&gt;
+&lt;/rule&gt;</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In the GroupWise driver, you can set the <span class="literal">Exclusive Use of Internet Domain Name</span> by using the attribute 50045. In the legacy GroupWise driver, it could be done by using the attribute 50157. To set the <span class="literal">Exclusive Use of Internet Domain Name</span> by using the attribute 50045, set the component <span class="literal">exclusive</span> to <span class="literal">true</span> for the 50045 attribute in the above example policy.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

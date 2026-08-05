@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4eqyl8053wa,custom_wd_driver,custom_wd_driver,t4eqymkdeu0j,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Customizing the Publisher Channel for Additional Attributes - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4eqyl8053wa">
+
+<h1 class="title h1"><span class="number">3.1</span> Customizing the Publisher Channel for Additional Attributes</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can customize the stylesheet to:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="t4eqyl8053wa.html#t4flm8ss6ioi" class="xref">Modifying an Existing Attribute</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="t4eqyl8053wa.html#t4flm96o5q9t" class="xref">Adding a New Attribute</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4flm8ss6ioi">
+
+<h2 class="title h2"><span class="number">3.1.1</span> Modifying an Existing Attribute</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can modify an existing attribute value in the custom stylesheet. For example, consider a scenario where you want to update your domestic phone number in place of your international phone number. In this scenario, you can just modify the phone attribute in the custom stylesheet as shown below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Stylesheet for phone attribute (in bold) is shown below:</p><pre class="screen">&lt;attr&gt;
+&lt;xsl:attribute name="attr-name"&gt;
+&lt;xsl:value-of select='"wd-WorkPrimaryPhone"'/&gt;
+&lt;/xsl:attribute&gt;
+&lt;value&gt;
+&lt;xsl:value-of select="$primary_work_phone_node/@<span class="strong">wd:International_Formatted_Phone</span>"/&gt;
+&lt;/value&gt;
+&lt;/attr&gt;</pre></li>
+<li class="listitem">
+<p class="listitem">The modified custom stylesheet:</p><pre class="screen">&lt;attr&gt;
+&lt;xsl:attribute name="attr-name"&gt;
+&lt;xsl:value-of select='"wd-WorkPrimaryPhone"'/&gt;
+&lt;/xsl:attribute&gt;
+&lt;value&gt;
+&lt;xsl:value-of select="$primary_work_phone_node/@<span class="strong">wd:National_Formatted_Phone</span>"/&gt;
+&lt;/value&gt;
+&lt;/attr&gt;</pre></li></ul></div>
+
+<p class="para">You can customize the Workday objects and their attributes using custom stylesheet over the Publisher and Subscriber channel. The custom XSLT paths must be specified for the required objects as per your environment to exchange information between Workday and Identity Vault. For more information on customization, see <a href="t4avmq79xc47.html#cust_attr_xslt" class="xref">Step 8</a>.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>These above mentioned attribute values (in the custom stylesheet) are sample values and must be used for reference purposes only. If you want to add a new custom attribute, or modify an existing attribute for the respective workday supported objects (files), there is no significant action or insertion required though the Workday driver configuration. The Workday driver shim, by default, would handle the existing objects that are supported by Workday and also their respective attribute transformations.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4flm96o5q9t">
+
+<h2 class="title h2"><span class="number">3.1.2</span> Adding a New Attribute</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To add a new attribute, the perform the following steps:</p>
+<div class="procedure" id="t4eqlcz63btb">
+<ol class="steps">
+<li class="step">
+<p class="para">Fetch the SOAP response from Workday.</p></li>
+<li class="step">
+<p class="para">Identify the XPATH of the required attribute from the fetched SOAP response.</p></li>
+<li class="step">
+<p class="para">Build the XPATH for the attribute in the required format. This path will be added in the XSLT stylesheet.</p></li>
+<li class="step" id="step4_xslt_path_publisher">
+<p class="para">Add the XPATH of the new attribute to the XSLT stylesheet. For example, if you are adding an attribute for Marital Status, add the following to the XSLT stylesheet.</p><pre class="screen">&lt;!--  **** Worker : Marital Status************* --&gt;
+&lt;attr&gt;
+&lt;xsl:attribute name="attr-name"&gt;
+&lt;xsl:value-of select='"wd-MaritalStatusID"'/&gt;
+&lt;/xsl:attribute&gt;
+&lt;value&gt;
+&lt;xsl:value-of select="<span class="strong">wd:Worker_Data/wd:Personal_Data/wd:Marital_Status_Reference/wd:ID[@wd:type='Marital_Status_ID']</span>"/&gt;
+&lt;/value&gt;
+&lt;/attr&gt;</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In the above example, the bold text is the XPATH that is built for Marital Status attribute, referring to the fetched schema file from Workday.</p></div>
+</li>
+<li class="step">
+<p class="para">Extend the schema file for the new attribute. The attribute added in the XSLT stylesheet should be added in the schema extension (.sch) file also, so that Identity Manager supports that attribute.</p>
+<p class="para">Ensure to add the attribute name to the Object Class, as shown below:</p><pre class="screen">"wd-MaritalStatusID" ATTRIBUTE ::=
+{
+ Operation ADD,
+ SyntaxID SYN_CI_STRING,
+ Flags {DS_STRING_ATTR},
+ ASN1ObjID {2 16 840 1 113719 1 14 4 1 2746}
+}</pre></li>
+<li class="step">
+<p class="para">In Identity Console<span class="guimenu">,</span> click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step">
+<p class="para">On the Driver Dashboard, click the Workday Driver icon.</p></li>
+<li class="step">
+<p class="para">Click the <span class="guimenu">Data Transformation and Synchronization</span> tab.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Filter</span> in the <span class="guimenu">Publisher Channel</span>.</p></li>
+<li class="step">
+<p class="para">Add the attribute name, for example <span class="filename">wd-MaritalStatusID</span>. To add:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Select <span class="guimenu">User</span> as class and click <span class="guimenu">Add Attribute</span>.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Show All Attribute</span> to display the list of attributes applicable for the class.</p></li>
+<li class="step">
+<p class="para">Add <span class="filename">wd-MaritalStatusID</span>, and save.</p></li>
+<li class="step">
+<p class="para">Select the attribute from the class list and set the <span class="guimenu">Publisher</span> option to <span class="guimenu">Synchronize</span> to match the attribute name with the schema extension name.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Add the XSLT stylesheet path as prepared in <a href="t4eqyl8053wa.html#step4_xslt_path_publisher" class="xref">Step 4</a>. To add the path:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Click the <span class="guimenu">Configuration</span> tab.</p></li>
+<li class="step">
+<p class="para">Expand the Driver Parameters section and click the <span class="guimenu">Subscriber Settings</span> tab.</p></li>
+<li class="step">
+<p class="para">Add the path in the <span class="guimenu">Import Worker Stylesheet</span> field.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Save.</p></li>
+<li class="step">
+<p class="para">Restart the driver for the changes to take effect.</p></li></ol>
+</div>
+
+<p class="para">To add the XSLT stylesheet path, in Designer:</p>
+<div class="procedure" id="t4mtq072snfg">
+<ol class="steps">
+<li class="step">
+<p class="para">Double click the connector line, and navigate to <span class="guimenu">Driver Configuration &gt; Driver Parameters.</span></p></li>
+<li class="step">
+<p class="para">Select Publisher Options &gt; Worker &gt; Worker Poll Settings &gt; Import Worker Stylesheet.</p></li>
+<li class="step">
+<p class="para">Restart the driver for the changes to take effect.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

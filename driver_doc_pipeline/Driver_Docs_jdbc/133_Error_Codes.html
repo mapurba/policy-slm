@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="list-of-error-codes-sybase-jdbc,sybase-chain-modes-and-identity-manager-jdbc-driver,sybase-chain-modes-and-identity-manager-jdbc-driver,how-to-use-stored-procedures-and-modes-in-jdbc,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Error Codes - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="list-of-error-codes-sybase-jdbc">
+
+<h1 class="title h1"><span class="number">N.1</span> Error Codes</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="list-of-error-codes-sybase-jdbc.html#h4un2qmv" class="xref">Error 226: SET CHAINED command not allowed within multi-statement transaction</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="list-of-error-codes-sybase-jdbc.html#b6tdr3w" class="xref">Error 7112: Stored procedure 'x' may be run only in chained transaction mode</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="list-of-error-codes-sybase-jdbc.html#b6tdr3x" class="xref">Error 7113: Stored procedure 'x' may be run only in unchained transaction mode</a>
+          </p></li></ul></div>
+
+<div class="container simplemsgentry" id="h4un2qmv">
+<div class="msgtext">
+            
+<p class="para">Error 226: SET CHAINED command not allowed within multi-statement transaction</p>
+          </div><div class="msgexplan">
+            <span class="title">Effect:</span>
+            <span class="para">Throws the exception of com.sybase.jdbc2.jdbc.SybSQLException with error code 226 and an SQL state of ZZZZZ.</span>
+          </div><div class="msgexplan">
+            <span class="title">Cause:</span>
+            <span class="para">This exception is usually caused by a defect in older versions of jConnect.</span>
+          </div><div class="msgexplan">
+            <span class="title">Solution:</span>
+            <span class="para">Download and upgrade to the latest version. Downloads are available at the <a href="http://www.sybase.com/products/informationmanagement/softwaredeveloperkit/jconnect" class="ulink">jConnect for JDBC Web page</a>.</span>
+          </div>
+</div>
+
+<div class="container simplemsgentry" id="b6tdr3w">
+<div class="msgtext">
+            
+<p class="para">Error 7112: Stored procedure 'x' may be run only in chained transaction mode</p>
+          </div><div class="msgexplan">
+            <span class="title">Effect:</span>
+            <span class="para">Throws the exception of com.sybase.jdbc2.jdbc.SybSQLException with error code 7712 and an SQL state of ZZZZZ.</span>
+          </div><div class="msgexplan">
+            <span class="title">Cause:</span>
+            <span class="para">The stored procedure was created in chained mode, or later altered to run in chained mode, but the driver is currently running in unchained mode. The probable cause is that the <a href="configure-jdbc-driver-specific-parameters.html#b1pu3m7" class="xref">Use Manual Transactions?</a> parameter is set to <span class="guimenu">False</span>. Another possibility is that the transaction type has been overridden to <span class="guimenu">auto</span> in a policy.</span>
+          </div><div class="msgexplan">
+            <span class="title">Solution:</span>
+            <span class="para">Do one of the following:</span>
+            
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Use stored procedure sp_procxmode to change the stored procedure's mode to <span class="guimenu">unchained</span> or <span class="guimenu">anymode</span> (preferred).</p></li>
+<li class="listitem">
+<p class="listitem">Change the driver's <a href="configure-jdbc-driver-specific-parameters.html#b1pu3m7" class="xref">Use Manual Transactions?</a> parameter to <span class="guimenu">True</span>, or change the policy transaction type to <span class="guimenu">manual</span>.</p></li></ul></div>
+
+          </div>
+</div>
+
+<div class="container simplemsgentry" id="b6tdr3x">
+<div class="msgtext">
+            
+<p class="para">Error 7113: Stored procedure 'x' may be run only in unchained transaction mode</p>
+          </div><div class="msgexplan">
+            <span class="title">Effect:</span>
+            <span class="para">Throws the exception com.sybase.jdbc2.jdbc.SybSQLException with error code 7713 and an SQL state of ZZZZZ.</span>
+          </div><div class="msgexplan">
+            <span class="title">Cause:</span>
+            <span class="para">The stored procedure was created in unchained mode, or later altered to run in unchained mode, but the driver is currently running in chained mode. The probable cause is that the <a href="configure-jdbc-driver-specific-parameters.html#b1pu3m7" class="xref">Use Manual Transactions?</a> parameter is set to <span class="guimenu">True</span>. Another possibility is that the transaction type has been overridden to <span class="guimenu">manual</span> in policy.</span>
+          </div><div class="msgexplan">
+            <span class="title">Solution:</span>
+            <span class="para">Do one of the following:</span>
+            
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Use stored procedure sp_procxmode to change the stored procedure's mode to <span class="guimenu">chained</span> or <span class="guimenu">anymode</span> (preferred).</p></li>
+<li class="listitem">
+<p class="listitem">Change the driver's <a href="configure-jdbc-driver-specific-parameters.html#b1pu3m7" class="xref">Use Manual Transactions?</a> parameter to <span class="guimenu">False</span>, or change the policy transaction type to <span class="guimenu">auto</span>.</p></li></ul></div>
+
+            
+<p class="para">If you set use-manual-transactions to <span class="guimenu">False</span>, all transactions consist of a maximum of one statement.</p>
+          </div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

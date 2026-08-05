@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 20 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="customize-referenced-attributes-using-policies,customize-driver,customize-driver,customize-servicenow-application-schema,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Customizing the Referenced Attributes Using Policies - NetIQ ServiceNow Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="customize-referenced-attributes-using-policies">
+
+<h1 class="title h1"><span class="number">4.1</span> Customizing the Referenced Attributes Using Policies</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Referenced attributes can be handled by customizing the policies in ServiceNow. Company, Location, and Building are examples of some of the referenced attributes in ServiceNow.</p>
+<p class="para">Identity Manager allows you to customize the referenced attributes by modifying the policies. For example, you can update the <span class="literal">Company</span> attribute for a user on the Subscriber channel by adding a custom policy to the driver using Designer.</p>
+<div class="procedure" id="t42gsrqh3tkb"><p class="title">To add a custom policy:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">In Designer, add the <span class="filename">Company</span> attribute to the ServiceNow driver filter and select <span class="guimenu">Synchronize</span> under the <span class="guimenu">Subscribe</span> settings.</p></li>
+<li class="step">
+<p class="para">Right-click the <span class="guimenu">Output Transformation Policy</span>, click <span class="guimenu">New</span>, and then click <span class="guimenu">DirXML Script</span>.</p></li>
+<li class="step">
+<p class="para">Add the below DirXML script to the policy you just created.</p><pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Company attribute Verification&lt;/description&gt;
+  &lt;conditions&gt;
+   &lt;and&gt;
+    &lt;if-class-name op="equal"&gt;sys_user&lt;/if-class-name&gt;
+    &lt;if-attr name="company" op="available"/&gt;
+    &lt;if-operation mode="nocase" op="equal"&gt;modify&lt;/if-operation&gt;
+   &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+   &lt;do-set-local-variable name="companyName" scope="policy"&gt;
+    &lt;arg-string&gt;
+     &lt;token-xpath expression="./modify-attr[@attr-name=&amp;apos;company&amp;apos;]/add-value/value/text()&amp;#xd;&amp;#xa;"/&gt;
+    &lt;/arg-string&gt;
+   &lt;/do-set-local-variable&gt;
+   &lt;do-set-local-variable name="companyInstance" scope="policy"&gt;
+    &lt;arg-node-set&gt;
+     &lt;token-query class-name="core_company" scope="entry"&gt;
+      &lt;arg-match-attr name="name"&gt;
+       &lt;arg-value&gt;
+        &lt;token-local-variable name="companyName"/&gt;
+       &lt;/arg-value&gt;
+      &lt;/arg-match-attr&gt;
+     &lt;/token-query&gt;
+    &lt;/arg-node-set&gt;
+   &lt;/do-set-local-variable&gt;
+   &lt;do-if&gt;
+    &lt;arg-conditions&gt;
+     &lt;and&gt;
+      &lt;if-xpath op="not-true"&gt;$companyInstance/../instance&lt;/if-xpath&gt;
+     &lt;/and&gt;
+    &lt;/arg-conditions&gt;
+    &lt;arg-actions&gt;
+     &lt;do-add-dest-object class-name="core_company" when="before"&gt;
+      &lt;arg-dn&gt;
+       &lt;token-text xml:space="preserve"&gt;Companyattr&lt;/token-text&gt;
+      &lt;/arg-dn&gt;
+     &lt;/do-add-dest-object&gt;
+     &lt;do-add-dest-attr-value class-name="core_company" name="name" when="before"&gt;
+      &lt;arg-dn&gt;
+       &lt;token-text xml:space="preserve"&gt;Companyattr&lt;/token-text&gt;
+      &lt;/arg-dn&gt;
+      &lt;arg-value type="string"&gt;
+       &lt;token-xpath expression="./modify-attr[@attr-name='company']/add-value/value/text()"/&gt;
+      &lt;/arg-value&gt;
+     &lt;/do-add-dest-attr-value&gt;
+     &lt;do-add-dest-attr-value class-name="sys_user" name="company"&gt;
+      &lt;arg-value type="string"&gt;
+       &lt;token-xpath expression="./modify-attr[@attr-name='company']/add-value/value/text()"/&gt;
+      &lt;/arg-value&gt;
+     &lt;/do-add-dest-attr-value&gt;
+    &lt;/arg-actions&gt;
+    &lt;arg-actions/&gt;
+   &lt;/do-if&gt;
+  &lt;/actions&gt;
+ &lt;/rule&gt;</pre></li>
+<li class="step">
+<p class="para">Deploy the driver along with the policy.</p></li></ol>
+</div>
+
+<p class="para">In the above example, when the driver is deployed to the Identity Vault, the policy checks whether the company name exists in the ServiceNow database and performs one of the following actions:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If the company name exists, the policy links the company with the user.</p></li>
+<li class="listitem">
+<p class="listitem">If the company name does not exist in the database, the policy updates ServiceNow with the company name and links it with the user.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

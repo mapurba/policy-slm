@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3r9j7s,b3r9hzv,b3r9hzv,b3r8t50,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Upgrading from the Fan-Out Driver - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3r9j7s">
+
+<h1 class="title h1"><span class="number">4.1</span> Upgrading from the Fan-Out Driver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Identity Manager Fan-Out driver provides one-way synchronization to a heterogeneous mix of systems including Linux and UNIX systems, and IBM<sup class="superscript">*</sup> i5/OS<sup class="superscript">*</sup> and z/OS<sup class="superscript">*</sup> systems. The Fan-Out driver also provides authentication redirection from those systems.</p>
+<p class="para">Moving to the Linux and UNIX driver provides two main advantages.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b3yyw3d">
+            <p class="title"><em class="title">Bidirectional Synchronization:</em>
+            The Linux and UNIX driver allows synchronization from the connected Linux or UNIX system.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b3yywrw">
+            <p class="title"><em class="title">Standard Identity Manager Policies That Simplify Customization:</em>
+            The Fan-Out driver makes minimal use of Identity Manager policies.</p>
+          </div>
+</li></ul></div>
+
+<p class="para">Consider the following before migrating from the Fan-Out driver to the Linux and UNIX driver.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b3yyx16">
+            <p class="title"><em class="title">Heterogeneity:</em>
+            The Fan-Out driver supports operating systems in addition to Linux and UNIX. You can continue to use the Fan-Out driver for those systems while using the Linux and UNIX driver for Linux and UNIX systems.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b3yyy8j">
+            <p class="title"><em class="title">Scalability:</em>
+            The Fan-Out driver can fan out identities to any number of systems. The Linux and UNIX driver can replicate to only one system. (Although that system might provide account management for many computers using NIS or NIS+.)</p>
+          </div>
+
+<p class="listitem">One Linux and UNIX driver is required for each connected system. For best performance, we recommend no more than a total of 60 drivers.</p></li>
+<li class="listitem">
+<div class="formalpara" id="b3yyy8k">
+            <p class="title"><em class="title">Authentication Redirection:</em>
+            The Fan-Out driver provides authentication redirection from Linux and UNIX using PAM or LAM. The Linux and UNIX driver provides only bidirectional password synchronization.</p>
+          </div>
+</li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3xgfhc">
+
+<h2 class="title h2"><span class="number">4.1.1</span> Preparing for Migration</h2>
+
+<div class="content_wrapper">
+
+<p class="para">If necessary, migrate the UID and GID numbers from the appropriate Fan-Out driver Platform Set. You can assign RFC 2307 attributes, such as homeDirectory and loginShell, to objects in the Identity Vault.</p>
+<p class="para">To use the Linux and UNIX Settings driver to accomplish this:</p>
+<div class="procedure" id="b412a76">
+<ol class="steps">
+<li class="step" id="b412a77">
+<p class="para">Install the Linux and UNIX Settings driver on each connected Linux or UNIX system.</p></li>
+<li class="step" id="b412agd">
+<p class="para">Set the properties of the Linux and UNIX Settings driver to correspond to the UID/GID ranges that were specified in the Fan-Out driver.</p></li>
+<li class="step" id="b42kxzt">
+<p class="para">Configure the Linux and UNIX Settings driver to populate the desired RFC 2307 attributes.</p></li></ol>
+</div>
+
+<p class="para">For details about installing and configuring the Linux and UNIX Settings driver, see the <span class="citetitle">Linux and UNIX Settings Driver Implementation Guide</span> on the <a href="https://www.netiq.com/documentation/identity-manager-47-drivers" class="ulink">Identity Manager 4.8 Drivers Documentation Web site</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3xgi3w">
+
+<h2 class="title h2"><span class="number">4.1.2</span> Migrating Fan-Out Driver Platform Services to the Linux and UNIX Driver</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b3xgif4">
+<p class="para">Perform the following steps on your target platform system:</p>
+<ol class="steps">
+<li class="step" id="b3xgif5">
+<p class="para">Stop the following processes:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">asamrcvr</p></li>
+<li class="listitem">
+<p class="listitem">asampsp</p></li></ul></div>
+</li>
+<li class="step" id="b3xgird">
+<p class="para">Remove the Platform Services startup scripts from <span class="filename">/etc/init.d</span>.</p></li>
+<li class="step" id="b4ifj03">
+<p class="para">Install the driver shim on the connected system.</p>
+<p class="para">For details, see <a href="b3xehpq.html" class="xref">Installing the Driver Shim on the Connected System</a>.</p></li>
+<li class="step" id="b4ifj04">
+<p class="para">Install the Linux and UNIX driver PAM or LAM module.</p>
+<p class="para">For details, see <a href="b3xfnmq.html" class="xref">Installing the PAM or LAM Module</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3xgjcz">
+
+<h2 class="title h2"><span class="number">4.1.3</span> Configuring the Driver</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b3xgjge">
+<ol class="steps">
+<li class="step" id="b3xgktg">
+<p class="para">Install and set up the Linux and UNIX driver on the Metadirectory server.</p>
+<p class="para">For details, see <a href="b1bybgrg.html" class="xref">Creating the Driver in Designer</a>.</p></li>
+<li class="step" id="b3xgl46">
+<p class="para">Make any required policy modifications.</p>
+<p class="para">Create or modify an appropriate policy to use the alternative naming attribute if one was used by the Fan-Out driver. For more information about policy customization, see the policy documentation on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p></li>
+<li class="step" id="b3xglpf">
+<p class="para">Start the Linux and UNIX driver.</p>
+<p class="para">Click the upper right corner of the driver icon, then click <span class="guimenu">Start driver</span>.</p></li>
+<li class="step" id="b3xglrs">
+<p class="para">Migrate the users to make new associations. For details, see <a href="b3xxotz.html#b3xxpl3" class="xref">Migrating Identities from the Identity Vault to the Connected System</a> and <a href="b3xxotz.html#b3xxw83" class="xref">Migrating Identities from the Connected System to the Identity Vault</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3xgm2l">
+
+<h2 class="title h2"><span class="number">4.1.4</span> Post-Migration Tasks</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Perform the steps listed in <a href="b3xfpxf.html" class="xref">Post-Installation Tasks</a>.</p>
+<div class="procedure" id="b3xgmb1">
+<p class="para">After the new driver is operating properly, you can remove the Fan-Out driver components.</p>
+<ol class="steps">
+<li class="step" id="b3xgmb2">
+<p class="para">Delete the Platform object from the Fan-Out driver configuration.</p></li>
+<li class="step" id="b3xgnm2">
+<p class="para">On the connected system, uninstall Platform Services by removing all startup scripts and deleting the <span class="filename">/usr/local/ASAM</span> directory.</p></li>
+<li class="step" id="b3xgmm7">
+<p class="para">If this is the last platform being served by the Fan-Out driver, you can uninstall the Fan-Out core driver:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b3xgmzc">
+<p class="para">Remove the <span class="filename">ASAM</span> directory from the file system.</p></li>
+<li class="step" id="b3xgn99">
+<p class="para">Remove the ASAM System container object and all of its subordinates from the tree.</p></li>
+<li class="step" id="b3xgnh9">
+<p class="para">Uninstall the Fan-Out driver plug-ins.</p></li></ol>
+</div>
+</li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

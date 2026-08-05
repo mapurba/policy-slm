@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b8mow8v,b8moo2s,b8moq22,b1bybgrg,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing the Windows Scripting Driver - NetIQ Scripting Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b8mow8v">
+
+<h1 class="title h1"><span class="number">3.2</span> Installing the Windows Scripting Driver</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Topics in this section include</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mow8v.html#b8mowoy" class="xref">Installing the Driver Shim</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mow8v.html#b8mp00j" class="xref">Running the Driver</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mow8v.html#brh2if1" class="xref">Running the Script Service for PowerShell (default mode)</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b8mow8v.html#brh2jbf" class="xref">Running Multiple Instances of the Driver (optional)</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mowoy">
+
+<h2 class="title h2"><span class="number">3.2.1</span> Installing the Driver Shim</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b8mowxn">
+<ol class="steps">
+<li class="step" id="b8mowxo">
+<p class="para">Obtain one of the following files from your installation media:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="filename">win_x86_64_scriptdriver_install.exe</span> (64-bit)</p></li>
+<li class="listitem">
+<p class="listitem"><span class="filename">win_x86_scriptdriver_install.exe</span> (32-bit)</p></li></ul></div>
+
+<p class="para">Run this file on your Windows system.</p></li>
+<li class="step" id="b8mowze">
+<p class="para">Click <span class="guimenu">Next</span> to continue the installation.</p></li>
+<li class="step" id="b8mox16">
+<p class="para">Accept the default installation folder or specify your own. Click <span class="guimenu">Next</span> to continue.</p></li>
+<li class="step" id="b8mox32">
+<p class="para">Review your settings and click <span class="guimenu">Next</span> to continue.</p></li>
+<li class="step" id="b8mox4r">
+<p class="para">After the driver files are copied, you are prompted to retrieve an SSL certificate. NetIQ eDirectory must be running to retrieve the certificate. The certificate allows SSL encryption between the Identity Manager engine and the driver shim. Enabling SSL is optional but is recommended for better security. To retrieve the certificate, click <span class="guimenu">Yes</span> and follow the prompts in the console window:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b8moxkn">
+<p class="para">Specify the DNS name or IP address of your eDirectory server.</p></li>
+<li class="step" id="b8moxmb">
+<p class="para">Specify the LDAP secure port, default 636.</p></li>
+<li class="step" id="b8moxns">
+<p class="para">Enter <span class="command">Y</span> to accept the certificate.</p></li></ol>
+</div>
+</li>
+<li class="step" id="b8moxsi">
+<p class="para">You are prompted to enter Driver and Remote Loader passwords. These passwords are used to verify that an authorized driver shim is communicating with the Identity Manager engine. Although you donât need to enter the passwords immediately, they must be set at some point before running the driver. Click <span class="guimenu">Yes</span> to the prompt and follow the prompts in the console window:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b8moxyg">
+<p class="para">Enter and confirm the Remote Loader password.</p></li>
+<li class="step" id="b8moy0e">
+<p class="para">Enter and confirm the Driver password.</p></li></ol>
+</div>
+</li>
+<li class="step" id="b8moy4m">
+<p class="para">The installation of the driver shim is finished, with the option of starting the Driver Shim Service. Proceed to the next section to complete the installation of the driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b8mp00j">
+
+<h2 class="title h2"><span class="number">3.2.2</span> Running the Driver</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Start the driver engine component in NetIQ iManager.</p>
+<p class="para">The driver shim is a Windows service. Use the Windows Services application to start and stop the NetIQ Identity Manager Windows Script Driver service (see <a href="b8nnhcs.html" class="xref">Section 6.0, Using the Scripting Driver</a>).</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="brh2if1">
+
+<h2 class="title h2"><span class="number">3.2.3</span> Running the Script Service for PowerShell (default mode)</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Script Service preloads Windows PowerShell and keeps it in memory to provide faster performance. Requests to the Script Service are securely submitted by a small program called the Script Client.</p>
+<div class="container sect3" id="brh2mfh">
+
+<h3 class="title h3">Using the Script Service</h3>
+
+<p class="para">To install and use the Script Service:</p>
+<div class="procedure" id="bqnavb6">
+<ol class="steps">
+<li class="step" id="bqnavb7">
+<p class="para">If necessary, add the .NET Framework 3.5 Feature using the Add Roles and Features operation in the Server Manager application.</p></li>
+<li class="step" id="bqnavz7">
+<p class="para">Run <span class="filename">Win\Microsoft WSE 3.0 Runtime.msi</span> to install the Web Service Enhancements module.</p></li>
+<li class="step" id="bqnax9k">
+<p class="para">It may be necessary to open TCP port 8081 in your firewall--this port is used only for communication between the Script Client and Script Service executables. The port can be customized in scriptservice.conf, as explained below.</p></li>
+<li class="step" id="bqnayfb">
+<p class="para">In the Services application, set <span class="guimenu">NetIQ IDM Windows Script Driver - Script Service</span> to start automatically.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="brh2n0s">
+
+<h3 class="title h3">Configuring the Script Service</h3>
+
+<p class="para">To configure the Script Service</p>
+<div class="procedure" id="bqnbrbn">
+<ol class="steps">
+<li class="step" id="bqnbrbo">
+<p class="para">Create a file named <span class="filename">scriptservice.conf</span> in the <span class="filename">WSDriver\conf</span> directory.</p></li>
+<li class="step" id="bqnbs0s">
+<p class="para">Open the file and add the desired configuration lines, using the following keywords:</p>
+<div class="informaltable">
+<table class="topbot" width="96%"><col width="17%" /><col width="32%" /><col width="52%" />
+                    
+<tr class="headerrow" id="bqnc0ax"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Keyword</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Syntax</p></th>
+</tr>
+                  
+<tr class="oddrow" id="bqnc0ay"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                          <span class="literal">-address</span>
+                        </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Change the default address and port for Script Service.</p>
+<p class="para"><span class="strong">Default</span>: localhost:8081</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">-address &lt;DNS name or IP address&gt;[:port]</p></td>
+</tr>
+<tr class="evenrow" id="bqnc0az"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                          <span class="literal">-nosecurity</span>
+                        </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Do not enforce security. This command is required if the <span class="guimenu">Use Windows EFS</span> driver parameter is disabled.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="screen">-nosecurity</pre></td>
+</tr>
+<tr class="oddrow" id="bqnc0b0"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                          <span class="literal">-command</span>
+                        </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Execute a script command on startup. May be specified multiple times.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="screen">-command &lt;command&gt;</pre></td>
+</tr></table>
+</div>
+</li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="brh2orm">
+
+<h3 class="title h3">Using PowerShell Directly</h3>
+
+<p class="para">If you no longer wish to use the Script Service, follow these steps:</p>
+<div class="procedure" id="bqnccc4">
+<ol class="steps">
+<li class="step" id="bqnccc5">
+<p class="para">Open the Driver Configuration in iManager. In the Driver Parameters, change <span class="literal">Script Command</span> to <span class="literal">powershell.exe</span>.</p></li>
+<li class="step" id="bqncceb">
+<p class="para">Either stop or disable the Script Service.</p></li>
+<li class="step" id="bqnccex">
+<p class="para">Restart the driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="brh2jbf">
+
+<h2 class="title h2"><span class="number">3.2.4</span> Running Multiple Instances of the Driver (optional)</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Running multiple instances of the Scripting Driver on the same system may be desirable, but require some additional steps taken. The instructions in this section assume that you have already installed the Scripting Driver on the system.</p>
+<div class="container sect3" id="brh4w84">
+
+<h3 class="title h3">Adding a Windows Scripting Driver Instance</h3>
+
+<p class="para">To add an instance:</p>
+<div class="procedure" id="brh2ts1">
+<ol class="steps">
+<li class="step" id="brh2ts2">
+<p class="para">Copy existing files:</p>
+<p class="para">After stopping your original driver, create a new directory, and copy all original driver files to the new directory, using the same directory structure.</p>
+<p class="para">For example, copy files and directories from <span class="literal">C:\Program Files\Novell\WSDriver</span> to <span class="literal">C:\Program Files\Novell\WSDriver2</span>.</p></li>
+<li class="step" id="brh2tvb">
+<p class="para">Edit <span class="literal">wsdrv.conf:</span></p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="brh4qwy">
+<p class="para">Open the file <span class="literal">conf\wsdrv.conf</span> in your new directory structure. Replace all file paths with the path to the new instance directory.</p>
+<p class="para">For example, paths might appear for the <span class="literal">-path</span>, <span class="literal">-tracefile</span> and <span class="literal">-connection</span> options.</p></li>
+<li class="step" id="brh4qwz">
+<p class="para">Change the port numbers (connection and HTTP) to be different from the original driver's port numbers.</p>
+<p class="para">For example, if the original driver uses default ports 8090 and 8091, the new instance could use 9090 and 9091. Note that these ports need to be opened in a firewall.</p></li></ol>
+</div>
+</li>
+<li class="step" id="brh2ty7">
+<p class="para">Create a new service:</p>
+<p class="para">Using the Command Prompt, run <span class="filename">wsdriver.exe</span> from the new instance directory with the following options:</p><pre class="screen">  wsdriver -installService -instance {number} -path {path}</pre>
+<p class="para">The instance number could be <span class="filename">2</span> for the second instance, <span class="literal">3</span> for a third, and so on. The path should be the path to the new instance directory, using quote marks. Here's an example:</p><pre class="screen">  wsdriver -installService -instance 2 -path "C:\Program
+     Files\Novell\WSDriver2"</pre>
+<p class="para">This command will create a service named <span class="literal">Novell IDM Windows Script Driver - 2</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you would like to run a driver instance directly (not as a service), use the <span class="literal">-instance</span> option:</p><pre class="screen">  wsdriver -instance 2</pre>
+<p class="para">This option is not needed for the original instance.</p></div>
+</li>
+<li class="step" id="brh2u18">
+<p class="para">Create a new driver object:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="brh4sr0">
+<p class="para">Using iManager or Designer, create a new Driver Object to connect to the new instance. Alternatively, export the original driver's configuration and import it as a new driver.</p></li>
+<li class="step" id="brh4t2w">
+<p class="para">After creating the Driver, open its configuration. Change the port number in <span class="literal">Remote Loader Connection Parameters</span> to the new instance's connection port.</p></li></ol>
+</div>
+</li>
+<li class="step" id="brh2u7b">
+<p class="para">Start the services and drivers:</p>
+<p class="para">Start the server for the original and new instances, and start the Drivers in iManager or Designer. The instances will run independently.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="brh4z8s">
+
+<h3 class="title h3">Removing a Windows Scripting Driver Instance</h3>
+
+<p class="para">To remove an instance:</p>
+<div class="procedure" id="brh505p">
+<ol class="steps">
+<li class="step" id="brh505q">
+<p class="para">Stop the Service.</p></li>
+<li class="step" id="brh50g9">
+<p class="para">Uninstall the Service.</p>
+<p class="para">From the Command Prompt, run:</p><pre class="screen">  wsdriver -removeService -instance {number}</pre>
+<p class="para">For example:</p><pre class="screen">  wsdriver -removeService -instance 2</pre></li>
+<li class="step" id="brh50n0">
+<p class="para">Delete the files.</p>
+<p class="para">Delete the new directory, and all sub-directories, created for the instance.</p></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>To remove the original instance, use the uninstall feature.</p></div>
+
+</div>
+
+<div class="container sect3" id="t4evz4omsf90">
+
+<h3 class="title h3">Adding a Linux or Unix Scripting Driver Instance</h3>
+
+<p class="para">To add an instance:</p>
+<div class="procedure" id="t4evz4omvufi">
+<ol class="steps">
+<li class="step">
+<p class="para">Copy existing files:</p>
+<p class="para">After stopping your original driver, copy the file structure from <span class="filename">/opt/novell/usdrv</span> to your alternate instance location. For example:</p>
+<p class="para">
+                <span class="literal">cp -r /opt/novell/usdrv /opt/novell/usdrv-instance2</span>
+              </p></li>
+<li class="step">
+<p class="para">Create a new, separate configuration file from <span class="filename">/etc/usdrv.conf</span>:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Open the new configuration file, <span class="filename">/etc/usdrv-instance2.conf</span>, and specify the alternate path location for your new instance.</p>
+<p class="para">For example, paths might appear for the <span class="literal">-path</span>, <span class="literal">-tracefile</span> and <span class="literal">-connection</span> options.</p></li>
+<li class="step">
+<p class="para">Change the port numbers (connection and HTTP) to be different from the original driver's port numbers.</p>
+<p class="para">For example, if the original driver uses default ports 8090 and 8091, the new instance could use 9090 and 9091. Note that these ports need to be opened in a firewall.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Create a new, separate, startup script from the original <span class="filename">/etc/init.d/usdrvd</span> and change the new startup script to specify the alternate paths as well.</p></li>
+<li class="step">
+<p class="para">Create a new driver object:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Using iManager or Designer, create a new Driver Object to connect to the new instance. Alternatively, export the original driver's configuration and import it as a new driver.</p></li>
+<li class="step">
+<p class="para">After creating the Driver, open its configuration. Change the port number in <span class="literal">Remote Loader Connection Parameters</span> to the new instance's connection port.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Start the services and drivers:</p>
+<p class="para">Start the server for the original and new instances, and start the Drivers in iManager or Designer. The instances will run independently.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

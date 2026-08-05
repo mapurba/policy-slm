@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-call-stored-procedures-and-functions,embed-sql-statements-in-xds-events-for-jdbc-driver,how-to-implement-check-object-password,best-practices-to-use-stored-procedures-and-functions,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Calling Stored Procedures and Functions - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-call-stored-procedures-and-functions">
+
+<h1 class="title h1"><span class="number">12.14</span> Calling Stored Procedures and Functions</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The JDBC driver enables you to use stored procedures. The ability to use the &lt;<span class="literal">jdbc:call-procedure</span>&gt; and &lt;<span class="literal">jdbc:call-function</span>&gt; elements to call stored procedures from a policy has been tested only against Oracle and is supported only on that platform.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-call-stored-procedures-and-functions.html#b87snuq" class="xref">Using Embedded SQL to Call Stored Procedures or Functions</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-call-stored-procedures-and-functions.html#b87suy1" class="xref">Using the jdbc:call-procedure Element</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-call-stored-procedures-and-functions.html#b886mfz" class="xref">Using the jdbc:call-function Element</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87snuq">
+
+<h2 class="title h2"><span class="number">12.14.1</span> Using Embedded SQL to Call Stored Procedures or Functions</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can call stored procedures or functions in one of two ways:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Call the procedure or function by using a Statement object.</p></li>
+<li class="listitem">
+<p class="listitem">Call the procedure by using a Callable Statement object.</p></li></ul></div>
+
+<h4 class="bridgehead" id="b87sql7">Example 1: Calling a Stored Procedure by Using a Statement</h4>
+<pre class="screen">     &lt;!-- call syntax is Oracle --&gt;
+     &lt;jdbc:statement&gt;
+          &lt;jdbc:sql&gt;CALL schema.procedure-name&lt;/jdbc:sql/&gt;
+     &lt;/jdbc:statement&gt;</pre>
+<h4 class="bridgehead" id="b87sqe5">Example 2: Calling a Stored Procedure as a CallableStatement</h4>
+<pre class="screen">     &lt;!-- call syntax is vendor agnostic --&gt;
+     &lt;jdbc:statement&gt;
+      &lt;jdbc:call-procedure jdbc:name="schema.procedure-name"/&gt;
+     &lt;/jdbc:statement&gt;</pre>
+<h4 class="bridgehead" id="b87sq0n">Example 3: Calling a Function by Using a Statement</h4>
+<pre class="screen">     &lt;!-- call syntax is Informix --&gt;
+     &lt;jdbc:statement&gt;
+       &lt;jdbc:sql&gt;EXECUTE FUNCTION schema.function-name&lt;/jdbc:sql/&gt;</pre><pre class="screen">     &lt;/jdbc:statement&gt;</pre>
+<h4 class="bridgehead" id="b87st1h">Example 4: Calling a Function as a CallableStatement</h4>
+<pre class="screen">     &lt;!-- call syntax is vendor agnostic --&gt;
+     &lt;jdbc:statement&gt;
+          &lt;jdbc:call-function jdbc:name="schema.function-name"/&gt;
+     &lt;/jdbc:statement&gt;</pre>
+<p class="para">The principle advantage of using the CallableStatement interface is that you do not need to know the proprietary call syntaxes of each database vendor or JDBC implementation. Other advantages include the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">It's much easier to build procedure or function calls in the Policy Builder.</p></li>
+<li class="listitem">
+<p class="listitem">You can differentiate between Null and empty string parameter values.</p></li>
+<li class="listitem">
+<p class="listitem">You can call functions on all database platforms.</p>
+<p class="listitem">Oracle, for instance, doesn't support calling functions by using a statement.</p></li>
+<li class="listitem">
+<p class="listitem">You can retrieve Out parameter values from stored procedure calls.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b87suy1">
+
+<h2 class="title h2"><span class="number">12.14.2</span> Using the jdbc:call-procedure Element</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Stored procedures do not necessarily require parameters. Only a name is required. If a database supports schemas, we recommend that you schema-qualify the name. If a schema qualifier isn't provided, how names are resolved depends upon your third-party JDBC implementation and might change, depending upon driver configuration settings.</p>
+<p class="para">The jdbc:call-procedure element must be wrapped in a jdbc:statement element.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b87tt30" class="xref">Specifying a Procedure Name</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b87tvm2" class="xref">Passing In or In Out Parameter Values</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b87uog6" class="xref">Handling Out or In Out Parameters</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b886br1" class="xref">Example Complex Stored Procedure Calls</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b87tt30">
+
+<h3 class="title h3">Specifying a Procedure Name</h3>
+
+<p class="para">&lt;<span class="command">jdbc:call-procedure jdbc:name="schema.procedure-name"/</span>&gt;</p>
+</div>
+
+<div class="container sect3" id="b87tvm2">
+
+<h3 class="title h3">Passing In or In Out Parameter Values</h3>
+
+<p class="para">The number of jdbc:param elements specified must match the number of param elements declared in the procedure. Only jdbc:param elements corresponding to In or In Out procedure parameters can have values. Out parameters (those that can't be passed values) must be represented by an empty jdbc:param element.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b87u9nx" class="xref">Calling a Procedure with No Parameters</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b87uawc" class="xref">Calling a Procedure with a Null Parameter</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b87uaz7" class="xref">Calling a Procedure with an Empty String Parameter</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b87ugjd" class="xref">Calling a Procedure with a Literal Value</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b87ugje" class="xref">Calling a Procedure with an Out Parameter</a>
+              </p></li></ul></div>
+
+<div class="container sect4" id="b87u9nx">
+
+<h4 class="title h4">Calling a Procedure with No Parameters</h4>
+<pre class="screen">     &lt;jdbc:statement&gt;
+          &lt;jdbc:call-procedure jdbc:name="schema.procedure-name"/&gt;
+     &lt;/jdbc:statement&gt;</pre>
+</div>
+
+<div class="container sect4" id="b87uawc">
+
+<h4 class="title h4">Calling a Procedure with a Null Parameter</h4>
+<pre class="screen">     &lt;jdbc:call-procedure jdbc:name="schema.procedure-name"&gt;
+          &lt;!-- no value element = pass null --&gt;
+          &lt;jdbc:param/&gt;
+     &lt;/jdbc:call-procedure&gt;</pre>
+</div>
+
+<div class="container sect4" id="b87uaz7">
+
+<h4 class="title h4">Calling a Procedure with an Empty String Parameter</h4>
+<pre class="screen">     &lt;jdbc:call-procedure jdbc:name="schema.procedure-name"&gt;
+          &lt;!-- empty value element = pass empty string --&gt;
+          &lt;jdbc:param&gt;
+               &lt;jdbc:value/&gt;
+          &lt;/jdbc:param&gt;
+     &lt;jdbc:param&gt;</pre>
+<p class="para">Literals can be passed only to procedure parameters declared as In or In Out. Passed literals must be type-compatible with declared procedure parameters.</p>
+</div>
+
+<div class="container sect4" id="b87ugjd">
+
+<h4 class="title h4">Calling a Procedure with a Literal Value</h4>
+<pre class="screen">     &lt;jdbc:call-procedure jdbc:name="schema.procedure-name"&gt;
+          &lt;!-- non-empty value element = pass literal --&gt;
+          &lt;jdbc:param&gt;
+               &lt;jdbc:value&gt;literal&lt;/jdbc:value&gt;
+          &lt;/jdbc:param&gt;
+     &lt;jdbc:param&gt;</pre>
+</div>
+
+<div class="container sect4" id="b87ugje">
+
+<h4 class="title h4">Calling a Procedure with an Out Parameter</h4>
+
+<p class="para">Assuming that a procedure has two parameters, the first Out and the second In, you invoke the procedure as follows:</p><pre class="screen">     &lt;jdbc:call-procedure jdbc:name="schema.procedure-name"&gt;
+          &lt;!-- the OUT param place --&gt;
+          &lt;jdbc:param/&gt;
+            &lt;!-- the IN param --&gt;
+          &lt;jdbc:param&gt;
+               &lt;jdbc:value&gt;literal&lt;/jdbc:value&gt;
+          &lt;/jdbc:param&gt;
+     &lt;jdbc:param&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect3" id="b87uog6">
+
+<h3 class="title h3">Handling Out or In Out Parameters</h3>
+
+<p class="para">Stored procedures with Out or In Out parameters can return values. These values are returned by the driver and are accessible to policies. Out or In Out parameters values are returned at the same position as their corresponding declared parameter.</p>
+<p class="para">Also, to facilitate correlation of procedure calls and output parameter values, Out parameters contain the same event-ID value as the procedure call that generated them. This is particularly useful when multiple calls are made in the same document.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b8862sq" class="xref">Null or No Return Value</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b886csz" class="xref">Empty String Return Value</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b886ct0" class="xref">Literal Return Value</a>
+              </p></li></ul></div>
+
+<div class="container sect4" id="b8862sq">
+
+<h4 class="title h4">Null or No Return Value</h4>
+
+<p class="para">Assuming that a procedure has a single Out or In parameter, the following output is generated:</p><pre class="screen">     &lt;output&gt;
+         &lt;!-- no value element = OUT param returned null or IN param --&gt;
+        &lt;jdbc:out-parameters event-id="0" jdbc:number-of-params="1"&gt;
+             &lt;jdbc:param/&gt;
+        &lt;/jdbc:out-parameters&gt;
+        &lt;status event-id="0" level="success"/&gt;
+     &lt;/output&gt;</pre>
+</div>
+
+<div class="container sect4" id="b886csz">
+
+<h4 class="title h4">Empty String Return Value</h4>
+
+<p class="para">Assuming that a procedure has a single Out or In Out parameter, the following output is generated:</p><pre class="screen">     &lt;output&gt;
+         &lt;!-- empty value element = returned empty string --&gt;
+         &lt;jdbc:out-parameters event-id="0" jdbc:number-of-params="1"&gt;
+             &lt;jdbc:param&gt;
+                 &lt;jdbc:value/&gt;
+             &lt;/jdbc:param&gt;
+          &lt;/jdbc:out-parameters&gt;
+          &lt;status event-id="0" level="success"/&gt;
+     &lt;/output&gt;</pre>
+</div>
+
+<div class="container sect4" id="b886ct0">
+
+<h4 class="title h4">Literal Return Value</h4>
+
+<p class="para">Assuming that a procedure has a single Out or In Out parameter, the following output is generated:</p><pre class="screen">     &lt;output&gt;
+         &lt;!-- no-empty value element = returned literal value --&gt;
+         &lt;jdbc:out-parameters event-id="0" jdbc:number-of-params="2"&gt;
+             &lt;jdbc:param&gt;
+                 &lt;jdbc:value&gt;literal&lt;jdbc:value&gt;
+             &lt;/jdbc:param&gt;
+         &lt;/jdbc:out-parameters&gt;
+         &lt;status event-id="0" level="success"/&gt;
+     &lt;/output&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect3" id="b886br1">
+
+<h3 class="title h3">Example Complex Stored Procedure Calls</h3>
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b886cew" class="xref">Procedure Declaration</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b886ct1" class="xref">Procedure Call from Policy</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b886ct2" class="xref">Procedure Output to Policy</a>
+              </p></li></ul></div>
+
+<div class="container sect4" id="b886cew">
+
+<h4 class="title h4">Procedure Declaration</h4>
+
+<p class="para">This procedure uses Oracle PSQL syntax.</p><pre class="screen">CREATE PROCEDURE indirect.p1(i1 IN VARCHAR2, io2 IN OUT VARCHAR2, o3 OUT INTEGER, i4 IN VARCHAR2)
+AS
+BEGIN
+    SELECT 'literal' INTO io2 FROM DUAL;
+    SELECT 1 INTO o3 FROM DUAL;
+END p1;</pre>
+</div>
+
+<div class="container sect4" id="b886ct1">
+
+<h4 class="title h4">Procedure Call from Policy</h4>
+<pre class="screen">&lt;input&gt;
+     &lt;jdbc:statement event-id="0"&gt;
+         &lt;jdbc:call-procedure jdbc:name="indirect.p1"&gt;
+              &lt;!-- i1 IN VARCHAR2 --&gt;
+              &lt;jdbc:param&gt;
+                   &lt;!-- pass empty string --&gt;
+                   &lt;jdbc:value/&gt;
+              &lt;/jdbc:param&gt;
+              !-- io2 IN OUT VARCHAR2 --&gt;
+              &lt;jdbc:param&gt;
+                   &lt;!-- pass literal --&gt;
+                   &lt;jdbc:value&gt;literal&lt;/jdbc:value&gt;
+              &lt;/jdbc:param&gt;
+              &lt;!-- o3 OUT INTEGER --&gt;
+              &lt;!-- param placeholder --&gt;
+              &lt;jdbc:param/&gt;
+              &lt;!-- o4 IN VARCHAR2 --&gt;
+              &lt;!-- pass null --&gt;
+              &lt;jdbc:param/&gt;
+          &lt;/jdbc:call-procedure&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+</div>
+
+<div class="container sect4" id="b886ct2">
+
+<h4 class="title h4">Procedure Output to Policy</h4>
+<pre class="screen">&lt;output&gt;
+     &lt;jdbc:out-parameters event-id="0" jdbc:number-of-params="2"&gt;
+          &lt;jdbc:param/&gt;
+          &lt;jdbc:param jdbc:name="IO2"
+                    jdbc:param-type="INOUT"
+                    jdbc:position="2"
+                    jdbc:sql-type="java.sql.Types.VARCHAR"&gt;
+               &lt;jdbc:value&gt;literal&lt;/jdbc:value&gt;
+          &lt;/jdbc:param&gt;
+          &lt;jdbc:param jdbc:name="O3"
+                    jdbc:param-type="OUT"
+                    jdbc:position="3"
+                    jdbc:sql-type="java.sql.Types.DECIMAL"&gt;
+                &lt;jdbc:value&gt;1&lt;/jdbc:value&gt;
+          &lt;/jdbc:param&gt;
+          &lt;jdbc:param/&gt;
+     &lt;/jdbc:out-parameters&gt;
+     &lt;status event-id="0" level="success"/&gt;
+&lt;/output&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b886mfz">
+
+<h2 class="title h2"><span class="number">12.14.3</span> Using the jdbc:call-function Element</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Functions do not necessarily require parameters. Only a name is required. If a database supports schemas, we recommend that you schema-qualify the name. If a schema qualifier isn't provided, how names are resolved depends upon your third-party JDBC implementation and might change depending upon driver configuration settings.</p>
+<p class="para">The jdbc:call-function element must be wrapped in a jdbc:statement element.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b886plk" class="xref">Specifying a Function Name</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b887upa" class="xref">Passing In Parameter Values</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b887upb" class="xref">Calling a Function with No Parameter</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b887upc" class="xref">Calling a Function with a Null Parameter</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b887upd" class="xref">Calling a Function with an Empty String Parameter</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b887upe" class="xref">Calling a Function with a Literal Value</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b887upf" class="xref">Handling Function Results</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-call-stored-procedures-and-functions.html#b888j98" class="xref">Example Complex Function Calls</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b886plk">
+
+<h3 class="title h3">Specifying a Function Name</h3>
+<pre class="screen">     &lt;jdbc:call-function jdbc:name="schema.function-name"/&gt;</pre>
+</div>
+
+<div class="container sect3" id="b887upa">
+
+<h3 class="title h3">Passing In Parameter Values</h3>
+
+<p class="para">The number of jdbc:param elements specified must match the number of params declared in the function.</p>
+</div>
+
+<div class="container sect3" id="b887upb">
+
+<h3 class="title h3">Calling a Function with No Parameter</h3>
+<pre class="screen">     &lt;jdbc:call-function jdbc:name="schema.function-name"/&gt;</pre>
+</div>
+
+<div class="container sect3" id="b887upc">
+
+<h3 class="title h3">Calling a Function with a Null Parameter</h3>
+<pre class="screen">     &lt;jdbc:call-function jdbc:name="schema.function-name"&gt;
+          &lt;!-- no value element = null --&gt;
+          &lt;jdbc:param/&gt;
+     &lt;/jdbc:call-procedure&gt;</pre>
+</div>
+
+<div class="container sect3" id="b887upd">
+
+<h3 class="title h3">Calling a Function with an Empty String Parameter</h3>
+<pre class="screen">     &lt;jdbc:call-function jdbc:name="schema.function-name"&gt;
+          &lt;!-- empty value element = pass empty string --&gt;
+          &lt;jdbc:param&gt;
+               &lt;jdbc:value/&gt;
+          &lt;/jdbc:param&gt;
+     &lt;jdbc:param&gt;</pre>
+<p class="para">Literals can be passed to function parameters declared as In. Passed literals must be type-compatible with declared function parameters.</p>
+</div>
+
+<div class="container sect3" id="b887upe">
+
+<h3 class="title h3">Calling a Function with a Literal Value</h3>
+<pre class="screen">     &lt;jdbc:call-function jdbc:name="schema.function-name"&gt;
+          &lt;!-- non-empty value element = pass literal --&gt;
+          &lt;jdbc:param&gt;
+               &lt;jdbc:value&gt;literal&lt;/jdbc:value&gt;
+          &lt;/jdbc:param&gt;
+     &lt;jdbc:param&gt;</pre>
+</div>
+
+<div class="container sect3" id="b887upf">
+
+<h3 class="title h3">Handling Function Results</h3>
+
+<p class="para">Unlike stored procedures, functions do not support Out or In Out parameters. They can, however, return a single, scalar value (such as an integer or string) or return a result set. Also, to facilitate correlation of function calls and results, results contain the same event-id value as the function call that generated them. This is particularly useful when multiple calls are made in the same document.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b887upg" class="xref">Scalar Return Value</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b88830p" class="xref">Empty Set</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b8886yh" class="xref">Non-Empty Results Set</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b8886yi" class="xref">Multiple Result Sets</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b8888jg" class="xref">Oracle Results Set</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b8886yj" class="xref">Returning Result Sets as Out Parameters</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b8886yk" class="xref">Special Attributes</a>
+              </p></li></ul></div>
+
+<div class="container sect4" id="b887upg">
+
+<h4 class="title h4">Scalar Return Value</h4>
+
+<p class="para">Scalar return values are returned by using the same syntax as stored procedure Out parameters. The scalar return value is always returned in the first parameter position.</p><pre class="screen">&lt;output&gt;
+     &lt;jdbc:out-parameters event-id="0" jdbc:number-of-params="1"&gt;
+          &lt;jdbc:param jdbc:name="return value"</pre><pre class="screen">                    jdbc:param-type="OUT"
+                    jdbc:position="1"
+                    jdbc:sql-type="java.sql.Types.VARCHAR"&gt;
+               &lt;jdbc:value&gt;1&lt;/jdbc:value&gt;
+          &lt;/jdbc:param&gt;
+     &lt;/jdbc:out-parameters&gt;
+     &lt;status event-id="0" level="success"/&gt;
+&lt;/output</pre>
+</div>
+
+<div class="container sect4" id="b88830p">
+
+<h4 class="title h4">Empty Set</h4>
+
+<p class="para">Assuming that a function returns no results set or an empty result set, the following output is generated:</p><pre class="screen">&lt;output&gt;
+     &lt;jdbc:result-set event-id="0" jdbc:number-of-rows="0"/&gt;
+     &lt;status event-id="0" level="success"/&gt;
+&lt;/output&gt;</pre>
+</div>
+
+<div class="container sect4" id="b8886yh">
+
+<h4 class="title h4">Non-Empty Results Set</h4>
+
+<p class="para">Assuming a function returns a non-empty result set, output similar to the following is generated:</p><pre class="screen">&lt;output&gt;
+     &lt;jdbc:result-set event-id="0" jdbc:number-of-rows="1"&gt;
+          &lt;jdbc:row jdbc:number="1"&gt;
+               &lt;jdbc:column jdbc:name="SYSDATE"
+                         jdbc:position="1
+                         jdbc:type="java.sql.Types.TIMESTAMP"&gt;
+                    &lt;jdbc:value&gt;2007-01-03 14:52:20.0&lt;/jdbc:value&gt;
+               &lt;/jdbc:column&gt;
+          &lt;/jdbc:row&gt;
+     &lt;/jdbc:result-set&gt;
+     &lt;status event-id="0" level="success"/&gt;
+&lt;/output&gt;</pre>
+</div>
+
+<div class="container sect4" id="b8886yi">
+
+<h4 class="title h4">Multiple Result Sets</h4>
+
+<p class="para">Multiple result sets are returned in the order returned by the function. They all share a common event-id value.</p><pre class="screen">&lt;output&gt;
+     &lt;jdbc:result-set event-id="0" jdbc:number-of-rows="0"/&gt;
+     &lt;jdbc:result-set event-id="0" jdbc:number-of-rows="0"/&gt;
+     &lt;status event-id="0" level="success"/&gt;
+&lt;/output&gt;</pre>
+</div>
+
+<div class="container sect4" id="b8888jg">
+
+<h4 class="title h4">Oracle Results Set</h4>
+
+<p class="para">Oracle's JDBC implementation uses a proprietary mechanism to return a single result set from a function. To return a result set from an Oracle function, you need to explicitly set the <a href="how-to-call-stored-procedures-and-functions.html#b889hg3" class="xref">jdbc:return-type</a> value to OracleTypes.CURSOR on the jdbc:call-function element.</p>
+</div>
+
+<div class="container sect4" id="b8886yj">
+
+<h4 class="title h4">Returning Result Sets as Out Parameters</h4>
+
+<p class="para">See the special attribute <a href="how-to-call-stored-procedures-and-functions.html#b889gww" class="xref">jdbc:return-format</a>.</p>
+</div>
+
+<div class="container sect4" id="b8886yk">
+
+<h4 class="title h4">Special Attributes</h4>
+
+<h4 class="bridgehead" id="b889gww">jdbc:return-format</h4>
+
+<p class="para">This attribute can be placed on the jdbc:call-function element to format the first row of a returned results set as stored procedure Out parameters of the result.</p>
+<p class="para">This works only when the jdbc:return-type attribute isn't used.</p><pre class="screen">&lt;input&gt;
+     &lt;jdbc:statement&gt;
+          &lt;jdbc:call-function jdbc:name="schema.function-name"
+                    jdbc:return-format="return value"&gt;
+               &lt;/jdbc:call-function&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<h4 class="bridgehead" id="b889hg3">jdbc:return-type</h4>
+
+<p class="para">This attribute can be placed on the jdbc:call-function element to allow Oracle functions to return a result set.</p><pre class="screen">&lt;input&gt;
+     &lt;jdbc:statement&gt;
+          &lt;jdbc:call-function jdbc:name="schema.function"
+               jdbc:return-type="OracleTypes.CURSOR"&gt;
+          &lt;/jdbc:call-function&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect3" id="b888j98">
+
+<h3 class="title h3">Example Complex Function Calls</h3>
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b888jiq" class="xref">Function Declaration</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b888l57" class="xref">Function Call from a Policy</a>
+              </p></li>
+<li class="listitem">
+<p class="listitem">
+                <a href="how-to-call-stored-procedures-and-functions.html#b888l58" class="xref">Function Results to a Policy</a>
+              </p></li></ul></div>
+
+<div class="container sect4" id="b888jiq">
+
+<h4 class="title h4">Function Declaration</h4>
+
+<p class="para">This declaration is for Oracle PSQL syntax.</p><pre class="screen">CREATE OR REPLACE FUNCTION indirect.f1(i1 IN VARCHAR2, i2 IN INTEGER)
+  RETURN VARCHAR2 
+AS
+  o_idu VARCHAR2(32);
+BEGIN
+  SELECT 'literal' INTO o_idu FROM DUAL;
+  RETURN o_idu;
+END f1;</pre>
+</div>
+
+<div class="container sect4" id="b888l57">
+
+<h4 class="title h4">Function Call from a Policy</h4>
+<pre class="screen">&lt;input&gt;
+     &lt;jdbc:statement&gt;</pre><pre class="screen">          &lt;jdbc:call-function jdbc:name="indirect.f1"&gt;
+               &lt;jdbc:param&gt;
+                    &lt;jdbc:value&gt;literal&lt;/jdbc:value&gt;
+               &lt;/jdbc:param&gt;
+               &lt;jdbc:param&gt;
+                    &lt;jdbc:value&gt;1&lt;/jdbc:value&gt;
+               &lt;/jdbc:param&gt;
+           &lt;/jdbc:call-function&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+</div>
+
+<div class="container sect4" id="b888l58">
+
+<h4 class="title h4">Function Results to a Policy</h4>
+<pre class="screen">&lt;output&gt;
+     &lt;jdbc:out-parameters event-id="0" jdbc:number-of-params="1"&gt;
+          &lt;jdbc:param jdbc:name="return value"
+                    jdbc:param-type="OUT"
+                    jdbc:position="1"
+                    jdbc:sql-type="java.sql.Types.VARCHAR"&gt;
+               &lt;jdbc:value&gt;literal&lt;/jdbc:value&gt;
+          &lt;/jdbc:param&gt;
+     &lt;/jdbc:out-parameters&gt;
+     &lt;status event-id="0" level="success"/&gt;
+&lt;/output&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

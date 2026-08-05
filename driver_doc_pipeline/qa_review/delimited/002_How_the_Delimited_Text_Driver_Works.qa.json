@@ -1,0 +1,107 @@
+{
+  "driver": "Delimited Text driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "How does the Delimited Text driver control data flow between the Identity Vault and delimited text files?",
+      "input": "",
+      "output": "The Delimited Text driver uses the Publisher channel, the Subscriber channel, and policies to control data flow between the Identity Vault and delimited text files. The Publisher channel reads information from input text files on the local file system and submits it to the Identity Vault via the Identity Manager engine. The Subscriber channel watches for additions and modifications to Identity Vault objects and creates output files on the local file system that reflect those changes. Policies control the data synchronization between the driver and the Identity Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Publisher channel in the Delimited Text driver?",
+      "input": "",
+      "output": "The Publisher channel in the Delimited Text driver reads information from input text files on the local file system and submits that information to the Identity Vault via the Identity Manager engine. By default, it checks the input directory every 10 seconds, processes any files that have a .csv extension, changes the .csv extensions of processed files to .bak, and cycles through this process until the driver is stopped."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Subscriber channel do in the Delimited Text driver?",
+      "input": "",
+      "output": "The Subscriber channel in the Delimited Text driver watches for additions and modifications to Identity Vault objects and creates output files on the local file system that reflect those changes. By default, the Subscriber channel keeps an output file open until either 200 transactions have been logged or 30 seconds have elapsed. When either of these thresholds is reached, the output file is saved with a number.csv filename and a new output file is opened."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default processing intervals and file extension behavior for the Delimited Text driver's Publisher channel?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Publisher channel has the following default behavior: it checks the input directory every 10 seconds, processes any files that have a .csv extension, and changes the .csv extensions of processed files to .bak. This cycle continues until the driver is stopped."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default thresholds that trigger file closure in the Subscriber channel of the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver's Subscriber channel, the default thresholds for closing an output file are: either 200 transactions have been logged or 30 seconds have elapsed, whichever occurs first. When either threshold is reached, the output file is saved with a number.csv filename and a new output file is opened."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which Identity Vault User properties are mapped to application attributes by the Schema Map policy in the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Schema Map policy maps Identity Vault User properties to application attributes as follows: Surname > LastName, Given Name > FirstName, Title > Title, Internet EMail Address > Email, Telephone Number > WorkPhone, Facsimile Telephone Number > Fax, mobile > WirelessPhone, and Description > Description. The application attributes correspond to the sequence of values in the file or to the attributes associated with unnamed XDS <field> elements if present."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Input Transform policy do in the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Input Transform policy is configured on the driver object. If the input document is an XML document, no transformations are made. If the document is a delimited text file, each record is transformed into an XDS Add element for User objects with attributes defined by the schema map. Associations are defined by the value of the user's e-mail attribute."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the function of the Output Transform policy in the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Output Transform policy is configured on the driver object. It specifies that a comma is used as the delimiter character for output files and that the file format is comma-separated value (CSV) format. This policy transforms the XDS document into CSV format and submits it to the driver shim."
+    },
+    {
+      "category": "config",
+      "instruction": "What requirements does the Create policy specify for creating a User in the Identity Vault using the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Create policy is configured on the Publisher channel and specifies that in order for a User to be created in an Identity Vault, the Given Name and Internet EMail Address attributes must be defined. The user CN is formed by concatenating the values of first name and last name."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Matching policy determine if a user in the Identity Vault is the same as a user specified in the input file for the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Matching policy is configured on the Publisher channel and specifies that a user in an Identity Vault is the same user specified in the input file when the value of Internet Email Address is the same in both places. If there is a match, only changed attributes are updated in the Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "What container placement does the Placement policy specify for new users in the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Placement policy is configured on the Publisher channel and specifies that a new user is placed in the Users or Active container and named with the CN created by the Input Transform rule. You need to create a Users\\Active container at the root of your tree before you start the driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What transformation does the Event Transform policy perform in the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Event Transform policy is configured on the Subscriber channel. If an Identity Vault reports a Modify or Sync event, those events are changed to an instance element that can be used to create a complete output record."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which two file types does the Delimited Text driver currently support?",
+      "input": "",
+      "output": "The Delimited Text driver currently supports two types of files: Comma-Separated Values (CSV) files and XML files in XDS format."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are Comma-Separated Values files and how are they structured in the context of the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, Comma-separated value (CSV) files are text files that contain data divided into fields and records. Fields are delimited by commas, and records are delimited by a hard return. If a comma or hard return is needed within the value of a particular field, the entire field value should be enclosed in quotes. Because the meaning of each field in a CSV file is derived from its position, each record should have the same number of fields. Field values can be left blank, but each record should have the same number of delimiter characters."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the XDS format supported by the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the XDS format is the defined NetIQ subset of possible XML formats. This is the initial format for data coming from an Identity Vault. By modifying default rules and changing the style sheets, the Delimited Text driver can be configured to work with any XML format."
+    },
+    {
+      "category": "howto",
+      "instruction": "If only one-way data flow is required in the Delimited Text driver, what should be done with the unused channel?",
+      "input": "",
+      "output": "In the Delimited Text driver, when only one-way data flow is required, only a Publisher or Subscriber channel is used depending on the direction needed. The other channel should be disabled."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of how the Delimited Text driver works.",
+      "input": "",
+      "output": "The Delimited Text driver synchronizes data between the Identity Vault and delimited text files using two channels and policies. The Publisher channel reads input text files (by default, .csv files checked every 10 seconds) and submits data to the Identity Vault. The Subscriber channel monitors Identity Vault changes and creates output files (closed after 200 transactions or 30 seconds). Seven preconfigured policies control synchronization: Schema Map (maps User properties to attributes), Input Transform (converts CSV to XDS Add elements), Output Transform (converts XDS to CSV), Create (requires Given Name and Email for user creation), Matching (matches users by Internet Email Address), Placement (places new users in Users\\Active container), and Event Transform (converts Modify/Sync events to instance elements). The driver supports CSV files and XML files in XDS format. Many configurations use only one channel for one-way synchronization."
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xfu1c,b3r8si5,b3xfpxf,b3r9hzv,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Uninstalling the Driver - NetIQ ACF2 Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xfu1c">
+
+<h1 class="title h1"><span class="number">3.8</span> Uninstalling the Driver</h1>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xfu1c.html#b6m29nd" class="xref">Uninstalling the Security System Exits</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xfu1c.html#b6m2adc" class="xref">Uninstalling the Driver Shim</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xfu1c.html#b6m2a11" class="xref">Uninstalling the Driver Object from the Identity Vault</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6m29nd">
+
+<h2 class="title h2"><span class="number">3.8.1</span> Uninstalling the Security System Exits</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The procedure you use for uninstalling the security exits depends on how you set them up.</p>
+<p class="para">If you linked the <span class="command">LDXNPXIT</span> exit with exits of your own:</p>
+<div class="procedure" id="b136c2at">
+<ol class="steps">
+<li class="step" id="b136c2au">
+<p class="para">Reinstall your original exits, then IPL with CLPA to load the relinked exits in the active LPA.</p></li>
+<li class="step" id="b136cp57">
+<p class="para">If you change the exit names as you relinked them, be sure to also update the GSO EXITS record with the changed exit names.</p></li>
+<li class="step" id="b136cp58">
+<p class="para">Delete the exit modules from the LPA library containing them. Then IPL with CLPA at a convenient time.</p></li></ol>
+</div>
+
+<p class="para">If you are using <span class="command">LDXNPXIT</span>, <span class="command">LDXNPHXT</span> or <span class="command">LDXPOST</span> alone:</p>
+<div class="procedure" id="b136cp59">
+<ol class="steps">
+<li class="step" id="b136cp5a">
+<p class="para">Update the GSO <span class="filename">EXITS</span> record to remove the exit names.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b136cp5b">
+<p class="para">Enter the following TSO commands:</p><pre class="screen"> READY
+acf
+  ACF
+set control(gso) sysid(<span class="replaceable">system</span>)
+  CONTROL
+insert sysid(<span class="replaceable">system</span>) exits lidpost() newpxit() npwpexit()</pre></li>
+<li class="step" id="b136dm8y">
+<p class="para">Install the new values. From an z/OS console, enter:</p><pre class="screen"> MODIFY ACF2,REFRESH</pre></li></ol>
+</div>
+</li>
+<li class="step" id="b136cp5d">
+<p class="para">Delete the exit modules from the LPA library containing them. Then IPL with CLPA at a convenient time.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6m2adc">
+
+<h2 class="title h2"><span class="number">3.8.2</span> Uninstalling the Driver Shim</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b6m2g6l">
+<ol class="steps">
+<li class="step" id="b6m2gpc">
+<p class="para">Remove the change log started task (<span class="filename">LDXLOGR</span>) and driver shim (<span class="filename">ACF2DRV</span>) started task from your system startup and shutdown procedures.</p></li>
+<li class="step" id="b6m2hv7">
+<p class="para">Stop both started tasks (<span class="filename">LDXLOGR</span> and <span class="filename">ACF2DRV</span>).</p>
+<p class="para">For details, see <a href="b432wif.html" class="xref">Starting and Stopping the Change Log Started Task</a> and <a href="b6ba6cj.html" class="xref">Starting and Stopping the Driver Shim Started Task</a>.</p></li>
+<li class="step" id="b6m2g6m">
+<p class="para">Remove members <span class="filename">LDXLOGR</span> and <span class="filename">ACF2DRV</span> from your started task procedure library.</p></li>
+<li class="step" id="b6m2hyh">
+<p class="para">Remove the driver load library from your APF list by modifying <span class="filename">PARMLIB IEAAPFxx</span> or <span class="filename">PROGxx</span> member as appropriate.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you use the dynamic APF facility, you can use the <span class="command">SET PROG</span> command to activate your changes. Otherwise, you must IPL for the change to take affect.</p></div>
+</li>
+<li class="step" id="b6m2ik8">
+<p class="para">Remove the <span class="command">LDXSERV</span> and <span class="command">ACFQUERY</span> TSO commands from <span class="filename">IKJTSO<span class="replaceable">xx</span></span>.</p></li>
+<li class="step" id="b6m2k05">
+<p class="para">Remove the driver files from the HFS:</p><pre class="screen">  oshell rm -rf /opt/novell</pre></li>
+<li class="step" id="b6m2l0e">
+<p class="para">Delete the <span class="filename">SAMPLIB</span>, <span class="filename">LOAD</span> and <span class="filename">EXEC</span> driver data sets.</p></li>
+<li class="step" id="b6m2pw4">
+<p class="para">Delete the change log data set that you created in <a href="b3xehpq.html#b689r3r" class="xref">Allocating and Initializing the Change Log Data Set</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b6m2a11">
+
+<h2 class="title h2"><span class="number">3.8.3</span> Uninstalling the Driver Object from the Identity Vault</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b6yz5ww">
+<ol class="steps">
+<li class="step" id="b6yzahs">
+<p class="para">In iManager, select <span class="guimenu">Identity Manager Administration</span> from the top menu icons.</p></li>
+<li class="step" id="b136crrq">
+<p class="para">Under <span class="guimenu">Administration</span> tasks, select <span class="guimenu">Identity Manager Overview</span>.</p></li>
+<li class="step" id="b6yzaht">
+<p class="para">Click <span class="guimenu">Driver Sets</span> and navigate to your driver set by clicking on its name.</p></li>
+<li class="step" id="b6yz5wx">
+<p class="para">Click <span class="guimenu">Drivers</span>, then click <span class="guimenu">Delete Driver</span> on the <span class="guimenu">Driver Set Overview</span> page.</p></li>
+<li class="step" id="b6yz7nw">
+<p class="para">Select the driver object to be deleted, then click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

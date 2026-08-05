@@ -1,0 +1,155 @@
+{
+  "driver": "Delimited Text driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you access the Driver Configuration properties for the Delimited Text driver in Identity Console?",
+      "input": "",
+      "output": "To access the Driver Configuration properties for the Delimited Text driver in Identity Console:\n1. Click the IDM Administration tile.\n2. Select the driver set that contains the driver whose properties you want to edit.\n3. Click the driver icon to display the driver's properties page."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you access the Driver Configuration properties for the Delimited Text driver in Designer?",
+      "input": "",
+      "output": "To access the Driver Configuration properties for the Delimited Text driver in Designer:\n1. Open a project in the Modeler.\n2. Right-click the driver icon or line, then select Properties > Driver Configuration."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the Driver Module section used for in the Delimited Text driver configuration?",
+      "input": "",
+      "output": "The Driver Module section in the Delimited Text driver configuration lets you change the driver from running locally to running remotely or the reverse. You can select between Java (for a local Java class), Native (for a .dll file), or Connect to Remote Loader (for remote connections to the connected system)."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the Java class name used for the Delimited Text driver when running locally?",
+      "input": "",
+      "output": "For the Delimited Text driver, the Java class name when running locally is:\ncom.novell.nds.dirxml.driver.delimitedtext.DelimitedTextDriver\n\nThis class can be located in the classes directory as a class file, or in the lib directory as a .jar file."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the Driver Object Password required when using the Remote Loader with the Delimited Text driver?",
+      "input": "",
+      "output": "For the Delimited Text driver, the Driver Object Password is required when using the Remote Loader because the Remote Loader uses this password to authenticate itself to the remote driver shim. Without this password, the remote driver does not run."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Delimited Text driver Authentication section, what format should the Remote Loader Connection Parameter use in Identity Console?",
+      "input": "",
+      "output": "In the Delimited Text driver Authentication section, the Remote Loader Connection Parameter should use this format:\n\nhostname=xxx.xxx.xxx.xxx port=xxxx kmo=certificatename\n\nWhere:\n- hostname is the IP address of the Remote Loader server\n- port is the port the Remote Loader is listening on (default: 8090)\n- kmo is the certificate name (optional, used only for SSL connections)\n\nExample: hostname=10.0.0.1 port=8090 kmo=IDMCertificate"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the three Startup Options available for the Delimited Text driver, and what does each do?",
+      "input": "",
+      "output": "The three Startup Options for the Delimited Text driver are:\n\n1. Auto start: The driver starts every time the Identity Manager server is started.\n\n2. Manual: The driver does not start when the Identity Manager server is started. The driver must be started through Designer or Identity Console.\n\n3. Disabled: The driver has a cache file that stores all events. When set to Disabled, this file is deleted and no new events are stored until the driver state is changed to Manual or Auto Start."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default Field Delimiter for the Delimited Text driver, and how can you specify a tab character as the delimiter?",
+      "input": "",
+      "output": "For the Delimited Text driver, the default Field Delimiter is a comma. To specify a tab character as the delimiter, you can use {tab} as the delimiter field value. The delimiter must be one character. If field values contain this character, enclose the entire value in quotes to prevent it from being seen as a delimiter."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default field names configured in the Field Names parameter of the Delimited Text driver?",
+      "input": "",
+      "output": "The default field names configured in the Field Names parameter of the Delimited Text driver are:\n\nLastName, FirstName, Title, Email, WorkPhone, Fax, WirelessPhone, and Description\n\nThese are specified as a comma-separated list of attribute names that can be referred to in the Schema Mapping rule. In the input files, the fields of the records must correspond to the order and positioning of the names in this list."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the \"Allow Driver to Consume Its Own Output\" parameter prevent in the Delimited Text driver, and when would you set it to Yes?",
+      "input": "",
+      "output": "In the Delimited Text driver, the \"Allow Driver to Consume Its Own Output\" parameter prevents you from inadvertently creating a situation where the driver writes output files that are immediately read in again as input of the same driver. The default is No, and the driver won't load if you have both a Subscriber and Publisher channel with the same input/output directories and file extensions.\n\nYou would set this parameter to Yes when you want to feed the output of the Subscriber channel into the input of the Subscriber channel to detect Identity Vault events that trigger other changes in the Identity Vault. For example, to update the Full Name attribute when the Given Name, Surname, or Initials attributes are updated."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default Output File Path values for the Delimited Text driver on different operating systems?",
+      "input": "",
+      "output": "The default Output File Path values for the Delimited Text driver are:\n\nWindows: c:\\csvsample\\output\n\nSolaris or Linux: /csvsample/output\n\nThe Output File Path specifies the directory on the local file system where output files will be created. An error occurs if this directory doesn't exist."
+    },
+    {
+      "category": "config",
+      "instruction": "How do the three output file threshold parameters work together in the Delimited Text driver's Subscriber Options?",
+      "input": "",
+      "output": "In the Delimited Text driver's Subscriber Options, three parameters can act as thresholds for when output files are closed:\n\n1. Maximum Number of Transactions per Output File: Closes the file when the transaction limit is reached.\n\n2. Maximum Time in Seconds before Flushing All Transactions: Closes the file if no new transactions have been written within the specified time.\n\n3. Time of Day (Local Time) to Flush All Transactions: Closes the file at a specified time each day.\n\nThese parameters can work together, and any of them can trigger file closure. To avoid output files remaining open indefinitely, if all three parameters are blank or zero, the driver automatically sets the Maximum Number of Transactions per Output File to 1. As long as a file is open for writing by the Delimited Text driver, it should not be accessed by other processes."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the format for the Time of Day parameter in the Delimited Text driver, and what time zone does it assume?",
+      "input": "",
+      "output": "For the Delimited Text driver's \"Time of Day (Local Time) to Flush All Transactions\" parameter, the format can be:\n\n- HH:MM:SS (using the 24-hour clock), or\n- H:MM:SS AM/PM\n\nAn hour is required, but the minutes and seconds are optional. The parameter assumes local time, so any time zone information included in the value is ignored. If a value is supplied, the current output file is closed at the specified time each day, and subsequent transactions are written to a new file."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default Input File Path values for the Delimited Text driver on different platforms?",
+      "input": "",
+      "output": "The default Input File Path values for the Delimited Text driver are:\n\nOn Windows: c:\\csvsample\\input\n\nOn Solaris and Linux: /usr/lib/dirxml/rules/delim\n\nThe Publisher channel looks for new input files in the Input File Path, which is a directory on the local file system."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the Delimited Text driver handle character encoding for XML input files when the Input File Extension is .xml?",
+      "input": "",
+      "output": "For the Delimited Text driver, when the Input File Extension parameter is .xml, the Source File Character Encoding can be indicated in one of two ways:\n\n1. If a value is indicated in the Source File Character Encoding parameter, it is used.\n\n2. If the parameter is blank and the XML document specifies an Encoding Declaration as described in the W3C XML Recommendation (paragraph 4.3.3), the Encoding Declaration is handled by the XML parser in the Identity Manager engine.\n\nThe Identity Manager XML parser handles these character encodings: UTF-8, UTF-16, ISO-8859-1, and US-ASCII."
+    },
+    {
+      "category": "config",
+      "instruction": "What happens to input files after the Delimited Text driver's Publisher channel processes them?",
+      "input": "",
+      "output": "For the Delimited Text driver, after the Publisher channel processes input files, the value of the Rename File Extension parameter is appended to the filename, preventing the Publisher channel from processing the same file again. If the Rename File Extension parameter value is left blank, the source file is deleted after it is processed.\n\nIMPORTANT: If you change the default, use only characters that are valid in filenames on your platform. Invalid characters cause the rename to fail and the driver to reprocess the same file repeatedly."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the Polling Rate parameter control in the Delimited Text driver's Publisher channel?",
+      "input": "",
+      "output": "In the Delimited Text driver's Publisher channel, the Polling Rate (in Seconds) parameter specifies how long the Publisher channel waits before checking for new source files to process. When the Publisher channel has finished processing all source files, it waits the number of seconds specified in this parameter before checking again for new source files."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the Publisher heartbeat interval used for in the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the Publisher heartbeat interval configures the driver shim to send a periodic status message on the Publisher channel when there has been no Publisher traffic for the given number of minutes. This helps monitor that the driver is still active even when no files are being processed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ECMAScript section in the Delimited Text driver configuration (Designer Only)?",
+      "input": "",
+      "output": "In the Delimited Text driver configuration in Designer, the ECMAScript section enables you to add ECMAScript resource files. These resources extend the driver's functionality when Identity Manager starts the driver, allowing for custom scripting and enhanced capabilities beyond the standard driver features."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Global Configurations section contain for the Delimited Text driver?",
+      "input": "",
+      "output": "For the Delimited Text driver, the Global Configurations section displays an ordered list of Global Configuration objects. These objects contain extension GCV (Global Configuration Value) definitions for the driver that Identity Manager loads when the driver is started. You can add or remove the Global Configuration objects, and you can change the order in which the objects are executed."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the Delimited Text driver's Field Delimiter needs to be changed from comma to another character in both input and output files?",
+      "input": "",
+      "output": "For the Delimited Text driver, to change the Field Delimiter in both input and output files:\n\n1. Change the Field Delimiter parameter in the Driver Options to your desired character (e.g., {tab} for tab).\n\n2. For input files, this parameter change is sufficient.\n\n3. For output files when using a Subscriber, changing the Field Delimiter parameter alone does NOT automatically change the delimiter in output files. You must also edit the Output Transform style sheet. The delimiter character is assigned to a variable at the beginning of the style sheet.\n\nFor example, locate the line <xsl:variable name=\"delimiter\" select=\"','\"/> in the default style sheet and modify it appropriately to match your new delimiter."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the Cache limit (KB) parameter in the Delimited Text driver Authentication section, and what does setting it to zero do?",
+      "input": "",
+      "output": "In the Delimited Text driver Authentication section, the Cache limit (KB) parameter specifies the maximum event cache file size in kilobytes. If it is set to zero, the file size is unlimited. In Designer, you can click Unlimited to set the file size to unlimited."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the \"Do not automatically synchronize the driver\" option do in the Delimited Text driver's Startup Options?",
+      "input": "",
+      "output": "In the Delimited Text driver's Startup Options, the \"Do not automatically synchronize the driver\" option applies only if the driver is deployed and was previously disabled. If this option is not selected, the driver re-synchronizes the next time it is started. Selecting this option prevents automatic re-synchronization after the driver has been disabled and then re-enabled."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the Enable/Disable Duplicate Records parameter in the Delimited Text driver's Subscriber Options, and what is its default value?",
+      "input": "",
+      "output": "In the Delimited Text driver's Subscriber Options, the Enable/Disable Duplicate Records parameter controls whether duplicate records can be written into the output files. By default, this parameter is set to No, which means duplicate records are not allowed. To allow duplicate records to be written into the output files, change this parameter to Yes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration sections and purposes in the Delimited Text driver configuration.",
+      "input": "",
+      "output": "The Delimited Text driver configuration is divided into several key sections:\n\n1. Driver Module: Controls whether the driver runs locally (Java or Native) or remotely (via Remote Loader).\n\n2. Driver Object Password: Required for Remote Loader authentication.\n\n3. Authentication: Stores credentials and connection parameters for the connected system, including Remote Loader settings.\n\n4. Startup Option: Determines driver behavior when Identity Manager starts (Auto start, Manual, or Disabled).\n\n5. Driver Parameters: Contains driver-specific settings divided into:\n   - Driver Options: Field delimiters, field names, object class names, and self-consumption prevention\n   - Subscriber Options: Output file paths, encoding, transaction limits, and duplicate record handling\n   - Publish Options: Input file paths, encoding, polling rates, and file processing behavior\n\n6. ECMAScript (Designer Only): Allows adding ECMAScript resources for extended functionality.\n\n7. Global Configurations: Lists Global Configuration objects containing extension GCV definitions.\n\nThe configuration provides comprehensive control over file processing, data transformation, and synchronization behavior for the Delimited Text driver."
+    }
+  ]
+}

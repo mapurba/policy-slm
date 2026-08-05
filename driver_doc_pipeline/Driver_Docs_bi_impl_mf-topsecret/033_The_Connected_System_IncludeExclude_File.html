@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xxit1,b3r8tim,b3xxapt,b3xywb2,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>The Connected System Include/Exclude File - NetIQ Top Secret Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xxit1">
+
+<h1 class="title h1"><span class="number">6.3</span> The Connected System Include/Exclude File</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can use an optional include/exclude file on the connected system to control which identities are or are not synchronized from the Identity Vault to the connected system.</p>
+<p class="para">To control which objects are synchronized from the connected system to the Identity Vault, use policies. For details about customizing policies, see the policy documentation on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p>
+<p class="para">The connected system include/exclude file must be a sequential file or a member of a partitioned data set. The INCEXC DD statement in the driver shim started task JCL identifies the include/exclude file. An example include/exclude file that excludes many common z/OS users and groups, such as JES, OMVS, and INIT, is provided in the driver samples library member <span class="filename">INCEXC</span>.</p>
+<p class="para">The file is read when the driver shim starts. If you make changes to it, you must restart the driver shim.</p>
+<p class="para">The include/exclude file can contain include rules and exclude rules. To ensure optimal performance, each include/exclude file should contain no more than 50 entries total.</p>
+<p class="para">You can use the include/exclude file to phase in your deployment of the driver, excluding most users and groups at first, and then adding more as you gain confidence and experience.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xxit1.html#b3zz6ui" class="xref">Include/Exclude Processing</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xxit1.html#b3zz851" class="xref">Include/Exclude File Syntax</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3xxit1.html#b3zz8n9" class="xref">Example Include/Exclude Files</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3zz6ui">
+
+<h2 class="title h2"><span class="number">6.3.1</span> Include/Exclude Processing</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Identity Vault events for identities that match an exclude rule are discarded by the Subscriber shim.</p>
+<p class="para">Included identities are treated normally by the Subscriber shim.</p>
+<p class="para">Identities that do not match an include rule or an exclude rule in the file are included.</p>
+<p class="para">Identities are matched in the following priority:</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Exclude rules</p></li>
+          
+<li class="listitem">
+<p class="listitem">Include rules</p></li>
+        </ol></div>
+
+<p class="para">Within each level of this matching priority, identities are matched against rules in the order that the rules appear in the file. The first rule that matches determines whether the identity is included or excluded.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3zz851">
+
+<h2 class="title h2"><span class="number">6.3.2</span> Include/Exclude File Syntax</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Except for class names, attribute names, and the values to match, the contents of the include/exclude file are case insensitive.</p>
+<p class="para">The Subscriber Creation policy converts object names to uppercase. Use uppercase names in the include/exclude file to match identities.</p>
+<p class="para">The include/exclude file can contain any number of include sections, exclude sections, and single-line rules.</p>
+<p class="para">Include sections and exclude sections can contain class matching rules, and class matching rules can contain attribute matching rules. Include sections and exclude sections can also contain association matching rules.</p>
+<p class="para">Class and attribute names used in the include/exclude file must correspond to the names specified in the schema file. For details about the schema file, see <a href="b3xxapt.html" class="xref">The Connected System Schema File</a>.</p>
+<div class="container sect3" id="b3zzbcn">
+
+<h3 class="title h3">Comments</h3>
+
+<p class="para">Lines that begin with an octothorpe (#) are comments.</p><pre class="screen"># This is a comment.</pre>
+</div>
+
+<div class="container sect3" id="b3zzfh7">
+
+<h3 class="title h3">Include and Exclude Sections</h3>
+
+<p class="para">Include and exclude sections provide rules to specify which objects are to be included or excluded from synchronization.</p>
+<p class="para">An include section begins with an include line and ends with an endinclude line.</p><pre class="screen">INCLUDE
+  .
+  .
+  .
+ENDINCLUDE</pre>
+<p class="para">An exclude section begins with an exclude line and ends with an endexclude line.</p><pre class="screen">EXCLUDE
+  .
+  .
+  .
+ENDEXCLUDE</pre>
+<p class="para">You can use class matching rules and association matching rules within an include section and an exclude section.</p>
+<div class="container sect4" id="b400eqe">
+
+<h4 class="title h4">Class Matching Rules</h4>
+
+<p class="para">Use a class matching rule within an include section or an exclude section to specify the name of a class of objects to include or exclude.</p>
+<p class="para">A class matching rule is defined by a class line that specifies the name of the class and ends with an endclass line.</p><pre class="screen">CLASS <span class="replaceable">className</span>
+  .
+  .
+  .
+ENDCLASS</pre>
+<p class="para">You can use attribute matching rules within a class matching rule.</p>
+</div>
+
+<div class="container sect4" id="b40z0ba">
+
+<h4 class="title h4">Attribute Matching Rules</h4>
+
+<p class="para">You can use attribute matching rules within a class matching rule to limit the objects that are included or excluded. If no attribute matching rules are specified for a class, all objects of the specified class are included or excluded.</p>
+<p class="para">An attribute matching rule comprises an attribute name, an equals sign (=), and an expression. The expression can be an exact value, or it can use limited regular expressions. For details about limited regular expressions, see <a href="b3xxit1.html#b4a9yip" class="xref">Limited Regular Expressions</a>.</p><pre class="screen"><span class="replaceable">attributeName</span>=<span class="replaceable">expression</span></pre>
+<p class="para">Multiple attribute matching rules can be specified for a given class.</p>
+<p class="para">Attribute matching rules within a class matching rule are logically ANDed together. To logically OR attribute matching rules for a class, specify multiple class matching rules. For example, the following include/exclude file excludes both user01 and user02:</p><pre class="screen"># Exclude the User object if its ACID is USER01 or USER02.
+EXCLUDE
+CLASS USER
+    ACID=USER01
+ENDCLASS
+CLASS USER
+    ACID=USER02
+ENDCLASS
+ENDEXCLUDE</pre>
+</div>
+
+<div class="container sect4" id="b40z0hu">
+
+<h4 class="title h4">Association Matching Rules</h4>
+
+<p class="para">You can specify association matching rules in an include or exclude section. Association matching rule expressions can specify an exact association or a limited regular expression. For details about limited regular expressions, see <a href="b3xxit1.html#b4a9yip" class="xref">Limited Regular Expressions</a>.</p>
+<p class="para">By default, an association is the ACID. Association formation can be customized in the Subscriber REXX execs.</p>
+<p class="para">For example, to exclude the <span class="systemitem">root</span> user, specify</p><pre class="screen">EXCLUDE
+  ROOT
+ENDEXCLUDE</pre>
+</div>
+
+</div>
+
+<div class="container sect3" id="b3zzfqv">
+
+<h3 class="title h3">Single-Line Rules</h3>
+<pre class="screen">INCLUDE|EXCLUDE [<span class="replaceable">className</span>] <span class="replaceable">objectSelection</span></pre>
+<p class="para">Where <span class="replaceable">objectSelection</span> can be</p><pre class="screen">{<span class="replaceable">associationMatch</span> | <span class="replaceable">attributeName=expression</span>}</pre>
+<p class="para">You must specify whether the rule is to include or exclude the objects it matches.</p>
+<p class="para">You can specify a class name to limit matches to only objects of that class.</p>
+<p class="para">You must specify either an association or an attribute matching expression. The syntax of the association and attribute matching expression is the same as that of association matching rules and attribute matching rules previously described. For details, see <a href="b3xxit1.html#b40z0hu" class="xref">Association Matching Rules</a> and <a href="b3xxit1.html#b40z0ba" class="xref">Attribute Matching Rules</a>.</p>
+<p class="para">For example, to ignore events from the Admin user in the Identity Vault:</p><pre class="screen"># Do not subscribe to events for the Admin user.
+EXCLUDE ADMIN</pre>
+</div>
+
+<div class="container sect3" id="b4a9yip">
+
+<h3 class="title h3">Limited Regular Expressions</h3>
+
+<p class="para">A limited regular expression is a pattern used to match a string of characters.</p>
+<p class="para">Character matching is case sensitive.</p>
+<p class="para">Any literal character matches that character.</p>
+<p class="para">A period (<span class="literal">.</span>) matches any single character.</p>
+<p class="para">A bracket expression is a set of characters enclosed by left (<span class="literal">[</span>) and right (<span class="literal">]</span>) brackets that matches any listed character. Within a bracket expression, a range expression is a pair of characters separated by a hyphen, and is equivalent to listing all of the characters that sort between the given characters. For example, <span class="literal">[0-9]</span> matches any single digit.</p>
+<p class="para">An asterisk (<span class="literal">*</span>) indicates that the preceding item is matched zero or more times.</p>
+<p class="para">A plus sign (<span class="literal">+</span>) indicates that the preceding item is matched one or more times.</p>
+<p class="para">A question mark (<span class="literal">?</span>) indicates that the preceding item is matched zero or one times.</p>
+<p class="para">You can use parentheses to group multiple expressions into a single item. For example, <span class="literal">(abc)+</span> matches <span class="literal">abc</span>, <span class="literal">abcabc</span>, <span class="literal">abcabcabc</span>, etc. Nesting of parentheses is not supported.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3zz8n9">
+
+<h2 class="title h2"><span class="number">6.3.3</span> Example Include/Exclude Files</h2>
+
+<div class="content_wrapper">
+
+<div class="example" id="b46q4nf">
+          <p class="title"><em class="num">Example 6-1 </em>Example 1</p>
+          <pre class="screen"># Exclude users whose names start with TEMP
+EXCLUDE
+    CLASS USER
+        ACID=TEMP.*
+    ENDCLASS
+ENDEXCLUDE</pre>
+        </div>
+
+<div class="example" id="b46q4ys">
+          <p class="title"><em class="num">Example 6-2 </em>Example 2</p>
+          <pre class="screen"># Exclude USERA and USERB
+# Because attribute rules are ANDed, these must be in separate
+# CLASS sections.
+EXCLUDE
+    CLASS USER
+        ACID=USERA
+    ENDCLASS
+    CLASS USER
+        ACID=USERB
+    ENDCLASS
+ENDEXCLUDE</pre>
+        </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

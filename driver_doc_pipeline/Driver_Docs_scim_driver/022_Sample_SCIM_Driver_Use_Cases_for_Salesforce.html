@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="February 17 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="scim_usecase_slsforce,t4cfey7g3sej,gcv_sls_force,scim_mapp_attr_slsforce,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Sample SCIM Driver Use Cases for Salesforce - NetIQ SCIM Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="scim_usecase_slsforce">
+
+<h1 class="title h1"><span class="number">5.4</span> Sample SCIM Driver Use Cases for Salesforce</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section explains the sample use cases that you can perform in Identity Manager to execute the required operation on resources available in Salesforce.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>All the field values shown in this section are just sample values. You must ensure not use them directly to perform the use case operations.</p></div>
+
+<p class="para">The following operations can be performed on the subscriber channel:</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>You must replace the variable values in the SCIM end point URL as per Salesforce specifications. These are just sample values, replace them as applicable for the SCIM end point examples mentioned in other sections.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="filename"><span class="replaceable">&lt;tenant name&gt;</span></span> with <span class="filename"><span class="replaceable">ap16, ap17,</span></span> etc.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="filename"><span class="replaceable">&lt;current version&gt;</span></span> with <span class="filename"><span class="replaceable">v2,</span></span> etc.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="filename"><span class="replaceable">&lt;association&gt;</span></span> with <span class="filename"><span class="replaceable">salesforce-userid, salesforce-groupid</span></span>, etc.</p></li></ul></div>
+</div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <span class="strong">Operations performed on a user</span>
+          </p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="41%" /><col width="40%" /><col width="19%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Operation</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample SCIM endpoint</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Adding a user</span>: A user is added in Identity Manager and synchronized to Salesforce through the SCIM driver. For example, the details of the user such as, user's first name, last name, contact details, email ID, location, department, user name, initial login password are added and synchronized with Salesforce.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Ensure to add the auxiliary class <span class="filename">scim-User</span> to the object class attribute. In case the auxiliary class is not added, the scim related attributes such as, <span class="filename">scim-Entitlementsvalue, scim-Address</span> will not be displayed, and the user created in Identity Console will not sync to Salesforce. To sync the created user to Salesforce, you must mandatorily provide the <span class="strong"><span class="filename">scim-Entitlementsvalue</span></span> attribute value. For example, <span class="strong"><span class="replaceable">&lt;00e2x000000K4Yv&gt;</span></span>.</p></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">https://&lt;tenantname&gt;.salesforce.com/services/scim/&lt;current version&gt;/Users</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">POST</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Deleting a user</span>: Deleting a user in Identity Manager disables the user in Salesforce.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">https://&lt;tenantname&gt;.salesforce.com/services/scim/&lt;current version&gt;/Users/<span class="replaceable">&lt;salesforce-userid&gt;</span></span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DELETE</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Modifying a user</span>: If there are any changes made to the user details such as, contact details, email ID etc, they will be synchronized with Salesforce.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Salesforce does not support renaming a user.</p></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">https://&lt;tenantname&gt;.salesforce.com/services/scim/&lt;current version&gt;/Users/<span class="replaceable">&lt;salesforce-userid&gt;</span></span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Migrating a user</span>: You can migrate an individual or multiple users from Identity Manager to Salesforce and vice-versa.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">https://&lt;tenantname&gt;.salesforce.com/services/scim/&lt;current version&gt;/Users</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET/PUT</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Polling a user</span>: You can poll a user or multiple users from Salesforce to Identity Manager.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">https://&lt;tenantname&gt;.salesforce.com/services/scim/&lt;current version&gt;/Users/</span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Querying a User</span>: You can query the synced attributes of resource such as user from Salesforce through Identity Console. Also, you can query through <span class="command">dxcmd</span> utility to fetch required resources or attributes using specific conditions.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="filename">https://&lt;tenantname&gt;.salesforce.com/services/scim/&lt;current version&gt;/Users/<span class="replaceable">&lt;salesforce-userid&gt;</span></span>
+                    </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Complex JSON attributes cannot be queried from SCIM compliant applications through <span class="command">dxcmd</span> utility.</p></div>
+</td>
+</tr></table>
+</div>
+</li>
+<li class="listitem">
+<p class="listitem">
+            <span class="strong">Operations performed on public groups</span>
+          </p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="40%" /><col width="42%" /><col width="18%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Operation</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Sample SCIM endpoint</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Adding a group</span>: A group is added in Identity Manager to manage multiple users with same set of access permissions, rather than managing them individually.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to add a group: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups</span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">POST</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Adding member to a group</span>: A member is added to a group based on the userâs role, department and access permissions that the user qualifies for, so that the access permissions for that designated user role are provisioned accordingly.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to add a member to a group: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups</span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Removing member from a group</span>: A user can be removed from a group if the userâs role or designation, or access permissions provided do not qualify a user to belong to that group. This happens in case of a role or designation change of the user, or separation or termination of the user.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to remove a member from a group: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups/<span class="replaceable">&lt;salesforce-groupid&gt;</span></span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Renaming group object</span>: The group name can be renamed as required.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to renaming a group: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups/<span class="replaceable">&lt;salesforce-groupid&gt;</span></span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Deleting a group</span>: Duplicate groups, redundant groups, empty groups or groups that are not required can be deleted, and the group members will be moved to another group as required.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to delete a group: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups/<span class="replaceable">&lt;salesforce-groupid&gt;</span></span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DELETE</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Migrating a Group</span>: You can migrate an individual or multiple groups from Identity Manager to Salesforce and vice-versa.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to add a member to a group: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups</span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PUT/GET</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Polling a Group</span>: You can poll groups from Salesforce to Identity Manager.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to poll groups: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups</span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Querying a Group</span>: You can query the synced attributes of resource such as group from Salesforce through Identity Console. Also, you can query through <span class="command">dxcmd</span> utility to fetch required resources or attributes using specific conditions.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The SCIM end point for Salesforce to query groups: <span class="filename">https://<span class="replaceable">&lt;tenantname&gt;</span>.salesforce.com/services/scim/<span class="replaceable">&lt;current version&gt;</span>/Groups</span></p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Complex JSON attributes cannot be queried from SCIM compliant applications through <span class="command">dxcmd</span> utility.</p></div>
+</td>
+</tr></table>
+</div>
+</li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="scim_known_obs_slsfrce">
+
+<h2 class="title h2"><span class="number">5.4.1</span> Known Observations from Salesforce</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following are a few observations when some specific operations are performed in Salesforce:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">If you try to modify an email ID in Identity Manager and sync with Salesforce, the email ID does not get updated in Salesforce. The success code 200 is returned which appears in the driver log when this operation is performed.</p></li>
+<li class="listitem">
+<p class="listitem">Salesforce does not support renaming a user from Identity Manager.</p></li>
+<li class="listitem">
+<p class="listitem">Salesforce does not support the canonical type attribute for the phone number.</p></li>
+<li class="listitem">
+<p class="listitem">Renaming a group in Identity Manager changes only the label attribute and not the name attribute.</p></li>
+<li class="listitem">
+<p class="listitem">By default, you can poll only up to 10 users from Salesforce using the GET method.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

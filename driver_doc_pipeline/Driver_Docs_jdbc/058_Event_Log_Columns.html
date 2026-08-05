@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="jdbc-event-log-columns,what-is-event-log-table-in-jdbc-driver,what-is-event-log-table-in-jdbc-driver,jdbc-event-types,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Event Log Columns - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="jdbc-event-log-columns">
+
+<h1 class="title h1"><span class="number">11.1</span> Event Log Columns</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section describes columns in the event log table. Columns are ordered by position.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0aiw" class="xref">record_id</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0aro" class="xref">table_key</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0b60" class="xref">status</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0hg5" class="xref">event_type</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0hsv" class="xref">event_time</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0hx1" class="xref">perpetrator</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0i3m" class="xref">table_name</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0i7u" class="xref">column_name</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0ibg" class="xref">old_value</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jdbc-event-log-columns.html#bgz0ifp" class="xref">new_value</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0aiw">
+
+<h2 class="title h2"><span class="number">11.1.1</span> record_id</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="literal">record_id</span> column is used to uniquely identify rows in the event log table and order publication events. This column must contain sequential, ascending, positive, unique integer values. Gaps between <span class="literal">record_id</span> values no longer prematurely end a polling cycle.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0aro">
+
+<h2 class="title h2"><span class="number">11.1.2</span> table_key</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Format values for this column are exactly the same in all triggers for a logical database class. The BNF or Backus Naur Form of this parameter is defined below:</p><pre class="screen">&lt;table-key&gt; ::= &lt;unique-row-identifier&gt; {"+" 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â &lt;unique-row-identifier&gt;}
+
+&lt;unique-row-identifier&gt; ::= &lt;primary-key-column-name&gt; "=" &lt;value&gt;</pre>
+<p class="para">For example, for the <span class="literal">usr</span> table referenced throughout this chapter, this columnâs value might be <span class="literal">idu=1</span>.</p>
+<p class="para">For the <span class="literal">view_usr</span> view referenced throughout this chapter, this columnâs value might be <span class="literal">pk_empno=1</span>.</p>
+<p class="para">For a hypothetical compound primary key (one containing multiple columns), this columnâs value might be <span class="replaceable">pkey1</span><span class="literal">=</span><span class="replaceable">value1</span><span class="literal">+</span><span class="replaceable">pkey2</span><span class="literal">=</span><span class="replaceable">value2</span>.</p>
+<p class="para">If primary key values placed in the <span class="literal">table_key</span> field contain any of the special characters {, ; ' + " = \ &lt; &gt;}, where { and } contain the set of special characters, delimit the value with double quotes. You also need to escape the double quote character <span class="literal">"</span> as <span class="literal">\"</span> and the literal escape character <span class="literal">\</span> as <span class="literal">\\</span> when they are contained inside a pair of double quotes.</p>
+<p class="para">For a hypothetical primary key containing special characters, this columnâs value might be <span class="literal">pkey=", ; ' + \" = \\ &lt; &gt;"</span>. (Note the double quotes and escaped characters.)</p>
+<p class="para">Differences in padding or formatting might result in out-of-order event processing. For performance reasons, remove any unnecessary white space from numeric values. For example, <span class="literal">idu=1</span> is preferred over <span class="literal">idu= 1</span>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0b60">
+
+<h2 class="title h2"><span class="number">11.1.3</span> status</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="literal">status</span> column indicates the state of a given row. The following table lists permitted values:</p>
+<div class="table" id="b87s669"><p class="title"><em class="num">Table 11-1 </em>Permitted Values for Status Columns</p>
+<table class="topbot" width="95%"><col width="19%" /><col width="81%" />
+              
+<tr class="headerrow" id="b87s66a"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Character Value</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Interpretation</p></th>
+</tr>
+            
+<tr class="oddrow" id="b87s66b"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">N</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">new</p></td>
+</tr>
+<tr class="evenrow" id="b87s66c"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">S</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">success</p></td>
+</tr>
+<tr class="oddrow" id="b87s66d"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">W</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">warning</p></td>
+</tr>
+<tr class="evenrow" id="b87s66e"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">E</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">error</p></td>
+</tr>
+<tr class="oddrow" id="b87s66f"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">F</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">fatal</p></td>
+</tr></table>
+</div>
+
+<p class="para">To be processed, all rows inserted into the event log table must have a <span class="literal">status</span> value of N. The remainder of the status characters are used solely by the Publisher channel to designate processed rows. All other characters are reserved for future use.</p>
+<p class="para">Status values are case sensitive.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0hg5">
+
+<h2 class="title h2"><span class="number">11.1.4</span> event_type</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Values in this column must be between 1 and 8. All other numbers are reserved for future use.</p>
+<p class="para">The following table describes each event type:</p>
+<div class="table" id="b87s66g"><p class="title"><em class="num">Table 11-2 </em>Event Types</p>
+<table class="topbot" width="95%"><col width="23%" /><col width="77%" />
+              
+<tr class="headerrow" id="b87s66h"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Event Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Interpretation</p></th>
+</tr>
+            
+<tr class="oddrow" id="b87s66i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">insert field</p></td>
+</tr>
+<tr class="evenrow" id="b87s66j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update field</p></td>
+</tr>
+<tr class="oddrow" id="b87s66k"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update field (remove all values)</p></td>
+</tr>
+<tr class="evenrow" id="b87s66l"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">delete row</p></td>
+</tr>
+<tr class="oddrow" id="b87s66m"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">insert row (query-back)</p></td>
+</tr>
+<tr class="evenrow" id="b87s66n"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">6</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update row (query-back)</p></td>
+</tr>
+<tr class="oddrow" id="b87s66o"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">insert field (query-back)</p></td>
+</tr>
+<tr class="evenrow" id="b87s66p"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">update field (query-back)</p></td>
+</tr></table>
+</div>
+
+<p class="para">For additional information on this field, see <a href="jdbc-event-types.html" class="xref">Event Types</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0hsv">
+
+<h2 class="title h2"><span class="number">11.1.5</span> event_time</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This column serves as an alternative ordering column to <span class="literal">record_id</span>. It contains the effective date of the event. It must not be <span class="literal">NULL</span>. For this column to become the ordering column, set the Enable Future Event Processing parameter to Boolean True. See <a href="how-to-set-publication-parameters.html#bvw4xdy" class="xref">Enable Future Event Processing?</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0hx1">
+
+<h2 class="title h2"><span class="number">11.1.6</span> perpetrator</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This column identifies the database user who instigated the event. A <span class="literal">NULL</span> value is interpreted as a user other than the driver user. Rows with a <span class="literal">NULL</span> value or value not equal to the driverâs database username are published. Rows with a value equal to the driverâs database username are not published unless the Allow Loopback Publisher parameter is set to Boolean True. See <a href="how-to-set-publication-parameters.html#bvw4x51" class="xref">Allow Loopback?</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0i3m">
+
+<h2 class="title h2"><span class="number">11.1.7</span> table_name</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The name of the table or view where the event occurred.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0i7u">
+
+<h2 class="title h2"><span class="number">11.1.8</span> column_name</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The name of the column that was changed. This column is used only for per-field (1-3, 7-8) event types. Nevertheless, it must always be present in the event log table. If it is missing, the Publisher channel cannot start.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0ibg">
+
+<h2 class="title h2"><span class="number">11.1.9</span> old_value</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The fieldâs old value. This column is used only for per-field, non-query-back event types (1-3). Nevertheless, it must always be present in the event log table. If it is missing, the Publisher channel cannot start.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgz0ifp">
+
+<h2 class="title h2"><span class="number">11.1.10</span> new_value</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The fieldâs new value. This column is used only by per-field, non-query-back event types (1-3). Nevertheless, it must always be present in the event log table. If it is missing, the Publisher channel cannot start.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

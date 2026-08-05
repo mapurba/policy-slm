@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="February 17 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4d9zhni2ir2,t4d2m59259wh,t4d3lryweckm,driver-properties,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>SCIM JSON Attribute Representation Using SCIM Schema Utility - NetIQ SCIM Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4d9zhni2ir2">
+
+<h1 class="title h1"><span class="number">6.3</span> SCIM JSON Attribute Representation Using SCIM Schema Utility</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The schema mapping policy comprises all the resource attributes. The attributes are represented with their sub-attributes, or their canonical types, or both. These attributes are modified to the required format as explained in the following sections.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="t4d9zixyt96p">
+
+<h2 class="title h2"><span class="number">6.3.1</span> Attribute Representation Using SCIM Utility Grammar With Delimiters</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The resource attributes in the Identity Manager are in the JSON format. These attributes are of singular, complex, complex multivalued types. For schema mapping, the resource attributes can be from a core class or from an extension. The SCIM driver modifies the JSON format to a linear SCIM format using delimiters, as shown below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">+</span> as the urn(Resource) delimiter</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">:</span> as the attribute-Sub attributes delimiter</p></li></ul></div>
+
+<p class="para">The delimiters as mentioned earlier are used to represent the SCIM attributes as shown below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Core attributes: The core attributes are of three types and are delimited by <span class="strong">:</span> , as shown below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Singular: <span class="filename"><span class="replaceable">&lt;attribute&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem">Complex Singular: <span class="filename"><span class="replaceable">&lt;attribute&gt;:&lt;subattribute&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem">Complex Multi-valued: <span class="filename"><span class="replaceable">&lt;attribute&gt;:&lt;cannonicalType&gt;:&lt;subattribute&gt;</span></span></p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Extensions attributes: The extension attributes are associated to the URN with a <span class="strong">+</span>, as shown below:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Singular: <span class="filename"><span class="replaceable">&lt;urn&gt;+&lt;attribute&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem">Complex Singular: <span class="filename"><span class="replaceable">&lt;urn&gt;+&lt;attribute&gt;:&lt;subattribute&gt;</span></span></p></li>
+<li class="listitem">
+<p class="listitem">Complex Multi-valued: <span class="filename"><span class="replaceable">&lt;urn&gt;+&lt;attribute&gt;:&lt;cannonicalType&gt;:&lt;subattribute&gt;</span></span></p></li></ul></div>
+</li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4da0uykt551">
+
+<h2 class="title h2"><span class="number">6.3.2</span> Formatting JSON Structures to SCIM Attributes</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The SCIM driver formats the JSON structure into a linear format SCIM attribute using delimiters. The following table shows how the JSON structures are transformed into linear SCIM attributes using utility grammar.</p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="29%" /><col width="39%" /><col width="31%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">JSON Structure</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">SCIM Attributes</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Grammar</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="strong">Singular Attribute</span>
+                  </p>
+<p class="para"><span class="filename">"userName"</span>:johndoe@microfocus.com</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="filename">username</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;attribute&gt;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="strong">Complex Attribute</span>
+                  </p><pre class="screen">"phoneNumbers":[ {"type":"work", "value":"09663502443"},],</pre></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                        <span class="filename">phoneNumbers</span>
+                      </p></li>
+<li class="listitem">
+<p class="listitem">
+                        <span class="filename">phoneNumbers:work</span>
+                      </p></li>
+<li class="listitem">
+<p class="listitem">
+                        <span class="filename">phoneNumbers:value</span>
+                      </p></li>
+<li class="listitem">
+<p class="listitem">
+                        <span class="filename">phoneNumbers:work:value</span>
+                      </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">&lt;attribute&gt;</p></li>
+<li class="listitem">
+<p class="listitem">&lt;attribute&gt;:&lt;cannonicalType&gt;</p></li>
+<li class="listitem">
+<p class="listitem">&lt;attribute&gt;:&lt;subattribute&gt;</p></li>
+<li class="listitem">
+<p class="listitem">&lt;attribute&gt;:&lt;cannonicalType&gt;:&lt;subattribute&gt;</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="strong">Extension Attribute</span>
+                  </p><pre class="screen">"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User":
+ {    "organization":"00D2v000002mBdQEAU","employeeNumber":"21212"
+ },</pre></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                        <span class="filename">urn:ietf:params:scim:schemas:extension:enterprise:2.0:User+Organization</span>
+                      </p></li>
+<li class="listitem">
+<p class="listitem">
+                        <span class="filename">urn:ietf:params:scim:schemas:extension:enterprise:2.0:User+employeeNumber</span>
+                      </p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">&lt;urn&gt;+&lt;attribute&gt;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="strong">Complex Values in Extension Attribute</span>
+                  </p><pre class="screen">"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User":
+{ 
+"manager":
+[ 
+{ "displayName":"John Doe"
+}, 
+], 
+},</pre></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="filename">urn:ietf:params:scim:schemas:extension:enterprise:2.0:User+Manager:displayName</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">&lt;urn&gt;+&lt;attribute&gt;:&lt;cannonicalType&gt;:&lt;subattribute&gt;</p></li>
+<li class="listitem">
+<p class="listitem">&lt;urn&gt;+&lt;attribute&gt;:&lt;subattribute&gt;</p></li></ul></div>
+</td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

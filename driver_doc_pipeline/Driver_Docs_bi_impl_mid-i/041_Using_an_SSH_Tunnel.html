@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="tunnel,b3wv5kq,b4010ep,b4012qy,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Using an SSH Tunnel - NetIQ IBM i (i5/OS and OS/400) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="tunnel">
+
+<h1 class="title h1"><span class="number">8.2</span> Using an SSH Tunnel</h1>
+
+<div class="content_wrapper">
+
+<p class="para">In the event that SSL cannot be used, you may also secure the communications channel between the Metadirectory engine and the driver shim on the connected system using an SSH tunnel.</p>
+<p class="para">Ensure that the SSHD server is running on your IBM i box. To start the server, run the following command:</p>
+<p class="para">
+        <span class="command">STRTCPSVR SERVER(*SSHD)</span>
+      </p>
+<p class="para">You must enable the server to automatically start with TCP/IP. For more information, see <a href="https://www.ibm.com/support/pages/how-setup-ibm-i-ssh-daemon-autostart-tcpip" class="ulink">How to setup the IBM i SSH daemon to autostart with TCP/IP</a>.</p>
+<p class="para">Login to your identity vault server as the user you will use for ssh authentication. You can enable the key based authentication to avoid providing a password each time the ssh client is started. To enable key based authentication, perform the below steps based on your operating system:</p>
+<p class="para">On Windows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Start a Command Prompt</p></li></ul></div>
+
+<p class="para">Both on Windows and Linux:</p>
+<div class="procedure" id="t4cfugj6nfk2">
+<ol class="steps">
+<li class="step">
+<p class="para">Run the following command: <span class="command">ssh-keygen</span></p></li>
+<li class="step">
+<p class="para">Press enter to accept the defaults and do not specify a passphrase. If you are asked to overwrite, select no.</p></li>
+<li class="step">
+<p class="para">Open id_rsa.pub and copy the contents to your i box. On Linux, this file will be located at <span class="filename">~/.ssh/id_rsa.pub</span>. On windows, this file will be located at <span class="filename">%HOMEPATH%\.ssh\id_rsa.pub</span>.</p></li></ol>
+</div>
+
+<p class="para">Login to your i box as the user you will use for ssh.</p>
+<div class="procedure" id="t4cfuh610exx">
+<ol class="steps">
+<li class="step">
+<p class="para">Run QSH</p></li>
+<li class="step">
+<p class="para">From QSH, run the following command: <span class="command">mkdir ~/.ssh</span></p></li>
+<li class="step">
+<p class="para">Next, run the following command from QSH: <span class="command">chmod 700 ~</span></p></li>
+<li class="step">
+<p class="para">Next, run the following command from QSH: <span class="command">chmod 600 ~/.ssh</span></p></li>
+<li class="step">
+<p class="para">Place the contents of <span class="filename">id_rsa.pub</span> file identified above into <span class="filename">~/.ssh/authorized_keys</span>. You may need to create this file.</p></li>
+<li class="step">
+<p class="para">From QSH, run the following command: <span class="command">chmod 600 ~/.ssh/authorized_keys</span></p></li></ol>
+</div>
+
+<p class="para">Start the ssh client on your Identity Vault server to tunnel the connection to your i box using the following commands based on your operating system. Be default, the port will be 8090.</p>
+<p class="para">On Linux:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <span class="command">ssh -fN -i ~/.ssh/id_rsa -L &lt;port&gt;:localhost:&lt;port&gt; &lt;ssh-user&gt;@&lt;ibm-i-host&gt;</span>
+          </p></li></ul></div>
+
+<p class="para">On Windows:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">You may need to install the OpenSSH client. For more information, see Installation of <a href="https://docs.microsoft.com/en-us/windows-server-administration/openssh/openssh_install_firstuse" class="ulink">OpenSSH for Windows Server 2019 and Windows 10</a>.</p></li>
+<li class="listitem">
+<p class="listitem">
+            <span class="command">ssh -i %HOMEPATH%\.ssh\id_rsa -L &lt;port&gt;:localhost&lt;port&gt; &lt;ssh-user&gt;@&lt;ibm-i-host&gt;</span>
+          </p></li></ul></div>
+
+<p class="para">On your IBM i box, perform the following steps to modify I5OSDRV configuration file:</p>
+<div class="procedure" id="t4cfugj6qzye">
+<ol class="steps">
+<li class="step">
+<p class="para">Run the following command: <span class="command">GO I5OSDRV/I5OSDRV</span></p></li>
+<li class="step">
+<p class="para">Choose option 3 to modify the configuration file</p></li>
+<li class="step">
+<p class="para">Remove c<span class="command">a=/usr/local/i5osdrv/keys/ca.pem</span> from the <span class="command">-connection</span> line.</p></li>
+<li class="step">
+<p class="para">Choose option 2 to stop I5OSDRV driver shim, then option 1 to start it back up.</p></li></ol>
+</div>
+
+<p class="para">In iManager, perform the following steps:</p>
+<div class="procedure" id="t4cfugj6u5u6">
+<ol class="steps">
+<li class="step">
+<p class="para">Go to the configuration for your i5/OS driver and remove <span class="command">kmo="SSL CertificateDNS"</span> from the remote loader connection parameters.</p></li>
+<li class="step">
+<p class="para">Change the hostname to <span class="command">localhost</span>.</p></li>
+<li class="step">
+<p class="para">Restart the driver and the connection to your IBM i box should succeed over the SSH tunnel.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

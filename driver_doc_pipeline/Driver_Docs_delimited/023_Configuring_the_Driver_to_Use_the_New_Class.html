@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="configure-driver-new-class,delimited-java-interfaces-customize-file,create-java-jar-file,manage-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring the Driver to Use the New Class - NetIQ Identity Manager Driver for Delimited Text Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="configure-driver-new-class">
+
+<h1 class="title h1"><span class="number">8.3</span> Configuring the Driver to Use the New Class</h1>
+
+<div class="content_wrapper">
+
+<p class="para">After you have placed the new <span class="filename">.jar</span> file in the correct location, configure the driver to use your new class by modifying the driver's properties.</p>
+<div class="procedure" id="b8mjx8">
+<ol class="steps">
+<li class="step" id="bg1jwy5">
+<p class="para">In Identity Console, go to the Identity Manager Administration page:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="ag7yzoo">
+<p class="para">In the <span class="guimenu">Identity Manager</span> frame, click <span class="guimenu">IDM Administration</span>.</p></li>
+<li class="step" id="aicgv0g">
+<p class="para">Select the driver set that contains the driver.</p></li>
+<li class="step" id="aicgv2g">
+<p class="para">Click the driver icon.</p></li></ol>
+</div>
+</li>
+<li class="step" id="aicgvdg">
+<p class="para">Select <span class="guimenu">Configuration</span> tab.</p></li>
+<li class="step" id="b195kxa">
+<p class="para">Click <span class="guimenu">Driver Parameters</span> drop down, then click <img src="../graphics/edit_xml.png" alt="" class="inline" /> Edit XML.</p></li>
+<li class="step" id="ag7yzux">
+<p class="para">Locate the &lt;<span class="literal">publisher-options</span>&gt; section of the file.</p>
+<p class="para">This file defines which parameters and values appear in the Driver Parameters section of the D<span class="guimenu">river Configuration</span> page.</p>
+<p class="para">For each class you created that works on the Publisher channel, you enter an additional option in the &lt;<span class="literal">publisher-options</span>&gt; section. After you update this file, you see your new options in the interface.</p></li>
+<li class="step" id="agasthy">
+<p class="para">For each new class you created on the Publisher channel, add an entry corresponding to the interface type. Use the following table as a guide:</p>
+<div class="informaltable">
+<table class="topbot" width="89%"><col width="18%" /><col width="82%" />
+                
+<tr class="headerrow" id="agasu5q"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Interface</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">New Entry</p></th>
+</tr>
+              
+<tr class="oddrow" id="agasu5r"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">InputSorter</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">&lt;definition display-name="InputSorter Class" name=" input-sorter" type="string"&gt; &lt;value&gt;com.acme.MyNewClass&lt;/value&gt; &lt;/definition&gt;</span>
+                    </p>
+<p class="para">
+                      <span class="literal">&lt;definition display-name="InputSorter init string" name=" input-sorter-params" type="string"&gt; &lt;value&gt;MY CONFIG PARAMS&lt;/value&gt; &lt;/definition&gt;</span>
+                    </p></td>
+</tr>
+<tr class="evenrow" id="agasu5s"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">InputSource</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">&lt;definition display-name="InputSource Class" name=" input-source" type="string"&gt; &lt;value&gt;com.acme.MyNewClass&lt;/value&gt; &lt;/definition&gt;</span>
+                    </p>
+<p class="para">
+                      <span class="literal">&lt;definition display-name="InputSource init string" name=" input-source-params" type="string"&gt; &lt;value&gt;MY CONFIG PARAMS&lt;/value&gt; &lt;/definition&gt;</span>
+                    </p></td>
+</tr>
+<tr class="oddrow" id="agasu5t"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">PreProcessor</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                      <span class="literal">&lt;definition display-name="PreProcessor Class" name="pre-processor" type="string"&gt; &lt;value&gt;com.acme.MyNewClass&lt;/value&gt; &lt;/definition&gt;</span>
+                    </p>
+<p class="para">
+                      <span class="literal">&lt;definition display-name="PreProcessor init string" name="pre-processor-params" type="string"&gt; &lt;value&gt;MY CONFIG PARAMS&lt;/value&gt; &lt;/definition&gt;</span>
+                    </p></td>
+</tr></table>
+</div>
+
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="ag7zeeh">
+<p class="para">Replace <span class="literal">com.acme.MyNewClass</span> with the name of the class that you defined, along with a full package identifier.</p></li>
+<li class="step" id="ag7zeei">
+<p class="para">Replace <span class="literal">MY CONFIG PARAMS</span> with any information that you want to pass to the init method of your class.</p>
+<p class="para">The init method of your class is then responsible for parsing the information contained in this string. If your class doesnât require a configuration string to be passed to the init method, you can leave off the whole element, in which case null is passed to the init method.</p></li></ol>
+</div>
+</li>
+<li class="step" id="btb7mpd">
+<p class="para">If you created a PostProcessor rule, locate the &lt;<span class="literal">subscriber-options</span>&gt; section of the file and add the following lines:</p><pre class="screen">&lt;definition display-name="PostProcessor Class" name="post-processor" type="string"&gt;
+&lt;value&gt;com.acme.MyNewClas&lt;/value&gt;
+&lt;/definition&gt;
+
+&lt;definition display-name="PostProcessor Parameters" name="post-processor-params" type="string"&gt;
+&lt;value&gt;MY CONFIG PARAMS&lt;/value&gt;
+&lt;/definition&gt;</pre>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="btb7mpe">
+<p class="para">Replace <span class="literal">com.acme.MyNewClass</span> with the name of the class that you have defined along with full package information.</p></li>
+<li class="step" id="btb7mpf">
+<p class="para">Replace <span class="literal">MY CONFIG PARAMS</span> with any information that you want to pass to the init method of your class.</p>
+<p class="para">The init method of your class is then responsible for parsing the information contained in this string. If your class doesnât require a configuration string to be passed to the init method, you can leave off the entire element, in which case null would be passed to the init method.</p></li></ol>
+</div>
+</li>
+<li class="step" id="agat1db">
+<p class="para">Click <span class="guimenu">OK</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

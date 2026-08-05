@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b410u7u,b3r8tim,b3r8tim,b3xxapt,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>The Scriptable Framework - NetIQ RACF Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b410u7u">
+
+<h1 class="title h1"><span class="number">6.1</span> The Scriptable Framework</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver provides a comprehensive scriptable framework that you can use to add to the built-in support for the security system, and to add support for other applications and security system fields that have been customized for a particular installation.</p>
+<p class="para">The driverâs scriptable framework includes components that simplify the job of extending the driver to support new applications and fields.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Embedded Remote Loader</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Full SSL support, and an installer to easily configure the certificates</p></li>
+<li class="listitem">
+<p class="listitem">Web access to debugging information from the embedded Remote Loader</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Encrypted change log that stores changes from the application to the Identity Vault if there is a communication problem</p></li>
+<li class="listitem">
+<p class="listitem">Loopback detection system to prevent subscribed events from being published back to the Identity Vault</p></li>
+<li class="listitem">
+<p class="listitem">z/OS name/token callable services helper programs that provide for securely passing large variables to and from the REXX execs</p></li>
+<li class="listitem">
+<p class="listitem">Easily extendable connected system schema file to support any application</p></li>
+<li class="listitem">
+<p class="listitem">Include/exclude file for simplified testing and deployment by the platform administrator</p></li>
+<li class="listitem">
+<p class="listitem">Event support, both for applications that have exits or callouts, and for applications that must be polled for changes</p></li></ul></div>
+
+<p class="para">The names of objects and attributes in the REXX execs are the names specified in the connected system schema file.</p>
+<p class="para">The following tables describe the major REXX execs.</p>
+<div class="table" id="b4fgafn"><p class="title"><em class="num">Table 6-1 </em>Identity Vault Command Processing Execs</p>
+<table class="topbot" width="100%"><col width="28%" /><col width="72%" />
+            
+<tr class="headerrow" id="b46pk4d"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">REXX Exec</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Identity Vault Event</p></th>
+</tr>
+          
+<tr class="oddrow" id="b46pqrt"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMADDG</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Add Group</p></td>
+</tr>
+<tr class="evenrow" id="b46pqru"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMADDU</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Add User</p></td>
+</tr>
+<tr class="oddrow" id="b46pqrw"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMDELG</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Delete Group</p></td>
+</tr>
+<tr class="evenrow" id="b46pqrx"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMDELU</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Delete User</p></td>
+</tr>
+<tr class="oddrow" id="b46pr8p"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMMODG</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Modify Group</p></td>
+</tr>
+<tr class="evenrow" id="b46pqs1"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMMODU</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Modify User</p></td>
+</tr>
+<tr class="oddrow" id="b46pqs2"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMMODPW</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Password Change</p></td>
+</tr>
+<tr class="evenrow" id="b46pqs7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMQUERY</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Query</p></td>
+</tr>
+<tr class="oddrow" id="b6acepb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMCHOPW</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Check Password</p></td>
+</tr></table>
+</div>
+
+<div class="table" id="b46pk82"><p class="title"><em class="num">Table 6-2 </em>Other Execs</p>
+<table class="topbot" width="100%"><col width="27%" /><col width="73%" />
+            
+<tr class="headerrow" id="b46pkko"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">REXX Exec</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Purpose</p></th>
+</tr>
+          
+<tr class="oddrow" id="b46pkkp"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMSUB</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Calls the appropriate command processing exec based on the type of event and object. This is executed for every Subscriber event.</p></td>
+</tr>
+<tr class="evenrow" id="b46pmdj"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMPOLL</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not used for RACF. You can use this exec as needed to support your own applications if they do not generate events when changes are made.</p></td>
+</tr>
+<tr class="oddrow" id="b6aci89"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMHRTBT</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Heartbeat exec.</p></td>
+</tr>
+<tr class="evenrow" id="b46pmdm"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMGLBLS</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Holds configurable options that all REXX execs can use during event processing.</p></td>
+</tr>
+<tr class="oddrow" id="b46pmdl"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMSTATS</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sends a status document to report the health of the application.</p></td>
+</tr>
+<tr class="evenrow" id="b46pmdk"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">IDMTSOEX</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Executes a TSO command and returns the command return code and command output.</p></td>
+</tr>
+<tr class="oddrow" id="b6aqv09"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">SETPWDS</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sets the Remote Loader and Driver object passwords, which are used to authenticate and authorize the connection between the driver shim started task and the Metadirectory system.</p></td>
+</tr>
+<tr class="evenrow" id="b6ar7gg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">SETCERT</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Retrieves the certificate authority for the Metadirectory engine that uses SSL to communicate with the driver shim started task.</p></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bmio7x2">
+
+<h2 class="title h2"><span class="number">6.1.1</span> Modifying a REXX Exec</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Each of the REXX execs that come with the driver is designed with a common format, which makes it easy to read, edit, and maintain. Following are functional descriptions of the standard sections included in each exec:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Retrieve subscriber shim variables, using <span class="command">IDMGETV</span> sub.</p></li>
+<li class="listitem">
+<p class="listitem">Retrieve event data variables, using <span class="command">IDMGETV</span> event.</p></li>
+<li class="listitem">
+<p class="listitem">Trace a useful message to be logged to the TSO print file.</p></li>
+<li class="listitem">
+<p class="listitem">Provide comments instructing where to insert custom code before the TSO command is executed.</p></li>
+<li class="listitem">
+<p class="listitem">Execute the TSO command stored in variable <span class="replaceable">RACFCMD</span>, which performs the basic action.</p></li>
+<li class="listitem">
+<p class="listitem">Provide comments instructing where to insert custom code after the TSO command has been executed.</p></li>
+<li class="listitem">
+<p class="listitem">Return of status document, using the <span class="command">IDMSTATS</span> function.</p></li></ul></div>
+
+<div class="container sect3" id="bmiobvu">
+
+<h3 class="title h3">Retrieving and Returning Information with IDMGETV and IDMSETV</h3>
+
+<p class="para">The REXX execs use <span class="literal">IDMGETV</span> to obtain information about the event and about the properties configured on the RACF driver. The REXX execs use <span class="literal">IDMSETV</span> to return information to the driver shim or Metadirectory engine for processing. Both <span class="literal">IDMGETV</span> and <span class="literal">IDMSETV</span> are utilities, found in the distribution <span class="filename">LOAD</span> library, which transport information between REXX variables and memory storage. When information is retrieved using <span class="literal">IDMGETV</span>, the REXX variables will be created and populated and a special variable, <span class="replaceable">VariableList</span>, will also be created to contain a list of the available REXX variables from the shim.</p>
+<p class="para">To check for the existence of a REXX variable, set by <span class="literal">IDMGETV</span>, use:</p><pre class="screen">  if wordpos("VariableName", VariableList) &gt; 0; then do;
+    /* REXX variable, VariableName exists and was created by IDMGETV */
+  end;</pre>
+<p class="para">Where <span class="literal"><span class="replaceable">VariableName</span></span> is the name of the variable of interest. Event variables will contain the prefix ADD_ or REMOVE_ to indicate that this attribute has been added or removed from the object in question. For example, to check if the REVOKE field has been removed:</p><pre class="screen">  if wordpos("REMOVE_REVOKED", VariableList) &gt; 0; then do;
+    /* User had REVOKED value removed */
+  end;</pre>
+<p class="para">For example, if the following XDS document is sent to the RACF driver shim:</p><pre class="screen">  &lt;modify class-name="User" event-id="12345"&gt;
+    &lt;association&gt;USER\IBMUSER&lt;/association&gt;
+    &lt;modify-attr attr-name="DirXML-RACF-name"&gt;
+      &lt;remove-value&gt;
+        &lt;value&gt;IBMUSER&lt;/value&gt;
+      &lt;/remove-value&gt;
+      &lt;add-value&gt;
+        &lt;value&gt;THE IBMUSER&lt;/value&gt;
+      &lt;/add-value&gt;
+    &lt;/modify-attr&gt;
+  &lt;/modify&gt;</pre>
+<p class="para">The resulting REXX variables would look like:</p><pre class="screen">  COMMAND=modify
+  CLASS_NAME=User
+  EVENT_ID=12345
+  ASSOCIATION=USER\IBMUSER
+  REMOVE_DIRXML_RACF_NAME=IBMUSER
+  ADD_DIRXML_RACF_NAME=THE IBMUSER</pre>
+<p class="para">When attributes are mapped to REXX variables, all invalid REXX variable characters are converted into underscore (â_â) characters. These include â-â, â@â and â...â.</p>
+</div>
+
+<div class="container sect3" id="bmj2rr5">
+
+<h3 class="title h3">Multivalued (Stem) Variables</h3>
+
+<p class="para">When attributes are multivalued, <span class="literal">IDMGETV</span> assigns a suffix to the variable name to index its values. The count of the number of values is represented by <span class="literal">suffix.0</span> and the values are represented from .1 to .n, where <span class="replaceable">n</span> is the total count. For example, if the variable <span class="literal">CLASSES</span> was multivalued with values: CLS1, CLS2, CLS3, the following variables would be created:</p><pre class="screen">  CLASSES.0=3
+  CLASSES.1=CLS1
+  CLASSES.2=CLS2
+  CLASSES.3=CLS3</pre>
+<p class="para">To iterate over each value, use a REXX do loop:</p><pre class="screen">  do i = 1 to CLASSES.0
+    class = CLASSES.i
+  end;</pre>
+</div>
+
+<div class="container sect3" id="bmj35m2">
+
+<h3 class="title h3">Returning Status Documents Using IDMSTATS</h3>
+
+<p class="para">Identity Manager uses status documents, returned by the driver, to investigate whether an event was processed by the driver shim. Therefore, itâs important for the REXX execs to return a status document indicating whether the event was successful or resulted in an error. Use the supplied REXX exec, <span class="literal">IDMSTATS</span>, to return a status document:</p><pre class="screen">  x = IDMSTATS("success", "Event was processed successfully", EVENT_ID);</pre>
+<p class="para">The <span class="literal">IDMSTATS</span> script takes three parameters: level, message and event id. The level must be one of: success, error, warning, retry or fatal.</p><pre class="screen">  &lt;status level="success" event-id="12345"&gt;
+    Event was processed successfully
+  &lt;/status&gt;</pre>
+</div>
+
+<div class="container sect3" id="bmj35qj">
+
+<h3 class="title h3">Understanding the RACFCMD Variable</h3>
+
+<p class="para">Before an XDS command is sent to the driver shim, the Output Transformation policy converts the XDS document into a RACF TSO administrative command and stores the result in the attribute, <span class="literal">RACFCMD</span>. This process avoids adding parsing logic inside the REXX execs to build the command, making the REXX execs cleaner, shorter, and easier to read. Therefore the default action of each REXX exec is to look for the <span class="literal">RACFCMD</span> variable, which may be multivalued, and execute the command by default.</p>
+</div>
+
+<div class="container sect3" id="bmj3981">
+
+<h3 class="title h3">Using IDMTRACE To Print Messages</h3>
+
+<p class="para"><span class="literal">IDMTRACE</span> is another REXX exec, supplied by the driver distribution, that allows you to simply trace a message to the TSO print file (<span class="literal">SYSTSPRT</span>), allocated by the <span class="literal">RACFDRV</span> JCL. It will only trace messages if <span class="literal">ENABLE_TRACE</span> is set to true in <span class="literal">IDMGLBLS</span>. It will also print the date and time before the message for convenience.</p><pre class="screen">  x = IDMTRACE("IDMADDU is running for user &lt;"ADD_DIRXML_RACF_USERID"&gt;.");</pre>
+</div>
+
+<div class="container sect3" id="bqk4s50">
+
+<h3 class="title h3">Global Settings in member IDMGLBLS</h3>
+
+<p class="para">The REXX exec <span class="literal">IDMGLBLS</span> is a simple script containing global settings that all scripts may use. It provides a common repository of variables you may change to alter the behavior of the other REXX execs. There are four variables of interest:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">SUBCOMMAND_SEPARATOR: Defines the character to be recognized as a delimiter between lines of output received from TSO when executing commands that produce output. The default is the EBDIC newline character.</p></li>
+<li class="listitem">
+<p class="listitem">MESSAGE_PREFIX: Defines a string that precedes lines in the TSO print file (<span class="literal">SYSTSPRT</span>) in which a TSO command is about to be executed. The default is <span class="literal">--&gt;TSO:</span></p></li>
+<li class="listitem">
+<p class="listitem">DISPLAY_TSO_OUTPUT: A boolean variable that controls whether TSO output received from a command should be displayed in the TSO print file (<span class="literal">SYSTSPRT</span>). The default is <span class="literal">true</span></p></li>
+<li class="listitem">
+<p class="listitem">ENABLE_TRACE: A boolean variable that controls whether <span class="literal">IDMTRACE</span> messages should be displayed. The default is <span class="literal">true</span></p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Enabling trace can be useful for troubleshooting and log collecting; however, disabling trace can reduce the amount of output that is saved in the <span class="literal">SYSTSPRT</span> file.</p></div>
+</li></ul></div>
+
+</div>
+
+<div class="container sect3" id="bmj3f6o">
+
+<h3 class="title h3">Using IDMTSOEX To Execute A TSO Command</h3>
+
+<p class="para">In REXX, a TSO command can be evaluated simply by entering the command on its own line:</p><pre class="screen">  cmd = "ALU IBMUSER NAME(IBMUSER)IDMTRACE");
+  cmd;</pre>
+<p class="para">The <span class="literal">IDMTSOEX</span> exec, also supplied by the distribution, will provide a few other options:</p><pre class="screen">  x = IDMSOEX(cmd);</pre>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Log the command (password sanitized) using <span class="literal">IDMTRACE</span></p></li>
+<li class="listitem">
+<p class="listitem">Trap the output and return code from the command</p></li>
+<li class="listitem">
+<p class="listitem">Return the code and output of the command to the caller</p></li></ul></div>
+
+<p class="para">It's convenient to use this output to display a message back to the engine through a status document:</p><pre class="screen">  response = IDMTSOEX("ALU IBMUSER NAME(IBMUSER)");
+
+  /* first word is the return code */
+  if word(cmd_response) &gt; 0 then do;
+    x = IDMSTATS("error", response, EVENT_ID);
+  end;
+  else do;
+    x = IDMSTATS("success", respons, EVENT_ID);
+  end;</pre>
+</div>
+
+<div class="container sect3" id="bmj3fi4">
+
+<h3 class="title h3">Putting It All Together</h3>
+
+<p class="para">The following code sample illustrates how the IMMADDU exec can be modified to additionally create and OMVS home directory:</p><pre class="screen">  /* retrieve subscriber variables */
+  "IDMGETV sub";
+
+  /* retrieve event variables */
+  "IDMGETV event";
+
+  /* trace a message to SYSTSPRT */
+  x = idmtrace("IDMADDU running for user &lt;"ADD_DIRXML_RACF_USERID"&gt;.");
+
+  /*
+     INSERT CUSTOM CODE HERE
+
+     Add any custom code here that needs to be executed before
+     creating the user in the RACF database.
+  */
+ 
+  /* Add the user to the RACF database using a TSO command */
+  if wordpos("ADD_RACFCMD.0", variablelist) &lt;= 0; then do;
+    /* we did not get a RACFCMD from the event document */
+    success = IDMSTATS("error", "No RACF command found", EVENT_ID);
+    exit 0;
+  end;
+
+  do i = 1 to ADD_RACFCMD.0
+    tsocmd = ADD_RACFCMD.i
+    /* For an event, multiple TSO commands may be generated */
+    cmd_response = IDMTSOEX(tsocmd);
+    /* check the return code from our command */
+    if word(cmd_response, 1) &gt; 0 then do;
+      /* an error occured, report an error and exit from script */
+      success = IDMSTATS("error", cmd_response, EVENT_ID);
+      exit 0;
+    end;
+    else do;
+      success = IDMSTATS("success", cmd_response, EVENT_ID);
+    end;
+  end;
+
+  /*
+  INSERT CUSTOM CODE HERE
+  Add any custom code here that needs to be executed after
+  creating the user in the RACF database.
+  */
+
+  /* check for the home directory attribute and create it */
+  if wordpos("ADD_DIRXML_RACF_OMVS_HOME", VariableList) &gt; 0; then do
+    makeDir = "mkdir '"ADD_DIRXML_RACF_OMVS_HOME"'"; 
+    response = IDMTSOEX(makeDir);
+    if word(response, 1) &gt; 0 then do;
+      x = IDMSTATS("warning", response, EVENT_ID);
+    end;
+  end;
+
+  /* All is successful, so we need to return an association
+   for this user.  RACF associations are of the form:
+     USER\USERID*/
+
+  parse upper var ADD_DIRXML_RACF_USERID ASSOCIATION;
+  ASSOCIATION = "USER\"ASSOCIATION;
+
+  "IDMSETV MODIFY NAME(COMMAND) VALUE(ADD_ASSOCIATION)";
+  "IDMSETV MODIFY NAME(ASSOCIATION) VALUE("ASSOCIATION")";
+  "IDMSETV MODIFY NAME(EVENT_ID) VALUE("EVENT_ID")";
+
+  if SRC_DN &lt;&gt; "SRC_DN"; then
+    "IDMSETV MODIFY NAME(DEST_DN) VALUE("SRC_DN")";
+  end;
+
+  if SRC_ENTRY_ID &lt;&gt; "SRC_ENTRY_ID"; then
+    "IDMSETV MODIFY NAME(DEST_ENTRY_ID) VALUE("SRC_ENTRY_ID")";
+  end;
+
+  /* Exit the script with return code 0 (no error) */
+  exit 0;</pre>
+</div>
+
+<div class="container sect3" id="bqk5mog">
+
+<h3 class="title h3">REXX Performance Considerations</h3>
+
+<p class="para">Using the REXX execs to customize policy on the RACF system provides a powerful and flexible option for mainframe system administrators. However, it should be noted that using them for processing will impose a slight decrease in performance. To understand more about these effects on performance, see <a href="bmn9uvw.html" class="xref">Performance Information</a>. To disable REXX processing, see the <span class="literal">-disablerexx</span> driver shim option found in <a href="b4baik6.html#b4572iu" class="xref">Table 5-5</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

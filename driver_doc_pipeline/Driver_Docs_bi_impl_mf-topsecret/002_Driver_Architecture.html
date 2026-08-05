@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3wvpsh,b3r8p5u,b3r8p5u,b3wx9up,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Architecture - NetIQ Top Secret Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3wvpsh">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Architecture</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver synchronizes information between the Identity Vault and the security system on the connected z/OS system.</p>
+<p class="para">Identity Manager detects relevant changes to identities in the Identity Vault and notifies the Subscriber component of the driver. After customizable policy processing, events are sent to the Subscriber channel of the driver shim started task on the connected system. The Subscriber shim securely passes the information to customizable REXX execs that perform the required actions.</p>
+<p class="para">Standard security system exit routines capture password and other changes and place them on a memory queue. The change log started task moves events from the memory queue to the change log data set, where they are stored for processing. At configurable intervals, the Publisher shim polls the change log for events and submits them to the Metadirectory engine. The Metadirectory engine processes these events using customizable policies, and posts relevant changes to the Identity Vault.</p>
+<p class="para">The following illustration shows an overview of the architecture.</p>
+<div class="figure" id="b6n4rqe"><p class="title"><em class="num">Figure 1-1 </em>Top Secret Driver Architecture</p>
+            <img src="../graphics/ts-arch_a.png" alt="" />
+          </div>
+
+<p class="para">The following topics describe the driver architecture in more detail:</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#b3ww1kz" class="xref">Publisher Channel</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#b3wwjcn" class="xref">Subscriber Channel</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#b67ophu" class="xref">Driver Shim Started Task</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#b67pui2" class="xref">LDXSERV Command</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#b42k9un" class="xref">Scriptable Framework</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#b3wwpn7" class="xref">Schema File</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b3wvpsh.html#b3wwr5t" class="xref">Include/Exclude File</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3ww1kz">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Publisher Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Publisher shim periodically examines the change log for events. When the Publisher shim finds events in the change log, it decrypts, processes, and sends them to the Metadirectory engine in XDS format over a Secure Sockets Layer (SSL) network link. The Metadirectory engine applies policies, takes the appropriate actions, and posts the events to the Identity Vault.</p>
+<p class="para">z/OS object names are uppercase. The Publisher Placement policy converts object names to lowercase.</p>
+<div class="container sect3" id="b67pjzx">
+
+<h3 class="title h3">Security System Exit Routines</h3>
+
+<p class="para">Top Secret provides an installation exit named TSSINSTX. The driver uses this exit to detect activity of interest and to place events in the memory queue. When the driver exit routines place an event in the memory queue, they notify the change log started task. The change log started task then moves the event information to the change log data set. Each system that shares the security system database must run the exit routines provided by the driver in module IDMTSSIX.</p>
+<p class="para">The driver exit routines perform the following tasks:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Monitor password changes from the local security system and record user and password information in the memory queue.</p></li>
+<li class="listitem">
+<p class="listitem">Monitor security system administrative commands entered by users, either directly from the TSO command line, or as generated by the administrative panels. The exit routines record these commands and related information, such as the issuer and time stamp, in the memory queue.</p></li></ul></div>
+
+</div>
+
+<div class="container sect3" id="b67opov">
+
+<h3 class="title h3">Memory Queue</h3>
+
+<p class="para">The memory queue is an encrypted, in-storage buffer that holds events. Events are added to the memory queue by the security system exit routines, and are removed from the queue by the change log started task. The memory queue is located in Subpool 231 (fetch-protected ECSA).</p>
+</div>
+
+<div class="container sect3" id="b6b87uk">
+
+<h3 class="title h3">Change Log Started Task</h3>
+
+<p class="para">The change log started task is notified of events added to the memory queue by the driver exit routines and moves them to the change log data set.</p>
+<p class="para">Each system that shares a security system database must run the change log started task. The change log started task must be started as part of your normal z/OS system initialization procedure and stopped during normal system shutdown.</p>
+</div>
+
+<div class="container sect3" id="b3ww6wx">
+
+<h3 class="title h3">Change Log Data Set</h3>
+
+<p class="para">The change log started task removes encrypted events from the memory queue and stores them in the change log data set for processing by the Publisher shim. The Publisher shim removes events from the change log at configurable intervals and submits them to the Metadirectory engine. If communication with the Metadirectory engine is temporarily lost, events remain in the change log until communication becomes available again.</p>
+<p class="para">The change log data set is a standard z/OS direct access (DSORG=DA) data set. There is one change log data set for the set of systems that share the security system database. The change log data set must reside on a shared device unless the security system database is not shared.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwjcn">
+
+<h2 class="title h2"><span class="number">1.1.2</span> Subscriber Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel of the driver shim started task receives XDS command documents from the Metadirectory engine, stores them using z/OS name/token callable services, then calls the appropriate REXX execs to handle the command.</p>
+<p class="para">The Subscriber Creation policy converts object names to uppercase before the command documents are sent to the Subscriber. z/OS object names are uppercase.</p>
+<p class="para">The Subscriber shim calls the <span class="command">LDXSERV</span> command on startup to identify itself to the security system exit routines for loopback detection. This prevents the exit routines from generating events for commands issued by the Subscriber shim.</p>
+<div class="container sect3" id="b6gyeub">
+
+<h3 class="title h3">SAFQUERY Command</h3>
+
+<p class="para"><span class="command">SAFQUERY</span> is an APF-authorized TSO command that is used by the driver to query security system information. <span class="command">SAFQUERY</span> uses the RACROUTE macro for z/OS to retrieve information from the security system database through the system authorization facility (SAF).</p>
+</div>
+
+<div class="container sect3" id="b6n5vez">
+
+<h3 class="title h3">REXX Execs</h3>
+
+<p class="para">The provided REXX execs support adds, modifies, deletes, and renames for User and Group objects, and handle password synchronization. The REXX execs use standard TSO commands to apply the changes. You can extend the REXX execs to support other object types and events. The REXX execs have secure access to the original XDS command data using the <span class="command">IDMGETV</span> command. <span class="command">IDMGETV</span> accesses z/OS name/token callable services and places the data in REXX variables.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b67ophu">
+
+<h2 class="title h2"><span class="number">1.1.3</span> Driver Shim Started Task</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver shim runs as a started task. Only one system that shares the security system database runs the driver shim started task. The driver shim started task must be started as part of your normal z/OS system initialization procedure and stopped during normal system shutdown.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b67pui2">
+
+<h2 class="title h2"><span class="number">1.1.4</span> LDXSERV Command</h2>
+
+<div class="content_wrapper">
+
+<p class="para"><span class="command">LDXSERV</span> is an APF-authorized TSO command that provides services for the driver shim. The Subscriber channel calls <span class="command">LDXSERV</span> with the NOTSSLOG parameter at startup. This uses z/OS name/token callable services to create a token in the address space. If the security system exit routines find the token, they do not generate events. This prevents publication of events for actions taken by the Subscriber (loopback).</p>
+<p class="para">You can use the <span class="command">LDXSERV STATUS</span> command to display information about the Publisher channel event subsystem. To use the <span class="command">LDXSERV</span> command, you must include the driver load library in the logon procedure STEPLIB concatenation.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b42k9un">
+
+<h2 class="title h2"><span class="number">1.1.5</span> Scriptable Framework</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The interface between the security system and the driver shim uses customizable REXX execs. You can extend the execs that are provided with the driver to support other applications and databases.</p>
+<p class="para">Several utility execs and helper commands are provided with the driver to enable communication with the driver shim and the change log. An extensible connected system schema file allows you to add your own objects and attributes to those already supported by the driver.</p>
+<p class="para">For more information about the REXX execs and the scriptable framework, see <a href="b410u7u.html" class="xref">The Scriptable Framework</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwpn7">
+
+<h2 class="title h2"><span class="number">1.1.6</span> Schema File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The configuration of class and attribute definitions for the connected system is specified using the schema file. You can modify and extend this file to include new objects and attributes. For details about configuring the schema file, see <a href="b3xxapt.html" class="xref">The Connected System Schema File</a>.</p>
+<p class="para">The driver uses the keywords and functions of the Top Secret <span class="command">TSS</span> administrative command to define the schema. The schema includes two classes: USER and GROUP. These correspond to Top Secret users and groups.</p>
+<p class="para">Some items in the schema refer to keywords used to create and modify Top Secret users, but cannot be queried or synchronized. These attributes can be used only by Identity Manager policies to make event-time decisions that affect the behavior of the <span class="command">TSS</span> administrative command. The auxiliary schema used to extend eDirectoryâ¢ does not include these attributes.</p>
+<p class="para">The schema contains some attributes that consolidate multiple Top Secret attributes.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b3wwr5t">
+
+<h2 class="title h2"><span class="number">1.1.7</span> Include/Exclude File</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The include/exclude file allows local system policies to enforce which objects are included or excluded from provisioning by the Subscriber channel. This allows for administrative rules to be set and enforced locally rather than having processing decisions made by the Metadirectory engine. For details about using the include/exclude file, see <a href="b3xxit1.html" class="xref">The Connected System Include/Exclude File</a>.</p>
+<p class="para">To control which objects are processed by the Publisher channel, use policies. For details about customizing policies, see the policy documentation on the <a href="https://www.netiq.com/documentation/identity-manager-47/" class="ulink">Identity Manager 4.8 Documentation Web site</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

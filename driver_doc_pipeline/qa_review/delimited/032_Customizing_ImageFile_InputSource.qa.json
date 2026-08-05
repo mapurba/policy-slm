@@ -1,0 +1,83 @@
+{
+  "driver": "Delimited Text driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the ImageFile InputSource in the Delimited Text driver and what is its purpose?",
+      "input": "",
+      "output": "The ImageFile InputSource is a component of the Delimited Text driver that processes image files from a specified directory. It can filter images based on size (file size in bytes) and dimensions (width and height in pixels), and then creates input files for the Delimited Text driver to process. The InputSource can be configured to consolidate all images into one input file or create separate input files for each image, and it supports renaming or deleting processed files based on configuration parameters."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the correct format for passing parameters to the ImageFile InputSource in the Delimited Text driver?",
+      "input": "",
+      "output": "Parameters must be passed to the ImageFile InputSource as a string in the following format:\n\n<name1>=<value1>;<name2>=<value2>;<name n>=<value n>\n\nFor example:\nsrcdir=c:\\temp\\dirxml;renameto=bak;delblacklist=false;renblacklistto=ignore;minsize=1000;debug=true\n\nParameter-value pairs are separated by semicolons, with no spaces around the equals signs or semicolons."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameters are required when configuring the ImageFile InputSource for the Delimited Text driver?",
+      "input": "",
+      "output": "Only one parameter is required when configuring the ImageFile InputSource for the Delimited Text driver:\n\n- srcdir: The directory where the image files are stored.\n\nAll other parameters (minsize, maxsize, minwidth, maxwidth, minheight, delim, consolidate, renameto, debug, delblacklist, renblacklistto) are optional and have default values."
+    },
+    {
+      "category": "config",
+      "instruction": "How do the minsize and maxsize parameters work in the Delimited Text driver's ImageFile InputSource?",
+      "input": "",
+      "output": "In the Delimited Text driver's ImageFile InputSource:\n\n- minsize: Sets the minimum file size (in bytes) for images to be processed. Default is -1.\n- maxsize: Sets the maximum file size (in bytes) for images to be processed. Default is -1.\n\nBoth parameters filter which image files get processed based on their file size. Setting either value to -1 disables that particular filter. For example, setting minsize=1000 would only process images that are 1000 bytes or larger."
+    },
+    {
+      "category": "config",
+      "instruction": "What image dimension filtering options are available in the ImageFile InputSource for the Delimited Text driver?",
+      "input": "",
+      "output": "The ImageFile InputSource for the Delimited Text driver provides the following dimension filtering parameters:\n\n- minwidth: Minimum width of the image in pixels (default: -1)\n- maxwidth: Maximum width of the image in pixels (default: -1)\n- minheight: Minimum height of the image in pixels (default: -1)\n- maxheight: Maximum height of the image in pixels (default: -1)\n\nAll dimension filters are disabled by default (value of -1). Setting any to a positive number enables that filter. For example, minwidth=800 would only process images with a width of 800 pixels or greater."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the delim parameter control in the Delimited Text driver's ImageFile InputSource?",
+      "input": "",
+      "output": "In the Delimited Text driver's ImageFile InputSource, the delim parameter specifies the delimiter character to be used in the created input files. The default delimiter is # (hash/pound sign).\n\nImportantly, the same delimiter must be configured in both the ImageFile InputSource parameters and the driver parameters for the Delimited Text driver to ensure proper parsing of the input files."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the consolidate parameter affect file generation in the ImageFile InputSource for the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver's ImageFile InputSource, the consolidate parameter controls how input files are created:\n\n- consolidate=true (default): Produces only one input file containing all processed images\n- consolidate=false: Produces a separate input file for each individual image\n\nThis setting allows you to choose between batch processing all images together or processing them individually."
+    },
+    {
+      "category": "config",
+      "instruction": "What happens to image files after processing in the ImageFile InputSource for the Delimited Text driver, and how can this behavior be controlled?",
+      "input": "",
+      "output": "In the Delimited Text driver's ImageFile InputSource, the post-processing behavior of image files is controlled by the renameto parameter:\n\n- By default (renameto not set): Image files are deleted after processing\n- renameto=<suffix>: Image files are renamed with the specified suffix appended instead of being deleted\n\nFor example, setting renameto=bak would rename processed files by appending 'bak' to their names, preserving the original files with a different name rather than deleting them."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the blacklist in the Delimited Text driver's ImageFile InputSource and how is it managed?",
+      "input": "",
+      "output": "In the Delimited Text driver's ImageFile InputSource, the blacklist consists of all image files that have been filtered out during processing (those that didn't meet the configured size or dimension criteria).\n\nThe blacklist is managed by two parameters:\n\n- delblacklist (default: true): When true, blacklisted files are deleted. When false, blacklisted files are preserved.\n- renblacklistto (default: not set): When specified with a suffix, blacklisted image files are renamed with that suffix instead of being deleted. If not set, blacklisted files are handled according to the delblacklist parameter.\n\nFor example, setting delblacklist=false and renblacklistto=ignore would preserve filtered-out files by renaming them with the 'ignore' suffix."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you enable debug logging for the ImageFile InputSource in the Delimited Text driver?",
+      "input": "",
+      "output": "To enable debug logging for the ImageFile InputSource in the Delimited Text driver, set the debug parameter to true in the parameter string:\n\ndebug=true\n\nBy default, debugging is turned off (debug=false). When enabled, debug messages will be generated to help troubleshoot ImageFile InputSource processing issues."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the ImageFile InputSource in the Delimited Text driver to process only images between 1000 and 50000 bytes in a specific directory?",
+      "input": "",
+      "output": "To configure the ImageFile InputSource in the Delimited Text driver to process only images between 1000 and 50000 bytes, set the following parameters:\n\nsrcdir=<your_directory_path>;minsize=1000;maxsize=50000\n\nFor example:\nsrcdir=c:\\temp\\images;minsize=1000;maxsize=50000\n\nThis configuration sets:\n- srcdir: The required directory path where image files are stored\n- minsize=1000: Only processes files 1000 bytes or larger\n- maxsize=50000: Only processes files 50000 bytes or smaller\n\nFiles outside this size range will be added to the blacklist and handled according to the delblacklist and renblacklistto parameters."
+    },
+    {
+      "category": "howto",
+      "instruction": "How would you configure the ImageFile InputSource for the Delimited Text driver to preserve both processed and filtered files with different suffixes?",
+      "input": "",
+      "output": "To preserve both processed and filtered files with different suffixes in the Delimited Text driver's ImageFile InputSource, configure the parameters as follows:\n\nsrcdir=<directory>;renameto=<processed_suffix>;delblacklist=false;renblacklistto=<filtered_suffix>\n\nFor example:\nsrcdir=c:\\temp\\images;renameto=processed;delblacklist=false;renblacklistto=filtered\n\nThis configuration:\n- renameto=processed: Appends 'processed' to successfully processed image files instead of deleting them\n- delblacklist=false: Prevents deletion of blacklisted (filtered-out) files\n- renblacklistto=filtered: Appends 'filtered' to files that didn't meet the filtering criteria\n\nThis way, you can retain all files with clear indicators of which were processed and which were filtered out."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration capabilities of the ImageFile InputSource for the Delimited Text driver.",
+      "input": "",
+      "output": "The ImageFile InputSource for the Delimited Text driver provides comprehensive configuration capabilities through parameter strings:\n\n**Required Configuration:**\n- srcdir: Specifies the source directory for image files\n\n**Filtering Options:**\n- File size filters (minsize, maxsize) in bytes\n- Image dimension filters (minwidth, maxwidth, minheight, maxheight) in pixels\n- All filters default to -1 (disabled)\n\n**Processing Behavior:**\n- delim: Sets the delimiter character (default: #) which must match the driver configuration\n- consolidate: Controls whether to create one file for all images (true, default) or individual files (false)\n\n**Post-Processing File Handling:**\n- renameto: Appends a suffix to processed files instead of deleting them\n- delblacklist: Controls whether filtered-out files are deleted (default: true)\n- renblacklistto: Specifies a suffix for renaming filtered-out files\n\n**Debugging:**\n- debug: Enables debug messages (default: false)\n\nParameters are passed as semicolon-separated name=value pairs in a single string."
+    }
+  ]
+}

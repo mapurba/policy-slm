@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="salesforce-driver-concept,bv5810b,bv5810b,salesforce-support-standard-driver-features,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Concepts - NetIQ Identity Manager Driver for Salesforce.com Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="salesforce-driver-concept">
+
+<h1 class="title h1"><span class="number">1.1</span> Driver Concepts</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section contains the following information:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="salesforce-driver-concept.html#cegfdbga" class="xref">Data Management</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="salesforce-driver-concept.html#cegiiiji" class="xref">How the Driver Works</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="cegfdbga">
+
+<h2 class="title h2"><span class="number">1.1.1</span> Data Management</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Salesforce.com driver communicates with Salesforce.com using the Salesforce.com partner API. The partner API is represented as XML and its transport is SOAP 1.1 over HTTPS.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="salesforce-driver-concept.html#cegjfbbh" class="xref">SOAP</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="salesforce-driver-concept.html#cegbfdcj" class="xref">XML</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="salesforce-driver-concept.html#cegjjagg" class="xref">HTTP</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="cegjfbbh">
+
+<h3 class="title h3">SOAP</h3>
+
+<p class="para">SOAP (Simple Object Access Protocol) is an XML-based protocol for exchanging messages. It defines the message exchange but not the message content. The driver supports SOAP 1.1.</p>
+<p class="para">SOAP documents are organized into three elements:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bw5r8d7">
+                <p class="title"><em class="title">Envelope:</em>
+                The root XML node.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="bw5r8ol">
+                <p class="title"><em class="title">Header:</em>
+                Provides context knowledge such as a transaction ID and security information.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="bw5r8vr">
+                <p class="title"><em class="title">Body:</em>
+                The method-specific information.</p>
+              </div>
+</li></ul></div>
+
+<p class="para">SOAP follows the HTTP request/response message model, which provides SOAP request parameters in an HTTP request and SOAP response parameters in an HTTP response.</p>
+</div>
+
+<div class="container sect3" id="cegbfdcj">
+
+<h3 class="title h3">XML</h3>
+
+<p class="para">XML (Extensible Markup Language) is a generic subset of Standard Generalized Markup Language (SGML) that allows for exchange of structured data on the Internet.</p>
+</div>
+
+<div class="container sect3" id="cegjjagg">
+
+<h3 class="title h3">HTTP</h3>
+
+<p class="para">HTTP is a protocol used to request and transmit data over the Internet or other computer network. The protocol works well in an Internet infrastructure and with firewalls.</p>
+<p class="para">HTTP is a stateless request/response system because the connection is usually maintained only for the immediate request. The client establishes a TCP connection with the server and sends it a request command. The server then sends back its response.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Salesforce.com communication mostly happens over HTTPS.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="cegiiiji">
+
+<h2 class="title h2"><span class="number">1.1.2</span> How the Driver Works</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following diagram illustrates the data flow between Identity Manager and Salesforce.com service:</p>
+<div class="figure" id="b1poait"><p class="title"><em class="num">Figure 1-1 </em>Salesforce.com Driver Data Flow</p>
+              <img src="../graphics/simple_overview_a.png" alt="" />
+            </div>
+
+<p class="para">The Identity Manager engine uses XDS, a specialized form of XML, to represent events in the Identity Vault. Identity Manager passes the XDS to the driver policy, which can consist of basic policies, DirXML Script, and XSLT style sheets.</p>
+<p class="para">The driver shim receives the XML from the driver policy. The driver shim uses HTTPS to communicate with Salesforce.com.</p>
+<p class="para">Salesforce.com processes the request, and returns a response to the driver shim. The driver processes the response, converting it into appropriate XDS that is reported back to the Identity Manager engine. The Publisher channel periodically polls for additions and modifications to the objects in Salesforce.com. On a successful retrieval of the changes, it stores the polling time for use in the next polling cycle. To prevent loopback, the driver discards modifications done by users that the Subscriber channel uses to update Salesforce.com.</p>
+<p class="para"></p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "driver": "Delimited Text driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Delimited Text driver to use a new custom class after placing the .jar file?",
+      "input": "",
+      "output": "To configure the Delimited Text driver to use a new custom class:\n\n1. In Identity Console, navigate to the Identity Manager Administration page by clicking IDM Administration in the Identity Manager frame.\n2. Select the driver set containing the driver and click the driver icon.\n3. Select the Configuration tab.\n4. Click the Driver Parameters drop down, then click Edit XML.\n5. Locate the <publisher-options> section for Publisher channel classes or the <subscriber-options> section for Subscriber channel classes.\n6. Add the appropriate XML definition entries for your custom class based on its interface type (InputSorter, InputSource, PreProcessor, or PostProcessor).\n7. Replace placeholder values with your actual class name (including full package identifier) and any required initialization parameters.\n8. Click OK to save the configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "What XML configuration entry should be added to the Delimited Text driver for a custom InputSorter class?",
+      "input": "",
+      "output": "For a custom InputSorter class in the Delimited Text driver, add the following entry to the <publisher-options> section:\n\n```xml\n<definition display-name=\"InputSorter Class\" name=\"input-sorter\" type=\"string\">\n<value>com.acme.MyNewClass</value>\n</definition>\n\n<definition display-name=\"InputSorter init string\" name=\"input-sorter-params\" type=\"string\">\n<value>MY CONFIG PARAMS</value>\n</definition>\n```\n\nReplace 'com.acme.MyNewClass' with your actual class name and full package identifier, and replace 'MY CONFIG PARAMS' with any initialization parameters needed by your class's init method. If no configuration parameters are required, you can omit the init string element entirely, and null will be passed to the init method."
+    },
+    {
+      "category": "config",
+      "instruction": "What XML configuration is required in the Delimited Text driver for a custom InputSource class?",
+      "input": "",
+      "output": "For a custom InputSource class in the Delimited Text driver, add the following to the <publisher-options> section:\n\n```xml\n<definition display-name=\"InputSource Class\" name=\"input-source\" type=\"string\">\n<value>com.acme.MyNewClass</value>\n</definition>\n\n<definition display-name=\"InputSource init string\" name=\"input-source-params\" type=\"string\">\n<value>MY CONFIG PARAMS</value>\n</definition>\n```\n\nReplace 'com.acme.MyNewClass' with your full class name including package identifier. Replace 'MY CONFIG PARAMS' with configuration parameters to be passed to the init method. If no parameters are needed, omit the init string element and null will be passed to the init method."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you configure a PreProcessor class in the Delimited Text driver's XML configuration?",
+      "input": "",
+      "output": "To configure a PreProcessor class in the Delimited Text driver, add this entry to the <publisher-options> section:\n\n```xml\n<definition display-name=\"PreProcessor Class\" name=\"pre-processor\" type=\"string\">\n<value>com.acme.MyNewClass</value>\n</definition>\n\n<definition display-name=\"PreProcessor init string\" name=\"pre-processor-params\" type=\"string\">\n<value>MY CONFIG PARAMS</value>\n</definition>\n```\n\nReplace 'com.acme.MyNewClass' with your class name and full package identifier. Replace 'MY CONFIG PARAMS' with any initialization parameters your class requires. The init method of your class is responsible for parsing this configuration string. If no configuration is needed, you can leave off the init string element entirely, resulting in null being passed to the init method."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the XML configuration for a PostProcessor class in the Delimited Text driver?",
+      "input": "",
+      "output": "For a PostProcessor class in the Delimited Text driver, add the following to the <subscriber-options> section:\n\n```xml\n<definition display-name=\"PostProcessor Class\" name=\"post-processor\" type=\"string\">\n<value>com.acme.MyNewClass</value>\n</definition>\n\n<definition display-name=\"PostProcessor Parameters\" name=\"post-processor-params\" type=\"string\">\n<value>MY CONFIG PARAMS</value>\n</definition>\n```\n\nReplace 'com.acme.MyNewClass' with your class name including full package information. Replace 'MY CONFIG PARAMS' with any initialization information to pass to the init method. Your class's init method must parse this configuration string. If no configuration string is needed, omit the entire parameters element, and null will be passed to the init method."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of modifying the publisher-options section in the Delimited Text driver configuration?",
+      "input": "",
+      "output": "The <publisher-options> section in the Delimited Text driver configuration defines which parameters and values appear in the Driver Parameters section of the Driver Configuration page. When you add entries for custom classes (InputSorter, InputSource, or PreProcessor) to this section, the new options become visible in the interface. Each class you create that works on the Publisher channel requires an additional option entry in the <publisher-options> section. After updating this file, your new custom class options will be displayed and accessible through the driver's configuration interface."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "In the Delimited Text driver, which custom class types are configured in the publisher-options section versus the subscriber-options section?",
+      "input": "",
+      "output": "In the Delimited Text driver configuration:\n\n- The <publisher-options> section is used for custom classes that work on the Publisher channel: InputSorter, InputSource, and PreProcessor classes.\n\n- The <subscriber-options> section is used for custom classes that work on the Subscriber channel: PostProcessor classes.\n\nThis separation reflects the different data flow directions in Identity Manager—Publisher channel handles events flowing from the connected system to the Identity Vault, while Subscriber channel handles events flowing from the Identity Vault to the connected system."
+    },
+    {
+      "category": "howto",
+      "instruction": "Where do you navigate in Identity Console to edit the XML configuration for custom classes in the Delimited Text driver?",
+      "input": "",
+      "output": "To edit the XML configuration for custom classes in the Delimited Text driver:\n\n1. In Identity Console, click IDM Administration in the Identity Manager frame to access the Identity Manager Administration page.\n2. Select the driver set that contains the Delimited Text driver.\n3. Click the driver icon for the Delimited Text driver.\n4. Select the Configuration tab.\n5. Click the Driver Parameters drop down.\n6. Click the Edit XML icon to open the XML editor where you can modify the <publisher-options> or <subscriber-options> sections."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What happens to the initialization parameters string configured for a custom class in the Delimited Text driver?",
+      "input": "",
+      "output": "In the Delimited Text driver, the initialization parameters string configured for a custom class (specified in the *-params definitions like input-sorter-params, pre-processor-params, or post-processor-params) is passed to the init method of your custom class. Your class's init method is then responsible for parsing the information contained in this string. If your class doesn't require a configuration string, you can omit the entire init string element from the XML configuration, in which case null will be passed to the init method instead. This allows flexible initialization configuration for custom classes without requiring code changes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the process of configuring custom classes in the Delimited Text driver after the .jar file has been deployed.",
+      "input": "",
+      "output": "After deploying a custom class .jar file for the Delimited Text driver, you must update the driver's XML configuration through the Identity Console. Navigate to the driver's Configuration tab, access Driver Parameters, and click Edit XML. For Publisher channel classes (InputSorter, InputSource, PreProcessor), add definition entries to the <publisher-options> section; for Subscriber channel classes (PostProcessor), add entries to the <subscriber-options> section. Each definition specifies the fully-qualified class name and optional initialization parameters. The class name must include the complete package identifier, and initialization parameters are passed to the class's init method for parsing. If no parameters are needed, the init string element can be omitted. After adding the appropriate XML definitions and saving, the custom class options appear in the Driver Parameters interface and become active in the driver configuration."
+    }
+  ]
+}

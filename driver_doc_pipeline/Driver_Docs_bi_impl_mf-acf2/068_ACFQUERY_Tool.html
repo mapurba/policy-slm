@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b6uukxe,b3r8ulu,b3yj43k,bmoaep5,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>ACFQUERY Tool - NetIQ ACF2 Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b6uukxe">
+
+<h1 class="title h1"><span class="number">C.2</span> ACFQUERY Tool</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver query processor uses the ACF2 API to retrieve information from the security system. Queries are used by the Metadirectory engine for matching and merging. The TSO command, <span class="literal">ACFQUERY</span>, is used to extract information from the ACF2 database. <span class="literal">ACFQUERY</span> has the following format for read operations:</p><pre class="screen">  ACFQUERY SCOPE(<span class="replaceable">entry</span>) CLASS(<span class="replaceable">class</span>) ASSOCIATION(<span class="replaceable">association</span>)
+    [READATTRS(<span class="replaceable">attrs...</span>)|ALLREADATTRS] [PRINT]</pre>
+<p class="para">The <span class="option">SCOPE</span> tells <span class="literal">ACFQUERY</span> that information about a specific profile is being requested. The <span class="option">CLASS</span> operand should always be set <span class="command">'Logonid'</span>. The <span class="command">ASSOCIATION</span> operand specifies the association of the object to read. For Logonid profiles, simply use the LID field for association values. <span class="command">READATTRS</span> operand specifies a list of attributes to return; optionally, you may specify <span class="command">ALLREADATTRS</span> instead to return everything. The <span class="command">PRINT</span> operand instructs <span class="literal">ACFQUERY</span> to print the results to the display. The output is a series of lines, each with a name=value pair. These pairs are interpreted by the driver shim to create an appropriate XDS document that the engine can use for processing. For example:</p><pre class="screen">  ACFQUERY SCOPE(<span class="replaceable">entry</span>) CLASS(Logonid) ASSOCIATION(IBMUSER)
+     READATTRS(ACCOUNT)PRINT</pre><pre class="screen">  COMMAND=instance
+  CLASS_NAME=Logonid
+  ASSOCIATION=IBMUSER
+  ATTR_ACCOUNT=true
+  COMMAND=status
+  STATUS_LEVEL=success</pre>
+<p class="para">For search operations, a search criteria is specified:</p><pre class="screen">  ACFQUERY SCOPE(subtree) SEARCHCLASSES(<span class="replaceable">classes..</span>) SEARCHATTRS(<span class="replaceable">'attr=value' </span>...)
+    [READATTRS(<span class="replaceable">attrs...</span>)|ALLREADATTRS] [PRINT]</pre>
+<p class="para">The <span class="command">subtree</span> <span class="option">SCOPE</span> tells <span class="literal">ACFQUERY</span> that information about a specific profile is being requested. The <span class="option">SEARCHCLASSES</span> operand lists the class(es) of interest. The <span class="option">SEARCHATTRS</span> provides a list of values and attributes to search on. For example:</p><pre class="screen">  ACFQUERY SCOPE(subtree) SEARCHCLASSES(Logonid) 
+    SEARCHATTRS('ACCOUNT=true') PRINT
+
+  COMMAND=instance
+  CLASS-NAME=Logonid
+  ASSOCIATION=ASCH
+  COMMAND=instance
+  CLASS_NAME=Logonid
+  ASSOCIATION=CICSA
+  COMMAND=instance
+  CLASS_NAME=Logonid
+  ASSOCIATION=CICSTART
+  COMMAND=status
+  STATUS_LEVEL=success</pre>
+<p class="para">You will notice that there are multiple results returned. Search operations may return zero or more responses.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

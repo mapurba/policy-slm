@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="best-practices-to-use-stored-procedures-and-functions,embed-sql-statements-in-xds-events-for-jdbc-driver,how-to-call-stored-procedures-and-functions,supported-databases-for-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Best Practices - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="best-practices-to-use-stored-procedures-and-functions">
+
+<h1 class="title h1"><span class="number">12.15</span> Best Practices</h1>
+
+<div class="content_wrapper">
+
+<p class="para">For performance reasons, it is better to call a single stored procedure/function that contains multiple SQL statements than to embed multiple statements in an XDS document.</p>
+<p class="para">In the following examples, the single stored procedure or function is preferred.</p>
+<h4 class="bridgehead" id="b9fxpx4">Single Stored Procedure</h4>
+<pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr"&gt;
+        &lt;add-attr name="fname"&gt;
+            &lt;value&gt;John&lt;/value&gt;
+        &lt;/add-attr&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+    &lt;/add&gt;
+    &lt;<span class="strong">jdbc:statement</span>&gt;
+        &lt;<span class="strong">jdbc:sql&gt;CALL PROCEDURE set_name('John', 'Doe')&lt;/jdbc:sql</span>&gt;
+    &lt;<span class="strong">/jdbc:statement</span>&gt;
+&lt;/input&gt;</pre>
+<h4 class="bridgehead" id="b9fxpx5">Multiple Embedded Statements</h4>
+<pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr"&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+    &lt;/add&gt;
+    &lt;<span class="strong">jdbc:statement</span>&gt;
+        &lt;<span class="strong">jdbc:sql</span>&gt;<span class="strong">UPDATE indirect.usr SET fname = 'John'                   WHERE idu = {$idu}&lt;/jdbc:sql</span>&gt;
+    &lt;<span class="strong">/jdbc:statement</span>&gt;
+    &lt;<span class="strong">jdbc:statement</span>&gt; 
+        &lt;<span class="strong">jdbc:sql</span>&gt;<span class="strong">UPDATE indirect.usr SET lname = 'Doe'                   WHERE idu = {$idu}&lt;/jdbc:sql</span>&gt;
+    &lt;<span class="strong">/jdbc:statement</span>&gt;
+&lt;/input&gt;</pre>
+<p class="para">The syntax used to call stored procedures or functions varies by database. For additional information, see <a href="characteristics-of-databases.html#bvowm5a" class="xref">Syntaxes for Calling Stored Procedures and Functions</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

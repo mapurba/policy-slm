@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="set-virtual-triggers-for-jdbc-drivers,embed-sql-statements-in-xds-events-for-jdbc-driver,token-substitution-for-jdbc-driver,manual-and-automatic-jdbc-transactions,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Virtual Triggers - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="set-virtual-triggers-for-jdbc-drivers">
+
+<h1 class="title h1"><span class="number">12.4</span> Virtual Triggers</h1>
+
+<div class="content_wrapper">
+
+<p class="para">In the same way that database triggers can fire before or after a triggering statement, embedded SQL can be positioned before or after the triggering XDS event. The following examples show how you can embed SQL before or after an XDS event.</p>
+<h4 class="bridgehead" id="b9fxmdl">Virtual Before Trigger</h4>
+<pre class="screen">&lt;input xmlns:jdbc"urn:dirxml:jdbc"&gt;
+     &lt;<span class="strong">jdbc:statement</span>&gt;
+          &lt;<span class="strong">association&gt;idu=1,table=usr,schema=indirect&lt;/association</span>&gt;
+          &lt;<span class="strong">jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE                     idu = {$idu}&lt;/jdbc:SQL</span>&gt;
+Â Â Â Â &lt;<span class="strong">/jdbc:statement</span>&gt;
+Â Â Â Â &lt;modify class-name="usr"&gt;
+Â Â Â Â Â Â Â Â &lt;association&gt;idu=1,table=usr,schema=indirect&lt;/association&gt;
+Â Â Â Â Â Â Â Â &lt;modify-attr name="lname"&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â &lt;remove-all-values/&gt; 
+Â Â Â Â Â Â Â Â Â Â Â Â &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â &lt;value&gt;Doe&lt;/value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â &lt;/add-value&gt;
+Â Â Â Â Â Â Â Â &lt;/modify-attr&gt;
+Â Â Â Â &lt;/modify&gt;
+&lt;/input&gt;</pre>
+<p class="para">This XML resolves to:</p><pre class="screen">SET AUTOCOMMIT OFF
+UPDATE indirect.usr SET fname = 'John' WHERE idu = 1;
+COMMIT; --explicit commit
+UPDATE indirect.usr SET lname = 'Doe'  WHERE idu = 1;
+COMMIT; --explicit commit</pre>
+<h4 class="bridgehead" id="b9fxmdm">Virtual After Trigger</h4>
+<pre class="screen">&lt;input xmlns:jdbc"urn:dirxml:jdbc"&gt;
+Â Â Â Â &lt;modify class-name="usr"&gt;
+Â Â Â Â Â Â Â Â &lt;association&gt;idu=1,table=usr,schema=indirect&lt;/association&gt;
+Â Â Â Â Â Â Â Â &lt;modify-attr name="lname"&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â &lt;remove-all-values/&gt; 
+Â Â Â Â Â Â Â Â Â Â Â Â &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â &lt;value&gt;Doe&lt;/value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â &lt;/add-value&gt;
+    Â Â Â Â &lt;/modify-attr&gt;
+Â Â Â Â &lt;/modify&gt;
+Â Â Â Â &lt;<span class="strong">jdbc:statement</span>&gt;
+Â Â Â Â Â Â Â Â &lt;<span class="strong">jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE          idu = {$idu}&lt;</span><span class="strong">/jdbc:sql</span>&gt;
+Â Â Â Â &lt;<span class="strong">/jdbc:statement</span>&gt;
+&lt;/input&gt;</pre>
+<p class="para">This XML resolves to:</p><pre class="screen">SET AUTOCOMMIT OFF
+UPDATE indirect.usr SET lname = 'Doe' WHERE idu = 1;
+COMMIT; --explicit commit
+UPDATE indirect.usr SET fname = 'John' WHERE idu = 1;
+COMMIT; --explicit commit</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4avmq7l2tq0,bookinfo,t4avmq7k5tby,legal,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Understanding the Driver State Storage - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container appendix expanding expanded" id="t4avmq7l2tq0">
+
+<h1 class="title h1"><span class="number">E.0</span> Understanding the Driver State Storage</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Workday driver periodically updates its current status in XML format in the <span class="filename">DirXML-DriverStorage</span> attribute which is stored in Identity Vault. Driver uses this XML document to resume its operation after a restart. Each element in the XML document is presented in the following format:</p><pre class="screen">&lt;<span class="replaceable">Object Class-Poll Type-Status Type</span>&gt;Value&lt;/<span class="replaceable">Object Class-Poll Type-Status Type</span>&gt;</pre>
+<p class="para">For example,</p><pre class="screen">&lt;worker-regular-poll-start-timestamp&gt;03-12-2019 14:37:20&lt;/worker-regular-poll-start-timestamp&gt;</pre>
+<p class="para">In the above example, <span class="guimenu">Worker</span> is the object class, <span class="guimenu">Regular Poll</span> is the poll type and <span class="guimenu">Start Timestamp</span> is the status type. The information related to the following object classes are stored in the XML document:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Worker</p></li>
+<li class="listitem">
+<p class="listitem">Terminated Worker</p></li>
+<li class="listitem">
+<p class="listitem">Job Profile</p></li>
+<li class="listitem">
+<p class="listitem">Job Family</p></li>
+<li class="listitem">
+<p class="listitem">Location</p></li>
+<li class="listitem">
+<p class="listitem">Organization</p></li>
+<li class="listitem">
+<p class="listitem">Photo</p></li></ul></div>
+
+<p class="para">The following Poll Types are stored in the XML document:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Migration</p></li>
+<li class="listitem">
+<p class="listitem">Migration_Restart</p></li>
+<li class="listitem">
+<p class="listitem">Regular_Poll</p></li></ul></div>
+
+<p class="para">The following table explains the various status types that are stored in the XML document:</p>
+<div class="table" id="t4b47hrcdnqq"><p class="title"><em class="num">Table E-1 </em>Explanation of Status Types</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+          
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Status Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+        
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">start-timestamp</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Start timestamp of the specified latest poll type</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">end-timestamp</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">End timestamp of the specified latest poll type</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">restart-timestamp</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Restart timestamp of the specified latest poll type</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">last-page-poll-start-timestamp</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Start timestamp of the last page that is fetched during the specified latest poll type</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">last-page-poll-end-timestamp</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">End timestamp of the last page that is fetched during the specified latest poll type</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">last-poll-timestamp</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The last timestamp for which the polling was requested to the Workday server</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">last-effective-poll-timestamp</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The last timestamp for which the effective polling was requested to the Workday server</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">migration-completed</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Timestamp of the migration completion</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">last-request-doc</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The last request that was sent to the Workday server. This request is stored in <span class="filename">Base64</span> format.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">page-count</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The number of pages fetched during the specified latest poll type</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">total-page</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The total number of pages in the Workday response during the specified latest poll type</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">entry-time</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The entry timestamp for which the polling was requested to the Workday server</p></td>
+</tr></table>
+</div>
+
+<div class="note"><p class="title">NOTE:</p>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The <span class="literal">last-request-doc</span> status type will not be stored in the conventional format. It stores the last request that was made to the Workday server irrespective of object class or poll type.</p></li>
+<li class="listitem">
+<p class="listitem">The effective polling happens once in a day and happens for worker and job profile.</p></li></ul></div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

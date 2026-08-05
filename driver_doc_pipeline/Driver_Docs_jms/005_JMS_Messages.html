@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="jms-messages,understanding-the-jms-driver,jms-messaging-models,how-subscriber-and-publisher-channel-works,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>JMS Messages - NetIQ Identity Manager Driver for JMS Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="jms-messages">
+
+<h1 class="title h1"><span class="number">1.4</span> JMS Messages</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following sections contain information about JMS message structures and message types, as well as examples for each.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="jms-messages.html#b5j1tsq" class="xref">Message Structure</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="jms-messages.html#b5j23nz" class="xref">Message Types</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j1tsq">
+
+<h2 class="title h2"><span class="number">1.4.1</span> Message Structure</h2>
+
+<div class="content_wrapper">
+
+<p class="para">JMS messages consist of metadata (comprised of headers and properties) and message data (a body). In order to make message metadata accessible to policy processing, messages sent to the driver can be wrapped in an envelope, and messages received by the driver and sent to the Identity Manager engine are also wrapped in an envelope. All message envelope elements and special attributes must have a namespace prefix bound to <span class="guimenu">urn:idm:jms</span>. For consistency, the namespace prefix <span class="guimenu">jms</span> is used throughout this document. The root message envelope element <span class="guimenu">jms:message</span> must be a child of the XDS input/output elements.</p>
+<h4 class="bridgehead" id="b5j1xlr">Example JMS Message Envelope</h4>
+<pre class="screen">&lt;jms:message xmlns:jms="urn:idm:jms"&gt;
+&lt;jms:headers&gt;
+      &lt;!-- standard JMS headers start with "JMS" --&gt;
+      &lt;!-- client-assignable headers --&gt;
+      &lt;jms:header jms:name="JMSDeliveryMode"/&gt;
+      &lt;jms:header jms:name="JMSExpiration"/&gt;
+      &lt;jms:header jms:name="JMSPriority"/
+      &lt;jms:header jms:name="JMSReplyTo"/&gt;
+      &lt;jms:header jms:name="JMSCorrelationID"/&gt;
+      &lt;jms:header jms:name="JMSType"/&gt;
+   &lt;/jms:headers&gt;
+   &lt;jms:properties&gt;
+      &lt;!-- standard JMS properties start with "JMSX" --&gt;      
+      &lt;jms:property jms:name="JMSXUserID"/&gt;
+      &lt;jms:property jms:name="JMSXAppID"/&gt;
+      &lt;jms:property jms:name="JMSXProducerTXID"/&gt;
+      &lt;jms:property jms:name="JMSXConsumerTXID"/&gt;
+      &lt;jms:property jms:name="JMSXRcvTimestamp"/&gt;
+      &lt;jms:property jms:name="JMSXDeliveryCount"/&gt;
+      &lt;jms:property jms:name="JMSXState"/&gt;
+      &lt;jms:property jms:name="JMSXGroupID"/&gt;
+      &lt;jms:property jms:name="JMSXGroupSeq"/&gt;
+      &lt;!-- provider-specific properties start with "JMS_" --&gt;   
+      &lt;!-- application-specific properties start with anything else --&gt;
+   &lt;/jms:properties&gt;
+  &lt;jms:body/&gt;
+&lt;/jms:message&gt;</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j23nz">
+
+<h2 class="title h2"><span class="number">1.4.2</span> Message Types</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Message type refers to how a message is sent, not necessarily what its content is. For example, a text message can be sent as text or bytes. The driver supports both text and bytes messages.</p>
+<h4 class="bridgehead" id="b5j24b2">Example Text Message</h4>
+<pre class="screen">&lt;jms:message xmlns:jms="urn:idm:jms"&gt;
+   &lt;jms:properties&gt;
+      &lt;!-- send message as text --&gt;
+      &lt;jms:property name="Novell_IDM_MessageType"&gt;text&lt;/jms:property&gt;
+   &lt;/jms:properties&gt;
+   &lt;jms:body&gt;content&lt;/jms:body&gt;
+&lt;/jms:message&gt;</pre>
+<h4 class="bridgehead" id="b5j24hb">Example Bytes Message</h4>
+<pre class="screen">&lt;jms:message xmlns:jms="urn:idm:jms"&gt;
+   &lt;jms:properties&gt;
+      &lt;!-- send message as bytes --&gt;
+      &lt;jms:property name="Novell_IDM_MessageType"&gt;bytes&lt;/jms:property&gt;
+   &lt;/jms:properties&gt;
+   &lt;jms:body&gt;content&lt;/jms:body&gt;
+&lt;/jms:message&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

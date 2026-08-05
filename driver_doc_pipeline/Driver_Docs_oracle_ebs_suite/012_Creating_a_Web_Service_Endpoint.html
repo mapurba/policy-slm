@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="creating-a-soap-endpoint,installing-the-driver-files,updating-the-pl-sql-apis,subscribing-to-the-business-events,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Creating a Web Service Endpoint - NetIQ Identity Manager Driver for Oracle E-Business Suite (User Management, HR, and TCA) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="creating-a-soap-endpoint">
+
+<h1 class="title h1"><span class="number">2.5</span> Creating a Web Service Endpoint</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver uses a SOAP/REST endpoint to synchronize the Identity Manager events in the Subscriber channel and poll the Oracle database for fetching events.</p>
+<div class="procedure" id="b19ezc8h">
+<ol class="steps">
+<li class="step" id="b19ezc8i">
+<p class="para">Create a new SOAP/REST endpoint. Run the following shell script on the Oracle EBS server:</p><pre class="screen">export FND_TOP=/u01/app/VIS/apps/apps_st/appl/fnd/12.0.0
+export APPL_TOP=/u01/app/VIS/apps/apps_st/appl
+. $APPL_TOP/APPS_instancename_hostname-ora.env
+#. /configure_EBS.sh</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Currently, this script is available only for UNIX platforms.</p></div>
+
+<p class="para">You must specify appropriate values for FND_TOP and APPL_TOP variables in the commands.</p></li>
+<li class="step" id="b19ezc8j">
+<p class="para">Using a Web browser, log into the Oracle EBS system as <span class="systemitem">sysadmin</span> user.</p></li>
+<li class="step" id="b19ezc8k">
+<p class="para">On the Dashboard, click the Integrated SOA Gateway link.</p></li>
+<li class="step" id="b19ezc8l">
+<p class="para">Click <span class="guimenu">Integration Repository</span> under the <span class="guimenu">Integrated SOA Gateway</span> tab, then change the view to <span class="guimenu">By option to Product Family</span>.</p>
+<p class="para">The Novell IDM Suite displays.</p></li>
+<li class="step" id="b19ezcht">
+<p class="para">Expand the view and click <span class="guimenu">Novell IDM Suite &gt; Driver &gt; Subscriber &gt; IDM Subscriber.</span></p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">In case you are using SOAP API, click on <span class="guimenu">SOAP Web Service</span> &gt; <span class="guimenu">Generate WSDL</span> &gt; <span class="guimenu">Deploy.</span></p></li>
+<li class="listitem">
+<p class="listitem">In case you are using REST API, click on <span class="guimenu">REST Web Service</span> and perform the following steps:</p>
+<div class="orderedlist">
+                
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Specify REST endpoint name in the <span class="guimenu">Service Alias</span> field. For example, you can specify <span class="filename">idmebs</span>.</p></li>
+                
+<li class="listitem">
+<p class="listitem">Select the <span class="guimenu">Subscribe IDM Events</span> check box.</p></li>
+                
+<li class="listitem">
+<p class="listitem">Click on <span class="guimenu">Deploy</span>.</p></li>
+                
+<li class="listitem">
+<p class="listitem">Click on <span class="guimenu">View WADL</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>You must use the resource base URL from the WADL file as your REST endpoint URL. You must use the URL without quotes and ending slash. For example, <span class="literal">http://oracleebs.labs.blr.novell.com:8010/webservices/rest/idmebs</span></p></div>
+</li>
+              </ol></div>
+</li></ul></div>
+</li>
+<li class="step" id="b19ezcxn">
+<p class="para">Click <span class="guimenu">Generate WSDL</span>, then click <span class="guimenu">Deploy</span>.</p></li>
+<li class="step" id="b19ezcxo">
+<p class="para">Select the <span class="guimenu">Subscribe Identity Manager Events</span> method under <span class="guimenu">Procedures and Functions</span>, then click <span class="guimenu">Create Grant</span>.</p></li>
+<li class="step" id="b19ezcxp">
+<p class="para">Select the user as <span class="systemitem">sysadmin</span> and click <span class="guimenu">Apply</span>.</p></li></ol>
+</div>
+
+<p class="para">On executing this command, if you get the error message, <span class="literal">"Can't locate Class/MethodMaker.pm in @INC (@INC contains:..."</span> , you need to install the Perl modules. For installation instructions, see the <a href="https://docs.oracle.com/cd/E18727-01/doc.121/e12169/T511175T543269.htm" class="ulink">Oracle E-Business Suite Integrated SOA Gateway Implementation Guide</a>.</p>
+<p class="para">If the deployment fails, go to the <span class="filename">/u01/app/VIS/inst/apps/VIS_sles11sp164-ora/soa/PLSQL/4723/SUBSCRIBE_EVENTS.wsdl</span> file and remove the line, <span class="literal">IRepOverloadSeq="1"</span> under the operation tag, then save the file and use the GUI method to redeploy the SOAP service.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

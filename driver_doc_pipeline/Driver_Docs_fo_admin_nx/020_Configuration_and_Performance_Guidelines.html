@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="babdhgie,babheghf,br3ne7b,babffihg,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuration and Performance Guidelines - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="babdhgie">
+
+<h1 class="title h1"><span class="number">4.2</span> Configuration and Performance Guidelines</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Many factors affect the performance of the Identity Manager Fan-Out Driver. Performance is most critical for Authentication Services, such as Check Password and Get Context.</p>
+<p class="para">There are many relationships within the driver, and one or more of the factors described in the following sections can affect all of these relationships. Use the following as guidelines in planning and troubleshooting your Fan-Out Driver installation.</p>
+<p class="para">Acceptable Authentication Services performance is achievable using two or three low-end servers for Core Drivers. However, if your present network experiences problems, such as slow logins related to eDirectory, Fan-Out Driver operations will experience similar response problems.</p>
+<p class="para">For fault tolerance, your configuration should include Core Drivers running on several servers.</p>
+<p class="para">For fault tolerance, each Core Driver should use a different LDAP host server.</p>
+<p class="para">For optimal performance, each Core Driver and its LDAP host server should run on the same server.</p>
+<p class="para">Topics in this section include</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="babdhgie.html#br3ne7c" class="xref">eDirectory</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="babdhgie.html#br3ne7d" class="xref">Object Services and the Event Subsystem</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="babdhgie.html#chdgbgca" class="xref">Event Journal Services</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="babdhgie.html#br3ne7e" class="xref">Authentication Services</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="babdhgie.html#br3ne7f" class="xref">Platform Systems</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="babdhgie.html#br3ne7g" class="xref">Platform Services / Authentication Services Relationship</a>
+            </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br3ne7c">
+
+<h2 class="title h2"><span class="number">4.2.1</span> eDirectory</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Tuning eDirectory on your network is beyond the scope of this document. Much documentation on this subject is available elsewhere, including NetIQ Technical Information Documents (TIDs), which are available at the <a href="http://support.netiq.com" class="ulink">NetIQ Support Web site</a>. The health and performance of eDirectory is critical to the ability of the driver to respond to Authentication Services requests and to deliver provisioning events in a timely manner. Therefore, the health and performance of eDirectory should be your starting point in doing any performance planning and troubleshooting with the driver.</p>
+<p class="para">Factors in driver performance relative to eDirectory include</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The size of the eDirectory tree</p></li>
+<li class="listitem">
+<p class="listitem">Communication links between the LDAP host servers used by Core Drivers and servers holding replicas of the ASAM System container and other objects referenced by the driver</p></li>
+<li class="listitem">
+<p class="listitem">LAN traffic</p></li>
+<li class="listitem">
+<p class="listitem">Size of partitions containing relevant objects</p></li>
+<li class="listitem">
+<p class="listitem">Performance of CPU and disks in servers holding relevant replicas</p></li>
+<li class="listitem">
+<p class="listitem">Amount of memory in servers holding relevant replicas</p></li></ul></div>
+
+<p class="para">The driver interfaces with eDirectory through LDAP. For LDAP tuning guidance, see the <span class="citetitle">NetIQ eDirectory Administration Guide</span>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br3ne7d">
+
+<h2 class="title h2"><span class="number">4.2.2</span> Object Services and the Event Subsystem</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Object Services component of the Core Driver is primarily responsible for maintaining the Census and other objects in the ASAM System container. Object Services receives provisioning events from the Event Subsystem, updates the Census as required, and passes the provisioning events to Event Journal Services. It is important for Identity Provisioning that the Core Driver be running at all times, but it is mostly a background process that does not require a great deal of processing power and is, for the most part, not a time-critical process.</p>
+<p class="para">Object Services performs Trawls to initially build and to verify the Census by performing a series of requests based on the Census Search objects defined in your configuration. For each Organizational Unit represented in the configuration, Object Services issues a single request to eDirectory to return all the objects contained in the given Organizational Unit.</p>
+<p class="para">Focus your Search objects to the specific directory locations of your users and groups rather than specifying a top level container object. This provides better feedback information during a Trawl and reduces the likelihood of an LDAP time-out because of slow servers or slow network links.</p>
+<p class="para">The Event Subsystem uses Identity Manager to provide events to Object Services. The Event Subsystem requires minimal processing power, but it does require replicas for all objects that are monitored. Network connectivity and eDirectory synchronization are the primary performance factors for the Event Subsystem.</p>
+<p class="para">For optimal performance, a writable partition of all replicas containing objects contained in the Census should reside on the same server as the LDAP host server used by a Core Driver. However, be aware that operations that lock the directory on the local server, such as running NDSRepair, sometimes delay requests or cause them to fail.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="chdgbgca">
+
+<h2 class="title h2"><span class="number">4.2.3</span> Event Journal Services</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Event Journal Services waits for Platform Receivers to connect, then provides pending events and a snapshot of User and Group objects for processing. Network connectivity to the platforms, and proximity of the Core Driver to servers holding replicas of managed User and Group objects are the primary performance factors for Event Journal Services.</p>
+<p class="para">Platforms with very large numbers of managed users and groups should be connected to Event Journal Services with connections of adequate bandwidth to ensure that Full Sync Mode and Check Mode processing will complete within an acceptable time.</p>
+<p class="para">To reduce the number of concurrent connections that must be serviced by a Core Driver host, avoid using Persistent Mode on Platform Receivers.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br3ne7e">
+
+<h2 class="title h2"><span class="number">4.2.4</span> Authentication Services</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Authentication Services is responsible for processing requests made by Platform Services.</p>
+<p class="para">For optimal performance, LDAP host servers used by Core Drivers should hold a writable replica that contains the User objects represented in the Census, and other objects that might be referenced often by Authentication Services.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br3ne7f">
+
+<h2 class="title h2"><span class="number">4.2.5</span> Platform Systems</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Platform Services sends requests to the Core Driver. The systems on which Platform Services reside can be anything from a desktop workstation to a high-end mainframe system. The inherent performance of these systems is based on a number of factors, including</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">System load</p></li>
+<li class="listitem">
+<p class="listitem">The power of the system</p></li>
+<li class="listitem">
+<p class="listitem">Network traffic</p></li>
+<li class="listitem">
+<p class="listitem">Connectivity and bandwidth to the Core Drivers</p></li>
+<li class="listitem">
+<p class="listitem">The number of Core Drivers defined in the configuration</p></li></ul></div>
+
+<p class="para">Consider each of these as you configure each platform and as you select the location of the Core Drivers.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="br3ne7g">
+
+<h2 class="title h2"><span class="number">4.2.6</span> Platform Services / Authentication Services Relationship</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The performance of the Platform Services / Authentication Services transaction is the most important performance relationship in the driver. The communication relies on the TCP/IP stack of the platform and Authentication Services server. TCP/IP configuration on the platform, the Authentication Services server, and the routers in between is the most important factor in the performance of servicing Authentication Services requests. Guidelines for configuring TCP/IP are beyond the scope of this section. Refer to appropriate NetIQ and platform operating system documentation and TIDs for further information.</p>
+<p class="para">Platform system planners should be aware of a mandatory three-second delay in reporting a bad password on a password check request. This delay is in eDirectory itself. It cannot be configured by the driver.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

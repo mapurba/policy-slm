@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 06 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="planning-the-installation,planning-the-driver-shim-installation,system-requirements,installing-the-driver-shim,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Planning the Installation - Identity Manager Driver for Sentinel Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="planning-the-installation">
+
+<h1 class="title h1"><span class="number">4.2</span> Planning the Installation</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can install the driver shim on either the Identity Manager system or a remote host. <a href="planning-the-installation.html#b10f0ans" class="xref">Figure 4-1</a> illustrates the two installation options. The installation includes the following components:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bzjnc9r">
+            <p class="title"><em class="title">Identity Vault:</em>
+            Used by NetIQ Identity Manager to store data for synchronization with Sentinel. The Identity Vault is a persistent database powered by NetIQ eDirectory. The vault can be viewed as a private data store for Identity Manager or as a metadirectory that holds enterprise-wide data. Data in the vault is available to any protocol supported by eDirectory, including NCP (the traditional protocol used by utilities, such as ConsoleOne and Identity Console), LDAP, and DSML.Since the Identity Vault is powered by eDirectory, you can easily integrate Identity Manager into your corporate directory infrastructure by using your existing directory tree as the vault. The Identity Vault runs on any platform supported by Identity Manager and communicates with the module on the connected system over a secure network link. For information on the supported platforms, see <q class="quote"><a href="https://www.netiq.com/documentation/idm401/idm_integrated_install/?page=/documentation/idm401/idm_integrated_install/data/bpo8wc2.html" class="ulink">Supported Platforms</a></q>in the <span class="citetitle"><a href="https://www.netiq.com/documentation/idm401/idm_integrated_install/?page=/documentation/idm401/idm_integrated_install/data/bpo8wc2.html" class="ulink">Identity Manager Installation Guide.</a></span></p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="bzkoh6r">
+            <p class="title"><em class="title">Driver Shim (Integration Module for Sentinel):</em>
+            Converts the XML based Identity Manager command and event language (XDS) to the protocols and API calls required to interact with Sentinel. This driver uses a Java based driver shim (<span class="filename">SentinelRESTShim.jar</span>.) The driver shim is an executable code and is available on the <a href="http://download.novell.com/index.jsp" class="ulink">NetIQ download Web site</a>.</p>
+          </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="bzjnjgz">
+            <p class="title"><em class="title">Remote Loader:</em>
+            Enables a driver shim to execute outside of the Identity Manager engine. The Remote Loader is typically used when a requirement of the driver shim is not met by the Identity Manager server. For example, if Identity Manager engine is running on Linux but you want to integrate with Active Directory, the Remote Loader is used to execute the Active Directory driver shim on a Windows server.</p>
+          </div>
+
+<p class="listitem">The Remote Loader is a service that executes the driver shim and passes information between the shim and Identity Manager engine. You can install the driver shim on the server where the Remote Loader is running. You can choose to use SSL to encrypt the connection between the Identity Manager engine and the Remote Loader.</p>
+<p class="listitem">When you use the Remote Loader with the driver shim, two network connections are established:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Between Identity Manager and Remote Loader</p></li>
+<li class="listitem">
+<p class="listitem">Between Sentinel and the driver shim</p></li></ul></div>
+
+<p class="listitem">For more information on Remote Loader, see <q class="quote"><a href="../../../identity-manager-49/driver_admin/data/b18xta1v.html#t45lujgcj7b0" class="ulink">Designer</a></q> in the <span class="citetitle"><a href="../../../identity-manager-49/driver_admin/data/bktitle.html#bktitle" class="ulink">NetIQ Identity Manager Driver Administration Guide</a></span>.</p></li></ul></div>
+
+<p class="para">The following figure illustrates the two options for installing the driver shim:</p>
+<div class="figure" id="b10f0ans"><p class="title"><em class="num">Figure 4-1 </em>Installing the Driver Shim</p>
+            <img src="../graphics/installation_architecture_a.png" alt="" />
+          </div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b108dz2e">
+
+<h2 class="title h2"><span class="number">4.2.1</span> Installing the Driver Shim on the Identity Manager System</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The most common hosting for Identity Manager integration is in the Identity Manager engine.</p>
+<div class="formalpara" id="bzlri8y">
+          <p class="title"><em class="title">Advantages:</em>
+          </p>
+        </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The Integration module logs the trace messages in the Identity Manager server trace log. Therefore, troubleshooting might be easier.</p></li>
+<li class="listitem">
+<p class="listitem">No need to configure a Remote Loader instance.</p></li>
+<li class="listitem">
+<p class="listitem">No extra TCP/IP traffic between Identity Manager and Remote Loader.</p></li></ul></div>
+
+<div class="formalpara" id="bzlrlzn">
+          <p class="title"><em class="title">Disadvantages:</em>
+          </p>
+        </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Resource consumption on the Identity Manager server (memory, processor time).</p></li>
+<li class="listitem">
+<p class="listitem">The requirement to restart the Identity Manager server each time the integration module is installed or updated.</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bzlrhcc">
+
+<h2 class="title h2"><span class="number">4.2.2</span> Installing the Driver Shim on a Remote System</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following are the advantages and disadvantages of the installing the driver shim on a remote system:</p>
+<div class="formalpara" id="bzlrpss">
+          <p class="title"><em class="title">Advantages:</em>
+          </p>
+        </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Resource consumption (memory, processor time) is in a different process, or on another host.</p></li>
+<li class="listitem">
+<p class="listitem">You need to restart only the Remote Loader process when the integration module is updated.</p></li></ul></div>
+
+<div class="formalpara" id="bzlrqnq">
+          <p class="title"><em class="title">Disadvantages:</em>
+          </p>
+        </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Multiple trace files. Therefore, when troubleshooting, you might need to examine trace files from both the Identity Vault process and the Remote Loader process.</p></li>
+<li class="listitem">
+<p class="listitem">The need to configure a Remote Loader instance.</p></li>
+<li class="listitem">
+<p class="listitem">Extra TCP/IP traffic between the Identity Vault and the Remote Loader.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

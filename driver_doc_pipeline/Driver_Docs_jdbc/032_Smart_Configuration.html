@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="auto-configure-jdbc-driver-parameters,configure-jdbc-driver,configure-jdbc-driver,jdbc-driver-parameters,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Smart Configuration - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="auto-configure-jdbc-driver-parameters">
+
+<h1 class="title h1"><span class="number">6.1</span> Smart Configuration</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The JDBC driver can recognize the supported set of third-party JDBC drivers and databases. Also, the driver can dynamically and automatically configure the majority of driver compatibility parameters so you donât need to understand and explicitly set such parameters.</p>
+<p class="para">These features are implemented via the following four types of XML descriptor files, which describe a third-party JDBC driver or database to the JDBC driver.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Third-party JDBC driver</p></li>
+<li class="listitem">
+<p class="listitem">Third-party JDBC driver import</p></li>
+<li class="listitem">
+<p class="listitem">Database</p></li>
+<li class="listitem">
+<p class="listitem">Database import</p></li></ul></div>
+
+<p class="para">In addition to predefined descriptor files, you can create custom descriptor files for a database or third-party JDBC driver.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="auto-configure-jdbc-driver-parameters.html#bgyzc99" class="xref">Specifying Custom Descriptor Files</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="auto-configure-jdbc-driver-parameters.html#bgyzcjc" class="xref">Reserved Filenames for Descriptor Files</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="auto-configure-jdbc-driver-parameters.html#bgyzcp8" class="xref">Import Descriptor Files</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="auto-configure-jdbc-driver-parameters.html#bgyzcv6" class="xref">Descriptor File Locations</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="auto-configure-jdbc-driver-parameters.html#bgyzd12" class="xref">Precedence</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="auto-configure-jdbc-driver-parameters.html#bgyzd7v" class="xref">Custom Descriptor Best Practices</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="auto-configure-jdbc-driver-parameters.html#bgyzdda" class="xref">Descriptor File DTDs</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgyzc99">
+
+<h2 class="title h2"><span class="number">6.1.1</span> Specifying Custom Descriptor Files</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can force the driver to use a custom descriptor file for a database or third-party JDBC driver. To specify a custom database descriptor file, see <a href="configure-jdbc-driver-specific-parameters.html#b1pu3m0" class="xref">Database Descriptor Filename</a>. To specify a custom third-party driver descriptor file, see <a href="configure-jdbc-driver-specific-parameters.html#b1pu3lt" class="xref">JDBC Driver Descriptor Filename</a>. This is useful when multiple descriptor files exist for the same database or third-party JDBC driver. For the custom descriptor file to take effect, set the driver parameter as the jdbc-driver-descriptor.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgyzcjc">
+
+<h2 class="title h2"><span class="number">6.1.2</span> Reserved Filenames for Descriptor Files</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Descriptor filenames that ship with the driver begin with the underscore character ( _ ). Such filenames are reserved to ensure that descriptor files that ship with the driver do not conflict with custom descriptor files. Obviously, custom descriptor filenames must not begin with the underscore character.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgyzcp8">
+
+<h2 class="title h2"><span class="number">6.1.3</span> Import Descriptor Files</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Import descriptor files allow multiple, nonimport descriptor files to share content. This functionality reduces the size of nonimport descriptor files, minimizes the need for repetition of content, and increases maintainability. Import files cannot be imported across major types. That is, JDBC driver descriptors cannot import database imports, and database descriptors cannot import JDBC driver imports.</p>
+<p class="para">Furthermore, custom nonimport descriptors cannot import reserved descriptor imports. For example, if a custom third-party JDBC driver descriptor file named <span class="filename">custom.xml</span> tries to import a reserved third-party JDBC driver descriptor named <span class="filename">_reserved.xml</span>, an error is issued. These limitations accomplish the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Ensure that no dependencies exist between reserved and custom import files</p></li>
+<li class="listitem">
+<p class="listitem">Allow extension of existing reserved descriptor files in later versions of the driver</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgyzcv6">
+
+<h2 class="title h2"><span class="number">6.1.4</span> Descriptor File Locations</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Descriptor files must be located in a <span class="filename">.jar</span> file whose name begins with the prefix âjdbcâ (case-insensitive) and resides in the runtime classpath.</p>
+<p class="para">The following table identifies where to place descriptors within a descriptor <span class="filename">.jar</span> file:</p>
+<div class="table" id="b1mm8vp"><p class="title"><em class="num">Table 6-1 </em>Where to Place Descriptors</p>
+<table class="topbot" width="95%"><col width="38%" /><col width="62%" />
+              
+<tr class="headerrow" id="bvwl9gy"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Descriptor Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Directory Path</p></th>
+</tr>
+            
+<tr class="oddrow" id="bvwl9gz"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Third-party JDBC driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="filename">com/novell/nds/dirxml/driver/jdbc/db/descriptor/driver</span>
+                  </p></td>
+</tr>
+<tr class="evenrow" id="bvwlb0i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Third-party JDBC driver import</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="filename">com/novell/nds/dirxml/driver/jdbc/db/descriptor/driver/import</span>
+                  </p></td>
+</tr>
+<tr class="oddrow" id="bvwlb0j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Database</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="filename">com/novell/nds/dirxml/driver/jdbc/db/descriptor/db</span>
+                  </p></td>
+</tr>
+<tr class="evenrow" id="bvwlb0k"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Database import</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="filename">com/novell/nds/dirxml/driver/jdbc/db/descriptor/db/import</span>
+                  </p></td>
+</tr></table>
+</div>
+
+<p class="para">Reserved descriptor files are located in the <span class="filename">JDBCConfig.jar</span> file. To ensure that these reserved files are not overwritten when the JDBC driver is updated, place custom descriptors in a different <span class="filename">.jar</span> file.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgyzd12">
+
+<h2 class="title h2"><span class="number">6.1.5</span> Precedence</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Parameters explicitly specified through a management console, such as Identity Console, always have precedence over parameters specified through descriptor files. Descriptor file parameters only take effect when a parameter is not set through the management console.</p>
+<p class="para">Parameters and other information specified in a nonimportable descriptor file always have precedence over information specified in descriptor import files. If a parameter or other information is duplicated within a descriptor file, the first instance of the parameter or information takes precedence over subsequent instances.</p>
+<p class="para">Among import files, precedence is determined by import order. Import files declared earlier in the import list take precedence over those that follow.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgyzd7v">
+
+<h2 class="title h2"><span class="number">6.1.6</span> Custom Descriptor Best Practices</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Do not begin custom descriptor files name with the underscore ( _ ) character.</p></li>
+<li class="listitem">
+<p class="listitem">Place custom descriptor files in a jar file other than <span class="literal">JDBCConfig.jar</span>, and begin the filename with the prefix âjdbcâ (case-insensitive).</p></li>
+<li class="listitem">
+<p class="listitem">Do not use custom descriptors to import reserved import files (filenames that begin with the underscore character).</p></li></ul></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bgyzdda">
+
+<h2 class="title h2"><span class="number">6.1.7</span> Descriptor File DTDs</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The following sections contain DTDs for all descriptor file types. These DTDs can help you construct custom descriptor files.</p>
+<div class="table" id="b1mm9qh"><p class="title"><em class="num">Table 6-2 </em>Where to Find Descriptor DTDs</p>
+<table class="topbot" width="95%"><col width="27%" /><col width="73%" />
+              
+<tr class="headerrow" id="bvwlg1x"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Descriptor Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Appendix</p></th>
+</tr>
+            
+<tr class="oddrow" id="bvwlg1y"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Third-party JDBC driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="third-party-jdbc-driver-descriptor-dtd.html" class="xref">Section H.0, Third-Party JDBC Driver Descriptor DTD</a>
+                  </p></td>
+</tr>
+<tr class="evenrow" id="bvwlg1z"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Third-party JDBC driver import</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="third-party-jdbc-driver-descriptor-import-dtd.html" class="xref">Section I.0, Third-Party JDBC Driver Descriptor Import DTD</a>
+                  </p></td>
+</tr>
+<tr class="oddrow" id="bvwlg20"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Database</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="database-descriptor-dtd.html" class="xref">Section J.0, Database Descriptor DTD</a>
+                  </p></td>
+</tr>
+<tr class="evenrow" id="bvwlg21"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Database import</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <a href="database-descriptor-dtd-import.html" class="xref">Section K.0, Database Descriptor Import DTD</a>
+                  </p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

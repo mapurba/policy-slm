@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g4e2b6f,t4cb3g4da6yy,t4cb3g4dy104,t4cb3g4ef3ea,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Gmail Settings Attributes - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4cb3g4e2b6f">
+
+<h1 class="title h1"><span class="number">3.3</span> Gmail Settings Attributes</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Several attributes are exposed for the Google Schema that update a userâs default email settings within a Google Domain. These attributes are not mapped to an eDirectory attribute but can be set on modify events.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Due to limitations in the Gmail API and Directory API interactions, it is not possible to set these attributes during user creation. It is recommended that a delay of at least five seconds or more be used between the creation of a new user and any attempted setting of a Gmail Setting attribute.</p></div>
+
+<p class="para">The following sections provide information these attributes:</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4e5y08">
+
+<h2 class="title h2"><span class="number">3.3.1</span> GmailSettingsDelegates</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Use this attribute to add, remove, or list the assigned delegates to a userâs Gmail account. The attribute takes one of two forms: a string value which consists of the email address of the designated delegate or a distinguished name syntax with an association reference for the designated delegate for this user. The connector will take either form.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4e65pm">
+
+<h2 class="title h2"><span class="number">3.3.2</span> GmailSettingsEnableIMAP</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Use this attribute to enable or disable the IMAP feature of a userâs account. The attribute takes two values: true or false.</p>
+<p class="para">This attribute does not support remove-value or remove-all-values as a userâs IMAP settings cannot be removed. Change the state of this setting with an add-value command.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4e6sij">
+
+<h2 class="title h2"><span class="number">3.3.3</span> GmailSettingsEnablePOP</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Use this attribute to manage a userâs POP settings. This attribute takes a structured value with the following components:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">EnableFor</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Whether to enable POP for all mail, or mail from now on.</p></li>
+<li class="listitem">
+<p class="listitem">Enumerated</p></li>
+<li class="listitem">
+<p class="listitem">Required</p></li>
+<li class="listitem">
+<p class="listitem">Values:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">ALL_MAIL</p></li>
+<li class="listitem">
+<p class="listitem">MAIL_FROM_NOW_ON</p></li></ul></div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Action</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">What Google Mail should do with its copy of the email after it is retrieved using POP</p></li>
+<li class="listitem">
+<p class="listitem">Enumerated</p></li>
+<li class="listitem">
+<p class="listitem">Required</p></li>
+<li class="listitem">
+<p class="listitem">Values:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">KEEP</p></li>
+<li class="listitem">
+<p class="listitem">ARCHIVE</p></li>
+<li class="listitem">
+<p class="listitem">DELETE</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Enable</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Whether to enable/disable POP access</p></li>
+<li class="listitem">
+<p class="listitem">Boolean</p></li></ul></div>
+</li></ul></div>
+</li></ul></div>
+
+<p class="para">This attribute does not support remove-all-values and remove-value commands as POP settings cannot be removed from users. Send any changes as an add-value command.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4e7uzx">
+
+<h2 class="title h2"><span class="number">3.3.4</span> GmailSettingsForwarding</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Use this attribute to set and update a userâs auto-forwarding rule. The attribute takes a structured value with the following components:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Enable</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Whether to enable forwarding of incoming mail</p></li>
+<li class="listitem">
+<p class="listitem">Boolean</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">ForwardAddress</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The email address to which the email will be forwarded</p></li>
+<li class="listitem">
+<p class="listitem">This must be verified, which means it must satisfy one of these tests:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">It belongs to the same domain</p></li>
+<li class="listitem">
+<p class="listitem">It belongs to a subdomain of the same domain</p></li>
+<li class="listitem">
+<p class="listitem">It belongs to a domain alias configured as part of the same GÂ Suite account</p></li></ul></div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Action</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">What Google Mail should do with its copy of the email after forwarding it on</p></li>
+<li class="listitem">
+<p class="listitem">Enumerated</p></li>
+<li class="listitem">
+<p class="listitem">Values</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">KEEP</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Keep it in the inbox</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">ARCHIVE</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Archive it</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">DELETE</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Delete it</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">MARK_READ</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Mark it as read</p></li></ul></div>
+</li></ul></div>
+</li></ul></div>
+</li></ul></div>
+
+<p class="para">This attribute only supports add-value changes. Use an add-value command to update or disable auto-forward.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4e8prz">
+
+<h2 class="title h2"><span class="number">3.3.5</span> GmailSettingsLabel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This attribute can be used to list, add to, and remove from a userâs configured set of labels within Gmail. Note that the API only allows access to the user custom labels. The pre-defined system default labels cannot be manipulated with the API. The attribute accepts string syntax values representing the label to be created or removed. It supports add-value, remove-value, and remove-all-values commands.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4e9564">
+
+<h2 class="title h2"><span class="number">3.3.6</span> GmailSettingsLanguage</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This attribute can be used to change or display the language setting for a userâs Gmail account. Note that the values accepted and displayed by this API are strictly constrained by the API service to be in RFC 3066 language tag format.</p>
+<p class="para">See <a href="https://www.w3.org/International/articles/languagetags/" class="ulink">https://www.w3.org/International/articles/language-tags/</a></p>
+<p class="para">The attribute is string syntax containing the language tag desired. It only supports add-value commands.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4ea64t">
+
+<h2 class="title h2"><span class="number">3.3.7</span> GmailSettingsSendAs</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This attribute can be used to display, set, and remove SendAs aliases. A SendAs alias is a configuration on a userâs account that allows them to send mail as another name and email address. Note that the collection of SendAs alias on any user account includes a system entry, the primary SendAs, which will be displayed when queried, but cannot be removed. The attribute is structured with the following components:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Name</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The display name for the send as alias</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">SendAs</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The email address used for the send as alias</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">ReplyTo</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The reply-to address used for the send as alias</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">isDefault</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Whether or not this alias is the default SendAs configuration for this user</p></li>
+<li class="listitem">
+<p class="listitem">Takes the value of either true or false</p></li></ul></div>
+</li></ul></div>
+
+<p class="para">The attribute supports add-value, remove-value, and remove-all-values.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4ealiy">
+
+<h2 class="title h2"><span class="number">3.3.8</span> GmailSettingsSignature</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This attribute can be used to display or change a userâs signature. The attribute takes a string value which is the signature for the user and applies it to their account.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4eb0wz">
+
+<h2 class="title h2"><span class="number">3.3.9</span> Gmail Settings Attribute Syntax and Examples</h2>
+
+<div class="content_wrapper">
+
+<div class="table" id="t4cb3g4eb8m2"><p class="title"><em class="num">Table 3-2 </em>Gmail Settings Attribute Syntax and Examples</p>
+<table class="topbot" width="100%"><col width="35%" /><col width="16%" /><col width="49%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Application Attribute Name</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Syntax</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsDelegates</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DN/String</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p>
+<p class="para">This can be formatted as a distinguished name with an association-ref or as a plain string in the form of an email address of the delegate.</p><pre class="screen">
+&lt;modify-attr attr-name="GmailSettingsDelegates"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+&lt;value association-ref=user@mydomain.com" type="dn"&gt;/data/users/my-user&lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+ == OR ==
+&lt;modify-attr attr-name="GmailSettingsDelegates"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+&lt;value type="string"&gt;user@mydomain.com&lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsEnableIMAP</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Boolean</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p>
+<p class="para">&lt;modify-attr attr-name="GmailSettingsEnableIMAP"&gt;</p><pre class="screen">
+Â Â Â Â Â Â  &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;value type="string"&gt;true&lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="34%" /><col width="17%" /><col width="49%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Application Attribute Name</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Syntax</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsEnablePop</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Structured</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p><pre class="screen">
+&lt;modify-attr attr-name="GmailSettingsEnablePOP"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;value type="structured"&gt;
+&lt;component name="EnableFor"&gt;ALL_MAIL&lt;/component&gt;
+&lt;component name="Action"&gt;KEEP&lt;/component&gt;
+&lt;component name="Enable"&gt;true&lt;/component&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsForwarding</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Structured</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p><pre class="screen">
+&lt;modify-attr attr-name="GmailSettingsForwarding"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â &lt;value type="structured"&gt;
+&lt;component name="ForwardAddress"&gt;user@domain.com&lt;/component&gt;
+&lt;component name="Action"&gt;KEEP&lt;/component&gt;
+&lt;component name="Enable"&gt;true&lt;/component&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="34%" /><col width="17%" /><col width="49%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Application Attribute Name</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Syntax</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsLabel</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">String</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p><pre class="screen">
+
+&lt;modify-attr attr-name="GmailSettingsLabel"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;value type="string"&gt;MyProject&lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsLanguage</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">String</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p><pre class="screen">
+&lt;modify-attr attr-name="GmailSettingsLanguage"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;value type="string"&gt;Eng&lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="34%" /><col width="17%" /><col width="49%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Application Attribute Name</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                    <span class="bold">Syntax</span>
+                  </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsSendAs</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Structured</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p><pre class="screen">
+
+&lt;modify-attr attr-name="GmailSettingsSendAs"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;value type="structured"&gt;
+&lt;component name="Name"&gt;My Name&lt;/component&gt;
+&lt;component name="SendAs"&gt;name@idmtest.org&lt;/component&gt;
+&lt;component name="ReplyTo"&gt;name@idmtest.org&lt;/component&gt;
+&lt;component name="IsDefault"&gt;true&lt;/component&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                    <span class="bold">GmailSettingsSignature</span>
+                  </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">String</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><p>&nbsp;</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="3" rowspan="1">
+<p class="para">
+                    <span class="bold">Example</span>
+                  </p><pre class="screen">
+
+&lt;modify-attr attr-name="GmailSettingsSignature"&gt;
+Â Â Â Â Â Â  &lt;add-value&gt;
+Â Â Â Â Â Â Â Â Â Â Â Â Â  &lt;value type="string"&gt;Signature Data&lt;/value&gt;
+Â Â Â Â Â Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+
+</pre></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

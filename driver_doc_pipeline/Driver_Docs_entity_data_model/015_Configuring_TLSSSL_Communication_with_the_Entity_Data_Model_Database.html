@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 03 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="b1fu7np8,b1eq5x6y,b1fnie50,legal,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring TLS/SSL Communication with the Entity Data Model Database - Identity Manager Driver for Entity Data Model Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b1fu7np8">
+
+<h1 class="title h1"><span class="number">4.2</span> Configuring TLS/SSL Communication with the Entity Data Model Database</h1>
+
+<div class="content_wrapper">
+
+<p class="para">To ensure that the Entity Data Model driver communicates securely with the Entity Data Model database, you can configure a TLS/SSL connection. You must enable SSL for both the database and the driver.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="b1fu7np8.html#b1g1f5o7" class="xref">Preparing the Database Platform for SSL Communication</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b1fu7np8.html#b1g0zlav" class="xref">Enabling the Entity Data Model Databases for SSL Communication</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="b1fu7np8.html#b1fu7r2v" class="xref">Enabling the Entity Data Model Driver for SSL Communication</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1g1f5o7">
+
+<h2 class="title h2"><span class="number">4.2.1</span> Preparing the Database Platform for SSL Communication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">This section provides information for creating an SSL server certificate that the PostgreSQL and Oracle database platforms can use for secure communication with the Entity Data Model driver.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="b1fu7np8.html#b1fu7np9" class="xref">Preparing PostgreSQL for SSL Communication</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="b1fu7np8.html#b1fyw3nt" class="xref">Preparing Oracle for SSL Communication</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b1fu7np9">
+
+<h3 class="title h3">Preparing PostgreSQL for SSL Communication</h3>
+
+<div class="procedure" id="t42gjuwb5dnb">
+<ol class="steps">
+<li class="step">
+<p class="para">On the server where you deployed Entity Data Model, stop Tomcat.</p></li>
+<li class="step">
+<p class="para">Log in to the PostgreSQL server for Entity Data Model.</p></li>
+<li class="step">
+<p class="para">Stop Postgres.</p></li>
+<li class="step">
+<p class="para">To generate a passphrase-protected certificate, enter the following command:</p><pre class="screen">openssl req -new -text -out cert.req</pre></li>
+<li class="step">
+<p class="para">To remove the passphrase so the server can start the postmaster automatically, enter the following command:</p><pre class="screen">openssl rsa -in privkey.pem -out cert.pem</pre></li>
+<li class="step">
+<p class="para">To convert the certificate into a self-signed certificate, enter the following command:</p><pre class="screen">openssl req -x509 -in cert.req -text -key cert.pem -out cert.cert</pre></li>
+<li class="step" id="step7certcreation">
+<p class="para">Copy the following files to the <span class="filename">data</span> directory of the PostgreSQL installation:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                    <span class="filename">cp cert.pem $PGDATA/server.key</span>
+                  </p></li>
+<li class="listitem">
+<p class="listitem">
+                    <span class="filename">cp cert.cert $PGDATA/server.crt</span>
+                  </p>
+<p class="listitem">where <span class="filename">$PGDATA</span> = <span class="filename">/opt/netiq/idm/apps/postgresql/data/</span></p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">To change the permission of the files, navigate to the /opt/netiq/idm/apps/postgresql/data/ directory and enter the following commands:</p><pre class="screen">chown postgres:postgres server.key
+chown postgres:postgres server.crt
+chmod 600 server.key </pre></li>
+<li class="step">
+<p class="para">In a text editor, change the SSL setting in the <span class="filename">$PGDATA/postgresql.conf</span> file to <span class="literal">on</span>. For example:</p><pre class="screen">ssl=on
+ssl_cert_file = '/opt/netiq/idm/apps/postgresql/data/server.crt' # (change requires restart)
+ssl_key_file = '/opt/netiq/idm/apps/postgresql/data/server.key'  # (change requires restart)</pre></li>
+<li class="step">
+<p class="para">Save and close the file.</p></li>
+<li class="step">
+<p class="para">Start Postgres.</p></li>
+<li class="step">
+<p class="para">(Optional) To verify that SSL communication is enabled for Postgres, complete the following steps:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Enter <span class="command">$ ./opt/netiq/idm/apps/postgres/bin/psql -U postgres -h localhost</span>.</p></li>
+<li class="step">
+<p class="para">Verify that the output is similar to the following content:</p><pre class="screen">psql (9.0.3)
+SSL connection (cipher: DHE-RSA-AES256-SHA, bits: 256)
+Type "help" for help.</pre></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Add the <span class="filename">server.crt</span> that you created in <a href="b1fu7np8.html#step7certcreation" class="xref">Step 7</a> to the <span class="literal">cacert</span>. For example, enter the following command:</p><pre class="screen">keytool -import -trustcacerts -alias ar -file server.crt -keystore /opt/netiq/idm/apps/jre/lib/security/cacerts</pre></li>
+<li class="step">
+<p class="para">Start Tomcat.</p></li>
+<li class="step">
+<p class="para">Ensure that you update the Entity Data Model databases to recognize the secured connection.</p>
+<p class="para">For more information, see <a href="b1fu7np8.html#b1g0zlav" class="xref">Enabling the Entity Data Model Databases for SSL Communication</a>.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b1fyw3nt">
+
+<h3 class="title h3">Preparing Oracle for SSL Communication</h3>
+
+<p class="para">To enable SSL in Oracle, you must have a certificate for the Oracle Server signed by a certificate authority (CA).</p>
+<div class="procedure" id="t42gjuwb5ld4">
+<ol class="steps">
+<li class="step">
+<p class="para">Download and unpack the SSL helper scripts named <span class="command">ssl.ca-0.1.tar.gz</span>.</p></li>
+<li class="step">
+<p class="para">Create a certification request using Oracle Wallet Manager (<span class="command">/opt/oracle/product/11gR1/db/owm</span>) using the following commands:</p><pre class="screen">su âoracle
+owm</pre></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Wallet &gt; New</span>.</p></li>
+<li class="step">
+<p class="para">Enter your password, then select <span class="guimenu">Yes</span> to create folders for the wallet.</p></li>
+<li class="step">
+<p class="para">Fill in the requested information, then select <span class="guimenu">OK</span>.</p></li>
+<li class="step">
+<p class="para">Highlight the certification request, then select <span class="guimenu">Operations &gt; Export Certificate Request</span>.</p></li>
+<li class="step" id="oraclesavefile">
+<p class="para">Save the file with the extension <span class="literal">.csr</span> in the folder where you extracted <span class="literal">ssl.ca-0.1.tar.gz</span> then save the wallet.</p></li>
+<li class="step">
+<p class="para">Create a self-signed <span class="literal">root</span> certificate by running the <span class="literal">new-root-ca.sh</span> script in the <span class="literal">ssl.ca-0.1</span> folder that you extracted in the previous step to create a file called <span class="literal">ca.crt</span>.</p></li>
+<li class="step" id="step9createcrt">
+<p class="para">To run the script that creates the self-signed server certificate, enter the following command:</p><pre class="screen">./sign-server-cert.sh CerReq</pre></li>
+<li class="step">
+<p class="para">Import the <span class="literal">ca.crt</span> into the Oracle wallet as a trusted certificate and import the <span class="literal"><span class="replaceable">certificate-request-filename.crt</span></span> as a user certificate.</p></li>
+<li class="step">
+<p class="para">Enable auto-login and save the wallet so that it is now ready for use.</p></li>
+<li class="step">
+<p class="para">To configure Oracle advanced security and listener configuration on the database server, run the following commands:</p><pre class="screen">su â oracle
+netmgr</pre></li>
+<li class="step">
+<p class="para">Select <span class="guimenu">Profile &gt; Select Network Security &gt; SSL</span>.</p></li>
+<li class="step">
+<p class="para">Ensure that the <span class="filename">sqlnet.ora</span> and <span class="filename">listener.ora</span> files mention the <span class="literal">WALLET</span>.</p></li>
+<li class="step">
+<p class="para">(Conditional) If the <span class="literal">SSL_CLIENT_AUTHENTICATION</span> parameter is not set, the default setting is <span class="literal">TRUE</span> and clients are required to present a certificate during the SSL handshake. If you do not need client authentication, disable it with the following parameter added to the end of the <span class="literal">$TNS_ADMIN/listener.ora</span> and <span class="literal">$TNS_ADMIN/sqlnet.ora</span> files: <span class="literal">SSL_CLIENT_AUTHENTICATION=FALSE</span></p></li>
+<li class="step">
+<p class="para">Restart the listener:</p><pre class="screen">lsnrctl stop
+lsnrctl start</pre></li>
+<li class="step">
+<p class="para">Ensure that you update the Entity Data Model databases to recognize the secured connection.</p>
+<p class="para">For more information, see <a href="b1fu7np8.html#b1g0zlav" class="xref">Enabling the Entity Data Model Databases for SSL Communication</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1g0zlav">
+
+<h2 class="title h2"><span class="number">4.2.2</span> Enabling the Entity Data Model Databases for SSL Communication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To use TLS/SSL connections, the three Entity Data Model databases need the server certificate information. This section applies to both Oracle and PostgreSQL platforms.</p>
+<div class="procedure" id="t42gjuwb5t2x">
+<ol class="steps">
+<li class="step">
+<p class="para">Enable SSL functionality in the database platform.</p>
+<p class="para">For more information, see <a href="b1fu7np8.html#b1fu7np9" class="xref">Preparing PostgreSQL for SSL Communication</a> or <a href="b1fu7np8.html#b1fyw3nt" class="xref">Preparing Oracle for SSL Communication</a>.</p></li>
+<li class="step">
+<p class="para">Log in to the server where you deployed Entity Data Model.</p></li>
+<li class="step">
+<p class="para">Stop Tomcat:</p><pre class="screen">/etc/init.d/idmapps_tomcat_init stop</pre></li>
+<li class="step">
+<p class="para">Add the SSL server certificate that you created for the database platform to the <span class="literal">cacert</span>. For example:</p>
+<div class="variablelist">
+              
+<dl class="variablelist">
+<dt class="term">PostgreSQL</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">keytool -import -trustcacerts -alias ar -file server.crt -keystore /opt/netiq/idm/apps/jre/lib/security/cacerts</span>
+                  </p></dd>
+
+              
+<dt class="term">Oracle</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">keytool -import -trustcacerts -alias aroracle -file ca.crt -keystore /opt/netiq/idm/apps/jre/lib/security/cacerts</span>
+                  </p></dd>
+
+            </dl></div>
+</li>
+<li class="step">
+<p class="para">In a text editor, open the <span class="filename">server.xml</span> file.</p></li>
+<li class="step">
+<p class="para">For the three Entity Data Model databases listed in the file, specify the URL for the SSL server certificate. For example:</p>
+<div class="variablelist">
+              
+<dl class="variablelist">
+<dt class="term">PostgreSQL</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">url="jdbc:postgresql://<span class="replaceable">hostname</span>:5432/<span class="replaceable">database_username</span>?ssl=true"</span>
+                  </p></dd>
+
+              
+<dt class="term">Oracle</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">url="jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCPS)(HOST = <span class="replaceable">hostname</span>)(PORT = 2484))(CONNECT_DATA =(SERVER = DEDICATED) (SERVICE_NAME = <span class="replaceable">name</span>))(SECURITY=(SSL_SERVER_CERT_DN='CN=OracleDB,OU=IN,O=IN,L=IN,ST=IN,C=IN')))"</span>
+                  </p></dd>
+
+            </dl></div>
+
+<p class="para">By default, the databases have the usernames <span class="filename">arops</span>, <span class="filename">ardcs</span>, and <span class="filename">arwf</span>.</p></li>
+<li class="step">
+<p class="para">Start Tomcat:</p><pre class="screen">/etc/ini.d/idmapps_tomcat_init start</pre></li>
+<li class="step">
+<p class="para">Ensure that you update the to recognize the secured connection.</p>
+<p class="para">For more information, see <a href="b1fu7np8.html#b1fu7r2v" class="xref">Enabling the Entity Data Model Driver for SSL Communication</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1fu7r2v">
+
+<h2 class="title h2"><span class="number">4.2.3</span> Enabling the Entity Data Model Driver for SSL Communication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Entity Data Model driver can communicate securely with the Entity Data Model databases. Ensure that you also enable SSL communication in the databases. For more information, see <a href="b1fu7np8.html#b1fu7np9" class="xref">Preparing PostgreSQL for SSL Communication</a> or <a href="b1fu7np8.html#b1fyw3nt" class="xref">Preparing Oracle for SSL Communication</a>.</p>
+<div class="procedure" id="t42gjuwb60sq">
+<ol class="steps">
+<li class="step">
+<p class="para">Log in to the server where you installed the Entity Data Model driver and the Remote Loader.</p></li>
+<li class="step">
+<p class="para">Stop the Remote Loader. For example, enter the following command:</p><pre class="screen">rdxml -config /home/ARShim.conf -u</pre></li>
+<li class="step">
+<p class="para">In a text editor, open the Remote Loader <span class="filename">conf</span> file for the driver, by default <span class="filename">ARshim.conf</span>.</p></li>
+<li class="step">
+<p class="para">Add the content of the SSL server certificate to the file. For example:</p>
+<div class="variablelist">
+              
+<dl class="variablelist">
+<dt class="term">PostgreSQL</dt>
+<dd class="listitem"><pre class="screen">-description ARDriver
+-commandport 8000
+-connection "port=8090 rootfile=<span class="replaceable">path</span>/server.crt"
+-trace 5
+-tracefile "/opt/netiq/ar.log"
+-tracefilemax 100M
+-class "com.novell.nds.dirxml.driver.arshim.AccessReviewDriverShim"</pre></dd>
+
+              
+<dt class="term">Oracle</dt>
+<dd class="listitem"><pre class="screen">-description ARDriver
+-commandport 8000
+-connection "port=8090 rootfile=<span class="replaceable">path</span>/ca.crt"
+-trace 5
+-tracefile /tmp/remoteloader.log
+-class com.novell.nds.dirxml.driver.arshim.AccessReviewDriverShim</pre></dd>
+
+            </dl></div>
+</li>
+<li class="step">
+<p class="para">Save and close the file.</p></li>
+<li class="step">
+<p class="para">Add the server certificate to the Remote Loader Java certs. For example:</p>
+<div class="variablelist">
+              
+<dl class="variablelist">
+<dt class="term">PostgreSQL</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">keytool -import -trustcacerts -alias ar -file server.crt -keystore /opt/novell/eDirectory/lib64/nds-modules/jre/lib/security/cacerts</span>
+                  </p></dd>
+
+              
+<dt class="term">Oracle</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">keytool -import -trustcacerts -alias aroracle -file ca.crt -keystore /opt/novell/eDirectory/lib64/nds-modules/jre/lib/security/cacerts</span>
+                  </p></dd>
+
+            </dl></div>
+</li>
+<li class="step">
+<p class="para">Start the Remote Loader. For example, enter the following command:</p><pre class="screen">rdxml -config /home/ARShim.conf</pre></li>
+<li class="step">
+<p class="para">In the AR Driver configuration, verify that the setting for <span class="guimenu">Entity Data Model Database Connection URL</span> resembles one of the following values:</p>
+<div class="variablelist">
+              
+<dl class="variablelist">
+<dt class="term">PostgreSQL</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">url="jdbc:postgresql://<span class="replaceable">hostname</span>:5432/<span class="replaceable">database_username</span>?ssl=true"</span>
+                  </p></dd>
+
+              
+<dt class="term">Oracle</dt>
+<dd class="listitem">
+<p class="listitem">
+                    <span class="command">jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCPS)(HOST = <span class="replaceable">hostname</span>)(PORT = 2484))(CONNECT_DATA =(SERVER = DEDICATED) (SERVICE_NAME = <span class="replaceable">name</span>))(SECURITY=(SSL_SERVER_CERT_DN='CN=OracleDB,OU=IN,O=IN,L=IN,ST=IN,C=IN')))</span>
+                  </p></dd>
+
+            </dl></div>
+
+<p class="para">By default, the databases have the usernames <span class="filename">arops</span>, <span class="filename">ardcs</span>, and <span class="filename">arwf</span>.</p></li>
+<li class="step">
+<p class="para">Restart the Entity Data Model driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

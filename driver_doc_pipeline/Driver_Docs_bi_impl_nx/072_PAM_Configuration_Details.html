@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3yj5z9,b3r8ulu,b3yj43k,b3yj64d,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>PAM Configuration Details - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3yj5z9">
+
+<h1 class="title h1"><span class="number">C.4</span> PAM Configuration Details</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The PAM module can publish password information on the system running the driver shim or from a remote system such as a NIS or NIS+ client. The only task of the driver PAM module is to obtain the password during normal password change operations that use PAM-enabled tools, such as the <span class="command">passwd</span> command.</p>
+<p class="para">You can install and optionally configure the PAM module at any time using the installation program. For details, see <a href="b3xfnmq.html" class="xref">Installing the PAM or LAM Module</a>.</p>
+<p class="para">After it is installed, you can configure the PAM module with the <span class="command">nxdrv-config</span> command. For details, see <a href="b4339kg.html" class="xref">Using the nxdrv-config Command</a>.</p>
+<p class="para">The installation script installs the PAM module as appropriate for the server operating system as shown in the following table:</p>
+<div class="table" id="b465rmb"><p class="title"><em class="num">Table C-3 </em>PAM Modules</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+            
+<tr class="headerrow" id="b465ryi"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Operating System</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">PAM Module</p></th>
+</tr>
+          
+<tr class="oddrow" id="b4igodt"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AIX</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">/usr/lib/security/pam_nxdrv</span>
+                </p></td>
+</tr>
+<tr class="evenrow" id="b4igodu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">HP-UX</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">/usr/lib/security/libpam_nxdrv.1</span>
+                </p></td>
+</tr>
+<tr class="oddrow" id="b4igodv"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Linux</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">/lib/security/pam_nxdrv.so</span>
+                </p></td>
+</tr>
+<tr class="evenrow" id="b4igodw"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Solaris</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="filename">/usr/lib/security/pam_nxdrv.so.1</span>
+                </p></td>
+</tr></table>
+</div>
+
+<p class="para">If you respond to the prompt to configure the PAM module, the installation script places an entry for the PAM module in the appropriate PAM configuration file for the password facility. The <span class="command">nxdrv-config</span> command also does this.</p>
+<p class="para">You can edit your PAM configuration file manually. The PAM module requires a command line option as shown in <a href="b3yj5z9.html#b4igolf" class="xref">Table C-4</a>. For the location and syntax of your PAM configuration file, see your systemâs PAM documentation. If you choose to edit your own PAM configuration files, you must place the PAM module entry below the module that obtains the new password during a password change.</p>
+<div class="table" id="b4igolf"><p class="title"><em class="num">Table C-4 </em>Linux and UNIX Driver PAM Module Command Line Options</p>
+<table class="topbot" width="100%"><col width="33%" /><col width="67%" />
+            
+<tr class="headerrow" id="b456mm4"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Option</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+          
+<tr class="oddrow" id="b456mm9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="literal">debug=*</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Logs PAM module activity to the <span class="filename">/usr/local/nxdrv/logs/pam_nxdrv.log</span> file.</p></td>
+</tr>
+<tr class="evenrow" id="b456mm7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="literal">host=<span class="replaceable">hostName</span></span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required for SOAP. Specifies the host name or IP address of the driver shim system.</p></td>
+</tr>
+<tr class="oddrow" id="b456mm5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="literal">mechanism=api</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The PAM module uses the API to send password change information to the driver shim. This method is used when the PAM module is running on the same system as the driver shim.</p></td>
+</tr>
+<tr class="evenrow" id="b456mm6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="literal">mechanism=soap</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The PAM module uses Simple Object Access Protocol (SOAP) to send password change information to the driver shim. This method is used when the PAM module is running on a different system from the driver shim, such as with NIS or NIS+ clients.</p></td>
+</tr>
+<tr class="oddrow" id="b456mm8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="literal">port=<span class="replaceable">portNumber</span></span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Required for SOAP. Specifies the TCP port number of the driver shim system. The default port is 8091.</p></td>
+</tr>
+<tr class="evenrow" id="bk140pd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="literal">LC_ALL=<span class="replaceable">locale</span></span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specifies the standard character set (<span class="literal"><span class="replaceable">locale</span></span>) in use by the connected system. This ensures accurate text data conversion between the connected system and Identity Manager, which uses the UTF-8 character set. For example, the option <span class="literal">LC_ALL=iso8559-1</span> would enable the PAM module to convert passwords and user IDs in the iso8559-1 (Latin-1) character set to UTF-8.</p></td>
+</tr></table>
+</div>
+
+<p class="para">The Linux and UNIX driver PAM module is contained in the pam-password part of the PAM stack below the other PAM modules on the system. When the other PAM modules participate in a dialog with a user who is changing the password, the driver PAM module uses pam_get_item to get the new password from the PAM framework.</p>
+<p class="para">When the Linux and UNIX driver PAM module obtains a new password on the system running the driver shim, it writes the new password to the change log so it can be published into the Identity Vault.</p>
+<p class="para">When the PAM module is used from a host other than the one where the driver shim is running (such as NIS or NIS+ clients), it uses a secure TCP/IP channel to communicate with the driver shim. If the password change event cannot be sent to the driver shim, a message is written to the system log.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

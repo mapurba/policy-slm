@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="set-jdbc-fan-out-driver-configuration-in-designer-and-imanager,jdbc-fan-out-driver-properties,jdbc-fan-out-driver-properties,set-gcv-for-jdbc-fan-out-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Configuration - NetIQ Identity Manager Driver for JDBC Fanout Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="set-jdbc-fan-out-driver-configuration-in-designer-and-imanager">
+
+<h1 class="title h1"><span class="number">B.1</span> Driver Configuration</h1>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b1bcxac2"><p class="title">In Identity Console:</p>
+<ol class="steps">
+<li class="step" id="b1bcxac3">
+<p class="para">Click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step" id="b1bcxac4">
+<p class="para">On the Driver Dashboard, locate the driver, then click the driver icon to display the driverâs properties page.</p></li></ol>
+</div>
+
+<div class="procedure" id="b94psgh"><p class="title">In Designer:</p>
+<ol class="steps">
+<li class="step" id="b94psgi">
+<p class="para">Open a project in the Modeler.</p></li>
+<li class="step" id="b94psgj">
+<p class="para">Right-click the driver icon or line, then select click <span class="guimenu">Properties &gt; Driver Configuration.</span></p></li></ol>
+</div>
+
+<p class="para">The following sections describe driver configuration in details:</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ijrhw9">
+
+<h2 class="title h2"><span class="number">B.1.1</span> Driver Module</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver module changes the driver from running locally to running remotely or the reverse.</p>
+<div class="formalpara" id="bs9f4lg">
+          <p class="title"><em class="title">Java:</em>
+          Use this option to specify the name of the Java class that is instantiated for the shim component of the driver. This class can be located in the <span class="filename">classes</span> directory as a class file, or in the <span class="filename">lib</span> directory as a <span class="filename">.jar</span> file. If this option is selected, the driver is running locally. Select this option to run the driver locally.</p>
+        </div>
+
+<p class="para">The Java class name is: <span class="filename">com.netiq.idm.driver.fanoutshim.FanoutDriverShim</span>.</p>
+<div class="formalpara" id="bs9f529">
+          <p class="title"><em class="title">Native:</em>
+          This option is not used with the JDBC Fanout driver.</p>
+        </div>
+
+<div class="formalpara" id="bs9f5ik">
+          <p class="title"><em class="title">Connect to Remote Loader:</em>
+          This option is not valid for this driver.</p>
+        </div>
+
+<div class="formalpara">
+          <p class="title"><em class="title">Name:</em>
+          Displays the java class name.</p>
+        </div>
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Although <span class="guimenu">Driver Object Password</span> option is editable, this parameter is not applicable for the Fanout driver.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ijrhwa">
+
+<h2 class="title h2"><span class="number">B.1.2</span> Authentication</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The authentication section describes the parameters required for authentication to the connected Active MQ.</p>
+<div class="formalpara">
+          <p class="title"><em class="title">Connection Information (Designer only):</em>
+          Specify the IP address or name of the server the application shim should communicate with. Use the syntax: <span class="filename">protocol://host:port</span>. For example, tcp://192.99.162.46:61616</p>
+        </div>
+
+<div class="formalpara">
+          <p class="title"><em class="title">Driver Cache Limit (kilobytes):</em>
+          Specify the maximum event cache file size (in KB). If it is set to zero, the file size is unlimited. select <span class="guimenu">Unlimited</span> option to set the file size to unlimited in Designer.</p>
+        </div>
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Although <span class="guimenu">Application Authentication ID</span> and <span class="guimenu">Set Password</span> options are editable, these parameters are not applicable for the Fanout driver.</p>
+<p class="para">The Remote Loader options do not apply to the Fanout driver. This driver uses the Fanout agent component to create multiple JDBC Fanout driver instances.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ijrhwb">
+
+<h2 class="title h2"><span class="number">B.1.3</span> Startup Option</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Startup Option section allows you to set the driver state when the Identity Manager server is started.</p>
+<div class="formalpara" id="bs9f7v9">
+          <p class="title"><em class="title">Auto start:</em>
+          The driver starts every time the Identity Manager server is started.</p>
+        </div>
+
+<div class="formalpara" id="bs9f817">
+          <p class="title"><em class="title">Manual:</em>
+          The driver does not start when the Identity Manager server is started. The driver must be started through Designer or Identity Console.</p>
+        </div>
+
+<div class="formalpara" id="bs9f86n">
+          <p class="title"><em class="title">Disabled:</em>
+          The driver has a cache file that stores all of the events. When the driver is set to Disabled, this file is deleted and no new events are stored in the file until the driver state is changed to Manual or Auto Start.</p>
+        </div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ijrhwc">
+
+<h2 class="title h2"><span class="number">B.1.4</span> Driver Parameters</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Driver Parameters section lets you configure the driver-specific parameters. When you change driver parameters, you tune driver behavior to align with your network environment.</p>
+<p class="para">The parameters are presented by category:</p>
+<div class="container sect3" id="b1ijrhwd">
+
+<h3 class="title h3">Driver Settings</h3>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Fanout transport related parameters:</em>
+            Select <span class="guimenu">Show</span> to view the transport related parameters for Fanout driver.</p>
+          </div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Show Subscriber Event Queue parameters:</em>
+            Select <span class="guimenu">Show</span> to view the Subscriber event parameters. The options are:</p>
+          </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">SEND:</em>
+                The driver uses this queue for sending the Subscriber events to the Fanout agent.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">RECV:</em>
+                The driver uses this queue for receiving the Subscriber events from the Fanout agent.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">DELAYED RECV:</em>
+                This driver uses this queue for receiving the delayed Subscriber events from the Fanout agent.</p>
+              </div>
+</li></ul></div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Show Configuration Queue Parameters:</em>
+            Select <span class="guimenu">Show</span> to view the configuration queue parameters. The options are SEND and RECV.</p>
+          </div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Show Query-in Queue Parameters:</em>
+            Select <span class="guimenu">Show</span> to view the query-in queue parameters. The options are SEND and RECV.</p>
+          </div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Show Query-out Queue Parameters:</em>
+            Select <span class="guimenu">Show</span> to view the query-out queue parameters. The options are SEND and RECV.</p>
+          </div>
+
+<p class="para">The Fanout agent creates queues for each connection instance. It uses these queues to send events to individual connection instances. These queues act as event caches (at Fanout agent level) for the connection instances.</p>
+<div class="formalpara">
+            <p class="title"><em class="title">Show Other Parameters:</em>
+            Select <span class="guimenu">Show</span> to view the additional parameters.</p>
+          </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Configuration batch size:</em>
+                Specifies the batch size for the driver configuration document. The value ranges from 1 - 99999.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Show Fanout Parameters:</em>
+                Select <span class="guimenu">Show</span> to view the Fanout connection related information such as Fanout agent password, configuration information, Fanout agent shim password.</p>
+              </div>
+</li></ul></div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Fanout Shim Password:</em>
+                Specifies the password for the Fanout driver shim. After successful authentication, the Fanout agent loads/creates the driver instances of the specified shim class name.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Fanout Agent Password:</em>
+                Specifies the password for the Fanout agent you are connecting to. The Fanout agent establishes connection only after a valid authentication.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Encryption Key:</em>
+                Specifies the key to encrypt/decrypt the sensitive data before sending to the message queue(s).</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">AMQ Keystore Key:</em>
+                Specifies the full path to the keystore file.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">AMQ Keystore Password:</em>
+                Specifies the keystore password.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">AMQ Truststore Path for SSL Certs:</em>
+                Specifies the full path to the truststore file.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">AMQ Truststore Password:</em>
+                Specifies the truststore password.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Secure Protocol Version:</em>
+                Specifies the version of the TLS protocol that the driver uses to connect to the Identity Manager engine. Identity Manager supports TLSv1, TLSv1_1, and TLSv1_2.</p>
+              </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>This parameter is included in Fanout driver 1.1.</p></div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Enforce Suite B:</em>
+                Specifies whether the driver uses Suite B for establishing communication with ActiveMQ. When Suite B is enabled, the communication is authenticated with Suite B cryptographic algorithms. This communication is supported only on TLS 1.2 protocol.</p>
+              </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>This parameter is included in Fanout driver 1.1.</p></div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Fanout Shim classname:</em>
+                Specifies the driver shim classname that the Fanout agent loads when you start the a Fanout driver.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Matching Attributes:</em>
+                Used by the Fanout agent to match the objects in the delayed add events. This parameter must be schema-mapped equivalent of the attributes that are used in the object matching policy. If you are using different attributes, specify the attribute names according to the connected system schema.</p>
+              </div>
+</li></ul></div>
+
+</div>
+
+<div class="container sect3" id="b1ijrhwe">
+
+<h3 class="title h3">Normal JDBC Driver Settings</h3>
+
+<p class="para">For the normal JDBC driver setting, see <a href="../../jdbc/data/how-to-configure-jdbc-driver.html#b4m4h9a" class="ulink">Driver Parameters</a> from the <a href="https://www.netiq.com/documentation/idm45drivers/jdbc/data/bookinfo.html" class="ulink">JDBC Driver Guide</a>.</p>
+</div>
+
+<div class="container sect3" id="b1ijrhwf">
+
+<h3 class="title h3">Subscriber Settings</h3>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Disable Subscriber:</em>
+            Select no (default) to allow flow of events from Identity Manager engine to the connected database.</p>
+          </div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Show primary key parameters:</em>
+            Select <span class="guimenu">Show</span> if you want to configure the primary key parameters.</p>
+          </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Generation/retrieval method (table-global):</em>
+                Select the desired option to generate/retrieve the primary key values. This setting is global for all tables and views. The options are as follows:</p>
+              </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">subscription event (default)</p></li>
+<li class="listitem">
+<p class="listitem">subscriber-generated</p></li>
+<li class="listitem">
+<p class="listitem">auto-generated / identity column</p></li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Retrieval timing (table-global):</em>
+                Select the desired option to retrieve the primary key value. This setting is global for all tables and views. The options are:</p>
+              </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">before row insertion (default)</p></li>
+<li class="listitem">
+<p class="listitem">after row insertion</p></li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                <p class="title"><em class="title">Method and timing (table-global):</em>
+                Specify how and when the primary key values are generated or retrieved on a per table or view basis. This parameter overrides global method and timing settings. Use semicolon, comma, or space as the delimiter for multiple values. For example: <span class="literal">usr("?=indirect.proc_idu()"); grp("indirect.proc_idg(idg)")</span>.</p>
+              </div>
+</li></ul></div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Disable statement-level locking:</em>
+            Select the appropriate option to disable statement locking. This option determines if explicit locking or database resources are disabled on the Subscriber channel. The default value is set to no.</p>
+          </div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Check update counts:</em>
+            Select yes to enable the Subscriber channel to check for any updates after any of the insert, update, or delete statements are executed against the tables. This option ensures that the statements are resulting in updating the database. The default value is set to yes.</p>
+          </div>
+
+<div class="formalpara">
+            <p class="title"><em class="title">Query TimeOut (in minutes):</em>
+            Specify the time in minutes that the driver waits for a response from the Fanout agent when the driver issues a query to the agent. The default value is 1 minute.</p>
+          </div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ijrhwh">
+
+<h2 class="title h2"><span class="number">B.1.5</span> ECMA Script</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Displays an ordered list of ECMAScript resource files. The files contain extension functions for the driver that Identity Manager loads when the driver starts. You can add additional files, remove existing files, or change the order the files are executed.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ijrhwi">
+
+<h2 class="title h2"><span class="number">B.1.6</span> Global Configuration</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Displays an ordered list of Global Configuration objects. The objects contain extension GCV definitions for the driver that Identity Manager loads when the driver is started. You can add or remove the Global Configuration objects, and you can change the order in which the objects are executed.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

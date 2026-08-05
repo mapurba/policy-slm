@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="token-substitution-for-jdbc-driver,embed-sql-statements-in-xds-events-for-jdbc-driver,basics-of-embedded-sql-for-jdbc-driver,set-virtual-triggers-for-jdbc-drivers,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Token Substitution - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="token-substitution-for-jdbc-driver">
+
+<h1 class="title h1"><span class="number">12.3</span> Token Substitution</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Rather than require you to parse field values from an association, the Subscriber channel supports token substitution in embedded SQL statements. In the following examples, tokens and the values they reference are bolded:</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;modify class-name="usr"&gt;
+        &lt;association&gt;idu=1,table=usr,schema=indirect&lt;/association&gt;
+        &lt;modify-attr name="lname"&gt;
+            &lt;add-value&gt;
+                &lt;value&gt;DoeRaeMe&lt;/value&gt;
+            &lt;/add-value&gt;
+        &lt;/modify-attr&gt;
+    &lt;/modify&gt;
+    &lt;jdbc:statement&gt;
+           &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE
+                     idu = <span class="strong">{$idu}</span>&lt;/jdbc:sql&gt;
+    &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">Token placeholders must adhere to the XSLT attribute value template syntax <span class="literal">{</span>$<span class="replaceable">field-name</span><span class="literal">}</span>. Also, the referenced association element must precede the <span class="literal">&lt;jdbc:statement&gt;</span> element in the XDS document, or must be present as a child of the <span class="literal">&lt;jdbc:statement&gt;</span> element. Alternatively, instead of copying the association element as child of the <span class="literal">&lt;jdbc:statement&gt;</span> element, you could copy the <span class="literal">src-entry-id</span> of the element containing the association element onto the &lt;jdbc:statement&gt; element. Both approaches are bolded in the following examples:</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;modify class-name="usr"&gt;
+        &lt;association&gt;idu=1,table=usr,schema=indirect&lt;/association&gt;
+        &lt;modify-attr name="lname"&gt;
+            &lt;add-value&gt;
+                &lt;value&gt;DoeRaeMe&lt;/value&gt;
+            &lt;/add-value&gt;
+        &lt;/modify-attr&gt;
+    &lt;/modify&gt;
+    &lt;jdbc:statement&gt;
+           &lt;<span class="strong">association&gt;idu=1,table=usr,schema=indirect&lt;/association</span>&gt;
+           &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE
+                     idu = {$idu}&lt;/jdbc:sql&gt;
+    &lt;/jdbc:statement&gt;</pre><pre class="screen">&lt;/input&gt;</pre><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;modify class-name="usr" <span class="strong">src-entry-id="0"</span>&gt;
+        &lt;association&gt;idu=1,table=usr,schema=indirect&lt;/association&gt;
+        &lt;modify-attr name="lname"&gt;
+            &lt;add-value&gt;
+                &lt;value&gt;DoeRaeMe&lt;/value&gt;
+            &lt;/add-value&gt;
+        &lt;/modify-attr&gt;
+    &lt;/modify&gt;
+    &lt;jdbc:statement <span class="strong">src-entry-id="0"</span>&gt;
+           &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE
+                     idu = {$idu}&lt;/jdbc:sql&gt;
+    &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">The <span class="literal">{</span><span class="replaceable">$field-name</span><span class="literal">}</span> token must refer to one of the naming RDN attribute names in the association value. The above examples have only one naming attribute: <span class="literal">idu</span>.</p>
+<p class="para">An <span class="literal">&lt;add&gt;</span> event is the only event where an association element is not required to precede embedded SQL statements with tokens because the association has not been created yet. Additionally, any embedded SQL statements using tokens must follow, not precede, the <span class="literal">&lt;add&gt;</span> event. For example:</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+     &lt;add class-name="usr"&gt;
+          &lt;add-attr name="lname"&gt;
+               &lt;value&gt;Doe&lt;/value&gt;
+          &lt;/add-attr&gt;
+     &lt;/add&gt;
+     &lt;jdbc:statement&gt;
+          &lt;jdbc:sql&gt;UPDATE indirect.usr SET fname = 'John' WHERE
+                    idu = {$idu}&lt;/jdbc:sql&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">To prevent tracing of sensitive information, you can use the <span class="literal">{$$password}</span> token to refer to the contents of the immediately preceding <span class="literal">&lt;password&gt;</span> element within the same document. In the following example, the password token and the value it refers to are bolded:</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+     &lt;add class-name="usr"&gt;
+          &lt;password&gt;some <span class="strong">password</span>&lt;/password&gt;
+          &lt;add-attr name="fname"&gt;
+              &lt;value&gt;John&lt;/value&gt;
+          &lt;/add-attr&gt;
+          &lt;add-attr name="lname"&gt;
+              &lt;value&gt;Doe&lt;/value&gt;
+          &lt;/add-attr&gt;
+     &lt;/add&gt;
+     &lt;jdbc:statement&gt;
+          &lt;jdbc:sql&gt;CREATE USER jdoe IDENTIFIED BY
+                    <span class="strong">{$$password}</span>&lt;/jdbc:sql&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">Furthermore, you can also refer to the driverâs database authentication password specified by the Application Password parameter as <span class="literal">{$$$driver-password}</span>. See <a href="jdbc-driver-parameters.html#bvqz3f5" class="xref">Application Password</a>. Named password substitution is not yet supported.</p>
+<p class="para">Just as with association elements, the referenced password element must precede the <span class="literal">&lt;jdbc:statement&gt;</span> element in the XDS document or must be present as a child of the <span class="literal">&lt;jdbc:statement&gt;</span> element. Alternatively, instead of copying the password element as child of the <span class="literal">&lt;jdbc:statement&gt;</span> element, you could copy the <span class="literal">src-entry-id</span> of the element containing the password element onto the <span class="literal">&lt;jdbc:statement&gt;</span> element. Both approaches are bolded in the following examples:</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+     &lt;add class-name="usr"&gt;
+          &lt;password&gt;some password&lt;/password&gt;
+          &lt;add-attr name="fname"&gt;
+              &lt;value&gt;John&lt;/value&gt;
+          &lt;/add-attr&gt;
+          &lt;add-attr name="lname"&gt;
+              &lt;value&gt;Doe&lt;/value&gt;
+          &lt;/add-attr&gt;
+     &lt;/add&gt;
+     &lt;jdbc:statement&gt;
+          &lt;<span class="strong">password&gt;some password&lt;/password</span>&gt;
+          &lt;jdbc:sql&gt;CREATE USER jdoe IDENTIFIED BY
+                    {$$password}&lt;/jdbc:sql&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+     &lt;add class-name="usr" <span class="strong">src-entry-id="0"</span>&gt;
+          &lt;password&gt;some password&lt;/password&gt;
+          &lt;add-attr name="fname"&gt;
+              &lt;value&gt;John&lt;/value&gt;
+          &lt;/add-attr&gt;
+          &lt;add-attr name="lname"&gt;
+              &lt;value&gt;Doe&lt;/value&gt;
+          &lt;/add-attr&gt;
+     &lt;/add&gt;
+     &lt;jdbc:statement<span class="strong"> src-entry-id="0"</span>&gt;
+          &lt;jdbc:sql&gt;CREATE USER jdoe IDENTIFIED BY
+                    {$$password}&lt;/jdbc:sql&gt;
+     &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-create-jdbc-fan-out-driver-object-in-designer,how-to-create-new-jdbc-fan-out-agent,how-to-create-new-jdbc-fan-out-agent,how-to-activate-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Creating a Fanout Driver Object in Designer - NetIQ Identity Manager Driver for JDBC Fanout Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-create-jdbc-fan-out-driver-object-in-designer">
+
+<h1 class="title h1"><span class="number">4.1</span> Creating a Fanout Driver Object in Designer</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Creating the driver includes installing the Fanout driver packages and then modifying the configuration to suit your environment.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9ihr" class="xref">Importing the Driver Packages</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9ihs" class="xref">Installing the Driver Packages</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9iht" class="xref">Configuring the Driver Object</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9ihu" class="xref">Configuring the Database Connections for the Driver</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9ihv" class="xref">Deploying the Driver Object</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9j9g" class="xref">Starting the Driver</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9j9f" class="xref">Managing the Connection Objects</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ij9ihr">
+
+<h2 class="title h2"><span class="number">4.1.1</span> Importing the Driver Packages</h2>
+
+<div class="content_wrapper">
+
+<p class="para">You can update the driver packages at any time.The driver packages are stored in the Package Catalog. Packages are initially imported into the Package Catalog when you create, import, or convert a project. Ensure that you import the latest packages into the Package Catalog before installing the driver.</p>
+<div class="procedure" id="b1hukmje"><p class="title">To verify the latest packages in the Package Catalog:</p>
+<ol class="steps">
+<li class="step" id="b1hukqhf">
+<p class="para">Open Designer.</p></li>
+<li class="step" id="b1hukqiy">
+<p class="para">In the toolbar, click <span class="guimenu">Help</span> &gt; <span class="guimenu">Check for Package Updates</span>.</p></li>
+<li class="step" id="b1hukqkf">
+<p class="para">Click <span class="guimenu">OK</span> to import the package updates.</p>
+<p class="para">If prompted to restart Designer for the changes to take effect, click <span class="guimenu">Yes</span>, save your project, and then wait for the Designer to restart.</p>
+<p class="para">or</p>
+<p class="para">Click <span class="guimenu">OK</span> if there are no package updates.</p></li>
+<li class="step" id="b1hukqsi">
+<p class="para">Continue with <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9ihs" class="xref">Installing the Driver Packages</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ij9ihs">
+
+<h2 class="title h2"><span class="number">4.1.2</span> Installing the Driver Packages</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="t41vmeivl569">
+<ol class="steps">
+<li class="step">
+<p class="para">In Designer, open your project.</p></li>
+<li class="step">
+<p class="para">In the Modeler, drag and drop a supported JDBC database from the Designer palette.</p>
+<p class="para">For example, Oracle. For information about supported databases, see <a href="supported-jdbc-fanout-databases.html" class="xref">Supported Databases</a>.</p></li>
+<li class="step">
+<p class="para">Select the Fanout Base from the list of available base packages, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">Select the <span class="guimenu">Synchronization Mode</span>. For more information, see <a href="supported-jdbc-fan-out-operations.html#b1ijodhb" class="xref">Data Synchronization</a>.</p></li>
+<li class="step">
+<p class="para">Select the optional features to install for the Fanout driver, then click <span class="guimenu">Next</span>.</p>
+<p class="para">All options are selected by default. The options are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Entitlements Support:</em>
+                  These packages contain the policies that provision the user accounts on the connected database. For more information, see the <span class="citetitle"><a href="../../../identity-manager-48/entitlements/data/identity-manager-entitlements.html#identity-manager-entitlements" class="ulink">NetIQ Identity Manager Entitlements Guide</a></span>.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Data Collection:</em>
+                  These packages contain the policies that enable the driver to collect data for reports. If you are using Identity Reporting, ensure that this option is selected. For more information, see <span class="citetitle"><a href="../../../identity-manager-48/report_descriptions/data/bookinfo.html#bookinfo" class="ulink">NetIQ Identity Reporting: Userâs Guide to Running Reports</a></span>.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Account Tracking:</em>
+                  These packages contain the policies that enable account tracking information for reports. If you are using Identity Reporting, ensure that this option is selected. For more information, see <span class="citetitle"><a href="../../../identity-manager-48/report_descriptions/data/bookinfo.html#bookinfo" class="ulink">NetIQ Identity Reporting: Userâs Guide to Running Reports</a></span>.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step">
+<p class="para">(Conditional) If there are package dependencies for the packages you selected to install for this driver, you must install them to install the selected package. Click <span class="guimenu">OK</span> to install the package dependency listed.</p></li>
+<li class="step">
+<p class="para">(Conditional) If more than one type of package dependency is installed, Designer displays separate configuration pages for each package. Click <span class="guimenu">OK</span> to install any additional package dependencies.</p></li>
+<li class="step" id="b1hukwmk">
+<p class="para">(Conditional) The Common Settings page is displayed only when the Common Settings package is installed as a dependency. On the Install Common Settings page, specify the common settings for User and Group containers:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b1hukufd">
+                  <p class="title"><em class="title">User Container:</em>
+                  Select the Identity Vault container where the user accounts will be added in the Identity Vault. This value becomes the default for all drivers in the driver set.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b1hukugx">
+                  <p class="title"><em class="title">Group Container:</em>
+                  Select the Identity Vault container where the groups will be added in the Identity Vault. This value becomes the default for all drivers in the driver set.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Next</span>.</p>
+<p class="para">When all dependencies are installed, you must configure the components.</p></li>
+<li class="step">
+<p class="para">On the Driver Information page, specify a name for the driver that is unique within the driver set, and then click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">On the Application Authentication page, fill in the following information:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Connection Information:</em>
+                  Specify the URL of the ActiveMQ instance to which this driver connects to. For example, <span class="filename">tcp://111.1.1.1:61616</span>.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Synchronization Filter:</em>
+                  Select the synchronization filter. For more information, see <a href="../../jdbc/data/configure-jdbc-driver-specific-parameters.html#b1pu3k1" class="ulink">Database Scoping Parameters</a> from the <a href="../../jdbc/data/netiq-identity-manager-driver-for-jdbc.html#netiq-identity-manager-driver-for-jdbc" class="ulink">NetIQ Identity Manager Driver for JDBC Implementation Guide</a>.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Synchronization Model:</em>
+                  Select the synchronization model based on the synchronization mode specified in Step 4.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step">
+<p class="para">Do not change the default values of the remaining parameters on this page, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">On the Entitlements Information page, specify a name for the <span class="guimenu">Account Entitlement Value</span> field, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Data Collection and Account Tracking groups of packages. On the Managed System Information page, fill in the following fields to define your connected database application:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b1hukr9k">
+                  <p class="title"><em class="title">Name:</em>
+                  Specify a descriptive name for the connected database application. The name is displayed in reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b1hukrb2">
+                  <p class="title"><em class="title">Description:</em>
+                  Specify a brief description for the connected database application. The description is displayed in reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b1hukrcy">
+                  <p class="title"><em class="title">Location:</em>
+                  Specify the physical location of the connected database application. The location is displayed in reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b1hukreh">
+                  <p class="title"><em class="title">Vendor:</em>
+                  Specify the vendor of the connected database application. This information is displayed in reports.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b1hukrfx">
+                  <p class="title"><em class="title">Version:</em>
+                  Specify the version of the connected database application. The version is displayed in reports.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Managed System packages and the Account Tracking packages. On the Install Managed System Information page, fill in the following fields to define the classification of the connected database application. This information is displayed in the reports. The options are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b1hukrje">
+                  <p class="title"><em class="title">Classification:</em>
+                  Select the classification of the connected database application. This information is displayed in the reports. Your options are:</p>
+                </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Mission-Critical</p></li>
+<li class="listitem">
+<p class="listitem">Vital</p></li>
+<li class="listitem">
+<p class="listitem">Not-Critical</p></li>
+<li class="listitem">
+<p class="listitem">Other</p>
+<p class="listitem">If you select <span class="guimenu">Other</span>, you must specify a custom classification for the JDBC system.</p></li></ul></div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b1hukrql">
+                  <p class="title"><em class="title">Environment:</em>
+                  Select the type of the connected database application environment. The options are:</p>
+                </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Development</p></li>
+<li class="listitem">
+<p class="listitem">Test</p></li>
+<li class="listitem">
+<p class="listitem">Staging</p></li>
+<li class="listitem">
+<p class="listitem">Production</p></li>
+<li class="listitem">
+<p class="listitem">Other</p>
+<p class="listitem">If you select <span class="guimenu">Other</span>, you must specify a custom classification for the database application.</p></li></ul></div>
+
+<p class="listitem">Click <span class="guimenu">Next</span>.</p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Data Collection and Account Tracking groups of packages. Fill in the following fields to define the ownership of the connected database application:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Business Owner:</em>
+                  Select a user object in the Identity Vault that is the business owner of the database application. This can only be a user object, not a role, group, or container.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Application Owner:</em>
+                  Select a user object in the Identity Vault that is the application owner of the database application. This can only be a user object, not a role, group, or container.</p>
+                </div>
+</li></ul></div>
+
+<p class="para">Click <span class="guimenu">Next</span>.</p></li>
+<li class="step">
+<p class="para">(Conditional) This page is displayed only if you selected to install the Account Tracking groups of packages. On the Account Tracking Initial Configuration page, fill in the following fields:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Fanout Database Type:</em>
+                  Select the required database. The Fanout supports databases such as, MySQL, SQL Server, Sybase, and Oracle.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Synchronization Model:</em>
+                  Specify the mode of data synchronization.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">User Table:</em>
+                  This field is populated based on your selection in the <span class="guimenu">Synchronization Model.</span> Specify the table or view in the connected database for which account tracking is enabled. By default, the value is <span class="literal">usr</span>.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Realm:</em>
+                  Specify the name of the realm that uniquely identifies the location of user accounts in the connected database. For example, <span class="filename">mysql.indirect.usr</span>, where mysql is the database name with the indirect data synchronization model, and user is the table or view in the connected database for which account tracking is enabled.</p>
+                </div>
+
+<p class="listitem">Click <span class="guimenu">Next</span>.</p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">Review the summary of tasks that will be completed to create the driver, then click <span class="guimenu">Finish</span>.</p></li></ol>
+</div>
+
+<p class="para">The driver is now created. To modify the configuration settings, proceed to the <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9iht" class="xref">Configuring the Driver Object</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ij9iht">
+
+<h2 class="title h2"><span class="number">4.1.3</span> Configuring the Driver Object</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After importing the packages and creating the driver object, configure the driver to make it operational. Many settings are available to help you customize and optimize the driver. However, you should first configure the driver parameters located on the Driver Configuration page.</p>
+<div class="procedure" id="t41vmeivlcw2">
+<ol class="steps">
+<li class="step">
+<p class="para">In Designer, open your project.</p></li>
+<li class="step">
+<p class="para">In the Modeler, right-click the driver icon or the driver line, then select <span class="guimenu">Properties</span>.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Driver Configuration</span> and select the <span class="guimenu">Driver Parameters</span> tab.</p></li>
+<li class="step">
+<p class="para">In the <span class="guimenu">Driver Options</span> tab, specify the queue names in the <span class="guimenu">Transport</span> parameters. The different queues are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Subscriber Event Queues (SEND/RECV/DELAYED):</em>
+                  The driver uses these queues to send the Subscriber events to the Fanout agent and receive the status of these events. </p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Configuration Queues (SEND/RECV):</em>
+                  The driver uses these queues for sending the driver initialization documents and exchanging the handshake documents with the Fanout agent.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Query-In Queues (SEND/RECV):</em>
+                  The driver uses these queues to receive the queries from the Fanout agent and sends the response of the queries to the Fanout agent.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Query-Out Queues (SEND/RECV):</em>
+                  The driver uses these queues to send the queries to the Fanout agent and receive the response of the queries from the Fanout agent.</p>
+                </div>
+</li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you specified a different name for the queues in these parameters, ensure that the same queue name is used during Fanout agent configuration.</p></div>
+</li>
+<li class="step">
+<p class="para">In the <span class="guimenu">Fanout Agent Configuration Parameters</span>, fill in the following information:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Fanout Shim Password:</em>
+                  Click <span class="guimenu">Set Password</span> to specify the Fanout shim password.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Fanout Agent Password:</em>
+                  Click <span class="guimenu">Set Password</span> to specify the Fanout agent password.</p>
+                </div>
+
+<p class="listitem">The Fanout driver uses these passwords for performing handshake with the Fanout agent.</p></li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Encryption Key:</em>
+                  Click <span class="guimenu">Set Password</span> to specify the key to encrypt or decrypt the sensitive data before sending the data to the message queues.</p>
+                </div>
+</li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Ensure that you provide the same value for the Fanout agent and shim passwords and the encryption key. The default passwords are <span class="guimenu">netiq</span>.</p></div>
+</li>
+<li class="step">
+<p class="para">To enable the SSL communication between the Fanout driver and ActiveMQ, specify the following information:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">AMQ Keystore Path:</em>
+                  The full path to the keystore file. For example, <span class="filename">/root/amq-clients.ks</span>.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">AMQ Keystore Password:</em>
+                  The password used by the keystore.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">AMQ Truststore Path for SSL Certs:</em>
+                  The full path to the truststore file. For example, <span class="filename">/root/amq-clients.ts</span>.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">AMQ Truststore Password:</em>
+                  The password used by the truststore.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Secure Protocol Version:</em>
+                  Specifies the version of the TLS protocol that the driver uses to connect to the Identity Manager engine. Identity Manager supports TLSv1, TLSv1_1, and TLSv1_2.</p>
+                </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>This parameter is included in Fanout driver 1.1.</p></div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Enforce Suite B:</em>
+                  Specifies whether the driver should use Suite B for establishing communication with ActiveMQ. When Suite B is enabled, the communication is authenticated with Suite B cryptographic algorithms. This communication is supported only on TLS 1.2 protocol.</p>
+                </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>This parameter is included in Fanout driver 1.1.</p></div>
+</li></ul></div>
+
+<p class="para">For more information about securing communication, see <a href="how-to-establish-ssl-communication-between-identity-manager-and-jdbc-fan-out-driver.html" class="xref">Section 6.0, Securing Fanout Driver Communication</a>.</p></li>
+<li class="step">
+<p class="para">Do not change the default value of <span class="guimenu">Fanout Shim classname</span>.</p></li>
+<li class="step">
+<p class="para">Do not change the default value of <span class="guimenu">Matching Attributes</span>.</p>
+<p class="para">The Fanout agent uses <span class="guimenu">Matching Attributes</span> to match the objects in the delayed add events. This parameter must be schema-mapped equivalent of the attributes that are used in the object matching policy. If you are using different attributes, specify the attribute names according to the connected system schema.</p></li>
+<li class="step">
+<p class="para">The <span class="guimenu">Normal JDBC Driver settings</span> section for the Fanout driver is similar to the JDBC driver. For more information about these parameters, see <a href="../../jdbc/data/how-to-configure-jdbc-driver.html#b4m4h9a" class="ulink">Driver Parameters</a> in the <a href="../../jdbc/data/netiq-identity-manager-driver-for-jdbc.html#netiq-identity-manager-driver-for-jdbc" class="ulink">NetIQ Identity Manager Driver for JDBC Implementation Guide</a>.</p></li></ol>
+</div>
+
+<p class="para">After completing the configuration tasks, continue with <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1ij9ihu" class="xref">Configuring the Database Connections for the Driver</a>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ij9ihu">
+
+<h2 class="title h2"><span class="number">4.1.4</span> Configuring the Database Connections for the Driver</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Designer lets you configure multiple database connections for the Fanout driver. Each JDBC driver instance loaded by the Fanout agent uses this information to connect to the database and for tracing purposes.</p>
+<p class="para">Alternatively, you can run the <span class="literal">createConnLDIF</span> script to create an LDIF file that includes the connection objects for the Fanout driver. However, you can run the script only after deploying the driver. For more information, see <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1imqqix" class="xref">Configuring the Database Connections by Using the createConnLDIF Script</a>.</p>
+<p class="para">The advantage of using Designer is that it allows you to manage the connections after they are configured. If you use the <span class="literal">createConnLDIF</span> script for creating the connections, the script does not provide this flexibility. </p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1iog05u" class="xref">Configuring the Database Connections in Designer</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="how-to-create-jdbc-fan-out-driver-object-in-designer.html#b1imqqix" class="xref">Configuring the Database Connections by Using the createConnLDIF Script</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="b1iog05u">
+
+<h3 class="title h3">Configuring the Database Connections in Designer</h3>
+
+<div class="procedure" id="t41vmeivlklv">
+<ol class="steps">
+<li class="step">
+<p class="para">Open your project in Designer.</p></li>
+<li class="step">
+<p class="para">In the Modeler, right-click the driver icon and select <span class="guimenu">Fanout Configuration</span>.</p></li>
+<li class="step">
+<p class="para">Click <img src="../graphics/icon_plus_green_n.png" alt="" class="inline" /> icon to create a Fanout connection.</p></li>
+<li class="step">
+<p class="para">Specify the Fanout connection details:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                    <p class="title"><em class="title">Name:</em>
+                    Specify the name for the new connection.</p>
+                  </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>NetIQ restricts the connection object name to15 characters.</p></div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                    <p class="title"><em class="title">User:</em>
+                    Specify the user name with which the JDBC driver instance will authenticate to the database.</p>
+                  </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                    <p class="title"><em class="title">Connection Password:</em>
+                    Specify the password with which the JDBC driver instance will authenticate to the database</p>
+                  </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                    <p class="title"><em class="title">Server:</em>
+                    Specify the server with which the JDBC driver instance will connect to. For more information, see <a href="../../jdbc/data/supported-third-party-jdbc-drivers.html#bvx364n" class="ulink">JDBC URL Syntaxes</a> in the <a href="../../jdbc/data/netiq-identity-manager-driver-for-jdbc.html#netiq-identity-manager-driver-for-jdbc" class="ulink">NetIQ Identity Manager Driver for JDBC Implementation Guide</a>.</p>
+                  </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                    <p class="title"><em class="title">Trace Level:</em>
+                    Specify the trace level for the JDBC driver instance. This defines the level for logging the trace messages.</p>
+                  </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                    <p class="title"><em class="title">Trace File:</em>
+                    Specify the name of the trace file. This file includes the trace and debugging messages for the JDBC driver instance.</p>
+                  </div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>In order to have a single trace file for both database connection and the Fanout agent, configure them with the same trace file name.</p></div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                    <p class="title"><em class="title">Trace File Size:</em>
+                    Specify the trace file size. This defines the limit for the trace file.</p>
+                  </div>
+
+<p class="listitem">This parameter is not currently supported with the driver.</p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">Click <img src="../graphics/enable_disable_n.png" alt="" class="inline" /> icon to enable or disable the selected connection. By default, the connection is disabled.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Save</span> on the Designer toolbar.</p></li>
+<li class="step">
+<p class="para">(Conditional) To create multiple database connections for the Fanout configuration, repeat Step 3 through Step 6.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="b1imqqix">
+
+<h3 class="title h3">Configuring the Database Connections by Using the createConnLDIF Script</h3>
+
+<p class="para">After deploying the driver, you can run the <span class="filename">createConnLDIF</span> script to create an LDIF file that allows you to create multiple database connection objects. The <span class="filename">createConnLDIF</span> file is located in default installation path of the Fanout agent.</p>
+<div class="procedure" id="t41vmeivlsbo"><p class="title">To create a database connection:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">Create a CSV file with the required database connection information. A sample CSV file is located in the default installation directory of the Fanout agent. </p></li>
+<li class="step">
+<p class="para">Run the <span class="filename">createConnLDIF</span> script as follows:</p><pre class="screen"><span class="strong">createConnLDIF</span> [DriverDN in LDAP format] [input csv absolute file path] [output ldif absolute file path]</pre>
+<p class="para">This script creates the LDIF file in the specified location.</p></li>
+<li class="step">
+<p class="para">Import the LDIF file into eDirectory using any LDAP tool.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ij9ihv">
+
+<h2 class="title h2"><span class="number">4.1.5</span> Deploying the Driver Object</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After you create the driver in Designer, you can deploy the driver into the Identity Vault. </p>
+<div class="procedure" id="t41vmeivm01h"><p class="title">To deploy the driver:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">In Designer, open your project.</p></li>
+<li class="step">
+<p class="para">In the Modeler, right-click the driver icon or the driver line, then select <span class="guimenu">Live</span> &gt; <span class="guimenu">Deploy</span>.</p></li>
+<li class="step">
+<p class="para">If you are authenticated to the Identity Vault, skip to Step 5; otherwise, specify the following information:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Host:</em>
+                  Specify the IP address or DNS name of the server hosting the Identity Vault.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Username:</em>
+                  Specify the DN of the user object used to authenticate to the Identity Vault.</p>
+                </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+                  <p class="title"><em class="title">Password:</em>
+                  Specify the userâs password.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step">
+<p class="para">Click <span class="guimenu">OK.</span></p></li>
+<li class="step">
+<p class="para">Read through the deployment summary, and then click <span class="guimenu">Deploy</span>.</p></li>
+<li class="step">
+<p class="para">Read the success message, and then click <span class="guimenu">OK</span>.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Define Security Equivalence</span> to assign rights to the driver.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Exclude Administrative Roles</span> to exclude users that should not be synchronized.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">OK.</span></p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ij9j9g">
+
+<h2 class="title h2"><span class="number">4.1.6</span> Starting the Driver</h2>
+
+<div class="content_wrapper">
+
+<p class="para">After creating a driver, you must start it. Identity Manager is an event-driven system and starts caching the events once the driver is deployed. These events are processed when you start the driver.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>NetIQ recommends that you complete the Fanout agent configuration before starting the driver. For more information, see <a href="how-to-configure-fan-out-agent.html" class="xref">Section 3.0, Configuring the Fanout Agent</a>.</p></div>
+
+<div class="procedure" id="t41vmeivm7ra"><p class="title">To start the driver:</p>
+<ol class="steps">
+<li class="step">
+<p class="para">In Designer, open your project.</p></li>
+<li class="step">
+<p class="para">In the Modeler, right-click the driver icon <img src="../graphics/driver_icon_n.png" alt="" class="inline" /> or the driver line, then select <span class="guimenu">Live</span> &gt; <span class="guimenu">Start Driver</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1ij9j9f">
+
+<h2 class="title h2"><span class="number">4.1.7</span> Managing the Connection Objects</h2>
+
+<div class="content_wrapper">
+
+<p class="para">When you make changes to the connection objects and deploy the Fanout driver, you need not restart the driver. Depending on the connection object changes, the Fanout driver starts, stops, or restarts the JDBC driver instances.</p>
+<p class="para">When you add, modify, or delete a connection object, the Fanout driver sends the configuration update to the Fanout agent. Based on the changes made, the Fanout agent starts, stops, or restarts the corresponding JDBC driver instance.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>To detect the changes to the connection objects, Identity Manager provides two additional filter classes namely <span class="guimenu">DirXML-Resource</span> and <span class="guimenu">DirXML-Driver</span> in the default filter of the Fanout driver.</p></div>
+
+<p class="para">Ensure that you review the following notes before redeploying the Fanout driver:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">When you deploy the Fanout driver, all the connection objects are also deployed. If you perform any dynamic updates to the connection objects or if you create the connection object dynamically using Designer, NetIQ recommends that you deploy those connection objects separately to avoid the entire driver restart.</p></li>
+<li class="listitem">
+<p class="listitem">If you change the password for a connection object, the connection object must be deployed again. In this case, NetIQ recommends that you do not separately deploy or reconcile the named-passwords for the connection objects.</p></li>
+<li class="listitem">
+<p class="listitem">When you use Designer to delete an existing Fanout connection, the connection object is deleted only from Designer and it is not updated in the Identity Vault. To delete an existing Fanout connection object from the Identity Vault, use Identity Console to manually remove the connection object.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

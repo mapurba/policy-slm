@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="October 28 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4avmq7ea8tv,bookinfo,t4avmq7dc5us,t4avmq7f8jir,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Securing Communication - NetIQ Workday Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container chapter expanding expanded" id="t4avmq7ea8tv">
+
+<h1 class="title h1"><span class="number">7.0</span> Securing Communication</h1>
+
+<div class="content_wrapper">
+
+<p class="para">If the remote Web service you are accessing allows HTTPS connections, you can configure the driver to take advantage of this increased security.</p>
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Only certificates from Java keystore are accepted. So, make sure that the keystore of the certificates is a Java keystore and the Workday tenant SSL certificate is available in the Java keystore.</p></div>
+
+<p class="para">The communication between the Identity vault and Workday is established through the Subscriber and Publisher channels. To establish a secure communication between them, you need a trust store containing a certificate issued by the certificate authority that signed the serverâs certificate.</p>
+<p class="para">It is recommended to import the chain of CA certificates from issuer's trusted URL. Workday instance uses certificates from a trusted CA. For example, if Workday is using the certificates from Digicert (trusted CA), you must verify the authenticity of the certificates from the Digicertâs website before downloading and importing them into the Java Keystore.</p>
+<p class="para">For testing purposes, you can download the certificates from the browser directly but this is not recommended. In case you want to view and download the certificates from browser, perform the following steps:</p>
+<div class="procedure" id="t4avmq7eagjo">
+<ol class="steps">
+<li class="step">
+<p class="para">Enter the Workday login URL in your browser (for example Chrome), and click <span class="guimenu">Enter</span>.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Different browsers have different procedures to view the certificates. Steps 1 to 6 considers Chrome browser as an example.</p></div>
+</li>
+<li class="step">
+<p class="para">Click the lock icon near the browser, and select <span class="guimenu">Certificate (Valid)</span>. The certificate is displayed.</p></li>
+<li class="step">
+<p class="para">Click <span class="guimenu">Certification Path</span>. The Certification Path displays the hierarchical structure of the structure of all the certificates.</p></li>
+<li class="step">
+<p class="para">Select the root certificate (the top most parent certificate), and click <span class="guimenu">View Certificate</span>. The root certificate is displayed.</p></li>
+<li class="step">
+<p class="para">To save the certificate to your system, click <span class="guimenu">Details &gt; Copy to File &gt; Next &gt; Next</span>.</p></li>
+<li class="step">
+<p class="para">Enter a filename for the certificate and save it to a location as required.</p></li>
+<li class="step">
+<p class="para">Import the saved Workday tenant root CA certificate into your trust store or create a new trust store by entering the following command at the command prompt:</p><pre class="screen">keytool -import -file name_of_cert_file -trustcacerts -noprompt -keystore filename -storepass password </pre>
+<p class="para">For example:</p><pre class="screen">keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell</pre></li>
+<li class="step">
+<p class="para">Configure the driver to use the trust store you created in Step 1:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">In Identity Console, click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step">
+<p class="para">On the Driver Dashboard, click the driverâs icon.</p></li>
+<li class="step">
+<p class="para">Select the <span class="guimenu">Configuration</span> tab, then expand the <span class="guimenu">Driver Parameters</span> section.</p></li>
+<li class="step">
+<p class="para">On the <span class="guimenu">Driver Settings</span> tab, in <span class="guimenu">SSL Parameters</span> &gt; <span class="guimenu">Workday Keystore file</span> setting, specify the path to the trust store you created in Step 1.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Save.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

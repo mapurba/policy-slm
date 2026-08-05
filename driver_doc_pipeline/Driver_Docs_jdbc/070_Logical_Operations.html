@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="logical-operations-in-jdbc-driver,embed-sql-statements-in-xds-events-for-jdbc-driver,how-to-execute-ddl-statements-in-jdbc-driver,how-to-implement-the-set-password-with-embedded-sql,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Logical Operations - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="logical-operations-in-jdbc-driver">
+
+<h1 class="title h1"><span class="number">12.10</span> Logical Operations</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Because it is not generally possible to mix DML and DDL statements in a single transaction, a single event can consist of one or more transactions. You can use the <span class="literal">jdbc:op-id</span> and <span class="literal">jdbc:op-type</span> to group multiple transactions together into a single logical operation. When grouped in this way, all members of the operation are handled as a single unit with regard to status. If one member has an error, all members return the same status level. Similarly, all members share the same status type.</p><pre class="screen">&lt;input xmlns:jdbc="urn:dirxml:jdbc"&gt;
+    &lt;add class-name="usr" <span class="strong">jdbc:op-id="0"</span> 
+                          <span class="strong">jdbc:op-type="password-set-operation"</span>&gt;
+        &lt;add-attr name="fname"&gt;
+            &lt;value&gt;John&lt;/value&gt;
+        &lt;/add-attr&gt;
+        &lt;add-attr name="lname"&gt;
+            &lt;value&gt;Doe&lt;/value&gt;
+        &lt;/add-attr&gt;
+        &lt;password&gt;Doe{$idu}&lt;/password&gt;
+    &lt;/add&gt;
+    &lt;jdbc:statement <span class="strong">jdbc:op-id="0"</span>&gt;
+        &lt;jdbc:sql&gt;CREATE USER jdoe IDENTIFIED BY {$$password}
+        &lt;/jdbc:sql&gt;
+    &lt;/jdbc:statement&gt;
+&lt;/input&gt;</pre>
+<p class="para">The <span class="literal">jdbc:op-type</span> attribute is ignored on all elements except the first element in a logical operation.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

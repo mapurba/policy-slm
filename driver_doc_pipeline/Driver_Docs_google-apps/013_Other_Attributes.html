@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g4eq7a6,t4cb3g4da6yy,t4cb3g4en7k4,t4cb3g4etjrn,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Other Attributes - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4cb3g4eq7a6">
+
+<h1 class="title h1"><span class="number">3.6</span> Other Attributes</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Several attributes are exposed for the Google Schema that the driver can use to make settings in GÂ Suite. The following table summarizes these attributes and provides an example of the settings.</p>
+<div class="table" id="t4cb3g4er9rn"><p class="title"><em class="num">Table 3-5 </em>Other Google Schema Attributes</p>
+<table class="topbot" width="100%"><col width="34%" /><col width="66%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Example DOM and Notes</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">CN</span>
+                </p>
+<p class="para">User Object.Â This attribute is mapped to Googleâs UserName.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">In GÂ Suite the UserName is the userâs primary email address name unless you use the GMailSettingsSendAs attribute to change it. TheÂ default driver config uses the source name of theÂ user object (naming value of the user) and then adds the primary GÂ Suite email domain name (i.e.Â <a href="mailto:user@mycompany.com" class="ulink">user@mycompany.com</a>).Â </p>
+<p class="para">In a multi-domain environment, you must set the userâs CN value to the domain in which you wish to create the user in the form of the email address (user@domainname.org).Â </p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">Permission</span>
+                </p>
+<p class="para">This attribute is set on Group objects during creation.Â This isÂ aÂ GCV setting that can be overwritten in the Create Rule.Â Â Â  Â </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="screen">
+&lt;add-attr attr-name="Permission"&gt;
+Â Â Â Â Â Â Â Â Â  &lt;value&gt;Owner&lt;value&gt;
+&lt;/add-attr&gt;
+</pre>
+<p class="para">Valid values are: Owner, Member,Â Domain, Anyone</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">Example DOM and Notes</span>
+                </p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">Assistant &amp; Manager</span>
+                </p>
+<p class="para">These are not special attributes but do not have theÂ same behavior as other drivers.Â Â  Â </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Assistant and Manager will only synchronize a DN (\\tree\org\user\myname) value to GÂ Suite unless a transformation is written (typically in the output transformation) that will query back for the information you want to send to GÂ Suite.Â This is information that will show up on the Google Contacts. For instance, if you would like the Manager or Assistants email address you would have to write a policy that would trigger on the Assistant/Manager attribute and then query back using the DN value for the Internet Email Address and finally reformat the attribute.Â  Â Â </p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">DirXMLGAGroupEMailAddress</span>
+                </p>
+<p class="para">This attribute is required on the Group object for sync to GÂ Suite.Â </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="screen">
+&lt;add-attr attr-name="DirXMLGAGroupEMailAddress"&gt;
+Â Â Â Â Â Â Â Â Â  &lt;value&gt;GroupA@mycompany.com&lt;value&gt;
+&lt;/add-attr&gt;
+</pre>
+<p class="para">In a multi-email domain environment (where there is a primary email domain and secondary/subdomain) it is possible through theÂ API to have groups in the secondary/subdomain domain.Â For example if your GÂ Suite Primary Email domain is mycompany.com andÂ your secondary domain is mycompany.org you could create the groupâs email address in the secondary domain by setting this value toÂ <a href="mailto:groupa@mycompany.org" class="ulink">groupa@mycompany.org</a>.Â </p>
+<p class="para">The default driver pre-config will set this value to the CN value of the object and the primary domain name.Â </p>
+<p class="para">Note that the Google Admin interface will not allow this creation within the UI but will allow you to see the group and manage it once it is created.Â </p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">preferredName</span>
+                </p>
+<p class="para">By default, this attribute is mapped to GÂ Suiteâs Alias attribute.Â It is used to add a nickname to the userâs mail account.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="screen">
+&lt;add-attr attr-name="preferredName"&gt;
+Â Â Â Â Â Â Â Â Â &lt;value&gt;First.Last@mycompany.com&lt;value&gt;
+Â Â Â Â Â Â Â Â  &lt;value&gt;first@mycompany.com&lt;value&gt;
+&lt;/add-attr&gt;
+</pre>
+<p class="para">The value should always be in the form of name@domain name.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">Facsimile Telephone Number</span>
+                </p>
+<p class="para">Due to the way eDirectory stores this attribute it cannot be sent to Google without a transformation.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">There is a policy that changes the format of this attribute so thatÂ GÂ Suite can consume it. The policy will take the first value found and send that value while removing the structured values.</p></td>
+</tr></table>
+</div>
+
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="34%" /><col width="66%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Attribute</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Example DOM and Notes</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">AgreedToTerms</span>
+                </p>
+<p class="para">AgreedToTerms is a flag indicating that you have agreed to Googleâs terms and conditions the first time you log into GA. This is a query-only attribute. YouÂ may not set this value.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The Google Provisioning API does not allow this value to be set.Â ItÂ can be queried to determine if the user has accepted the Google Terms on first login.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">IsAdmin</span>
+                </p>
+<p class="para">This is a flag that can be set on a user object to make the user a Domain Admin.Â  Â </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This attribute will return true if the user is a domain admin. The user can be made domain admin by setting it to true. Set it to false to remove that authority.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">ExternalId</span>
+                </p>
+<p class="para">ExternalIds reference identifiers in external systems. An external ID contains an ID value and an ID Type. Valid types are:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">account</p></li>
+<li class="listitem">
+<p class="listitem">custom</p></li>
+<li class="listitem">
+<p class="listitem">customer</p></li>
+<li class="listitem">
+<p class="listitem">network</p></li>
+<li class="listitem">
+<p class="listitem">organization</p></li></ul></div>
+</td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ExternalId is sent to the driver as a structured type. If the value of "type" is "custom" then a third component with name="customtype" must be provided to specify the custom type.</p><pre class="screen">
+&lt;modify-attr attr-name="ExternalId"&gt;
+Â  Â  Â  &lt;add-value&gt;
+Â  Â  Â  Â  Â  &lt;value timestamp="1467727743#2" type="structured"&gt;
+&lt;component name="value"&gt;bob@dog.com&lt;/component&gt;
+&lt;component name="type"&gt;account&lt;/component&gt;
+ Â Â  &lt;/value&gt;
+Â  Â  Â  &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+</pre></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

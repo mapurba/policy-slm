@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="br7ugbs,bexh66e,bfqs6cy,betxn43,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Troubleshooting the API - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container appendix expanding expanded" id="br7ugbs">
+
+<h1 class="title h1"><span class="number">C.0</span> Troubleshooting the API</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Most calls to the NetIQÂ® Identity Manager Fan-Out Driver AS Client API return a value that describes the outcome of the call. These return code values are defined in the C language <span class="literal">ascauth.h</span> header file and are provided as fields in the JAscAuth class in the Java interface. The C language API function ASC_STRERROR() and the Java interface method strError() can be used to return a text string that corresponds to the return code. This text string is included in many of the messages that are written to the platform log file for errors involving API calls.</p>
+<p class="para">The Java interface uses exceptions for most non-affirmative API call outcomes.</p>
+<p class="para">The following table lists the return codes and their corresponding text string, and suggests actions to take for them.</p>
+<div class="table" id="bbtrg9u"><p class="title"><em class="num">Table C-1 </em>Return Codes for Troubleshooting</p>
+<table class="topbot" width="95%"><col width="9%" /><col width="31%" /><col width="60%" />
+            
+<tr class="headerrow" id="br7t8e5"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Return Code</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Symbol Text String</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Explanation and Suggested Action</p></th>
+</tr>
+          
+<tr class="oddrow" id="br7t8e6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">0</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_OK</p>
+<p class="para">Action successful</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The operation returned a positive response. For calls such as check password, this corresponds to an answer of âYes.â</p></td>
+</tr>
+<tr class="evenrow" id="br7t8e7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_NO</p>
+<p class="para">Action not successful</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The operation returned a negative response. For calls such as check password, this corresponds to an answer of âNo.â</p></td>
+</tr>
+<tr class="oddrow" id="br7t8e8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_NOUSER</p>
+<p class="para">Unknown user</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The Enterprise User ID specified on the call is inactive or is not in the Census.</p>
+<div class="formalpara" id="br7t8e9">
+                  <p class="title"><em class="title">Action:</em>
+                  If you expect this user to be active in the Census, see <a href="bexh6ct.html" class="xref">Section II, Core Driver Administration</a> for additional information.</p>
+                </div>
+</td>
+</tr>
+<tr class="evenrow" id="br7t8ea"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">3</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_NOAGENT</p>
+<p class="para">No Core Drivers are available for authentication</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">No Core Drivers could be contacted to process the request.</p>
+<div class="formalpara" id="br7t8eb">
+                  <p class="title"><em class="title">Action:</em>
+                  This is generally caused by a configuration problem.</p>
+                </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Ensure that the platform configuration file specifies the correct network addresses for the Core Drivers.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the Core Driver is running on the specified servers and listening on the port specified in the platform configuration file.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that the Platform Services Process is running or that you have specified the <span class="literal">DIRECTTOAUTHENTICATION</span> statement in your platform configuration file.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that you have network connectivity to a Core Driver server.</p></li>
+<li class="listitem">
+<p class="listitem">Ensure that driver has been activated or that the evaluation period has not expired.</p></li></ul></div>
+
+<p class="para">For more information, see parts 2 and 3 in this guide.</p></td>
+</tr>
+<tr class="oddrow" id="br7t8ec"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_BADCLIENT</p>
+<p class="para">Local host is not authorized to query the Core Driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The network address used by the platform to contact a Core Driver did not match the network address listed in the Platform Configuration object in the ASAM System container.</p>
+<div class="formalpara" id="br7t8ed">
+                  <p class="title"><em class="title">Action:</em>
+                  For information about managing Platform objects with the Web interface, see.</p>
+                </div>
+
+<p class="para">For an administrative password reset, this can indicate that the administrator user ID/password is not valid or that the administrator does not have rights to change the password.</p></td>
+</tr>
+<tr class="evenrow" id="br7t8ee"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_REVOKED</p>
+<p class="para">User is disabled/revoked</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The specified Enterprise User ID corresponds to a User object that has been disabled.</p></td>
+</tr>
+<tr class="oddrow" id="br7t8ef"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">6</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_INTRUDER</p>
+<p class="para">Intruder detection is active</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The specified Enterprise User ID corresponds to a User object that has been locked because of intruder detection.</p></td>
+</tr>
+<tr class="evenrow" id="br7t8eg"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">7</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_INVALIDARGS</p>
+<p class="para">Invalid arguments</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The arguments specified on the call are not valid.</p>
+<div class="formalpara" id="br7t8eh">
+                  <p class="title"><em class="title">Action:</em>
+                  Make certain that the arguments passed to the call are of the correct type and value. For example, an argument that specifies the name of an object cannot be blank or null, and an argument that specifies a buffer size to hold a result cannot be zero.</p>
+                </div>
+</td>
+</tr>
+<tr class="oddrow" id="br7t8ei"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">8</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_INVALIDOBJ</p>
+<p class="para">Invalid object</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An object specified as an argument was not of the correct type or was not found.</p>
+<div class="formalpara" id="br7t8ej">
+                  <p class="title"><em class="title">Action:</em>
+                  Verify that the objects specified on arguments to the call are of the proper type. Handle the not-found condition as appropriate for your application.</p>
+                </div>
+</td>
+</tr>
+<tr class="evenrow" id="br7t8ek"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">9</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_INVALIDOBJLEN</p>
+<p class="para">Invalid object length</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An object name specified as an argument was longer than the maximum allowable eDirectoryâ¢ object name.</p>
+<div class="formalpara" id="br7t8el">
+                  <p class="title"><em class="title">Action:</em>
+                  Check object names that are specified as arguments to be sure that they do not exceed the maximum length for an eDirectory object name.</p>
+                </div>
+</td>
+</tr>
+<tr class="oddrow" id="br7t8em"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">10</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_PASSDUPLICATE</p>
+<p class="para">Password has been previously used</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The new password that was specified to the change password API function has been previously used for this User object and the User object is required to specify unique passwords.</p>
+<div class="formalpara" id="br7t8en">
+                  <p class="title"><em class="title">Action:</em>
+                  Specify a password that has not been previously used.</p>
+                </div>
+</td>
+</tr>
+<tr class="evenrow" id="br7t8eo"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">11</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_PASSTOOSHORT</p>
+<p class="para">Password does not meet password rules</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The new password that was specified to the change password API function is shorter than the minimum password length set for the User object.</p>
+<div class="formalpara" id="br7t8ep">
+                  <p class="title"><em class="title">Action:</em>
+                  Specify a password that meets the password rules for the User object.</p>
+                </div>
+</td>
+</tr>
+<tr class="oddrow" id="br7t8eq"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">12</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_TOOSMALL</p>
+<p class="para">Buffer is too small</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The size specified for a buffer argument is too small to hold the result. The result is truncated.</p>
+<div class="formalpara" id="br7t8er">
+                  <p class="title"><em class="title">Action:</em>
+                  Allocate a larger buffer, and issue the request again.</p>
+                </div>
+</td>
+</tr>
+<tr class="evenrow" id="br7t8es"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">13</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_ATTRNOTFOUND</p>
+<p class="para">Attribute not found</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The attribute specified was not found for the specified object.</p>
+<div class="formalpara" id="br7t8et">
+                  <p class="title"><em class="title">Action:</em>
+                  Process this response accordingly, or specify the name of an attribute that exists for the specified object.</p>
+                </div>
+</td>
+</tr>
+<tr class="oddrow" id="br7t8eu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">14</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_WSOCKUP</p>
+<p class="para">WINSOCK not initialized</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not used in the Identity Manager Fan-Out Driver.</p></td>
+</tr>
+<tr class="evenrow" id="br7t8ew"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">15</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_WSOCKDOWN</p>
+<p class="para">WINSOCK not terminated</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not used in the Identity Manager Fan-Out Driver.</p></td>
+</tr>
+<tr class="oddrow" id="br7t8ey"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">16</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_NOAUTHENV</p>
+<p class="para">No authentication environment established</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The asce argument did not specify a valid environment item.</p>
+<div class="formalpara" id="br7t8ez">
+                  <p class="title"><em class="title">C Action:</em>
+                  Verify that a successful call to ASC_INIT() or ASC_INIT_EXT() has been made. Successful calls return a pointer to a valid environment item. Unsuccessful calls return NULL. Verify that the pointer to the environment item is correctly specified as an argument to this call.</p>
+                </div>
+
+<div class="formalpara" id="br7t8f0">
+                  <p class="title"><em class="title">Java Action:</em>
+                  Verify that a successful call to init() has been made.</p>
+                </div>
+</td>
+</tr>
+<tr class="evenrow" id="br7t8f1"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">17</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_PRODUCTEXPIRED</p>
+<p class="para">Ascauth client has expired</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The expiration date for the platform has passed.</p>
+<div class="formalpara" id="br7t8f2">
+                  <p class="title"><em class="title">Action:</em>
+                  Install a current version of Platform Services.</p>
+                </div>
+</td>
+</tr>
+<tr class="oddrow" id="br7t8f3"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">18</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_INCLUDED</p>
+<p class="para">User matched an INCLUDE statement</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The Enterprise User ID specified on a call to ASC_USER_INCLUDE_EXCLUDE() matched an AS.USER.INCLUDE statement in the platform configuration file.</p></td>
+</tr>
+<tr class="evenrow" id="br7t8f4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">19</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_EXCLUDED</p>
+<p class="para">User matched an EXCLUDE statement</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The Enterprise User ID specified on a call to ASC_USER_INCLUDE_EXCLUDE() matched an <span class="literal">AS.USER.EXCLUDE</span> statement in the platform configuration file.</p></td>
+</tr>
+<tr class="oddrow" id="br7t8f5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">20</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_NOMATCH</p>
+<p class="para">User did not match any INCLUDE/EXCLUDE statement</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The Enterprise User ID specified on a call to ASC_USER_INCLUDE_EXCLUDE() did not match any <span class="literal">AS.USER.INCLUDE</span> or <span class="literal">AS.USER.EXCLUDE</span> statement in the platform configuration file. The user is included because <span class="literal">AS.USER.INCLUDE *</span> is implicit if <span class="literal">AS.USER.EXCLUDE *</span> is not specified.</p></td>
+</tr>
+<tr class="evenrow" id="br7t8f6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">21</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_NOLICENSE</p>
+<p class="para">Client is not licensed to use the driver</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not used in the Identity Manager Fan-Out Driver.</p></td>
+</tr>
+<tr class="oddrow" id="br7t8f7"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">22</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_INVALIDREQ</p>
+<p class="para">API request is not valid or unsupported</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The AS Client API call was not recognized by the Core Driver.</p>
+<div class="formalpara" id="br7t8f8">
+                  <p class="title"><em class="title">Action:</em>
+                  Ensure that the version of Platform Services and the version of the Core Driver are compatible.</p>
+                </div>
+</td>
+</tr>
+<tr class="evenrow" id="br7t8f9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">23</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_KEYEXPIRED</p>
+<p class="para">Client is using an expired DES key</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The DES encryption key used by a non-SSL version of Platform Services has expired.</p>
+<div class="formalpara" id="br7t8fa">
+                  <p class="title"><em class="title">Action:</em>
+                  Update the KEY statement in the platform configuration file with the same encryption key that is specified for the Platform in the Platform object in the ASAM System container. For information about managing Platform objects with the Web interface, see <a href="bexh6ct.html" class="xref">Section II, Core Driver Administration</a>.</p>
+                </div>
+</td>
+</tr>
+<tr class="oddrow" id="br7t8fb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">24</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">AS_INSUFFICIENTRIGHTS</p>
+<p class="para">Client is using an expired DES key</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">An administrative password reset was rejected. The administrative user does not exist, the password given for the administrative user is not valid, or the administrative user does not have rights to change the target user's password.</p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="installing-ibm-iq,configuring-messaging-vendors,configuring-messaging-vendors,installing-on-jboss-messaging,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing IBM MQ - NetIQ Identity Manager Driver for JMS Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="installing-ibm-iq">
+
+<h1 class="title h1"><span class="number">4.1</span> Installing IBM MQ</h1>
+
+<div class="content_wrapper">
+
+<p class="para">As part of installing IBM MQ for the driver, you should complete the following tasks consecutively. These instructions are for Windows, but you can follow the same procedure for other platforms.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-ibm-iq.html#b5j6nh4" class="xref">Placing Prerequisite Jar Files and Scripts</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-ibm-iq.html#b5j6qgq" class="xref">Creating a Server-Connection Channel and Queues</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-ibm-iq.html#b5j6qxp" class="xref">Starting the Publish/Subscriber Broker</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-ibm-iq.html#b5j6r3a" class="xref">Installing System Queues Necessary for Publish/Subscribe</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-ibm-iq.html#b5j6rdt" class="xref">Creating a User Account</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="installing-ibm-iq.html#b5j6rjs" class="xref">Setting Up JMS for IBM MQ 8.x and 9.x</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j6nh4">
+
+<h2 class="title h2"><span class="number">4.1.1</span> Placing Prerequisite Jar Files and Scripts</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b5j7tqf">
+<ol class="steps">
+<li class="step">
+<p class="para">(Conditional) If you are using IBM Websphere version lesser than 8.x, delete the following jars that are located at:</p>
+<div class="formalpara">
+              <p class="title"><em class="title">Linux:</em>
+              
+                <span class="filename">/opt/novell/eDirectory/lib/dirxml/classes</span>
+              </p>
+            </div>
+
+<div class="formalpara">
+              <p class="title"><em class="title">Windows:</em>
+              
+                <span class="filename">C:\Novell\NDS\lib</span>
+              </p>
+            </div>
+
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.jmqi.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mqjms.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">connector.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">dhbcore.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">fscontext.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">jndi.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.commonservices.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.headers.jar</span>
+                </p></li></ul></div>
+</li>
+<li class="step" id="refer1">
+<p class="para">Locate and copy the following jar files from your messaging server.</p>
+<p class="para">For example, <span class="filename">&lt;MQ_install_path&gt;\java\lib</span></p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.commonservices.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.headers.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mq.jmqi.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">com.ibm.mqjms.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">fscontext.jar</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">providerutil.jar</span>
+                </p></li></ul></div>
+</li>
+<li class="step" id="refer2">
+<p class="para">Download and copy <span class="filename">javax-jms-api-2.0.jar</span> from <a href="https://mvnrepository.com/artifact/javax.jms/javax.jms-api/2.0" class="ulink">MVN Repository</a>:</p></li>
+<li class="step" id="b5j7txk">
+<p class="para">Paste the jar files that is mentioned in <a href="installing-ibm-iq.html#refer1" class="xref">Step 2</a> and <a href="installing-ibm-iq.html#refer2" class="xref">Step 3</a> to the Identity Manager server.</p>
+<p class="para">The following table identifies where to place jar files on an Identity Management server, by platform.</p>
+<div class="informaltable">
+<table class="rowseps" width="90%"><col width="19%" /><col width="81%" />
+                  
+<tr class="headerrow" id="b5khieh"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Platform</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Directory Path</p></th>
+</tr>
+                
+<tr class="oddrow" id="b5khies"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Windows</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Local installation: <span class="filename">C:\Novell\IdentityManager\NDS\lib</span></p>
+<p class="para">Remote installation: <span class="filename">C:\Novell\IdentityManager\RemoteLoader\lib</span></p></td>
+</tr>
+<tr class="evenrow" id="b5khieu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Linux/UNIX</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Local installation: <span class="filename">/usr/lib/dirxml/classes</span> (pre-eDirectory 8.8) or <span class="filename">opt/novell/eDirectory/lib/dirxml/classes</span> (eDirectory 8.8)</p>
+<p class="para">Remote installation: <span class="filename">/usr/lib/dirxml/classes</span> (pre-eDirectory 8.8) or <span class="filename">/opt/novell/eDirectory/lib/dirxml/classes</span> (eDirectory 8.8)</p></td>
+</tr></table>
+</div>
+</li>
+<li class="step">
+<p class="para">Restart eDirectory.</p></li>
+<li class="step" id="b5lt3xu">
+<p class="para">Locate the installation script that is saved during the JMS driver installation. The following table indicates the default directories where scripts are installed, by platform.</p>
+<div class="informaltable">
+<table class="topbot" width="91%"><col width="20%" /><col width="80%" />
+                  
+<tr class="headerrow" id="b5lt3xv"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Platform</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Directory Path</p></th>
+</tr>
+                
+<tr class="oddrow" id="b5lt3xw"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Windows</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                        <span class="filename">C:\Novell\IdentityManager\NDS\DirXMLUtilities\jms\webmq</span>
+                      </p></td>
+</tr>
+<tr class="evenrow" id="b5lt3xy"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Linux\UNIX</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">i<span class="filename">nstall-dir/lib/dirxml/rules/jms/webmq</span></p></td>
+</tr></table>
+</div>
+</li>
+<li class="step" id="b5lt3xz">
+<p class="para">Copy the following scripts to your messaging server at <span class="filename">&lt;MQ_install_path&gt;\java\bin</span>.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">idm_jms_install.scp</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">idm_jms_uninstall.scp</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">idm_mq_install.mqsc</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">idm_mq_uninstall.mqsc</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">netiqsamplejms.prop</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">vinstall.bat</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="filename">vuninstall.bat</span>
+                </p></li></ul></div>
+</li>
+<li class="step" id="b5lt3y0">
+<p class="para">(Conditional) If necessary, restart your eDirectory server.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j6qgq">
+
+<h2 class="title h2"><span class="number">4.1.2</span> Creating a Server-Connection Channel and Queues</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b5j82yp">
+<ol class="steps">
+<li class="step" id="b5j82yq">
+<p class="para">From the command line, change directories to <span class="filename">&lt;MQ_HOME&gt;\java\bin</span>.</p></li>
+<li class="step" id="b5j83tw">
+<p class="para">From the command line, execute the following command:</p>
+<p class="para">
+              <span class="command">runmqsc QM &lt; idm_mq_install.mqsc</span>
+            </p>
+<p class="para">This file is provided only as an example; you might need to customize the content.</p></li>
+<li class="step" id="bsdncyy">
+<p class="para">Continue with <a href="installing-ibm-iq.html#b5j6qxp" class="xref">Starting the Publish/Subscriber Broker</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j6qxp">
+
+<h2 class="title h2"><span class="number">4.1.3</span> Starting the Publish/Subscriber Broker</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b5j84wv">
+<ol class="steps">
+<li class="step" id="b5j84ww">
+<p class="para">From the command line, execute the following command:</p>
+<p class="para">
+              <span class="command">strmqbrk -m QM</span>
+            </p>
+<p class="para">You should see a message indicating that the broker is running.</p></li>
+<li class="step" id="bsdnd5b">
+<p class="para">Continue with <a href="installing-ibm-iq.html#b5j6r3a" class="xref">Installing System Queues Necessary for Publish/Subscribe</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j6r3a">
+
+<h2 class="title h2"><span class="number">4.1.4</span> Installing System Queues Necessary for Publish/Subscribe</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b5j865l">
+<ol class="steps">
+<li class="step" id="b5j865m">
+<p class="para">From the command line, execute the following command:</p>
+<p class="para">
+              <span class="command">runmqsc QM &lt; MQJMS_PSQ.mqsc</span>
+            </p>
+<p class="para">You should see some tracing, indicating successful queue creation.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If you donât enter this command, you might see the following error: â<span class="literal">MQJMS1111: JMS 1.1 The required Queues/Publish Subscribe services are not set up {0} error.</span>â</p></div>
+</li>
+<li class="step" id="bsdndda">
+<p class="para">Continue with <a href="installing-ibm-iq.html#b5j6rdt" class="xref">Creating a User Account</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j6rdt">
+
+<h2 class="title h2"><span class="number">4.1.5</span> Creating a User Account</h2>
+
+<div class="content_wrapper">
+
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="installing-ibm-iq.html#bgntg7g" class="xref">Creating a User</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="installing-ibm-iq.html#bgntgq8" class="xref">Making the User a Member of the mqm Group</a>
+            </p></li></ul></div>
+
+<div class="container sect3" id="bgntg7g">
+
+<h3 class="title h3">Creating a User</h3>
+
+<div class="procedure" id="b5j8ahm">
+<ol class="steps">
+<li class="step" id="b5j8ahn">
+<p class="para">Click <span class="guimenu">Start</span> &gt; <span class="guimenu">Programs</span> &gt; <span class="guimenu">Administrative Tools</span> &gt; <span class="guimenu">Computer Management</span>.</p></li>
+<li class="step" id="b5j8b3n">
+<p class="para">Expand the <span class="guimenu">Local Users and Groups</span> subtree.</p></li>
+<li class="step" id="b5j8b61">
+<p class="para">Right-click the <span class="guimenu">Users</span> folder, then select <span class="guimenu">New User</span>.</p></li>
+<li class="step" id="b5j8baq">
+<p class="para">Specify a user name. The scripts referenced in these instructions assume <span class="guimenu">idm</span>.</p></li>
+<li class="step" id="b5j8bfp">
+<p class="para">Specify a password. The scripts referenced in these instructions assume <span class="guimenu">novell</span>.</p></li>
+<li class="step" id="b5j8bjf">
+<p class="para">Deselect the <span class="guimenu">User must change password at next login</span> check box.</p></li>
+<li class="step" id="b5j8bnu">
+<p class="para">Click the <span class="guimenu">Create</span> button.</p></li>
+<li class="step" id="b5j8brb">
+<p class="para">Click the <span class="guimenu">Close</span> button.</p></li>
+<li class="step" id="bsdndo8">
+<p class="para">Continue with <a href="installing-ibm-iq.html#bgntgq8" class="xref">Making the User a Member of the mqm Group</a>.</p></li></ol>
+</div>
+
+</div>
+
+<div class="container sect3" id="bgntgq8">
+
+<h3 class="title h3">Making the User a Member of the mqm Group</h3>
+
+<div class="procedure" id="b5j8akn">
+<ol class="steps">
+<li class="step" id="b5j8ako">
+<p class="para">Right-click the newly created user, then click <span class="guimenu">Properties</span>.</p></li>
+<li class="step" id="b5j8e3x">
+<p class="para">Select the <span class="guimenu">Member Of</span> tab.</p></li>
+<li class="step" id="b5j8e6x">
+<p class="para">Select the mqm group.</p></li>
+<li class="step" id="b5j8e8r">
+<p class="para">Click <span class="guimenu">Add</span>.</p></li>
+<li class="step" id="b5j8eaj">
+<p class="para">Click <span class="guimenu">OK</span> twice.</p></li>
+<li class="step" id="bsdndyr">
+<p class="para">Continue with <a href="installing-ibm-iq.html#b5j6rjs" class="xref">Setting Up JMS for IBM MQ 8.x and 9.x</a>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b5j6rjs">
+
+<h2 class="title h2"><span class="number">4.1.6</span> Setting Up JMS for IBM MQ 8.x and 9.x</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="b1c479qr">
+<ol class="steps">
+<li class="step" id="b1c479qs">
+<p class="para">On the MQ server, edit <span class="filename">&lt;MQ_install_path&gt;\java\bin\JMSAdmin.config</span>, and set the value to the following:</p>
+<p class="para">
+              <span class="filename">INITIAL_CONTEXT_FACTORY=com.sun.jndi.fscontext.RefFSContextFactoryPROVIDER_URL=file:/C:/JNDI-Directory</span>
+            </p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Depending on your OS platform adjust the PROVIDER_URL to point to a valid file location path on the MQ server.</p></div>
+</li>
+<li class="step" id="b1c479qt">
+<p class="para">Edit <span class="filename">&lt;MQ_install_path&gt;\java\bin\JMSAdmin.bat</span> file, and set the JAVA envionment variable pointing to the correct location of the java executable under the jre folder set <span class="filename">JAVA="%MQ_JRE_PATH%\bin\java"</span></p></li>
+<li class="step" id="b1c479qu">
+<p class="para">Edit <span class="filename">&lt;MQ_install_path&gt;\java\bin\PSIVTRun.bat</span> file, and set the JAVA envionment variable pointing to the correct location of the java executable under the jre folder.</p></li>
+<li class="step" id="b1c47p4g">
+<p class="para">Edit netiqsamplejms.prop file, and set the values as follows:</p>
+<div class="informaltable">
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                  
+<tr class="headerrow" id="b1c47p4h"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Properties Key</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Purpose</p></th>
+</tr>
+                
+<tr class="oddrow" id="b1c47p4i"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_LOCAL_USER_ACCOUNT_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A local windows user account will be created. This account will be used by the NetIQ JMS connetor to connect to MQ.</p>
+<p class="para">Example: IDM</p></td>
+</tr>
+<tr class="evenrow" id="b1c47p4j"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_LOCAL_USER_ACCOUNT_PWD</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Password for the local windows account.</p>
+<p class="para">Example: NetIQ123</p></td>
+</tr>
+<tr class="oddrow" id="b1c47p4k"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_QUEUE_MANAGER_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A queue manager is a program that provides messaging services to applications that use the Message Queue Interface to put and get messages from the queue. This is the name of the Queue Manager under which the IDM queues will be created and controlled.Example: IDM.QM</p></td>
+</tr>
+<tr class="evenrow" id="b1c47p4l"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_LISTENER_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A listener is a WebSphereÂ® MQ process that listens for connections to the queue manager. Provide the name for the listener that the above IDM queue manager will be using.Example: LISTENER.TCP</p></td>
+</tr>
+<tr class="oddrow" id="b1c47p4m"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_WEBMQ_HOST</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This is the hostname or IP address of the server where MQ is running.Example: webmq.lab.com or &lt;IP address&gt;</p></td>
+</tr>
+<tr class="evenrow" id="b1c47p4n"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_LISTENER_PORT</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">This is the listener port where MQ server can accept messages. The default port for MQ is 1414, however each installation can be changed to listen on different ports. Enter the port number that is relevant to your installation.Example: 1414</p></td>
+</tr>
+<tr class="oddrow" id="b1c47p4o"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_CHANNEL_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A channel is a communication link used by distributed queue managers identified by a unique name.Thereare two categories of channel in WebSphereÂ® MQ:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Message channels: which are unidirectional, and transfer messages from one queue manager to another.</p></li>
+<li class="listitem">
+<p class="listitem">MQI channels: which are bidirectional, and transfer MQI calls from a WebSphere MQ MQI client to aqueue manager, and responses from a queue manager to a WebSphere MQ client.</p></li></ul></div>
+
+<p class="para">IDM integtration uses MQI channels. Provide a name that IDM will use.</p>
+<p class="para">Example: CHANNEL.IDM.QM</p></td>
+</tr>
+<tr class="evenrow" id="b1c47p4p"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_DRV_QUEUE_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A WebSphere MQ queue is a named object on which applications can put and get messages.Specify a name that uniquely identifies the IDM queue where IDM events are sent and received from.Example: IDM.EVENTSQ</p></td>
+</tr>
+<tr class="oddrow" id="b1c47p4q"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_DRV_TOPIC_NAME</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A topic is the subject of the information that is published in a publish/subscribe message. Specify a unique TOPIC name that IDM can use to pub/sub messages.Example: IDM.EVENTSTOPIC</p></td>
+</tr>
+<tr class="evenrow" id="b1c47p4r"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_DRV_TOPIC_STRING</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A publisher creates a message, labels it with a topic string that best fits the subject of the publication and then publishers it. To receive publications, a subscriber creates a subscription with a pattern matching topic string to select publication topics.Example: IDM.TOPICSTR</p></td>
+</tr>
+<tr class="oddrow" id="b1c47p4s"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">IDM_JNDI_PROVIDER_URL</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Sun engineered JNDI like JMS in that there is an API that MQ clients/apps use and an SPI or Service Provider Interface that is used by something called a âregistryâ. Although JNDI can be implemented in LDAP, one of the base implementations that Sun provided right out of the box was to use the local filesystem as the registry. JNDI uses the .bindings file as the "registry" and it holds all the administered object definitions.</p>
+<p class="para">The objects in the .bindings file are represented in Name/Type/Value triplets. Each .bindings file typically has many objects. Each object has many attributes. Each attribute has a name, a value and the type of variable that holds the value. IBM provides the JMSAdmin tool to generate and read the .bindings file. But a valid file system location should be made availble for the JMSAdmin tool where it can create the .bindings file.</p>
+<p class="para">Example: C:\JNDI-Directory</p></td>
+</tr></table>
+</div>
+</li>
+<li class="step" id="b1c48op5">
+<p class="para">In command prompt change location to <span class="filename">&lt;MQ_install_path&gt;\java\bin\</span> and run vinstall.bat to create the MQ/JMS objects that will be used by the NetIQ JMS connector.</p></li>
+<li class="step" id="bgr9rd3">
+<p class="para">Make sure the <span class="filename">.bindings</span> file resides in the correct location.</p>
+<p class="para">The <span class="filename">.bindings</span> file is generated during the IBM MQ configuration. When you run the <span class="command">JMSAdmin.bat -v idm_jms_install.scp</span> command, the <span class="filename">.bindings</span> file is generated under the path specified in the <span class="filename">JMSAdmin.config</span> file.</p>
+<p class="para">If the driver, IBM MQ, Identity Manager engine, and Identity Vault are all on the same server, make sure the <span class="filename">.binding</span>s file resides in the location specified by the PROVIDER_URL option for the driver configuration (see <a href="driver-configuration.html#bs1qb36" class="xref">PROVIDER_URL</a>).</p>
+<p class="para">If the driver and IBM MQ are on one server and the Identity Manager engine and Identity Vault are on another server (a Identity Manager server), copy the <span class="filename">.bindings</span> file to the Identity Manager server and make sure the PROVIDER_URL includes the correct path to the file. If multiple Identity Manager servers connect to the IBM MQ server, copy the <span class="filename">.bindings</span> file to the PROVIDER_URL path on each Identity Manager server.</p></li>
+<li class="step">
+<p class="para">Copy <span class="filename">.binding</span> file from IBM MQ server location (Example: C:\JNDI-Directory) to Identity Manager server. (Example: C:\JNDI-Directory).</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

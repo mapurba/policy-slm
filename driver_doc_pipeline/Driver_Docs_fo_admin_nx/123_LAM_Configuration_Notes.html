@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="brk5h3s,bfqsgwj,b105xae3,bfqrsg4,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>LAM Configuration Notes - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="brk5h3s">
+
+<h1 class="title h1"><span class="number">B.3</span> LAM Configuration Notes</h1>
+
+<div class="content_wrapper">
+
+<p class="para">IBMâs proprietary Loadable Authentication Module (LAM) interface is an alternative to PAM on AIX systems. In fact, the Identity Manager Fan-Out Driver fully supports PAM <span class="emphasis">only</span> on AIX 5.3 and later.</p>
+<p class="para">If you use LAM with the Fan-Out Driver, be sure to include the following considerations in your configuration.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+              <a href="brk5h3s.html#brk6g17" class="xref">Locating the LAM Module</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="brk5h3s.html#brk6gmr" class="xref">Enabling the LAM Module</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="brk5h3s.html#brk6hcs" class="xref">Associating Users With the LAM Module</a>
+            </p></li>
+<li class="listitem">
+<p class="listitem">
+              <a href="brk5h3s.html#brk6umy" class="xref">Other LAM Configuration Considerations</a>
+            </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="brk6g17">
+
+<h2 class="title h2"><span class="number">B.3.1</span> Locating the LAM Module</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Fan-Out Driverâs LAM module is named <span class="filename">DCE</span> and located here on your AIX system:</p><pre class="screen">  /usr/lib/security/DCE</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>IBM also has a deprecated LAM module named <span class="filename">DCE</span>, which is their implementation of the Distributed Computing Environment. IBMâs <span class="filename">DCE</span> LAM module is unrelated to the Fan-Out Driverâs <span class="filename">DCE</span> LAM module.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="brk6gmr">
+
+<h2 class="title h2"><span class="number">B.3.2</span> Enabling the LAM Module</h2>
+
+<div class="content_wrapper">
+
+<p class="para">To enable the <span class="filename">DCE</span> LAM module as an available authentication mechanism, you must add it to the <span class="filename">methods.cfg</span> configuration file located here on your AIX system:</p><pre class="screen">  /usr/lib/security/methods.cfg</pre>
+<p class="para">A sample <span class="filename">methods.cfg</span> file is included in <span class="filename">/usr/local/ASAM/bin/PlatformServices</span>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="brk6hcs">
+
+<h2 class="title h2"><span class="number">B.3.3</span> Associating Users With the LAM Module</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The <span class="filename">DCE</span> LAM module can be made the default authentication method for all users, or it can be associated with particular users, via the <span class="filename">user</span> file located here on your AIX system:</p><pre class="screen">  /etc/security/user</pre>
+<p class="para">Two sample <span class="filename">user</span> files are included in <span class="filename">/usr/local/ASAM/bin/PlatformServices</span>:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="filename">user.sample</span> shows how to make <span class="filename">DCE</span> the default authentication mechanism.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="filename">user.sample2</span> shows how to make <span class="filename">DCE</span> the default authentication mechanism with fail-over to local authentication if <span class="filename">DCE</span> authentication is unavailable.</p></li></ul></div>
+
+<p class="para">Alternatively, the <span class="filename">DCE</span> LAM module can be explicitly associated with Fan-Out Driver managed users by adding the SYSTEM and registry attributes to the <span class="command">mkuser</span> command in the Fan-Out Driverâs <span class="filename">adduser.sh</span> script as follows:</p><pre class="screen">  COMMAND="/usr/bin/mkuser -R files SYSTEM=\"DCE\" registry=DCE "</pre>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="brk6umy">
+
+<h2 class="title h2"><span class="number">B.3.4</span> Other LAM Configuration Considerations</h2>
+
+<div class="content_wrapper">
+
+<div class="container sect3" id="brk71wr">
+
+<h3 class="title h3">AIX 5.3 and later</h3>
+
+<p class="para">To enable LAM on AIX 5.3 and later, you also need to modify the <span class="filename">login.cfg</span> file located here on your AIX system:</p><pre class="screen">  /etc/security/login.cfg </pre>
+<p class="para">In this file, make sure that <span class="literal">auth_type</span> is set to <span class="literal">STD_AUTH</span>.</p>
+</div>
+
+<div class="container sect3" id="brk72cu">
+
+<h3 class="title h3">Using SSH</h3>
+
+<p class="para">Finally, to use ssh with the <span class="filename">DCE</span> LAM module, you will need to check your <span class="filename">sshd_config</span> file located here on your AIX system:</p><pre class="screen">  /etc/ssh/sshd_config</pre>
+<p class="para">In this file, it is important for <span class="literal">PasswordAuthentication</span> to have the default setting of <span class="literal">yes</span> .</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

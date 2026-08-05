@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="August 05 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="customize-psa-trigger-transactions,customize-driver,customize-driver,change-data-schema-interface,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Customizing the PSA by Triggering Transactions - NetIQ Identity Manager Driver for PeopleSoft Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="customize-psa-trigger-transactions">
+
+<h1 class="title h1"><span class="number">6.1</span> Customizing the PSA by Triggering Transactions</h1>
+
+<div class="content_wrapper">
+
+<p class="para">Transaction record creation is triggered by PeopleCode associated with modifications and additions to data on the Schema Data record (DIRXML_S_PERS) and row Delete events on the Staging record (DIRXML_SCHEMA01). If desired, the PeopleSoft administrator or consultant can use these examples to trigger transactions based on other events within the PeopleSoft application.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The D Event Type operation has been redefined for the 5.0<span class="replaceable">x</span> PeopleSoft Service Agent (PSA). The D Event Type is now generated for application object Delete events instead of object Disable events. All Modification events now generate M (Modify) transaction events.</p></div>
+
+<p class="para">The default Transaction creation function is defined on the DIRXML_DRIVER field of the DIRXML_DERIVED Record definition:</p>
+<p class="para">A PeopleCode function call would be as follows:</p><pre class="screen">DirXML_Trans( Transaction Table Name,
+    Transaction Channel Type,
+          Schema CI Name,
+          Event Type,
+          Schema Record Key Value,
+          Transaction Date and Time,
+          Transaction Miscellaneous Info,
+          Collection Row Delete Field Name,
+          Collection Row Delete Field Key Value,
+          Transaction Status);</pre>
+<p class="para">An example of sample Modification event transaction from the PSA looks like this:</p><pre class="screen">DirXML_Trans("DIRXML_TRANS01", 
+      &amp;channel,
+        "DIRXML_SCHEMA01",
+        "A",
+        DIRXML_S_PERS.DIRXML_S_ID,
+        %DateTime,
+        &amp;tValue,
+        "",
+        "",
+        "A");</pre>
+<div class="table" id="b1gh6pk"><p class="title"><em class="num">Table 6-1 </em>Function Call Parameter Definitions</p>
+<table class="topbot" width="95%"><col width="27%" /><col width="46%" /><col width="27%" />
+            
+<tr class="headerrow" id="ah6olu7"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Parameter</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Default Value</p></th>
+</tr>
+          
+<tr class="oddrow" id="ah6olu8"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Transaction Table</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The name of the table where transactions are written. This table is built within PeopleTools and the field elements should be consistent with the delivered DIRXML_TRANS01 table.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DIRXML_TRANS01</p></td>
+</tr>
+<tr class="evenrow" id="ah6olu9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Transaction Channel Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The name used to identify the driver that processes the transactions and the channel that created the transactions.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The NPSDriver1S transaction was caused by a Subscriber channel event and is processed by driver NPSDriver1. The NPSDriver1P transaction was caused by a Publisher channel event and is processed by driver NPSDriver1.</p></td>
+</tr>
+<tr class="oddrow" id="ah6olua"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Schema CI Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The name of the Schema CI object that the transaction type is connected to. The driver uses the name of this object to query for the data connected to the transaction type.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DIRXML_SCHEMA01</p></td>
+</tr>
+<tr class="evenrow" id="ah6olub"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Event Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The type of XML event that is written to the transaction table. This can be 1 of 4 values as listed.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">A=ADD</p>
+<p class="para">M=MODIFY</p>
+<p class="para">D=DELETE</p>
+<p class="para">R=ROW DELETE</p></td>
+</tr>
+<tr class="oddrow" id="ah6oluc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Schema Record Key Value</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The identifier that is used to associate a particular record within PeopleSoft to an eDirectory object. It could be the EMPLID value for employees, STUDENTID value for students, DEPTID for departments, ACCTID for account codes, and so forth. Key elements must be identified for the Transaction Schema.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ASSOC_ID</p></td>
+</tr>
+<tr class="evenrow" id="ah6olud"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Transaction Date Time</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The date/time element used to determine when the transaction is processed.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">%Datetime</p></td>
+</tr>
+<tr class="oddrow" id="ah6olue"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Transaction Miscellaneous Info</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The parameter contains 1...n values that the developer wants to pass to the driver during processing. This value might not be available via the Schema object when a transaction is processed by the driver.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">ASSOC_ID | "|â | LAST_NAME</p></td>
+</tr>
+<tr class="evenrow" id="ah7893x"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Collection Row Delete Field Name</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The field name of the scroll level attribute in the application record.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">DIRXML_S_PHONES</p></td>
+</tr>
+<tr class="oddrow" id="ah789pu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Collection Row Delete Field Key</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The key field value of the deleted data row (CELL, PGR, BUSN).</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr>
+<tr class="evenrow" id="bt36tjf"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Transaction Status</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The initial processing status of the transaction. Generally this value is set to A for Available. For Subscriber delete events, it is not desirable for the driver to process the transaction event. Therefore, delete event transactions generated by the default PSA are assigned a status of S for Success.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"></p></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

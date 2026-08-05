@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 06 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="components-for-identity-tracking,introduction,introduction,how-the-driver-works,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Components for Identity Tracking - Identity Manager Driver for Sentinel Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="components-for-identity-tracking">
+
+<h1 class="title h1"><span class="number">1.1</span> Components for Identity Tracking</h1>
+
+<div class="content_wrapper">
+
+<p class="para">This section provides information about the components required to integrate Sentinel with Identity Manager.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="bzvlpgx">
+
+<h2 class="title h2"><span class="number">1.1.1</span> DirXML-Accounts Attribute</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The DirXML-Accounts attribute on an Identity Vault User object tracks information about accounts that a user has in different applications. Identity Manager drivers that manage the account information for a user in an application, create and maintain the DirXML-Accounts attribute values. For example, the Active Directory driver maintains the DirXML-Accounts values for the account identifiers that a user has in Active Directory.</p>
+<p class="para">The Driver for Sentinel uses the DirXML-Accounts values to create and manage account records in Sentinel. If the application has multiple ways of identifying a single application account, there might be multiple account records in Sentinel for a single account. For example, Active Directory has five different identifiers for the same account. The Active Directory driver provides information about four of these identifiers in the DirXML-Accounts attribute. The driver synthesizes the fifth value from one of the identifiers provided by the Active Directory driver.</p>
+<p class="para"><a href="components-for-identity-tracking.html#bzvlpgy" class="xref">Table 1-1</a> shows that the DirXML-Accounts attribute stores the different identifiers for Johnâs account. Active Directory has four different account identifiers for the same account and the LDAP directory has one.</p>
+<div class="table" id="bzvlpgy"><p class="title"><em class="num">Table 1-1 </em>Contents of the DirXML-Accounts Attribute</p>
+<table class="topbot" width="100%"><col width="22%" /><col width="25%" /><col width="53%" />
+              
+<tr class="headerrow" id="bzvlpgz"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Driver/Application</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Account Identifier Type</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Account Identifier Sample Data</p></th>
+</tr>
+            
+<tr class="oddrow" id="bzvlph0"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Active Directory</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">sAMAccountName</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">jsmith</p></td>
+</tr>
+<tr class="evenrow" id="bzvlph1"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Active Directory</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">userPrincipalName</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">jsmith@company.com</p></td>
+</tr>
+<tr class="oddrow" id="bzvlph2"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Active Directory</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDAPDN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">cn=John Smith,cn=users,dc=company,dc=com</p></td>
+</tr>
+<tr class="evenrow" id="bzvlph3"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Active Directory</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">association</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">5d377f84f3ab534babbf12edd6540d77</p></td>
+</tr>
+<tr class="oddrow" id="bzvlph4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDAP</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">LDAPDN</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">cn=jsmith,cn=users,dc=company,dc=com</p></td>
+</tr></table>
+</div>
+
+<p class="para">This allows for correlation between all of the account identities in the systems managed by Identity Manager. You can also validate business policies with this information.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bzvlv1e">
+
+<h2 class="title h2"><span class="number">1.1.2</span> Driver for Sentinel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver is an Identity Manager driver that sends the account identifier and the account status from the Identity Vault to the Sentinel REST API interface. The account identifier data is used to track the accounts, the status of the identities, and the account access information.</p>
+<p class="para">The driver implements data sharing policies with Sentinel. You can control the actions by using Identity Console to define filters and policies.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bzvm1he">
+
+<h2 class="title h2"><span class="number">1.1.3</span> Sentinel REST API Interface</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Sentinel REST API interface integrates the data from the driver to Sentinel. The interface performs functions, such as remote protocol connections and data mapping.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

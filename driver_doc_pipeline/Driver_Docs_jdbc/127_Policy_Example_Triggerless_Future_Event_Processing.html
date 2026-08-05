@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="triggerless-future-event-processing-sample-policy,netiq-identity-manager-driver-for-jdbc,database-descriptor-dtd-import,setup-oci-client-on-linux-for-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Policy Example: Triggerless Future Event Processing - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container appendix expanding expanded" id="triggerless-future-event-processing-sample-policy">
+
+<h1 class="title h1"><span class="number">L.0</span> Policy Example: Triggerless Future Event Processing</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following example assumes that a âcommenceâ attribute exists and does the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Holds the time stamp value indicating when an event should be processed</p></li>
+<li class="listitem">
+<p class="listitem">Contains an integer or Java string time stamp value. See <a href="configure-jdbc-driver-specific-parameters.html#b1pu3jg" class="xref">Time Syntax</a>.</p></li></ul></div>
+<pre class="screen">&lt;policy    xmlns:Timestamp="http://www.novell.com/nxsl/java/java.sql.Timestamp"
+  xmlns:TimestampUtil="http://www.novell.com/nxsl/java/com.novell.nds.dirxml.driver.jdbc.db.TimestampUtil"     
+  xmlns:jdbc="urn:dirxml:jdbc"&gt;
+&lt;rule&gt;
+&lt;description&gt;Get commencement date from datasource.&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-xpath op="true"&gt;.&lt;/if-xpath&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-set-local-variable name="commence"&gt;
+      &lt;arg-string&gt;
+        &lt;token-src-attr class-name="User" name="commence"/&gt;
+      &lt;/arg-string&gt;
+    &lt;/do-set-local-variable&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre><pre class="screen">&lt;rule&gt;
+  &lt;description&gt;Break if commencement date unavailable.&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-local-variable name="commence" op="equal"/&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-break/&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre><pre class="screen">&lt;rule&gt;
+&lt;description&gt;Parse times.&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-xpath op="true"&gt;.&lt;/if-xpath&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-set-local-variable name="dbTime"&gt;
+      &lt;arg-object&gt;
+        &lt;token-xpath expression="Timestamp:valueOf(@jdbc:database-local-time)"/&gt;
+      &lt;/arg-object&gt;
+    &lt;/do-set-local-variable&gt;
+    &lt;do-set-local-variable name="eventTime"&gt;
+      &lt;arg-object&gt;
+        &lt;token-xpath expression="Timestamp:valueOf($commence)"/&gt;
+      &lt;/arg-object&gt;
+    &lt;/do-set-local-variable&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;
+&lt;rule&gt;
+  &lt;description&gt;Is commencement date after database time?&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-xpath op="true"&gt;.&lt;/if-xpath&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-set-local-variable name="after"&gt;
+      &lt;arg-string&gt;
+        &lt;token-xpath expression="TimestampUtil:after($eventTime, $dbTime)"/&gt;
+      &lt;/arg-string&gt;
+    &lt;/do-set-local-variable&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;</pre><pre class="screen">&lt;rule&gt;
+&lt;description&gt;Retry if future event.&lt;/description&gt;
+  &lt;conditions&gt;
+    &lt;and&gt;
+      &lt;if-local-variable name="after" op="equal"&gt;true&lt;/if-local-variable&gt;
+    &lt;/and&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;do-status level="retry"&gt;
+      &lt;arg-string&gt;
+        &lt;token-text xml:space="preserve"&gt;Future event detected.&lt;/token-text&gt;
+      &lt;/arg-string&gt;
+    &lt;/do-status&gt;
+  &lt;/actions&gt;
+&lt;/rule&gt;
+&lt;/policy&gt;</pre>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b40141g,b3wv5kq,b40141f,b40141h,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Driver Security Certificates - NetIQ Linux and UNIX Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b40141g">
+
+<h1 class="title h1"><span class="number">8.5</span> Driver Security Certificates</h1>
+
+<div class="content_wrapper">
+
+<p class="para">SSL uses security certificates to control, encrypt, and authenticate communications.</p>
+<p class="para">Ensure that the security certificate directory <span class="filename">/usr/local/nxdrv/keys</span> is appropriately protected. The installation program sets secure file permissions for this directory.</p>
+<p class="para">The Driver Shim and the Identity Manager engine communicate through SSL using a certificate created in the Identity Vault and retrieved by the driver shim during the installation process. For more information on this certificate and how to renew or install third-party certificates, refer to the <span class="citetitle">Identity Manager Administration Guide</span>.</p>
+<p class="para">The Embedded Remote Loader web interface uses a dynamically generated, self-signed certificate for SSL communication. The details of this certificate are as follows:</p>
+<div class="table" id="b9vx157"><p class="title"><em class="num">Table 8-1 </em>Security Certificate Details (Embedded Remote Loader)</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+            
+<tr class="headerrow" id="b9vx2iz"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Property Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Values / Parameters</p></th>
+</tr>
+          
+<tr class="oddrow" id="b9vx2j0"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Subject</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SSL Server</p></td>
+</tr>
+<tr class="evenrow" id="b9vx2j1"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Issuer</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SSL Server</p></td>
+</tr>
+<tr class="oddrow" id="b9vx2j2"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Validity</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1 year</p></td>
+</tr>
+<tr class="evenrow" id="b9vx2j3"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Serial Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">0</p></td>
+</tr>
+<tr class="oddrow" id="b9vx2j4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Key</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">1024-bit RSA</p></td>
+</tr></table>
+</div>
+
+<p class="para">Renewal of this certificate automatically occurs every time the driver shim is restarted on the connected platform.</p>
+<p class="para">If you have configured your Driver Shim to provide remote NIS or NIS+ clients with password publishing, a certificate is generated during installation for SSL authorization and communication. This certificate is a self-signed certificate authority with the following certificate properties:</p>
+<div class="table" id="b9vx6n0"><p class="title"><em class="num">Table 8-2 </em>Security Certificate Details (Driver Shim)</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+            
+<tr class="headerrow" id="b9vx6n1"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Property Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Values / Parameters</p></th>
+</tr>
+          
+<tr class="oddrow" id="b9vx6n2"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Subject</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">soap api certificate authority</p></td>
+</tr>
+<tr class="evenrow" id="b9vx6n3"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Issuer</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">soap api certificate authority</p></td>
+</tr>
+<tr class="oddrow" id="b9vx6n4"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Validity</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">10 year</p></td>
+</tr>
+<tr class="evenrow" id="b9vx6n5"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Serial Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">0</p></td>
+</tr>
+<tr class="oddrow" id="b9vx6n6"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Key</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">4096-bit RSA</p></td>
+</tr></table>
+</div>
+
+<p class="para">These properties can be configured and renewed at any time. For information on how to configure these properties, refer to <a href="b4dwo69.html" class="xref">The Remote Publisher Configuration File</a>.</p>
+<p class="para">When remote NIS or NIS+ clients are configured to publish passwords, they retrieve a certificate from the Driver Shim and use this for SSL communication and client authorization. The client certificates contain the following certificate properties:</p>
+<div class="table" id="b9vx6n7"><p class="title"><em class="num">Table 8-3 </em>Security Certificate Details (NIS or NIS+ clients)</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+            
+<tr class="headerrow" id="b9vx6n8"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Property Name</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Values / Parameters</p></th>
+</tr>
+          
+<tr class="oddrow" id="b9vx6n9"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Subject</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">soap api client</p></td>
+</tr>
+<tr class="evenrow" id="b9vx6na"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Issuer</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">soap api certificate authority</p></td>
+</tr>
+<tr class="oddrow" id="b9vx6nb"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Validity</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2 year</p></td>
+</tr>
+<tr class="evenrow" id="b9vx6nc"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Serial Number</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">[starts at 1000]</p></td>
+</tr>
+<tr class="oddrow" id="b9vx6nd"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Key</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">2048-bit RSA</p></td>
+</tr></table>
+</div>
+
+<p class="para">For more information on how to configure these certificate properties, refer to <a href="b4dwo69.html" class="xref">The Remote Publisher Configuration File</a>.</p>
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

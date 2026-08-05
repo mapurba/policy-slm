@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g4en7k4,t4cb3g4da6yy,t4cb3g4ef3ea,t4cb3g4eq7a6,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Location Attribute - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4cb3g4en7k4">
+
+<h1 class="title h1"><span class="number">3.5</span> Location Attribute</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The user attribute Location exposes and processes a structured value representing a set of location values which are part of the user information available in the Google user object. Google exposes theÂ following Location data elements. (Taken from Google API documentation â <a href="https://developers.google.com/admin-sdk/directory/v1/reference/users" class="ulink">https://developers.google.com/admin-sdk/directory/v1/reference/users</a>)</p>
+<div class="table" id="t4cb3g4epcsw"><p class="title"><em class="num">Table 3-4 </em>Location Attribute Data Elements</p>
+<table class="topbot" width="100%"><col width="17%" /><col width="83%" />
+            
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Data Element</span>
+                </p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">
+                  <span class="bold">Description</span>
+                </p></th>
+</tr>
+          
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">area</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Textual location. This is most useful for display purposes to concisely describe the location. For example, "Mountain View, CA" or "Near Seattle."</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">buildingId</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Building identifier</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">deskCode</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Most specific textual code of individual desk location</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">floorName</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Floor name/number</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">
+                  <span class="bold">floorSection</span>
+                </p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Floor section. More specific location within the floor. For example, if a floor is divided into sections "A," "B," and "C," this field would identify one of those values.</p></td>
+</tr></table>
+</div>
+
+<p class="para">These data elements are collected into a group identified with a âtype.â There are three acceptable values for type:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">desk</p></li>
+<li class="listitem">
+<p class="listitem">default</p></li>
+<li class="listitem">
+<p class="listitem">custom</p></li></ul></div>
+
+<p class="para">If custom is chosen, then an additional element customType is needed.</p>
+<p class="para">The connector supports one instance of each type or custom/customType combination. Any added values of type âdesk,â for example, will replace any existing âdeskâ location sets. Any removed values for type âdeskâ will remove any âdeskâ location set values. The pair of type âcustomâ and the value ofÂ customType will uniquely identify one element.</p>
+<p class="para">Location is supported via a structured attribute with these components:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">type</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Must be desk, default, or custom</p></li>
+<li class="listitem">
+<p class="listitem">If set to âcustomâ, the component customType becomes mandatory.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">customType</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Mandatory if type is custom</p></li>
+<li class="listitem">
+<p class="listitem">Ignored if type is not custom</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">area</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Optional, string</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">buildingId</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Optional, string</p></li>
+<li class="listitem">
+<p class="listitem">The value MUST resolve to a building resource which exists in the domain*</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">deskCode</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Optional, string</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">floorName</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Optional, string</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">floorSection</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Optional, string</p></li></ul></div>
+</li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Building ID values will be rejected by the API stack if they do not refer to a building resource within the Google domain. This is done through the Google Admin interface. For more information, see: <a href="https://support.google.com/a/answer/1033925?hl=en&amp;ref_topic=1034362" class="ulink">https://support.google.com/a/answer/1033925?hl=en&amp;ref_topic=1034362</a></p></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="t4cb3g4epkh6">
+
+<h2 class="title h2"><span class="number">3.5.1</span> Examples</h2>
+
+<div class="content_wrapper">
+
+<div class="container sect3" id="t4cb3g4eps6e">
+
+<h3 class="title h3">Add Value</h3>
+<pre class="screen">
+&lt;modify-attr attr-name="Location"&gt;
+ &lt;add-value&gt;
+ &lt;value type="structured"&gt;
+ &lt;component name="type"&gt;default&lt;/component&gt;
+ &lt;component name="customType"/&gt;
+ &lt;component name="area"&gt;MyArea&lt;/component&gt;
+ &lt;component name="buildingId"/&gt;
+ &lt;component name="deskCode"&gt;Desk1121&lt;/component&gt;
+ &lt;component name="floorName"&gt;1st Floor&lt;/component&gt;
+ &lt;component name="floorSection"/&gt;
+ &lt;/value&gt;
+ &lt;/add-value&gt;
+&lt;/modify-attr&gt;
+</pre>
+</div>
+
+<div class="container sect3" id="t4cb3g4epzl5">
+
+<h3 class="title h3">Remove Value</h3>
+<pre class="screen">
+&lt;modify-attr attr-name="Location"&gt;
+ &lt;remove-value&gt;
+ &lt;value type="structured"&gt;
+ &lt;component name="type"&gt;default&lt;/component&gt;
+ &lt;/value&gt;
+ &lt;/remove-value&gt;
+&lt;/modify-attr&gt;
+</pre>
+<p class="para">On remove value elements, only type and, if needed, customType, are examined. All other components are ignored.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3gy8qc,b3fxjtu,b3fz6nm,b3fxjz5,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Retrieving Values with a Policy - NetIQ Linux and UNIX Settings Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3gy8qc">
+
+<h1 class="title h1"><span class="number">B.3</span> Retrieving Values with a Policy</h1>
+
+<div class="content_wrapper">
+
+<p class="para">You can retrieve values with a policy by calling methods from the driver shim. The following example demonstrates retrieving values with XPath expressions:</p><pre class="screen">&lt;do-set-local-variable name="DriverDN"&gt;
+  &lt;arg-string&gt;
+    &lt;token-text xml:space="preserve"&gt;\MYD1\mydriver\drivers\NxSettings&lt;/token-text&gt;
+  &lt;/arg-string&gt;
+&lt;/do-set-local-variable&gt;
+&lt;do-set-local-variable name="driverShimInstance"&gt;
+  &lt;arg-object&gt;
+    &lt;token-xpath expression="NxSettingsInstance:getInstance($DriverDN)"/&gt;
+  &lt;/arg-object&gt;
+&lt;/do-set-local-variable&gt;
+&lt;do-set-local-variable name="uid"&gt;
+  &lt;arg-string&gt;
+    &lt;token-xpath expression='driverShim:getNextRangeValue($driverShimInstance,"DefaultSet", "uid")'/&gt;
+  &lt;/arg-string&gt;
+&lt;/do-set-local-variable&gt;</pre>
+<p class="para">This works as follows:</p>
+<div class="orderedlist">
+        
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Local variable âDriverDNâ is set to the DN of the driver. This value is used to retrieve the correct instance of the driver shim from the Java* virtual machine.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The static getInstance method is called on the driver shim to retrieve a handle to the shim object.</p></li>
+        
+<li class="listitem">
+<p class="listitem">The getNextRangeValue method is called on the driver shim with the following arguments:</p>
+<div class="informaltable">
+<table class="topbot" width="96%"><col width="25%" /><col width="75%" />
+                
+<tr class="headerrow" id="b3gf0yt"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Argument</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Description</p></th>
+</tr>
+              
+<tr class="oddrow" id="b3gf0yu"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">driverShimInstance</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The handle to the shim</p></td>
+</tr>
+<tr class="evenrow" id="b3gf0yv"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">setName</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The name of the settings set to retrieve the range value from (defined by the value of the settings tag name attribute)</p></td>
+</tr>
+<tr class="oddrow" id="b3gf0yw"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">SettingName</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">The name of the setting containing the range information to be used to assign an ID</p></td>
+</tr></table>
+</div>
+</li>
+      </ol></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

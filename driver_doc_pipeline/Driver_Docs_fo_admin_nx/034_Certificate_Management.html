@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b1e5g643,chdcejie,b4baik6,babjjgjg,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Certificate Management - NetIQ Fan-Out Driver for Linux and UNIX Administration Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b1e5g643">
+
+<h1 class="title h1"><span class="number">6.7</span> Certificate Management</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Fan-Out driver uses SSL X.509 certificates to maintain secure connectivity between platforms and core drivers. These certificates are located in the file system, under the following paths for the Core Driver and Platform Services, respectively:</p><pre class="screen">  /usr/local/ASAM/data/CoreDriver/certs/
+  /usr/local/ASAM/data/PlatformServices/certs/</pre>
+<p class="para">For Core Drivers, there are five files:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="command">ca_cert.pem</span>âThis is the public certificate file for the Fan-Out "Root CA"</p></li>
+<li class="listitem">
+<p class="listitem"><span class="command">ca_key.pem</span>âThis is the private key file for the Fan-Out âRoot CAâ</p></li>
+<li class="listitem">
+<p class="listitem"><span class="command">ca.pem</span>âThis is the public certificate for the local Fan-Out Core Driver</p></li>
+<li class="listitem">
+<p class="listitem"><span class="command">key.pem</span>âThis is the private key file for the local Fan-Out Core Driver</p></li>
+<li class="listitem">
+<p class="listitem"><span class="command">ca.pem</span>âThis is also the public certificate file for the Fan-Out "Root CA"</p></li></ul></div>
+
+<p class="para">For Platform Services, there are three files:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="command">cert.pem</span>âThis is the public certificate file for this platform.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="command">key.pem</span>âThis is the private key file for this platform.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="command">ca.pem</span>âThis is the public certificate file for the Fan-Out "Root CA"</p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1e5g8k1">
+
+<h2 class="title h2"><span class="number">6.7.1</span> Certificate Properties</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Each certificate can be viewed in plaintext, using the OpenSSL command:</p><pre class="screen">    openssl x509 -in &lt;path to certificate.pem&gt; -text
+
+    Certificate:
+        Data:
+            Version: 3 (0x2)
+            Serial Number: 1002 (0x3ea)
+            Signature Algorithm: sha1WithRSAEncryption
+            Issuer: CN=Novell Account Management 3.1 Certificate Authority
+            Validity
+                Not Before: Sep 30 15:30:42 2020 GMT
+                Not After : Oct  1 15:30:42 2021 GMT
+            Subject: CN=localhost, OU=localhost, OU=platform sets, 
+        OU=event driven objects, OU=asam system, O=system
+              .  .  .</pre>
+<p class="para">The contents contain important fields, such as the <span class="strong">Subject Name</span>, <span class="strong">DNS Alternate Subject Names</span>, <span class="strong">Serial Number</span>, <span class="strong">Before</span> and <span class="strong">After</span> Dates, and <span class="strong">Issuer</span>. A combination of these fields are used to verify access during communication.</p>
+<p class="para">Alternatively, you can find the Certificate Expirations for everything in the Fan-Out Driver iManager Plug-In:</p>
+<div class="procedure" id="b1e5gl6f">
+<ol class="steps">
+<li class="step" id="b1e5gl6g">
+<p class="para">Click on Fan-<span class="guimenu">Out Driver Utilities.</span></p></li>
+<li class="step" id="b1e5gl6h">
+<p class="para">Click on <span class="guimenu">Component Status.</span></p>
+<p class="para">From here, you will find the certificate expiration date for the Root CA.</p></li>
+<li class="step" id="b1e5gmmk">
+<p class="para">Click on <span class="guimenu">Core Drivers</span> to list the certificate expiration dates for all core drivers; or click on <span class="guimenu">Platforms</span> to view the certificate expiration dates for all platforms.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1e5gne4">
+
+<h2 class="title h2"><span class="number">6.7.2</span> Certificate Configuration</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Certificates are created for Core Drivers during Core Driver startup, and for Platforms during the Platform Services installation and secure task. During this process, the Core Driver uses two attributes on the <span class="command">cn=Certificate Services,ou=Manager Services,ou=ASAM System</span> object:</p><pre class="screen">  &lt;definition display-name="Verify serial number of incoming platform connection: " 
+       id="111" 
+       name="verifySerialNumber" 
+       type="boolean"&gt;
+    &lt;description&gt;During the SSL handshake between the driver and the connecting platform, the serial number can be verified against the last serial number generated by the core driver.  Enter a value of "true" if you wish to verify this serial number upon connecting.&lt;/description&gt;
+    &lt;value&gt;false&lt;/value&gt;
+    &lt;/definition&gt;</pre>
+<p class="para">The definition above configures whether this Core Driver should validate Platform serial numbers when attempting to establish a connection.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1e5gqim">
+
+<h2 class="title h2"><span class="number">6.7.3</span> Renewing Platform Certificates</h2>
+
+<div class="content_wrapper">
+
+<p class="para">When a Platform Services is installed, a platform certificate is issued and an expiration date is stamped on the certificate âNot Beforeâ field. The duration of this certificate depends upon the Certificate Services attribute âASAM-certDelayExpireTimeâ value. This is global for all platforms and core drivers. This process is done using the following command-line run option:</p>
+<p class="para">
+            <span class="command">/usr/local/ASAM/bin/PlatformServices/PlatformReceiver/asamrcvr -s</span>
+          </p>
+<p class="para">This command may be run at any time to obtain a new certificate. However, it does expect you to authenticate to the Core Driver in order to do so. Often, itâs useful to use the previous certificate as an authentication method in order to obtain a new one for automation purposes. When a certificate is approaching expiration, a message may be displayed and logged to the system syslog to indicate:</p><pre class="screen">  CRT012A Platform Certificate will expire on 20211001153042Z</pre>
+<p class="para">You can renew the platform certificate by running the following command:</p><pre class="screen">  /usr/local/ASAM/bin/PlatformServices/PlatformReceiver/asamrcvr -t</pre>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>If your platform also requires a new Certificate Authority, you must first remove <span class="filename">ca.pem</span> on your platform OS and use the -s command-line option.</p></div>
+
+<p class="para">After obtaining the new certificates, simply re-start any services that are using it, such as <span class="command">asampsp</span> or <span class="command">asamrcvr</span>.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1e5grkr">
+
+<h2 class="title h2"><span class="number">6.7.4</span> Renewing Core Driver Certificates</h2>
+
+<div class="content_wrapper">
+
+<p class="para">When a Core Driver is installed, a certificate is issued and an expiration date is stamped on the certificate <span class="guimenu">Not Before</span> field during shim startup. The duration of this certificate depends upon the Certificate Services attribute <span class="command">ASAM-certExpirationDelay</span> value. This is global for all platforms and core drivers. When a certificate is approaching expiration, a message may be displayed and logged to the system syslog to indicate:</p><pre class="screen">  CRT013A Core Driver Certificate will expire on 20211001153042Z</pre>
+<p class="para">You can recreate the Core Driver certificates with a couple methods. Changing any of the Core Driver object properties, such as Network Address and restarting the Core Driver will automatically regenerate a new certificate. Alternatively, you may simply delete the <span class="filename">/usr/local/ASAM/data/CoreDriver/certs/cert.pem</span> file and restart the Core Driver to allow it to regenerate a new certificate.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1e5gt9i">
+
+<h2 class="title h2"><span class="number">6.7.5</span> Renewing the Root CA</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Root CA for the Fan-Out driver is the most important certificate, as it is used to issue and sign all certificate files for Platforms and Core Drivers. This certificate has a duration of 10 years. However, when it is renewed, a few steps must be followed. This procedure preserves the Root CAâs key, which is necessary to keep platform and core driver certificates valid, so do not delete the <span class="command">ca_key.pem</span>:</p>
+<div class="procedure" id="b1e5gua8">
+<ol class="steps">
+<li class="step" id="b1e5gua9">
+<p class="para">Remove the following files from all Core Driver servers:</p><pre class="screen">  /usr/local/ASAM/data/CoreDriver/certs/ca_cert.pem
+  /usr/local/ASAM/data/CoreDriver/certs/ca.pem</pre></li>
+<li class="step" id="b1e5guaa">
+<p class="para">Restart the primary Core Driver server shim to allow it to regenerate a new set of <span class="command">ca_cert.pem</span> and <span class="command">ca.pem</span> files.</p></li>
+<li class="step" id="b1e5guiz">
+<p class="para">Copy the <span class="command">ca_cert.pem</span> and <span class="command">ca.pem</span> to the remaining Core Driver servers and restart those driver shims to load the new Root CA.</p></li>
+<li class="step" id="b1e5gurv">
+<p class="para">Because the <span class="command">ca.pem</span> must be distributed to all platform objects, you must also force Platform Services to renew their certificates via section 6.7.3, or manually copy <span class="command">ca.pem</span> to each platform and restart the Platform Services processes.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

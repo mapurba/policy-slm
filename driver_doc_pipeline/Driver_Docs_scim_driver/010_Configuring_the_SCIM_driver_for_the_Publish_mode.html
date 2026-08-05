@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="February 17 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="t4uetnsljjqa,b94c4u0,create-driver-object-designer,t4d0rxs1iuyr,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring the SCIM driver for the Publish mode - NetIQ SCIM Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4uetnsljjqa">
+
+<h1 class="title h1"><span class="number">2.6</span> Configuring the SCIM driver for the Publish mode</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The SCIM driver supports the <span class="guimenu">Publish</span> mode. In this mode, the driver exposes SCIM endpoints to receive events from the connected SCIM service and then pushes those events to the Identity Vault.</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="t4uetojda369">
+
+<h2 class="title h2"><span class="number">2.6.1</span> Supporting Identity Manager engine through SCIM endpoints</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The SCIM driver exposes SCIM endpoints to the Identity Manager engine. This allows external applications and services to communicate with OpenText eDirectory and Identity Manager engine through the SCIM API.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The authentication header and content type are mandatory for SCIM methods.</p></div>
+
+<p class="para">The following table lists the URLs for the different methods and resources:</p>
+<div class="table" id="t4ueugc6ibly"><p class="title"><em class="num">Table 2-3 </em>List of URLs with methods and resources</p>
+<table class="topbot" width="100%"><col width="33%" /><col width="33%" /><col width="33%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Resource</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">URL</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Users</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET, POST</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specific user</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET, PUT, PATCH, DELETE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users/{id}</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Groups</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET, POST</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Groups</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specific group</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET, PUT, PATCH, DELETE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Groups/{id}</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Custom</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET, POST</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/custom/{resourceName}</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Specific custom</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">GET, PUT, PATCH, DELETE</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/custom/{resourceName}/{id}</p></td>
+</tr></table>
+</div>
+
+<div class="container sect3" id="t4uetttvr62v">
+
+<h3 class="title h3">POST method</h3>
+
+<p class="para">The following table lists an example of the POST method:</p>
+<div class="table" id="t4ueugc6ik2w"><p class="title"><em class="num">Table 2-4 </em></p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method: POST</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User URI</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Payload</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="literallayout">{    "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],    "userName": "johndoe@gmail.com",    "externalId": "4wJRiuTHyEC45uMCUYrkxmn=",    "name": {        "givenName": "John",        "familyName": "Doe"    },    "emails": [{ "value": "Johndoe@gmail.com", "type": "work", "primary": true }],    "active": true}</pre></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Authorization</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Basic c3lzdGVtL3N5c3RlbQ==</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Content-Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">application/json</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Response</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="literallayout">201 Created{    "schemas": [        "urn:ietf:params:scim:schemas:core:2.0:User"    ],    "userName": " johndoe@gmail.com ",    "externalId": "4wJRiuTHyEC45uMCUYrkxmn=",    "name": {        "givenName": "John",        "familyName": "Doe"    },    "emails": [        {            "value": " johndoe@gmail.com ",            "type": "work",            "primary": true        }    ],    "active": true,    "id": "CqekLDjY7UW3HAqnpCw42A=="}</pre></td>
+</tr></table>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The ID returned in the POST response body is the unique system identifier. This ID is required for all subsequent operations (GET, PUT, PATCH, and DELETE) targeting that specific resource. Thus, you must capture and store the ID.</p></div>
+
+</div>
+
+<div class="container sect3" id="t4uetxv91kxc">
+
+<h3 class="title h3">DELETE method</h3>
+
+<p class="para">The following table lists an example of the DELETE method:</p>
+<div class="table" id="t4ueugc6irt2"><p class="title"><em class="num">Table 2-5 </em></p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method: DELETE</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User URI</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users/{id}</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Payload</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not required</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Authorization</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Basic c3lzdGVtL3N5c3RlbQ==</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Content-Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">application/json</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Response</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">204 No Content</p></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="container sect3" id="t4ueubfdtnkb">
+
+<h3 class="title h3">GET method</h3>
+
+<p class="para">The following table lists an example of the GET method:</p>
+<div class="table" id="t4ueugc6izjc"><p class="title"><em class="num">Table 2-6 </em></p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method: POST</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User URI</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Payload</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not applicable</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Authorization</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Basic c3lzdGVtL3N5c3RlbQ==</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Content-Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">application/json</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Response</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="literallayout">{    "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],    "totalResults": 1,    "itemsPerPage": 100,    "Resources": [        {            "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],            "id": "nhjkuijkskhdid==",            "userName": " johndoe@gmail.com ",            "active": true        }    ]    "nextCursor": "rO0ABXNyACxjb20ubm92ZWxs...BZAO0ig=="}</pre></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="container sect3" id="t4ueucanomhy">
+
+<h3 class="title h3">PATCH method</h3>
+
+<p class="para">The following table lists an example of the PATCH method:</p>
+<div class="table" id="t4ueugc6j79h"><p class="title"><em class="num">Table 2-7 </em></p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method: PATCH</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User URI</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users/{id}</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Authorization</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Basic c3lzdGVtL3N5c3RlbQ==</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Content-Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">application/json</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Payload</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="literallayout">{    "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],    "Operations": [        {            "op": "replace",            "path": "name.familyName",            "value": "Doejohn@gmail.com"        }    ]}</pre></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Response</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">200 OK</p></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="container sect3" id="t4ueud3lz5ff">
+
+<h3 class="title h3">PUT method</h3>
+
+<p class="para">The following table lists an example of the PUT method:</p>
+<div class="table" id="t4ueugc6jeyk"><p class="title"><em class="num">Table 2-8 </em></p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method: PUT</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User URI</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users/{id}</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Authorization</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Basic c3lzdGVtL3N5c3RlbQ==</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Content-Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">application/json</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Payload</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="literallayout">{    "id": "CqekLDjY7UW3HAqnpCw42A==",    "userName": " johndoe@gmail.com ",    "externalId": "4wJRiuTHyEC45uMCUYrkxmn=",    "name": {        "givenName": "John",        "familyName": "Doe"    },    "emails": [        {            "value": " johndoe@gmail.com ",            "type": "work",            "primary": true        }    ],    "active": true,    "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"]}</pre></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Response</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="literallayout">200 OK{    "schemas": [        "urn:ietf:params:scim:schemas:core:2.0:User"    ],    "userName": " johndoe@gmail.com ",    "externalId": "4wJRiuTHyEC45uMCUYrkxmn=",    "name": {        "givenName": "John",        "familyName": "Doe"    },    "emails": [        {            "value": " johndoe@gmail.com ",            "type": "work",            "primary": true        }    ],    "active": true,    "id": "CqekLDjY7UW3HAqnpCw42A=="}</pre></td>
+</tr></table>
+</div>
+
+</div>
+
+<div class="container sect3" id="t4ueue23kmzv">
+
+<h3 class="title h3">GET method for specific user</h3>
+
+<p class="para">The following table lists an example of GET method that the driver supports for a specific user:</p>
+<div class="table" id="t4ueugc6jmou"><p class="title"><em class="num">Table 2-9 </em></p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+                
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Method: GET</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col"><p>&nbsp;</p></th>
+</tr>
+              
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User URI</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">http://{ipaddress}:{port}/scim/api/v2/Users/{id}</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Payload</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Not applicable</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Authorization</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Basic c3lzdGVtL3N5c3RlbQ==</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Content-Type</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">application/json</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Response</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1"><pre class="literallayout">{    "emails": [        {            "type": "work",            "value": " johndoe@gmail.com "        }    ],    "name": {        "familyName": "John",        "givenName": "Doe"    }    "active": "false",    "id": "CqekLDjY7UW3HAqnpCw42A==",    "userName": " johndoe@gmail.com ",    "schemas": [        "urn:ietf:params:scim:schemas:core:2.0:User"    ]}</pre></td>
+</tr></table>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

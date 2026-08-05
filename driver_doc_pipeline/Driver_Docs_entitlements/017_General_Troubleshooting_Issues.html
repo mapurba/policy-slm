@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="July 11 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="am46suj,troubleshooting-role-based-entitlements,troubleshooting-role-based-entitlements,bnxmlz5,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>General Troubleshooting Issues - NetIQ Identity Manager Entitlements Service Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="am46suj">
+
+<h1 class="title h1"><span class="number">9.1</span> General Troubleshooting Issues</h1>
+
+<div class="content_wrapper">
+
+<p class="para">When troubleshooting, keep in mind these issues:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">When you make any changes to policies by clicking <span class="guimenu">New</span>, <span class="guimenu">Edit</span>, or <span class="guimenu">Remove</span> on the page where the policies are listed, the Entitlements Service Driver is stopped. The driver is not restarted unless you click <span class="guimenu">Restart</span> on that page.</p>
+<p class="listitem">This feature prevents the driver from granting or revoking entitlements in your production environment while your changes to policies are incomplete.</p>
+<p class="listitem">If you donât use the <span class="guimenu">Restart</span> button on the page, you see the following in the trace:</p><pre class="screen">DirXML Log Event -------------------
+     Driver:   \ACME-LAB-LDAP\acme\Drivers\IDM\RBE-Entitlements Service
+     Status:   Fatal
+     Message:  Code(-9005) The driver returned a "fatal" status indicating that the driver should be shut down. Detail from d
+river: &amp;lt;description&gt;Entitlement Policy editor is currently locked by 'acme\admins\admin@127.0.0.1'.&amp;lt;/description&gt;
+&amp;lt;document xml:space="preserve"&gt;&amp;lt;nds dtdversion="3.5" ndsversion="8.x"&gt;
+        &amp;lt;source&gt;
+                &amp;lt;product version="3.6.1.4427"&gt;DirXML&amp;lt;/product&gt;
+                &amp;lt;contact&gt;Novell, Inc.&amp;lt;/contact&gt;
+        &amp;lt;/source&gt;
+        &amp;lt;input&gt;
+                &amp;lt;init-params src-dn="\ACME-LAB-LDAP\acme\Drivers\IDM\RBE-Entitlements Service"/&gt;
+        &amp;lt;/input&gt;
+&amp;lt;/nds&gt;&amp;lt;/document&gt;
+&amp;lt;application&gt;DirXML &amp;lt;/application&gt;
+&amp;lt;module&gt;RBE-Entitlements Service &amp;lt;/module&gt;
+&amp;lt;object-dn&gt;&amp;lt;/object-dn&gt;
+&amp;lt;component&gt;DirXML Engine&amp;lt;/component&gt;</pre></li>
+<li class="listitem">
+<p class="listitem">Similarly, the Entitlements Service Driver wonât start if more than one person appears to be editing Entitlement Policies at the same time.</p></li>
+<li class="listitem">
+<p class="listitem">Because one Entitlements Service Driver is used per driver set, an entitlement policy can manage only users that are in a read/write or master replica on the server that is associated with that driver set.</p></li></ul></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

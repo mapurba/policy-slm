@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="configuring-the-subscriber-channel,securing-communication,configuring-the-publisher-channel-using-the-keystore-file,manging-the-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring the Subscriber Channel - NetIQ Identity Manager Driver for Oracle E-Business Suite (User Management, HR, and TCA) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="configuring-the-subscriber-channel">
+
+<h1 class="title h1"><span class="number">5.3</span> Configuring the Subscriber Channel</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel sends information from the Identity Vault to the Web service. To establish a secure connection for the Subscriber channel, you need a trust store containing a certificate issued by the certificate authority that signed the serverâs certificate.</p>
+<p class="para">Oracle Wallet Manager is an application used to manage and edit security credentials in Oracle wallets. A wallet is a password-protected container that stores authentication and signing credentials, including private keys, certificates, and trusted certificates, all of which are used by SSL for strong authentication. For more information, see <a href="http://docs.oracle.com/cd/B15904_01/core.1012/b13995/wallets.htm" class="ulink">Managing Wallets and Certificates.</a></p>
+<div class="procedure" id="b8qusb">
+<ol class="steps">
+<li class="step" id="bs9f2lf">
+<p class="para">If you are not using the default wallet.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b120j0gg">
+<p class="para">Change the <span class="guimenu">SSLWallet</span> property in the <span class="filename">ssl.conf</span> file to point the path of the wallet. For example, if SSL wallet file is present in the <span class="filename">/etc/ORACLE/WALLETS/pub</span> location, enter this path in the <span class="filename">ssl.conf</span> file (for example, <span class="filename">/u01/app/VIS/inst/apps/VIS_hostname/ora/10.1.3/conf/ssl.conf</span>).</p></li>
+<li class="step" id="b120j0gh">
+<p class="para">Add the path of the wallet in the <span class="filename">sqlnet.ora</span> file:</p><pre class="screen">WALLET_LOCATION=
+ (SOURCE=
+      (METHOD=file)
+      (METHOD_DATA=
+         (DIRECTORY=/etc/ORACLE/WALLETS/pub)))</pre>
+<p class="para">The <span class="filename">sqlnet.ora</span> file is present in the &lt;<span class="filename">ORACLE_HOME&gt;/network/admin/&lt;VIS_hostname&gt;</span> location.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1k6n2">
+<p class="para">Specify the HTTPS port as <span class="guimenu">Listen</span> in the <span class="filename">ssl.conf</span> file. For example, <span class="guimenu">Listen 4443</span>.</p></li>
+<li class="step" id="b120j4nn">
+<p class="para">Start the Oracle Wallet Manager and create the certificate in the Oracle EBS system:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="b120j4no">
+                <p class="title"><em class="title">UNIX:</em>
+                At the command line, enter <span class="command">owm</span>.</p>
+              </div>
+</li>
+<li class="listitem">
+<div class="formalpara" id="b120j4np">
+                <p class="title"><em class="title">Windows:</em>
+                Select <span class="guimenu">Start &gt; Programs &gt; Oracle-HOME_NAME &gt; Network Administration &gt; Wallet Manager</span>.</p>
+              </div>
+</li></ul></div>
+
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="b120j7no">
+<p class="para">Add a certificate request to an Oracle wallet. Click <span class="guimenu">Operations &gt; Add Certificate Request</span>.</p>
+<p class="para">The <span class="guimenu">Common Name</span> must match with the <span class="guimenu">hostname</span> (don't include port). This is same as the <span class="guimenu">Server Name</span> entry in the <span class="filename">httpd.conf</span> file (for example, <span class="filename">sles11sp164-ora.novell.com</span>)</p></li>
+<li class="step" id="b120jbn3">
+<p class="para">Export the certificate request created in 3a. Click <span class="guimenu">Operations &gt; Export Certificate Request</span>, then save the exported file with a <span class="filename">.csr</span> extension (for example, <span class="filename">subreq.csr</span>).</p></li>
+<li class="step" id="b120jbn4">
+<p class="para">(Conditional) Create a new Certificate Authority.</p><pre class="screen">openssl req -new -x509 -keyout cakey.pem -out <span class="replaceable">cacert.crt</span> -days 365</pre>
+<p class="para">Omit this step if you are using an existing Certificate Authority.</p></li>
+<li class="step" id="b120jbn5">
+<p class="para">Create the user certificate.</p><pre class="screen">openssl x509 -req -in <span class="replaceable">subreq.csr</span> -CA <span class="replaceable">cacert.crt</span> -CAkey cakey.pem -CAcreateserial -days 365 &gt; <span class="replaceable">server.crt</span></pre></li>
+<li class="step" id="b120jesx">
+<p class="para">Add the <span class="filename">cacert.crt</span> certificate to the wallet. Click <span class="guimenu">Operations &gt; Import Trusted Certificate</span>.</p></li>
+<li class="step" id="b120jesy">
+<p class="para">Add the <span class="filename">server.crt</span> certificate to the wallet. Click <span class="guimenu">Operations &gt; Import User Certificate</span>.</p></li>
+<li class="step" id="b120jesz">
+<p class="para">Save the wallet, then restart the Oracle EBS system.</p>
+<p class="para">If you are not using default wallet location, copy the wallet files to the custom location.</p></li></ol>
+</div>
+</li>
+<li class="step" id="b120jpzk">
+<p class="para">Download the certificate created in <a href="configuring-the-subscriber-channel.html#b120j4nn" class="xref">Step 3</a> from the Oracle EBS system.</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Export the certificate using the Oracle Wallet Manager.</p>
+<p class="listitem">Or</p></li>
+<li class="listitem">
+<p class="listitem">Type the URL in a Web browser and download the certificate.</p>
+<p class="listitem">For example, type <span class="command">https://sles11sp164-ora.novell.com:4443</span>.</p></li></ul></div>
+</li>
+<li class="step" id="b14z02oc">
+<p class="para">Copy the certificate to the Identity Vault machine.</p></li>
+<li class="step" id="b120jpzl">
+<p class="para">Add the certificate to the trust store using the keytool.</p><pre class="screen">keytool -import -file <span class="replaceable">subscriber.cer</span> -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell</pre>
+<p class="para">where <span class="filename">subscriber.cer</span> is the certificate downloaded in <a href="configuring-the-subscriber-channel.html#b120jpzk" class="xref">Step 4</a>.</p></li>
+<li class="step" id="bw1k8hv">
+<p class="para">Configure the Subscriber channel to use the keystore name (<span class="filename">dirxml.keystore</span>) created in <a href="configuring-the-subscriber-channel.html#b120jpzl" class="xref">Step 6</a>:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step" id="bw1kswt">
+<p class="para">In Identity Console, click the <span class="guimenu">IDM Administration</span> tile.</p></li>
+<li class="step" id="bw1kswu">
+<p class="para">On the Driver Dashboard, locate the Oracle EBS driver icon, then click the upper right corner of the driver icon to display the driverâs properties page.</p></li>
+<li class="step" id="bw1kswv">
+<p class="para">Click the <span class="guimenu">Configuration</span> tab, then expand the <span class="guimenu">Driver Parameters</span> section.</p></li>
+<li class="step">
+<p class="para">Click the <span class="guimenu">Subscriber Settings</span> tab.</p></li>
+<li class="step" id="bw1k9bh">
+<p class="para">In the <span class="guimenu">Truststore File</span> field, specify the path to the keystore created in <a href="configuring-the-subscriber-channel.html#b120jpzl" class="xref">Step 6</a>.</p></li></ol>
+</div>
+</li>
+<li class="step" id="bw1kup8">
+<p class="para">Save the configuration.</p></li></ol>
+</div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>For setting up mutual authentication on the Subscriber channel, follow the instructions from <a href="configuring-the-publisher-channel-using-the-keystore-file.html" class="xref">Configuring the Publisher Channel Using the Keystore File</a> and add the certificate to the keystore file in the Subscriber channel mutual authentication settings.</p></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

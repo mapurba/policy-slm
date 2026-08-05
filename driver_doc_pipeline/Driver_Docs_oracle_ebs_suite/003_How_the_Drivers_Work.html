@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-the-driver-works,introduction,driver-concepts,supported-oracle-versions,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>How the Drivers Work - NetIQ Identity Manager Driver for Oracle E-Business Suite (User Management, HR, and TCA) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-the-driver-works">
+
+<h1 class="title h1"><span class="number">1.2</span> How the Drivers Work</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The driver is a bidirectional synchronization product between the Oracle EBS system and the Identity Vault. This framework uses XML and XSLT to provide data and event transformation capabilities that convert Identity Vault data and events into Oracle data and vice-versa.</p>
+<p class="para">The Identity Vault acts as a hub, with other applications and directories publishing their changes to it. The Identity Vault then sends changes to the applications and directories that have subscribed for them. This results in two main flows of data: the Publisher channel and the Subscriber channel.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="how-the-driver-works.html#alvpnqh" class="xref">Publisher Channel</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-the-driver-works.html#alvpuso" class="xref">Subscriber Channel</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-the-driver-works.html#alvqmhh" class="xref">Associations</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="alvpnqh">
+
+<h2 class="title h2"><span class="number">1.2.1</span> Publisher Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Oracle Workflow Business Event System (BES) is an application service that uses Oracle Advanced Queuing (AQ) technology to communicate business events among different Oracle systems. The BES consists of the Event Manager and Workflow that process event activities. The BES can propagate Add, Delete, and Modify event data to the Identity Vault. Only events specifically selected by the system administrator are transported from the Oracle EBS system to the PL/SQL APIs. The PL/SQL APIs (installed in the Oracle EBS system as part of the driver installation) handle the parsing of the events and read the appropriate data fields specified by the driver configuration, and provide secure transport of the data over an HTTP/HTTPS port to the Publisher channel. <a href="how-the-driver-works.html#b120hfae" class="xref">Figure 1-1</a> shows the Publisher channel data flow from the Oracle EBS system to the Identity Vault.</p>
+<p class="para">Only the event attributes that have been specified in the driver Publisher filter are published to the Identity Vault. The Publisher channel then submits XML-formatted documents to the Identity Manager engine to publish them into the Identity Vault.</p>
+<div class="figure" id="b120hfae"><p class="title"><em class="num">Figure 1-1 </em>Publisher Channel Data Transfer</p>
+              <img src="../graphics/oracle_ebspub_driver_a.png" alt="" />
+            </div>
+
+<p class="para">The business events are cached and stored into a database table (idmusrmgt.idm_events table) in the Oracle EBS system. To guarantee the delivery of events to the Identity Manager, the events remain in the idmusrmgt.idm_events table until they are successfully send to the Identity Vault. The Publisher channel uses a SOAP/REST endpoint to poll the idmusrmgt.idm_events table for certain future events such as future add or delete events or modification of roles and responsibilities to the existing users, which are meant to be executed at a later time. A future date of when these events need to be executed is specified along with the events. Future events are immediately synchronized with the Identity Vault. The login attribute is disabled for the future events until when they are required to be operational.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="alvpuso">
+
+<h2 class="title h2"><span class="number">1.2.2</span> Subscriber Channel</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Subscriber channel receives XML-formatted Identity Vault events from the Identity Manager engine. The driver uses the Web Service security (WSS) token for authentication and updates the idmusrmgt.idm_events table with the Identity Vault changes.</p>
+<div class="figure" id="b120hg4j"><p class="title"><em class="num">Figure 1-2 </em>Subscriber Channel Data Transfer</p>
+              <img src="../graphics/oracle_ebssub_driver_a-updated.png" alt="" />
+            </div>
+
+<p class="para">For data to flow from the Identity Vault to the Oracle system, the driver uses the SOAP/REST functions. By using Identity Manager and other Identity Manager drivers, the data can be shared with other business applications and directories. These other applications can add additional data, which in turn can be transferred back to the idmusrmgt.idm_events table using the SOAP/REST service on the Subscriber channel.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="alvqmhh">
+
+<h2 class="title h2"><span class="number">1.2.3</span> Associations</h2>
+
+<div class="content_wrapper">
+
+<p class="para">Associations are created between the Oracle EBS system and the Identity Vault objects during the synchronization process. For the Oracle EBS user object, a unique 7-digit number must be created. However, the Identity Vault and other applications do not need to share this same unique ID. Identity Manager allows various naming policies in an organization to be applied to objects by using the DirXML-Association attribute.</p>
+<p class="para">The DirXML-Association attribute is multivalued. Therefore, if Identity Manager is being used to synchronize an object among multiple applications, all of the objectâs unique IDs (or associations) can be stored in this attribute on the Identity Vault object.</p>
+<p class="para">The unique ID association links objects from the Oracle EBS database to the corresponding objects in the Identity Vault. When an Add or Matching event occurs, the association is made. This association allows the driver to perform subsequent tasks on the appropriate object.</p>
+<p class="para">The DirXML-Associations field is stored on the Identity Vault object on the Identity Manager property page. The User ID of a user in the Oracle EBS system is used to create association for the User Management and TCA drivers. The Person ID of an employee is used to create association for the HR driver.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

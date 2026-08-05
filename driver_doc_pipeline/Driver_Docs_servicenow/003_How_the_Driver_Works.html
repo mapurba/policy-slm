@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 20 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-servicenow-works,introduction-servicenow,supported-servicenow-versions,data-transfer-between-systems,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>How the Driver Works - NetIQ ServiceNow Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-servicenow-works">
+
+<h1 class="title h1"><span class="number">1.2</span> How the Driver Works</h1>
+
+<div class="content_wrapper">
+
+<p class="para"><a href="how-servicenow-works.html#b1i9dwlp" class="xref">Figure 1-1</a> illustrates the data flow between Identity Manager and a ServiceNow driver.</p>
+<div class="figure" id="b1i9dwlp"><p class="title"><em class="num">Figure 1-1 </em>ServiceNow Driver Data Flow</p>
+            <img src="../graphics/service_now_a.png" alt="" />
+          </div>
+
+<p class="para">The Identity Manager engine uses XDS, a specialized form of XML (Extensible Markup Language), to represent events in the Identity Vault. Identity Manager passes the XDS to the driver policy which can consist of basic policies, DirXML Script, and XSLT (Extensible Stylesheet Language Transformation) style sheets. The ServiceNow driver uses SOAP (Simple Object Access Protocol) protocol to handle the HTTP (Hypertext Transfer Protocol) transport of data between the Identity Vault and ServiceNow. The Subscriber channel receives XDS command documents from the Identity Manager engine, converts them to ServiceNow API (Application Program Interface) calls, and executes them.</p>
+<p class="para">The driver shim translates the XDS to XML payload on the Subscriber channel and then invokes the appropriate SOAP endpoints exposed by ServiceNow for Object CRUD (Create, Read, Update, and Delete) operations.</p>
+<p class="para">The driver uses the following Internet protocols and languages to exchange data between Identity Manager and ServiceNow.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="how-servicenow-works.html#b1i9e050" class="xref">SOAP</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-servicenow-works.html#b1i9e2ue" class="xref">HTTP</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="how-servicenow-works.html#b1i9e2uf" class="xref">HTTPS</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1i9e050">
+
+<h2 class="title h2"><span class="number">1.2.1</span> SOAP</h2>
+
+<div class="content_wrapper">
+
+<p class="para">SOAP is an XML-based protocol for exchanging messages. It defines the message exchange but not the message content. The driver supports SOAP 1.1.</p>
+<p class="para">SOAP documents are organized into three elements:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Envelope:</em>
+              The root XML node.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Header:</em>
+              Provides context knowledge such as a transaction ID and security information.</p>
+            </div>
+</li>
+<li class="listitem">
+<div class="formalpara">
+              <p class="title"><em class="title">Body:</em>
+              The method-specific information.</p>
+            </div>
+</li></ul></div>
+
+<p class="para">SOAP follows the HTTP request/response message model, which provides SOAP request parameters in an HTTP request and SOAP response parameters in an HTTP response.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1i9e2ue">
+
+<h2 class="title h2"><span class="number">1.2.2</span> HTTP</h2>
+
+<div class="content_wrapper">
+
+<p class="para">HTTP is a protocol used to request and transmit data over the Internet or other computer network. The protocol works well in an Internet infrastructure and with firewalls.</p>
+<p class="para">HTTP is a stateless request/response system because the connection is usually maintained only for the immediate request. The client establishes a TCP connection with the server and sends a request command. The server then sends back its response.</p>
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1i9e2uf">
+
+<h2 class="title h2"><span class="number">1.2.3</span> HTTPS</h2>
+
+<div class="content_wrapper">
+
+<p class="para">HTTPS is the HTTP protocol over SSL (Secure Socket Layer) as a sub-layer under the regular HTTP application layering. HTTPS encrypts and decrypts user page requests as well as the pages that are returned by the Web server.</p>
+<p class="para">ServiceNow processes the request and returns a SOAP response to the driver shim. The shim receives the response as an array of bytes and converts it to an XML document before passing it back to the driver policies. The input transformation style sheet processes the response and converts it into appropriate XDS that is reported back to the Identity Manager engine.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

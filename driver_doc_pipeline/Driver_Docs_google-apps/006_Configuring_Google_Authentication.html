@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="April 23 2016" id="content-date" />
+<meta name="product_and_version" content="Identity Manager 4.8 Drivers 4.8" />
+<meta name="topic-data" content="t4cb3g49b48a,installing_the_driver_files,t4cb3g492d0l,t4cb3g4da6yy,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Configuring Google Authentication - Google Suite Driver Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="t4cb3g49b48a">
+
+<h1 class="title h1"><span class="number">2.2</span> Configuring Google Authentication</h1>
+
+<div class="content_wrapper">
+
+<p class="para" id="creating_a_new_driver">All the Google services used by the GÂ Suite Driver are authorized using OAuth2 via a Service Account Flow. In order to use a Service Account credential, you must have an administrative user account available.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Google frequently updates the user interfaces of their web consoles. Your screens may differ from the ones shown in this guide.</p></div>
+
+<p class="para">The following sections provide information about configuring Google authentication:</p>
+</div>
+
+<div class="container sect2 expanding expanded" id="creating_google_administrative_acc">
+
+<h2 class="title h2"><span class="number">2.2.1</span> Creating a GÂ Suite Administrative Account</h2>
+
+<div class="content_wrapper">
+
+<p class="para">In order to be able to configure OAuth2 and properly authorize a Service Account credential, aÂ GÂ Suite domain account with Super Admin access will be required. It is a recommended best practice to create and dedicate an account specifically for use by the driver. This allows for tighter controls and better auditing of domain events.</p>
+<p class="para">To create a new admin in the GÂ Suite Domain:</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Create a new admin user in the Google Admin Dashboard at <a href="https://admin.google.com" class="ulink">https://admin.google.com</a></p></li>
+          
+<li class="listitem">
+<p class="listitem">Click on the <span class="bold">Users</span> icon.</p>
+<div class="figure" id="t4cbmhlpl0tt"><p class="title"><em class="num">Figure 2-1 </em>Starting the Administrative Account Creation Process</p>
+                  <img src="../graphics/figure02.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Add a new user.</p>
+<div class="figure" id="t4cbmkafpqf4"><p class="title"><em class="num">Figure 2-2 </em>Adding a New User</p>
+                  <img src="../graphics/figure03.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Specify an account that you can memorize and indicative of its role and purpose. Set or generate a password.Â </p>
+<div class="figure" id="t4cbmkafpuaa"><p class="title"><em class="num">Figure 2-3 </em>Naming the User and Creating a Password</p>
+                  <img src="../graphics/figure04.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Make the new user a super admin.</p>
+<div class="figure" id="t4cbmkafpy57"><p class="title"><em class="num">Figure 2-4 </em>Adding Administrative Roles to the User Account</p>
+                  <img src="../graphics/figure05.png" alt="" />
+                </div>
+
+<div class="figure" id="t4cbmkafq1zx"><p class="title"><em class="num">Figure 2-5 </em>Selecting Super Admin Role</p>
+                  <img src="../graphics/figure06.png" alt="" />
+                </div>
+
+<div class="figure" id="t4cbmkafq5uv"><p class="title"><em class="num">Figure 2-6 </em>Confirming the Super Admin Role Assignment</p>
+                  <img src="../graphics/figure07.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Log into the GÂ Suite Admin Console with the new admin user to confirm proper set up.</p>
+<div class="figure" id="t4cbmktocm9s"><p class="title"><em class="num">Figure 2-7 </em>Logging in to Verify Account Setup</p>
+                  <img src="../graphics/figure08.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Accept the terms and conditions. The account will not work until this step is completed.</p>
+<div class="figure" id="t4cbmktoctzr"><p class="title"><em class="num">Figure 2-8 </em>Accepting Terms and Conditions</p>
+                  <img src="../graphics/figure09.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">It is recommended to set up a recovery phone number and/or email address for this new adminÂ account.</p></li>
+        </ol></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>It is necessary to log in to the admin console with the new admin user via a web browser at least once to fully activate the account. Until that step is done, the driver will not function.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="enabling_google_api_access">
+
+<h2 class="title h2"><span class="number">2.2.2</span> Enabling the GÂ Suite API Access</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The driver will provision users, groups, organizations, and shared contacts into GÂ Suite. It is necessary to enable API Access in your GÂ Suite domain before the driver can perform its work.</p>
+<p class="para">To enable API Access in GÂ Suite:</p>
+<div class="orderedlist">
+          
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Using a web browser, log into the GÂ Suite Admin Console. From the Dashboard select â<span class="bold">Security</span>.â</p>
+<div class="figure" id="t4cbmktod1pr"><p class="title"><em class="num">Figure 2-9 </em>Starting Configuration of G Suite API Access</p>
+                  <img src="../graphics/figure10.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">From theÂ SecurityÂ management page, select â<span class="bold">API Reference</span>.â</p>
+<div class="figure" id="t4cbmmc12z31"><p class="title"><em class="num">Figure 2-10 </em>Working with the API Reference Setting</p>
+                  <img src="../graphics/figure11.png" alt="" />
+                </div>
+</li>
+          
+<li class="listitem">
+<p class="listitem">Check the box labeled â<span class="bold">Enable API Access</span>.â</p>
+<div class="figure" id="t4cbmmc136t4"><p class="title"><em class="num">Figure 2-11 </em>Enabling the API Access</p>
+                  <img src="../graphics/figure12.png" alt="" />
+                </div>
+</li>
+        </ol></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="configuring_oauth2_authentication_fo">
+
+<h2 class="title h2"><span class="number">2.2.3</span> Configuring API and Service Account</h2>
+
+<div class="content_wrapper">
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Google frequently updates the user interfaces of their web consoles. Your screens may differ from the ones shown in this guide.</p></div>
+
+<p class="para">The next step is to set up a developer project in the developer console. After creating the developer project, it is a recommended best practice to add additional administrators/owners of the project beyond the GÂ Suite Driver account created earlier. This can prevent losing access to the project should changes be needed in the future.</p>
+<div class="container sect3" id="sect4">
+
+<h3 class="title h3">Create Developer Project</h3>
+
+<div class="orderedlist">
+            
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Go to the Google developers console atÂ <a href="https://console.developers.google.com/" class="ulink">https://console.developers.google.com</a>. If possible, usingÂ a new tab on your browser is recommended. You should be logged in with the same adminÂ account created earlier. Agree to the terms of service, if needed.</p>
+<div class="figure" id="t4cbmmc13ej0"><p class="title"><em class="num">Figure 2-12 </em>Creating a New Developer Project</p>
+                    <img src="../graphics/figure13.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Create a new project within the developerâs console.</p>
+<div class="figure" id="t4cbmmc13m7z"><p class="title"><em class="num">Figure 2-13 </em>Working with the Project Creation Process</p>
+                    <img src="../graphics/figure14.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Fill in the Project Name field. The Project ID field is generated by Google.</p>
+<div class="figure" id="t4cbmmc13txr"><p class="title"><em class="num">Figure 2-14 </em>Naming the Project</p>
+                    <img src="../graphics/figure15.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Click âCreate.â The new project may take 1 to 2 minutes to create.</p></li>
+          </ol></div>
+
+<p class="para">Once the new project is created, there are several steps which must be performed:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Enable the relevant APIs</p></li>
+<li class="listitem">
+<p class="listitem">Create an OAuth ClientID</p></li>
+<li class="listitem">
+<p class="listitem">Create a service account</p></li></ul></div>
+
+</div>
+
+<div class="container sect3" id="t4cb3g49dw9q">
+
+<h3 class="title h3">Enable Admin SDK API</h3>
+
+<p class="para">Once the project is created, from the developer's console, proceed to enable the Admin SDK API. The Admin SDK exposes the majority of the necessary API endpoints that the driver needs. WhenÂ this API is enabled, we will be given an opportunity to create the needed credentials for theÂ connector.</p>
+<p class="para">From the project created in the previous step:</p>
+<div class="orderedlist">
+            
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Select "Enable APIs and Services."</p>
+<div class="figure" id="t4cbmmc141nu"><p class="title"><em class="num">Figure 2-15 </em>Enabling APIs and Services for the Project</p>
+                    <img src="../graphics/figure16.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Scroll to the GÂ Suite APIs; select View All, if needed.</p>
+<div class="figure" id="t4cbmmc149dp"><p class="title"><em class="num">Figure 2-16 </em>Displaying the G Suite APIs</p>
+                    <img src="../graphics/figure17.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Select and Enable the Admin SDK. The interface will prompt you to create credentials, whichÂ willÂ be needed for the driver to connect to Google's servers.</p>
+<div class="figure" id="t4cbmmc14h3o"><p class="title"><em class="num">Figure 2-17 </em>Select the Admin SDK</p>
+                    <img src="../graphics/figure18.png" alt="" />
+                  </div>
+
+<div class="figure" id="t4cbmmc14ots"><p class="title"><em class="num">Figure 2-18 </em>Enable the Admin SDK</p>
+                    <img src="../graphics/figure19.png" alt="" />
+                  </div>
+</li>
+          </ol></div>
+
+</div>
+
+<div class="container sect3" id="t4cb3g49ejcv">
+
+<h3 class="title h3">Create Service Account Credentials</h3>
+
+<p class="para">From the "create credentials" prompt in the Admin SDK panel, continue to create the necessary credentials for the driver to authenticate and obtain authorization to the GÂ Suite domain.</p>
+<div class="orderedlist">
+            
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">Select âCreate Credentials.â</p>
+<div class="figure" id="t4cbmni9vga2"><p class="title"><em class="num">Figure 2-19 </em>Starting the Credential Creation Process</p>
+                    <img src="../graphics/figure20.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">The GÂ Suite driver uses the âservice accountâ credential type. Select âservice account,â skippingÂ the wizard.</p>
+<div class="figure" id="t4cbmphvwndr"><p class="title"><em class="num">Figure 2-20 </em>Selecting an API for Credentials</p>
+                    <img src="../graphics/figure21.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Click âCreate Service Account.â</p>
+<div class="figure" id="t4cbmphvwv3q"><p class="title"><em class="num">Figure 2-21 </em>Select Create Service Account to Continue</p>
+                    <img src="../graphics/figure22.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Give the account a relevant name and description.</p>
+<div class="figure" id="t4cbmphvx2tl"><p class="title"><em class="num">Figure 2-22 </em>Provide an Account Name</p>
+                    <img src="../graphics/figure23.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Do NOT assign a role or permissions to the service account. Simply continue from the screenÂ above.</p>
+<div class="figure" id="t4cbmphvxajl"><p class="title"><em class="num">Figure 2-23 </em>Continue Without Assigning Role or Permissions</p>
+                    <img src="../graphics/figure24.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">There is no need to grant access to the service account. The driver uses a private key as theÂ login credential, so it is necessary to create a key from this screen. Select "Create Key." ThisÂ keyÂ is required for the driver to function.</p>
+<div class="figure" id="t4cbmphvxi9k"><p class="title"><em class="num">Figure 2-24 </em>Starting the Creation of the Private Key</p>
+                    <img src="../graphics/figure25.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Save the key in the P12 format. The key will download and be saved on your workstation. This is your ONLY copy of this key. The key cannot be redownloaded from the developer's console. If lost, a new key will need to be created for this service account. A new key can be recreated from the credential in the developer's console project, if needed. The P12 key file is the equivalent of the service accountâs password and should be treated accordingly.</p>
+<div class="figure" id="t4cbmphvxnjp"><p class="title"><em class="num">Figure 2-25 </em>Select P12 Format for the Private Key</p>
+                    <img src="../graphics/figure26.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">The key will need to be copied to the hosting machine which is running the driver.</p>
+<div class="figure" id="t4cbmphvxrfm"><p class="title"><em class="num">Figure 2-26 </em>Private Key Saved Locally</p>
+                    <img src="../graphics/figure27.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Click done.</p>
+<p class="listitem">Locate the P12 file and upload it to your Identity Manager server in a location accessible from the driver. <span class="bold">/opt/novell/eDirectory/lib/dirxml/classes</span> is a recommended location for Linux hosts. Generally,Â aÂ good location is the same location as the gmailshim.jar file. If the driver is on aÂ remote loader,Â then it needs to go with the gmailshim.jar file in the remote loader location.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>The location and filename of the key file is a necessary configuration parameter for theÂ driver.</p></div>
+
+<div class="figure" id="t4cbmphvxvag"><p class="title"><em class="num">Figure 2-27 </em>Completing the Private Key Creation</p>
+                    <img src="../graphics/figure28.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem"><span class="bold">IMPORTANT</span>: On the service account details screen below, copy and paste the Email and Unique ID values into a text file for later use. The required data is highlighted below. These two values will be used to authorize the service account to access your domain via the various APIs used by the driver.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Copy the Unique ID and service account email address to a text file. They will be necessary for authorizing the service account and configuring the connector.</p></div>
+
+<div class="figure" id="t4cbmphvxz5d"><p class="title"><em class="num">Figure 2-28 </em>Record Email and Unique ID Values in a Text File for Later Reference</p>
+                    <img src="../graphics/figure29.png" alt="" />
+                  </div>
+</li>
+          </ol></div>
+
+</div>
+
+<div class="container sect3" id="t4cb3g49f6g2">
+
+<h3 class="title h3">Managing Credentials and Keys</h3>
+
+<p class="para">If you need to create or manage credentials after the fact, they can be accessed from the developer's console, in the project you created earlier. In the console, with your project selected, pull down the menu to IAM &amp; admin and select service accounts as shown below.</p>
+<div class="figure" id="t4cbmploe2a5"><p class="title"><em class="num">Figure 2-29 </em>Managing Credentials and Keys After the Fact</p>
+                <img src="../graphics/figure30.png" alt="" />
+              </div>
+
+<p class="para">From there, you can either create a new service account, manage your existing service account, orÂ create new keys, as shown below.</p>
+<div class="figure" id="t4cbmqfsljv0"><p class="title"><em class="num">Figure 2-30 </em>Options for Managing Accounts and Keys</p>
+                <img src="../graphics/figure31.png" alt="" />
+              </div>
+
+<p class="para">For more information, see the Google's developer console help system accessible from the question mark icon at the top right of the page for more information.</p>
+</div>
+
+<div class="container sect3" id="t4cb3g49flu2">
+
+<h3 class="title h3">Enable Remaining APIs</h3>
+
+<p class="para">The Admin SDK API is not sufficient alone for the connector to function. It is necessary to enable these additional APIs:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Group Settings</p></li>
+<li class="listitem">
+<p class="listitem">Contacts</p></li>
+<li class="listitem">
+<p class="listitem">Gmail</p></li></ul></div>
+
+<p class="para">Follow these steps:</p>
+<div class="orderedlist">
+            
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">From the developer console dashboard, click the GoogleAPIs banner to easily reach this point.</p>
+<div class="figure" id="t4cbmquozabu"><p class="title"><em class="num">Figure 2-31 </em>Start of Process to Enable Remaining APIs</p>
+                    <img src="../graphics/figure32.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Select Enable APIs. From the API Library, search for and enable the Group Settings, Contacts, and Gmail APIs.</p>
+<div class="figure" id="t4cbmquoze6s"><p class="title"><em class="num">Figure 2-32 </em>Selecting the Group Settings API</p>
+                    <img src="../graphics/figure33.png" alt="" />
+                  </div>
+
+<div class="figure" id="t4cbmquozi1p"><p class="title"><em class="num">Figure 2-33 </em>Enabling the Group Settings API</p>
+                    <img src="../graphics/figure34.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Return to the Enable APIs screen and search for âContacts.â Enable the Contacts API.</p>
+<div class="figure" id="t4cbmsaby8j4"><p class="title"><em class="num">Figure 2-34 </em>Finding the Contacts API</p>
+                    <img src="../graphics/figure35.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Finally search for and enable the Gmail API.</p>
+<div class="figure" id="t4cbmsabyg93"><p class="title"><em class="num">Figure 2-35 </em>Enabling the Gmail API</p>
+                    <img src="../graphics/figure36.png" alt="" />
+                  </div>
+</li>
+          </ol></div>
+
+</div>
+
+<div class="container sect3" id="t4cb3g49ggmd">
+
+<h3 class="title h3">Authorizing Service Account</h3>
+
+<p class="para">The service account provides the driver with the ability to authenticate to the GÂ Suite domain. It is necessary to grant that account permission to access your GÂ Suite domain via the API service scope endpoints. For more information, see the <span class="emphasis">Directory API: Authorize Requests</span> document available from Google.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>You will need the Unique ID of the service account which was created earlier. You will also need the API scope list provided with the driver. The scope list can be found in a text file called DirectoryScopes.txt. The scope list is a list of authorized scopes, which take the form of URLs, in a comma separated list, all in one line. The authorized scope list can also be found in <span class="bold">Appendix E â Directory Scopes</span>. Use the most recent scope list as it may be updated in the future.</p></div>
+
+<div class="orderedlist">
+            
+<ol class="orderedlist">
+<li class="listitem">
+<p class="listitem">From the GÂ Suite Admin Console, select the Security icon.</p>
+<div class="figure" id="t4cbmsabynyy"><p class="title"><em class="num">Figure 2-36 </em>Beginning Service Account Authorization</p>
+                    <img src="../graphics/figure37.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Scroll down and select âAdvanced Settings.â</p>
+<div class="figure" id="t4cbmsabyvox"><p class="title"><em class="num">Figure 2-37 </em>Scroll to and Select Advanced Settings</p>
+                    <img src="../graphics/figure38.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Select âManage API client access.â Copy and paste the Unique ID of the service account into the "Client Name" field.</p>
+<div class="figure" id="t4cbmsabz3ew"><p class="title"><em class="num">Figure 2-38 </em>Entering the Client Name for the Authorized API Clients</p>
+                    <img src="../graphics/figure39.png" alt="" />
+                  </div>
+</li>
+            
+<li class="listitem">
+<p class="listitem">Copy and paste the contents of the DirectoryScopes.txt file (included with the driver download orÂ in <span class="bold">Appendix E â Directory Scopes</span>) into the "One or More API Scopes" field. Note thatÂ the content should be plain text, so copy from a text file not from a web page to avoid any metadata.</p>
+<p class="listitem">Click Authorize.</p>
+<div class="figure" id="t4cbmsabzb4v"><p class="title"><em class="num">Figure 2-39 </em>Entering the API Scope and Authorizing the API Client Access</p>
+                    <img src="../graphics/figure40.png" alt="" />
+                  </div>
+
+<p class="listitem">If this step was successful, the entry will appear in the authorized list similar to the image below:</p>
+<div class="figure" id="t4cbmsabziuu"><p class="title"><em class="num">Figure 2-40 </em>Example of Successful API Client Access Authorization</p>
+                    <img src="../graphics/figure41.png" alt="" />
+                  </div>
+</li>
+          </ol></div>
+
+<p class="para">If, for any reason, this does not work or you need to change the authorized scopes, delete the authorization entry and create it again with the correct information.</p>
+</div>
+
+<div class="container sect3" id="t4cb3g49i66m">
+
+<h3 class="title h3">Configuring Driver Authentication</h3>
+
+<p class="para">This section shows what information needs to be set in the Identity Manager driver properties to use the serviceÂ account. If you have not yet imported the driver configuration into Designer or iManager, thenÂ complete those steps first before attempting to set the service account information.</p>
+<p class="para">You will need the following information to configure the authentication settings:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Admin account email address and password for the GÂ Suite domain</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">This is the one created first in this guide</p></li>
+<li class="listitem">
+<p class="listitem">Do not use your only admin account. Create one for the driver to use.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Service account Email Address</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">This should have been copied when the service account was created.</p></li>
+<li class="listitem">
+<p class="listitem">It can be found in the developer's console under service account details, asÂ shownÂ below:</p>
+<div class="figure" id="t4cbmsabzqkt"><p class="title"><em class="num">Figure 2-41 </em>Locating the Service Account Email Address</p>
+                        <img src="../graphics/figure42.png" alt="" />
+                      </div>
+</li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Full path and file name of the P12 key file on the Identity Manager server</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">This file was created as part of the credential process earlier in this guide</p></li>
+<li class="listitem">
+<p class="listitem">The file MUST be uploaded to the Identity Manager server where the Google driver is running.</p></li>
+<li class="listitem">
+<p class="listitem">It is recommended that the file be placed in the same location as the gmailshim.jarÂ file.</p></li>
+<li class="listitem">
+<p class="listitem">On a Linux host, this location might be:</p>
+<p class="listitem">/opt/novell/eDirectory/lib/dirxml/classes/KEYFILENAME.p12</p></li></ul></div>
+</li></ul></div>
+
+<p class="para">In Identity Manager Designer or iManager, edit the GÂ Suite driver properties.</p>
+<p class="para">On the "Authentication" tab, setÂ the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Authentication ID</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The email address of the admin account</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Connection Information</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">The domain name of this Google domain</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">Set Password</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Set the password to the password of the admin account</p></li></ul></div>
+</li></ul></div>
+
+<p class="para">The admin account is the actual identity used by the driver to effect changes in the domain. Once authenticated via the service account, the driver assumes the identity of the admin account and does the work through that proxy.</p>
+<div class="figure" id="t4cbmsoahcyd"><p class="title"><em class="num">Figure 2-42 </em>Completing the Driver Configuration Authentication Tab</p>
+                <img src="../graphics/figure43.png" alt="" />
+              </div>
+
+<p class="para">On the "Driver Parameters" tab, set the following:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Service Account Email Address</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Set this to the service account email address from the service account createdÂ earlier.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p class="listitem">P12 Private Key File</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Set this to the precise path AND file name of the P12 file which was uploaded toÂ theÂ Identity Manager server.</p></li>
+<li class="listitem">
+<p class="listitem">Use the hosting operating systems file and path correct syntax e.g.:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">/path/filename for Linux</p></li>
+<li class="listitem">
+<p class="listitem">C:\path\filename for Windows</p>
+<div class="figure" id="t4cbmsoahgte"><p class="title"><em class="num">Figure 2-43 </em>Completing the Driver Configuration Driver Parameters Tab</p>
+                            <img src="../graphics/figure44.png" alt="" />
+                          </div>
+</li></ul></div>
+</li></ul></div>
+</li></ul></div>
+
+<p class="para">Finally, select âOkâ and update the driver in the Vault.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

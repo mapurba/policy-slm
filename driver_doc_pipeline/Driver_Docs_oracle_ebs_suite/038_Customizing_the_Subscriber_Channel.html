@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="June 04 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="customizing-the-subscriber-channel,customizing-the-drivers,customizing-the-publisher-channel,recommendations,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Customizing the Subscriber Channel - NetIQ Identity Manager Driver for Oracle E-Business Suite (User Management, HR, and TCA) Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="customizing-the-subscriber-channel">
+
+<h1 class="title h1"><span class="number">C.2</span> Customizing the Subscriber Channel</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The following sections provide information about customizing the Subscriber channel to synchronize additional attributes from the different Oracle modules with which the drivers synchronize attributes.</p>
+<div class="itemizedlist subtoc">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+            <a href="customizing-the-subscriber-channel.html#b1fx4oi7" class="xref">Modifying the IDM_DRIVER_S PL/SQL Script</a>
+          </p></li>
+<li class="listitem">
+<p class="listitem">
+            <a href="customizing-the-subscriber-channel.html#b1fx4t31" class="xref">Verifying the Changes</a>
+          </p></li></ul></div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1fx4oi7">
+
+<h2 class="title h2"><span class="number">C.2.1</span> Modifying the IDM_DRIVER_S PL/SQL Script</h2>
+
+<div class="content_wrapper">
+
+<p class="para">The Oracle EBS system provides many built-in APIs for making certain changes to the user or employee data. You can use the IDM_DRIVER_S PL/SQL package to make these changes on the Subscriber channel. This package uses some of the Oracle EBS built-in APIs.</p>
+<p class="para"><a href="customizing-the-subscriber-channel.html#b1fx4pn5" class="xref">Table C-1</a> lists the APIs used for each module.</p>
+<div class="table" id="b1fx4pn5"><p class="title"><em class="num">Table C-1 </em>Oracle Module and EBS System APIs</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Oracle Modules</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Oracle EBS System APIs</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">User Management</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">fnd_user_pkg.createuser</p></li>
+<li class="listitem">
+<p class="listitem">fnd_user_pkg.updateuser</p></li></ul></div>
+</td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">HR Implementation</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">r_employee_api.create_employee</p></li>
+<li class="listitem">
+<p class="listitem">hr_person_api.update_person</p></li>
+<li class="listitem">
+<p class="listitem">hr_person_api.delete_person</p></li></ul></div>
+</td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">TCA</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">hz_party_v2pub.create_person</p></li>
+<li class="listitem">
+<p class="listitem">hz_party_v2pub.update_person</p></li>
+<li class="listitem">
+<p class="listitem">hz_contact_point_v2pub.create_email_contact_point</p></li></ul></div>
+</td>
+</tr></table>
+</div>
+
+<p class="para">To understand which attributes are supported by these APIs, use the SQL Developer tool and connect to the database where Oracle EBS system is installed. The API information is stored under the <span class="guimenu">Packages</span> panel on the left side of the screen. To view the APIs, expand the <span class="guimenu">Packages</span> panel.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>Currently, the query operations are supported on the <span class="literal">FND_USER, PER_ALL_PEOPLE_F</span>, and <span class="literal">HZ_PARTIES</span> tables.</p></div>
+
+<p class="para"><a href="customizing-the-subscriber-channel.html#b1fx4rj4" class="xref">Table C-2</a> lists the Identity Manager Schema attributes.</p>
+<div class="table" id="b1fx4rj4"><p class="title"><em class="num">Table C-2 </em>Schema Attributes</p>
+<table class="topbot" width="100%"><col width="50%" /><col width="50%" />
+              
+<tr class="headerrow"><th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Condition</p></th>
+<th align="left" valign="top" colspan="1" rowspan="1" scope="col">
+<p class="para">Action</p></th>
+</tr>
+            
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Condition 1:</span>The attribute is supported by one of the Oracle EBS system APIs and belongs to one of the <span class="literal">FND_USER</span>, <span class="literal">PER_ALL_PEOPLE_F</span>, or <span class="literal">HZ_PARTIES</span> tables.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">There is no change required in the PL/SQL script. You can directly add the attribute to the driver schema and filter for extending it.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Condition 2:</span>The attribute is supported by one of the Oracle EBS system APIs but does not belong to any of the <span class="literal">FND_USER</span>, <span class="literal">PER_ALL_PEOPLE_F</span>, or <span class="literal">HZ_PARTIES</span> tables.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Modify the query in the <span class="literal">IDM_DRIVER_S</span> package to specify the appropriate table name in the IF condition that starts with IF EVENT_NAME = TO_CHAR('oracle.apps.fnd.user.search') THEN statement.</p></td>
+</tr>
+<tr class="oddrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Condition 3:</span>The attribute is not supported by any of the Oracle EBS system APIs but belongs to one of the <span class="literal">FND_USER</span>, <span class="literal">PER_ALL_PEOPLE_F</span>, or <span class="literal">HZ_PARTIES</span> tables.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Determine which Oracle EBS system API is required to find the attribute, then add that API to the <span class="literal">IDM_DRIVER_S PL/SQL</span> package. You can use the <span class="literal">EMPLOYEE_OPERATION</span> and <span class="literal">EXECUTE_EMPLOYEE_API</span> functions as examples in the <span class="literal">IDM_DRIVER_S</span> package.</p></td>
+</tr>
+<tr class="evenrow"><td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para"><span class="strong">Condition 4:</span>The attribute is neither supported by the Oracle EBS system APIs nor belongs to the <span class="literal">FND_USER</span>, <span class="literal">PER_ALL_PEOPLE_F</span>, or <span class="literal">HZ_PARTIES</span> tables.</p></td>
+<td align="left" valign="top" colspan="1" rowspan="1">
+<p class="para">Make changes as instructed for condition 2 and 3. A new Oracle EBS system API is needed to find the attribute and then modify the query to include it in the new table.</p></td>
+</tr></table>
+</div>
+
+<div class="important">
+<p class="para"><em class="title">IMPORTANT:</em>Restart the driver after making the required changes.</p></div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="b1fx4t31">
+
+<h2 class="title h2"><span class="number">C.2.2</span> Verifying the Changes</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="t42hg6qidvsw">
+<ol class="steps">
+<li class="step">
+<p class="para">Create a user in the Identity Vault with the recently added attributes and verify that the newly added attributes are synchronized to the EBS.</p></li>
+<li class="step">
+<p class="para">Perform a query operation for the recently added attributes and verify the response.</p></li></ol>
+</div>
+
+<div class="example" id="t42hg6qih868">
+          <p class="title"><em class="num">Example C-3 </em> <span class="strong">XML Code for the Subscriber Changes</span> </p>
+          <pre class="screen">&lt;EBS_EVENT&gt; 
+               &lt;EVENT_NAME&gt;oracle.apps.fnd.user.insert&lt;/EVENT_NAME&gt; 
+               &lt;DRIVER_TYPE&gt;UM&lt;/DRIVER_TYPE&gt; 
+               &lt;OBJECT TYPE="USER"&gt; 
+                  &lt;x_user_name&gt;IDM_TEST_SUB_996111&lt;/x_user_name&gt; 
+                  &lt;x_description&gt;IDM_TEST_SUB_998&lt;/x_description&gt; 
+                  &lt;x_email_address&gt;IDM_TEST_SUB_998@test.com&lt;/x_email_address&gt; 
+                  &lt;x_fax&gt;19999989&lt;/x_fax&gt; 
+               &lt;/OBJECT&gt; 
+            &lt;/EBS_EVENT&gt;</pre>
+        </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

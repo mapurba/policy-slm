@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="January 02 2016" id="content-date" />
+<meta name="product_and_version" content="YTD" />
+
+<meta name="topic-data" content="how-to-install-postgresql8-for-jdbc-driver,install-and-configure-database-objects-for-jdbc-driver,how-to-install-oracle-for-jdbc-driver,how-to-install-postgresql9-for-jdbc-driver,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installing PostgreSQL 8 - NetIQ Identity Manager Driver for JDBC Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="how-to-install-postgresql8-for-jdbc-driver">
+
+<h1 class="title h1"><span class="number">4.7</span> Installing PostgreSQL 8</h1>
+
+<div class="content_wrapper">
+
+<p class="para">The directory context for PostgreSQL scripts is found in the <span class="filename"><span class="replaceable">install-dir</span>\DirXMLUtilities\jdbc\sql\postgres\install</span> directory on Windows or <span class="filename"><span class="replaceable">install-dir</span>/lib/dirxml/rules/jdbc/sql/postgres/install</span> directory on UNIX/Linux platforms. The directory context for executing PostgreSQL commands is <span class="filename"><span class="replaceable">postgres-install-dir</span>/pgsql/bin</span>.</p>
+<div class="procedure" id="bbg1tnb">
+<ol class="steps">
+<li class="step" id="blpo6li">
+<p class="para">Create the <span class="literal">idm</span> database.</p>
+<p class="para">For example, from the UNIX command line, execute the following command:</p>
+<p class="para">
+            <span class="literal">./createdb idm</span>
+          </p></li>
+<li class="step" id="bbg1tne">
+<p class="para">From a PostgreSQL client such as psql, log in to the <span class="literal">idm</span> database as <span class="literal">postgres</span> user.</p>
+<p class="para">For example, from the UNIX command line, execute the following command:</p>
+<p class="para">
+            <span class="command">./psql -d idm postgres</span>
+          </p>
+<p class="para">By default, the <span class="literal">postgres</span> user has no password.</p></li>
+<li class="step" id="bbg1tnf">
+<p class="para">From inside psql, execute the script <span class="filename">1_install_8.sql</span>. For example:</p>
+<p class="para">
+            <span class="command">idm=# \i 1_install_8.sql</span>
+          </p></li>
+<li class="step" id="bbg1tng">
+<p class="para">Update the <span class="filename">pg_hba.conf</span> file.</p>
+<p class="para">In PostgreSQL 8, you can update the file through <span class="filename">pgAdminIII</span>. After you start, go to <span class="guimenu">Tools</span> &gt; <span class="guimenu">Connect</span> to connect to the server, select the <span class="filename">idm</span> database, then go to <span class="guimenu">Tools</span> &gt; <span class="guimenu">Server Configuration</span> &gt; <span class="filename">pg_hba.conf</span>. In the pgAdminIII pg_hba.conf editor, the <span class="guimenu">IP-ADDRESS</span> and <span class="guimenu">IP-MASK</span> columns in the file are combined into a single field named as <span class="guimenu">IP-Address</span>. Place the values of <span class="guimenu">IP-ADDRESS</span> and <span class="guimenu">IP-MASK</span> columns in this field separated by a single whitespace character.</p>
+<p class="para">For example, add entries for the <span class="filename">idm</span> database user. Adjust the IP-ADDRESS and IP-MASK as necessary:</p><pre class="screen"># TYPE DATABASE    USER   IP-ADDRESS        IP-MASK           METHOD# allow driver user idm to connect to database idm
+host    idm     idm    <span class="replaceable">&lt;ip-address&gt;</span>   <span class="replaceable">&lt;net-mask&gt;</span>     password</pre></li>
+<li class="step" id="bbg1tnh">
+<p class="para">Restart the PostgreSQL server to effect changes made to the <span class="filename">pg_hba.conf</span> file.</p></li>
+<li class="step" id="bgyl9vi">
+<p class="para">(Conditional) If you are using pgAdminIII, in the pg_hba.conf editor select the disk icon (save file) in the toolbar. When prompted, press <span class="guimenu">Yes</span>.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

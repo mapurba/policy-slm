@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="content-date" content="December 11 2016" id="content-date" />
+<meta name="product_and_version" content="NetIQÂ® Identity Manager" />
+<meta name="topic-data" content="b3xfpxf,b3r8si5,b3xd1sq,btvjcxg,true" />
+<meta name="copyright" content="Micro Focus" />
+
+<title>Installation Tasks - NetIQ Blackboard REST Implementation Guide</title>
+<link rel="stylesheet" href="/documentation/docui_b/docmain.css" />
+<script src="/documentation/docui_b/topic.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+
+<div class="container sect1 expanding expanded" id="b3xfpxf">
+
+<h1 class="title h1"><span class="number">2.4</span> Installation Tasks</h1>
+
+<div class="content_wrapper">
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bu1nr5t">
+
+<h2 class="title h2"><span class="number">2.4.1</span> Installing the Driver Shim on the Linux Server</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="t4b6vm4rvvd4">
+<ol class="steps">
+<li class="step">
+<p class="para">Log in to the target Linux server as root.</p></li>
+<li class="step">
+<p class="para">Make sure Perl 5 is installed.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">On Red Hat, <span class="command">yum install perl</span></p></li>
+<li class="step">
+<p class="para">On SLES, <span class="command">zypper install perl</span></p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Install the required Perl modules through your package manager, or use <span class="command">yum install</span> on Red Hat and <span class="command">zypper install</span> on SLES systems:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">perl-JSON</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">perl-JSON-XS</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">perl-libwww-perl</span>
+                </p></li></ul></div>
+
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>For Red Hat 8.1, you will also need to install <span class="command">perl-LWP-Protocol-https</span>.</p></div>
+</li>
+<li class="step">
+<p class="para">If any of the Perl Modules are not available through your system package manager, they may also be installed through CPAN:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">cpan JSON</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">cpan JSON::XS</span>
+                </p></li>
+<li class="listitem">
+<p class="listitem">
+                  <span class="command">cpan LWP::UserAgent</span>
+                </p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">Obtain the <span class="command">linux_x86_64_bbdriver_install.bin</span> file from your installation media and execute this self-extracting file on your Linux system.</p></li>
+<li class="step">
+<p class="para">Specify the language choice.</p></li>
+<li class="step">
+<p class="para">Read and accept the license agreement.</p></li>
+<li class="step">
+<p class="para">After the package is installed onto your system, you are prompted to enter Driver and Remote Loader passwords. These passwords are used to verify that an authorized driver shim is communicating with the Identity Manager engine. Follow the prompts:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Enter and confirm the Remote Loader Password.</p></li>
+<li class="step">
+<p class="para">Enter and confirm the Driver Object password.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Next, you are prompted to retrieve an SSL certificate. NetIQ eDirectory must be running to retrieve the certificate. The certificate allows SSL encryption between the Identity Manager engine and the driver shim. Enabling SSL is optional, but is recommended for better security. To retrieve the certificate, follow the prompts:</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Specify the DNS name or IP Address of your eDirectory server.</p></li>
+<li class="step">
+<p class="para">Specify the LDAP secure port, default 636.</p></li>
+<li class="step">
+<p class="para">Enter <span class="menuchoice"><span class="guimenu">Y</span></span> to accept the certificate.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">The installation of the driver shim is finished, with the option of starting the Driver Shim Service. Proceed to the next section to complete the installation of the driver.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="bu1nbaw">
+
+<h2 class="title h2"><span class="number">2.4.2</span> Extending the Schema for Identity Manager</h2>
+
+<div class="content_wrapper">
+
+<p class="para">If you plan on using the Identity Vault to manage connected system attributes that are not already mapped to standard eDirectoryâ¢ attributes, you will need to extend the schema. Otherwise, it is not necessary.</p>
+<p class="para">Extending the schema adds auxiliary classes to eDirectory User and Group objects for Blackboard user and group attributes. It also extends the schema for an effective class called DirXML-BB-Enrollment that can be used to represent an enrollment in a Blackboard Course or Organization.</p>
+<p class="para">To extend the schema:</p>
+<div class="procedure" id="bu1nebn">
+<ol class="steps">
+<li class="step" id="bucifvb">
+<p class="para">Obtain the <span class="filename">blackboard.sch</span> file for browser access, depending on the operating system you are running:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<div class="formalpara" id="bucij0z">
+                  <p class="title"><em class="title">Linux or Solaris:</em>
+                  Copy the <span class="filename">blackboard.sch</span> file from <span class="filename">/opt/netiq/eDirectory/lib/lib/nds-schema/</span> on the Blackboard application server where you installed the RPM to a location accessible to your web browser.</p>
+                </div>
+
+<div class="formalpara" id="bucild9">
+                  <p class="title"><em class="title">Windows:</em>
+                  Copy the <span class="filename">blackboard.sch</span> file from the <span class="filename">Additional_Drivers/Blackboard</span> directory in the ISO image for Windows to a location accessible to your web browser.</p>
+                </div>
+</li></ul></div>
+</li>
+<li class="step" id="bv6a64l">
+<p class="para">In iManager, select the <span class="guimenu">Extend Schema</span> task under <span class="guimenu">Schema</span>.</p></li>
+<li class="step" id="bu1nebo">
+<p class="para">Select <span class="guimenu">Import data from file on disk</span>, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bubfuak">
+<p class="para">Select a file type of <span class="guimenu">Schema File</span>.</p></li>
+<li class="step" id="bu1neyh">
+<p class="para">Type or browse for <span class="filename">blackboard.sch</span> as the file to import, then click <span class="guimenu">Next</span>.</p></li>
+<li class="step" id="bu1nevh">
+<p class="para">Specify the host name or IP address and the LDAP port number of your Metadirectory server.</p></li>
+<li class="step" id="bu1nfxo">
+<p class="para">To connect to the non-secure LDAP port (389), you must have the <span class="guimenu">Require TLS for Simple Binds with Password</span> option disabled on your LDAP Group. If necessary, you can edit this option using the <span class="guimenu">LDAP Options</span> task under <span class="guimenu">LDAP</span> in iManager. For details, see the <span class="citetitle">NetIQ eDirectory Administration Guide</span>.</p></li>
+<li class="step" id="bu1ngrb">
+<p class="para">Select <span class="guimenu">Authenticated login</span> and log in as Admin or another user with rights to extend the schema.</p></li>
+<li class="step" id="bu1nh1j">
+<p class="para">Click <span class="guimenu">Next</span> to go to the summary.</p></li>
+<li class="step" id="bu1nh80">
+<p class="para">Click <span class="guimenu">Finish</span> to extend the schema.</p></li></ol>
+</div>
+
+</div>
+
+</div>
+
+<div class="container sect2 expanding expanded" id="btvktxc">
+
+<h2 class="title h2"><span class="number">2.4.3</span> Configuring the REST API on your Blackboard Learn Instance</h2>
+
+<div class="content_wrapper">
+
+<div class="procedure" id="t4b6vm4rwq75">
+<ol class="steps">
+<li class="step">
+<p class="para">Setup a Blackboard Learn Application Key and Secret for your installation.</p>
+<div class="substeps">
+<ol class="steps">
+<li class="step">
+<p class="para">Login to <a href="https://developer.blackboard.com" class="ulink">https://developer.blackboard.com</a>. You may need to create an account.</p></li>
+<li class="step">
+<p class="para">Register a new application.</p></li>
+<li class="step">
+<p class="para">You will need to fill out the first three fields:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem"><span class="strong">Application Name</span>: NetIQ Blackboard Driver</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Description</span>: Provisions users and courses to Blackboard.</p></li>
+<li class="listitem">
+<p class="listitem"><span class="strong">Domain(s)</span>: myschool.edu (This is the domain of your Blackboard server instance)</p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">Once the API Key is generated, note the <span class="emphasis">Application Key</span>, <span class="emphasis">Secret</span> and <span class="emphasis">Application ID</span>.</p></li></ol>
+</div>
+</li>
+<li class="step">
+<p class="para">Create a Blackboard Learn System Role for use by the driver.</p></li>
+<li class="step">
+<p class="para">Assign privileges to this System Role so that courses, organizations and users can be created, deleted and modified by the driver. Privileges required:</p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses &gt; Create Course</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses &gt; Delete Courses</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses &gt; Edit</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses &gt; Edit &gt; Enrollments</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses &gt; Edit &gt; Enrollments &gt; Add Enrollment</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses &gt; Edit &gt; Enrollments &gt; Delete Enrollment</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Courses) &gt; Courses &gt; Edit &gt; Enrollments &gt; Edit Enrollment</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Organizations) &gt; Organizations</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Organizations) &gt; Organizations &gt; Create Organization</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Organizations) &gt; Organizations &gt; Delete Organization</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Organizations) &gt; Organizations &gt; Edit &gt; Enrollments</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Organizations) &gt; Organizations &gt; Edit &gt; Enrollments &gt; Add Enrollment</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Organizations) &gt; Organizations &gt; Edit &gt; Enrollments &gt; Delete Enrollment</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Organizations) &gt; Organizations &gt; Edit &gt; Enrollments &gt; Edit Enrollment</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Users) &gt; Users</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Users) &gt; Users &gt; Create User</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Users) &gt; Users &gt; Delete Users</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Users) &gt; Users &gt; Edit &gt; Change Password</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Users) &gt; Users &gt; Edit &gt; User Properties</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Users) &gt; Users &gt; Edit &gt; View Course Enrollments</p></li>
+<li class="listitem">
+<p class="listitem">Administrator Panel (Users) &gt; Users &gt; Edit &gt; View Organization Enrollments</p></li>
+<li class="listitem">
+<p class="listitem">Course/Organization Control Panel (Users and Groups) &gt; Users &gt; Remove Users from Course/Organization</p></li>
+<li class="listitem">
+<p class="listitem">Course/Organization Control Panel (Users and Groups) &gt; Users &gt; Change Userâs availability in Course/Organization</p></li></ul></div>
+</li>
+<li class="step">
+<p class="para">Create a Blackboard Learn User for use by the driver and assign the System Role you created above.</p></li>
+<li class="step">
+<p class="para">Follow Blackboardâs instructions to setup a REST integration: <a href="https://help.blackboard.com/Learn/Administrator/Hosting/System_Integration/Compare_Building_Blocks_and_Rest#register-a-rest-integration-in-blackboard-learn_OTP-4" class="ulink">Blackboard REST Integration</a></p>
+<div class="itemizedlist">
+<ul class="listbullet">
+<li class="listitem">
+<p class="listitem">Specify the user created in Step 2 as the Learn User for the REST Integration.</p>
+<div class="note">
+<p class="para"><em class="title">NOTE:</em>End User Access should be set to No.</p></div>
+</li>
+<li class="listitem">
+<p class="listitem">Enter the <span class="emphasis">Application ID</span> from <span class="strong">Step 1</span>.</p></li></ul></div>
+</li></ol>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>
