@@ -50,11 +50,11 @@ def generate_qa(driver_display: str, markdown_text: str, guidance: str = "") -> 
         f"Documentation page (Markdown):\n\n{markdown_text}"
     )
 
-    response = _bedrock_client.converse(
-        modelId=config.MODEL_ID,
-        system=[{"text": config.QA_SYSTEM_PROMPT}],
-        messages=[{"role": "user", "content": [{"text": user_text}]}],
-    )
+    # response = _bedrock_client.converse(
+    #     modelId=config.MODEL_ID,
+    #     system=[{"text": config.QA_SYSTEM_PROMPT}],
+    #     messages=[{"role": "user", "content": [{"text": user_text}]}],
+    # )
     
     model_broker_openAI_response = _openai_client.chat.completions.create(
         model="gpt-oss-120b",
