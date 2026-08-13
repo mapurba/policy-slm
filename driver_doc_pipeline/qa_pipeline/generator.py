@@ -8,6 +8,8 @@ from typing import Dict, List
 import boto3
 from botocore.config import Config
 
+import openai
+
 from . import config, utils
 
 _bedrock_config = Config(
@@ -20,6 +22,12 @@ _bedrock_client = boto3.client(
     region_name=config.AWS_REGION,
     config=_bedrock_config,
 )
+
+_openai_client = openai.OpenAI(
+    api_key="",
+    base_url="https://model-broker.aviator-model.bp.anthos.otxlab.net" # LiteLLM Proxy is OpenAI compatible, Read More: https://docs.litellm.ai/docs/proxy/user_keys
+)
+
 
 VALID_CATEGORIES = {
     "explanatory",
@@ -47,7 +55,21 @@ def generate_qa(driver_display: str, markdown_text: str, guidance: str = "") -> 
         system=[{"text": config.QA_SYSTEM_PROMPT}],
         messages=[{"role": "user", "content": [{"text": user_text}]}],
     )
-    raw = response["output"]["message"]["content"][0]["text"]
+    
+    model_broker_openAI_response = _openai_client.chat.completions.create(
+        model="gpt-3.5-turbo", 
+        messages = [
+            {
+                "role": "user",
+                "content": "this is a test request, write a short poem"
+            }
+        ]
+    )
+    # raw = response["output"]["message"]["content"][0]["text"]
+    # data = json.loads(utils.clean_json_text(raw))
+    # return _normalize(data, driver_display)
+    
+    raw = model_broker_openAI_response.choices[0].message.content
     data = json.loads(utils.clean_json_text(raw))
     return _normalize(data, driver_display)
 
