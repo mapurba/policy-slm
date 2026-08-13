@@ -87,7 +87,7 @@ def _process_file(driver_slug: str, md_name: str, driver_display: str, state: Di
         payload = json.loads(cached_json)
         logging.info("Cache hit for %s/%s", driver_slug, md_name)
     else:
-        console.print(f"[cyan]Generating Q&A for {driver_slug}/{md_name} via Bedrock…[/cyan]")
+        console.print(f"[cyan]Generating Q&A for {driver_slug}/{md_name} via OpenAI…[/cyan]")
         try:
             payload = generator.generate_qa(driver_display, md_text)
         except Exception as exc:  # noqa: BLE001
@@ -131,7 +131,7 @@ def _process_file(driver_slug: str, md_name: str, driver_display: str, state: Di
             return "quit"
         if choice == "redo":
             guidance = Prompt.ask("Optional guidance for regeneration", default="")
-            console.print("[cyan]Regenerating via Bedrock…[/cyan]")
+            console.print("[cyan]Regenerating via OpenAI…[/cyan]")
             try:
                 payload = generator.generate_qa(driver_display, md_text, guidance=guidance)
             except Exception as exc:  # noqa: BLE001

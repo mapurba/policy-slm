@@ -57,13 +57,11 @@ def generate_qa(driver_display: str, markdown_text: str, guidance: str = "") -> 
     )
     
     model_broker_openAI_response = _openai_client.chat.completions.create(
-        model="gpt-3.5-turbo", 
-        messages = [
-            {
-                "role": "user",
-                "content": "this is a test request, write a short poem"
-            }
-        ]
+        model="gpt-oss-120b",
+        messages=[
+            {"role": "system", "content": config.QA_SYSTEM_PROMPT},
+            {"role": "user", "content": user_text},
+        ],
     )
     # raw = response["output"]["message"]["content"][0]["text"]
     # data = json.loads(utils.clean_json_text(raw))
