@@ -1,0 +1,3 @@
+# 5.3 Upgrade Procedure
+
+The process for upgrading the eDirectory driver is the same as for other Identity Manager drivers. For detailed instructions, see "[Upgrading Identity Manager Components](../../../identity-manager-48/setup_linux/data/upgrading-identity-manager-components.html#upgrading-identity-manager-components)" in the [NetIQ Identity Manager Setup Guide for Linux](../../../identity-manager-48/setup_linux/data/front.html#front) or "[Upgrading Identity Manager Components](../../../identity-manager-48/setup_windows/data/upgrade-idm-components.html#upgrade-idm-components)" in the [NetIQ Identity Manager Setup Guide for Windows](../../../identity-manager-48/setup_windows/data/front.html#front).

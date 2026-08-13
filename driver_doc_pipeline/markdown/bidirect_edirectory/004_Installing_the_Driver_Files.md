@@ -1,0 +1,7 @@
+# 2.0 Installing the Driver Files
+
+By default, the Bidirectional eDirectory driver files are installed on the Identity Manager server at the same time as the Identity Manager engine. The installation program extends the Identity Vault’s schema and installs the driver shim. It does not create the driver in the Identity Vault (see [Section 4.0, Creating a New Driver Object](creating-a-new-driver-object.html)).
+
+If you performed a custom installation and did not install the Bidirectional eDirectory driver on the Identity Manager server, you must install the files on the Identity Manager server, using the instructions in [Planning Your Installation](../../../identity-manager-48/setup_linux/data/planning-an-identity-manager-installation.html#planning-an-identity-manager-installation)in the [NetIQ Identity Manager Setup Guide for Linux](../../../identity-manager-48/setup_linux/data/front.html#front) or [Planning to Install the Engine, Drivers, and Plug-ins](../../../identity-manager-48/setup_windows/data/planning-to-install-engine-drivers-plugins.html#planning-to-install-engine-drivers-plugins) in the [NetIQ Identity Manager Setup Guide for Windows](../../../identity-manager-48/setup_windows/data/front.html#front).
+
+For the Bidirectional eDirectory driver to work, you must also install the change-log module on the connected system (eDirectory). For information on change-log installation, see [Installing the Change-Log Module on a Remote eDirectory server](installing-the-change-log-module-on-remote-edirectory-server.html).

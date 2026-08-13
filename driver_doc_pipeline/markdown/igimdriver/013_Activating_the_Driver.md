@@ -1,0 +1,5 @@
+# 2.8 Activating the Driver
+
+The Identity Manager driver for IGIM is automatically activated as part of Identity Manager activation. If you create the driver in a driver set where you have already activated the Identity Manager server and service drivers, the driver inherits the activation from the driver set.
+
+If you create the driver in a driver set that has not been previously activated, the driver will run in the evaluation mode for 90 days. You must activate the driver during the evaluation period; otherwise, the driver will be disabled. If you try to run the driver, dstrace displays an error message indicating that you need to reactivate the driver to use it. For information on activation, refer to [Activating Identity Manager](../../../identity-manager-48/idm_overview_planning/data/activating-identity-manager.html#activating-identity-manager) in the [NetIQ Identity Manager Overview and Planning Guide](../../../identity-manager-48/idm_overview_planning/data/netiq-identity-manager-overview-and-planning.html#netiq-identity-manager-overview-and-planning).

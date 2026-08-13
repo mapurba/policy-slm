@@ -1,0 +1,10 @@
+# 5.1 Entitlement Agents
+
+An entitlement agent grants an entitlement to a user when criteria are met. You must create and configure one of the following entitlement agents for use with the preconfigured entitlements in the SAP Portal driver.
+
+* *Role-Based Entitlements (RBE):*
+  Manages entitlements based on the events that occur in the Identity Vault. This agent is used for simple automation. For example, when a user is added to the HR system, the user is automatically granted accounts in other systems. This requires an Entitlements driver created with policies that define the desired action. For instructions, see the [Implementation Checklist](../../z_entitlements/data/implementation-checklist.html#implementation-checklist)in the [NetIQ Identity Manager Entitlements Service Driver Implementation Guide](../../z_entitlements/data/entitlements-service-driver.html#entitlements-service-driver).
+* *Workflow:*
+  Manages entitlements through provisioning workflows. This agent is used when approvals are required. For example, when a user is added to the HR system, the manager must approve the accounts for the user. This requires a workflow that contains the desired actions. For instructions, see "[Configuring and Managing Provisioning Workflows](../../../identity-manager-48/identity_apps_admin/data/agpropartprovisioning.html#agpropartprovisioning)" in the [NetIQ Identity Manager - Administrator’s Guide to the Identity Applications](../../../identity-manager-48/identity_apps_admin/data/bookinfo.html#bookinfo).
+* *Roles Based Provisioning Module (RBPM):*
+  Manages entitlements based on roles that are assigned to users. For example, when a user is added to the Accounting role, the user automatically receives all accounts associated with the Accounting role. This requires that the Roles Based Provisioning Module be installed and configured for roles. For installation instructions, see the [NetIQ Identity Manager Technical Information website](https://www.netiq.com/products/identity-manager/advanced/technical-information/).

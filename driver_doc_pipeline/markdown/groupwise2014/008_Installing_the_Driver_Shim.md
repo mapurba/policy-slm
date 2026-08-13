@@ -1,0 +1,5 @@
+# 2.2 Installing the Driver Shim
+
+By default, the driver files are installed on the Identity Manager server at the same time as the Identity Manager engine. The installation program extends the Identity Vault’s schema and installs the driver shim and the driver configuration file. It does not create the driver in the Identity Vault or upgrade an existing driver’s configuration.
+
+You can install the driver on the Identity Manager server, or connect to the Identity Manager engine through a Remote Loader from a remote server. In this configuration, you install the Remote Loader and the driver files on a non-Identity Manager server where you want to run the driver. For more information, see in the [Configuring the Remote Loader and Drivers](../../../identity-manager-48/driver_admin/data/b18xta1v.html#b18xta1v) in the [NetIQ Identity Manager Driver Administration Guide](../../../identity-manager-48/driver_admin/data/bktitle.html#bktitle). After the driver files are installed, create the driver. For more information, see [Section 3.0, Creating a New Driver Object](b94c4u0.html).

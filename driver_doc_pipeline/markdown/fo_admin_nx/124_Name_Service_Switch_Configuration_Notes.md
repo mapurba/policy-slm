@@ -1,0 +1,3 @@
+# B.4 Name Service Switch Configuration Notes
+
+Identity Manager Fan-Out Driver platforms may also be configured for account redirection using the Name Service Switch and the Platform Services Cache Daemon.When a service requests account information such as uidNumber, gidNumber or homeDirectory, the Name Service Switch redirects these calls to the appropriate library configured by the Name Service Switch configuration file, /etc/nsswitch.conf. If configured to use the Fan-Out Platform Services Cache Daemon, information is retrieved from Event Journal Services memory cache which resides on the local Linux or UNIX system.

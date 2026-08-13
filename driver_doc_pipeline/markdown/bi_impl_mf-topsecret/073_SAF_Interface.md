@@ -1,0 +1,5 @@
+# C.2 SAF Interface
+
+The driver query processor uses the system authorization facility (SAF) to retrieve information from the security system. Queries are used by the Metadirectory engine for matching and merging. Some fields in Top Secret, including custom fields, cannot be queried, because they are not recognized by SAF. These fields cannot be migrated from the connected system to the Identity Vault. Merge operations, which occur when objects in both the Identity Vault and the connected system are matched for the first time, might not include these fields for the event being processed.
+
+Structured attributes are not supported by the schema. These attributes occur in certain Top Secret commands where more than one operand is used to define a field. Because these operands must be specified atomically on a single command, the corresponding auxiliary attribute in eDirectory™ must provide for this. These operands are filtered out and not synchronized by the default driver configuration. You can customize policies to process these fields if necessary.
