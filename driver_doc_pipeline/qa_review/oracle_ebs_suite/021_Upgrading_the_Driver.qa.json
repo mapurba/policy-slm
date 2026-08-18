@@ -1,0 +1,59 @@
+{
+  "driver": "Oracle E-Business Suite driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Oracle E-Business Suite driver upgrade process?",
+      "input": "",
+      "output": "The Oracle E-Business Suite driver upgrade process updates both the installed driver packages and the driver files. Upgrading the packages brings the driver components to newer versions, while applying a driver patch refreshes the driver binaries (RPMs or JAR files) to fix bugs, add features, or maintain compatibility with the Oracle E‑Business Suite applications."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to upgrade the Oracle E-Business Suite driver.",
+      "input": "",
+      "output": "To upgrade the Oracle E-Business Suite driver you must: 1) Back up the current driver configuration. 2) Upgrade installed packages via Designer (download packages, select upgrades, apply). 3) Download the appropriate driver patch from the NetIQ Patch Finder. 4) Apply the patch – either as a root user (install RPMs on Linux or copy JARs on Windows) or as a non‑root user (use rpm with relocated directories). 5) Restart the Identity Vault, Remote Loader, and driver instances if they were stopped."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the installed packages for the Oracle E-Business Suite driver using NetIQ Designer?",
+      "input": "",
+      "output": "1. Open the project that contains the Oracle E-Business Suite driver. 2. Right‑click the driver and choose **Driver > Properties**. 3. Click the **Packages** tab. 4. If an upgrade is available, a check mark appears in the **Upgrades** column. 5. Click **Select Operation** for the package that shows an upgrade and choose **Upgrade** from the drop‑down list. 6. Select the desired version and click **OK** (Designer lists all versions available). 7. Click **Apply**. 8. If additional information is required for the selected package, fill in the fields and click **Next**. 9. Review the summary of packages to be installed and click **Finish**. 10. After the upgrade completes, click **OK** to close the Package Management page."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply a driver patch as a root user for the Oracle E-Business Suite driver on Linux?",
+      "input": "",
+      "output": "1. Log in to the Linux server as root. 2. Download the Oracle E-Business Suite driver patch from the NetIQ Patch Finder and unzip it to a temporary location (e.g., IDM45_OracleEBS_4003.zip). 3. Run the following rpm commands, replacing <Driver Patch File Temporary Location> with the path to the unzipped folder:\n   ```\n   rpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLebsCommon.rpm\n   rpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLebsHR.rpm\n   rpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLebsTCA.rpm\n   rpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLebsUM.rpm\n   ```\n4. If the driver was stopped, restart the Identity Vault and driver instance (e.g., `ndsmanage startall`). 5. If the driver runs under Remote Loader, start the Remote Loader and driver instances."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply a driver patch as a root user for the Oracle E-Business Suite driver on Windows?",
+      "input": "",
+      "output": "1. Download and unzip the Oracle E-Business Suite driver patch from the NetIQ Patch Finder. 2. Navigate to the extracted `<Extracted Driver Patch File Temporary Location>\\windows` folder. 3. Copy the following files to the Identity Manager installation directories:\n   - Copy **EBSHRShim.jar** and **EBSUserShim.jar** to `<IdentityManager installation>\\NDS\\lib`.\n   - Copy **EBSTCAShim.jar** to `<IdentityManager installation>\\RemoteLoader\\<architecture>\\lib`.\n4. If the driver was stopped, restart the Identity Vault and the driver instance, or restart Remote Loader and driver instances as appropriate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Oracle E-Business Suite driver patch as a non‑root user?",
+      "input": "",
+      "output": "1. Ensure the non‑root eDirectory location contains a `rpm` directory with the file `_db.000`. If the file is missing, reinstall Identity Manager. 2. Set the root directory environment variable to the non‑root eDirectory location:\n   ```\n   ROOTDIR=<non-root eDirectory location>\n   ```\n3. Download and unzip the driver patch. 4. Install the driver RPM using the relocated rpm command, replacing `<rpm-location>` with the path to the specific RPM (e.g., `novell-DXMLebsHR.rpm`):\n   ```\n   rpm --dbpath $ROOTDIR/rpm -Uvh \\\n       --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles <rpm-location>\n   ```\n5. Restart the Identity Vault and driver or Remote Loader instances if they were stopped."
+    },
+    {
+      "category": "config",
+      "instruction": "Which RPM files are installed for the Oracle E-Business Suite driver on Linux when applying the driver patch?",
+      "input": "",
+      "output": "The following RPM files are installed for the Oracle E-Business Suite driver on Linux:\n- `novell-DXMLebsCommon.rpm`\n- `novell-DXMLebsHR.rpm`\n- `novell-DXMLebsTCA.rpm`\n- `novell-DXMLebsUM.rpm`\nEach file is located in the `<Driver Patch File Temporary Location>/linux` directory of the extracted patch."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the `_db.000` file is missing when applying the Oracle E-Business Suite driver patch as a non‑root user?",
+      "input": "",
+      "output": "If the `_db.000` file is missing, it indicates that the Identity Manager engine was not installed correctly for a non‑root setup. The recommended solution is to reinstall Identity Manager so that the `_db.000` file is created in the `<non-root eDirectory location>/rpm` directory before attempting to apply the Oracle E-Business Suite driver patch."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact rpm command to install the HR driver RPM for the Oracle E-Business Suite driver as a non‑root user, assuming the non‑root eDirectory location is `/opt/novell/edir` and the HR RPM is located at `/tmp/novell-DXMLebsHR.rpm`.",
+      "input": "",
+      "output": "```bash\nROOTDIR=/opt/novell/edir\nrpm --dbpath $ROOTDIR/rpm -Uvh \\\n    --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/etc=$ROOTDIR/etc \\\n    --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n    --relocate=/var=$ROOTDIR/var \\\n    --badreloc --nodeps --replacefiles /tmp/novell-DXMLebsHR.rpm\n```"
+    }
+  ]
+}

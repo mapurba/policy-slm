@@ -1,0 +1,53 @@
+{
+  "driver": "Oracle EBS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is Oracle Wallet Manager and why is it required when configuring the Publisher channel for the Oracle EBS driver?",
+      "input": "",
+      "output": "Oracle Wallet Manager is an application that manages and edits security credentials stored in an Oracle wallet. An Oracle wallet is a password‑protected container that holds authentication and signing credentials such as private keys, certificates, and trusted certificates. The Publisher channel of the Oracle EBS driver uses SSL for strong authentication, so a wallet containing a certificate issued by the authority that signed the server’s certificate is required to establish a secure connection."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a server certificate in Identity Console for the Oracle EBS driver?",
+      "input": "",
+      "output": "1. In Identity Console, select **Certificate Management > Server Certificate Management**.\n2. Click the **+** button to create a new server certificate.\n3. Enter the server name and a certificate nickname.\n4. Choose **Standard** as the creation method and click **Next**.\n5. Click **OK** to finish creating the server certificate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you export a self‑signed CA certificate from eDirectory for use with the Oracle EBS driver?",
+      "input": "",
+      "output": "1. In Identity Console, go to **Certificate Management > CA Management**.\n2. On the **Certificates** tab, check the box for the certificate you created in the previous step.\n3. Click **Export CA Certificate**.\n4. Choose the export format required by the client (either **DER** or **Base64**) and click **OK**.\n5. Click **Save** and store the exported file.\n6. Save the certificate into the Oracle Wallet Manager."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to import the exported certificate into Oracle Wallet Manager and configure the wallet for the Oracle EBS driver?",
+      "input": "",
+      "output": "1. Start Oracle Wallet Manager:\n   * On UNIX, run `owm` from the command line.\n   * On Windows, choose **Start > Programs > Oracle-HOME_NAME > Network Administration > Wallet Manager**.\n2. In Oracle Wallet Manager, select **Operations > Import Trusted Certificate**.\n3. In the dialog, choose the certificate exported in the previous step and click **OK**. A message will confirm the successful import and the certificate will appear under **Trusted Certificates**.\n4. Save the wallet.\n5. Copy the entire wallet folder to a new location (for example, `/opt/wallet`).\n6. Execute the required SQL statements in the Oracle EBS database (see the config pair for the exact statements).\n7. Add the necessary file‑system permissions to the new wallet folder."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration values (GCVs) must be inserted into IDM configuration for the Oracle EBS driver’s wallet, and what are the exact SQL statements to do so?",
+      "input": "",
+      "output": "Two global configuration values are required:\n\n- **WALLET_PATH** – the file URL of the wallet directory.\n- **WALLET_PASSWORD** – the password that protects the wallet.\n\nThe exact SQL statements to insert these values are:\n\n```\ninsert into idmusrmgt.idm_config values('WALLET_PATH','file:/etc/ORACLE/WALLETS/pub');\n```\n\n```\ninsert into idmusrmgt.idm_config values('WALLET_PASSWORD','test123');\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter must be set on the Publisher Settings tab for the Oracle EBS driver to use the KMO, and what value should be entered?",
+      "input": "",
+      "output": "On the Publisher Settings tab, set the **KMO name** parameter to the certificate nickname that was specified when the server certificate was created in Step 1. This links the Publisher channel to the correct KMO stored in the Oracle wallet."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete procedure for configuring the Publisher channel using a KMO file for the Oracle EBS driver.",
+      "input": "",
+      "output": "To configure the Publisher channel for the Oracle EBS driver using a KMO file, you must:\n1. Create a server certificate in Identity Console and note its nickname.\n2. Export the corresponding self‑signed CA certificate from eDirectory in DER or Base64 format.\n3. Open Oracle Wallet Manager (UNIX `owm` or Windows Start menu) and import the exported certificate as a trusted certificate.\n4. Save the wallet and copy the wallet folder to a secure location (e.g., `/opt/wallet`).\n5. In the Oracle EBS database, insert the `WALLET_PATH` and `WALLET_PASSWORD` values into `idmusrmgt.idm_config` using the provided SQL statements.\n6. Ensure the wallet folder has appropriate file permissions.\n7. In Identity Console, navigate to the Oracle EBS driver properties, open the Configuration → Publisher Settings tab, and set the **KMO name** to the certificate nickname from step 1.\n8. Save the driver settings. The Publisher channel will then use the wallet’s certificate for secure SSL communication."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact SQL statements that must be executed in the Oracle EBS system to configure the wallet for the Oracle EBS driver.",
+      "input": "",
+      "output": "```\ninsert into idmusrmgt.idm_config values('WALLET_PATH','file:/etc/ORACLE/WALLETS/pub');\n```\n\n```\ninsert into idmusrmgt.idm_config values('WALLET_PASSWORD','test123');\n```"
+    }
+  ]
+}

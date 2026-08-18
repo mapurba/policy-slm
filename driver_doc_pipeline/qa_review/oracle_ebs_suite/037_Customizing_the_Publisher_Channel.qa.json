@@ -1,0 +1,59 @@
+{
+  "driver": "Oracle EBS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Publisher channel in the Oracle EBS driver and when is it enabled by default?",
+      "input": "",
+      "output": "The Publisher channel in the Oracle EBS driver is the mechanism that receives change events from Oracle E‑Business Suite and forwards them as XML documents to the Identity Manager engine. It is enabled by default unless you explicitly disable it during driver configuration in Designer."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Oracle EBS driver receive events from the Oracle E‑Business Suite system?",
+      "input": "",
+      "output": "When the Oracle EBS system starts, the driver automatically starts an internal HTTP Jetty server and listens on the configured port. PL/SQL scripts in the driver securely transport the E‑Business events to the URL http://<driver IP address>:<Port>. The driver then submits the received XML documents to the Identity Manager engine for publication in the Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "Which database tables are synchronized by default by the Oracle EBS driver without any PL/SQL script changes?",
+      "input": "",
+      "output": "By default the Oracle EBS driver synchronizes all attributes from the following tables: **FND_USER**, **ER_ALL_PEOPLE_F**, and **HZ_PARTIES**."
+    },
+    {
+      "category": "config",
+      "instruction": "Where should you add new attribute XML tags when customizing the Publisher XML for the Oracle EBS driver?",
+      "input": "",
+      "output": "New attribute XML tags should be added as child elements under the **<OBJECT>** tag in the Publisher XML document. After adding the tags, you must also add the corresponding attributes to the driver’s Schema Mapping policy in Identity Manager."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you synchronize a new attribute from the PER_ADDRESSES table using the Oracle EBS driver?",
+      "input": "",
+      "output": "To synchronize a new attribute from the PER_ADDRESSES table in the Oracle EBS driver, follow these steps:\n1. Create a temporary table IDMUSRMGT.IDM_PER_ADDRESSES in the Oracle EBS database.\n2. Write a PL/SQL procedure named **FIND_PER_ADDRESSES_ADD_EVENTS** that builds an XML document for each new or changed address record (similar to the provided sample procedure).\n3. In the procedure, query PER_ADDRESSES for rows created since the last sync, generate the XML using `dbms_xmlquery.getxml`, and copy the XML into a CLOB named **HR_EVENT_DOC**.\n4. Call **PERSISTS_EVENT('oracle.apps.fnd.user.insert','EMPLOYEE_ADD',NULL,HR_EVENT_DOC,NULL,'NEW',SYSDATE)** to publish the event.\n5. Add a call to **FIND_PER_ADDRESSES_ADD_EVENTS()** inside the existing **SYNCH_EVENTS_WITH_IDM** method.\n6. Update the driver’s Schema Mapping policy to map the new attribute to an Identity Manager attribute.\n7. Restart the Oracle EBS driver so the new procedure is included in the polling cycle."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to verify that recently added attributes are synchronized with Identity Manager in the Oracle EBS driver?",
+      "input": "",
+      "output": "To verify synchronization of newly added attributes in the Oracle EBS driver:\n1. Create a user or employee record in the Oracle EBS system, including the newly added attributes.\n2. Modify the values of those attributes for the same user.\n3. Check the Identity Manager console or Identity Vault to confirm that the attributes have been created and then updated according to the changes made in Oracle EBS."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If user attributes are not appearing in the Identity Vault after a Publisher event, what checks should you perform according to the Oracle EBS driver documentation?",
+      "input": "",
+      "output": "When attributes are missing in the Identity Vault after a Publisher event, perform the following checks as recommended for the Oracle EBS driver:\n1. Ensure the Publisher channel is still enabled in the driver configuration (it may have been disabled in Designer).\n2. Verify that the PL/SQL script **IDM_DRIVER.PUBLISH_EVENT_TO_IDM** has been updated to include the new attribute XML tags under the `<OBJECT>` element.\n3. Confirm that the new attribute has been added to the driver’s Schema Mapping policy in Identity Manager.\n4. Check that the HTTP Jetty server is running and listening on the configured port, and that the PL/SQL script is successfully sending the XML to `http://<driver IP address>:<Port>`.\n5. Review the driver logs for any errors during XML parsing or event publishing."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points for customizing the Publisher channel in the Oracle EBS driver.",
+      "input": "",
+      "output": "Customizing the Publisher channel in the Oracle EBS driver involves: (1) The channel is enabled by default and receives events via an internal Jetty HTTP server. (2) Sample Publisher XML for user add and modify events can be edited to include additional attributes under `<OBJECT>`. (3) By default the driver syncs attributes from FND_USER, ER_ALL_PEOPLE_F, and HZ_PARTIES; new attributes require changes to the `IDM_DRIVER.PUBLISH_EVENT_TO_IDM` PL/SQL script and the Schema Mapping policy. (4) To sync attributes from other tables, create a new PL/SQL procedure (e.g., `FIND_PER_ADDRESSES_ADD_EVENTS`), add it to `SYNCH_EVENTS_WITH_IDM`, update the schema mapping, and restart the driver. (5) Verify changes by creating and modifying a user in Oracle EBS and checking the Identity Vault."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a Publisher XML request for a User Add event that includes a custom attribute <DEPARTMENT> under the <OBJECT> tag for the Oracle EBS driver.",
+      "input": "",
+      "output": "<EBS_EVENT>\n    <EVENT_NAME>oracle.apps.fnd.user.insert</EVENT_NAME>\n    <EVENT_KEY>$user id</EVENT_KEY>\n    <OBJECT type=\"user\">\n        <USER_NAME></USER_NAME>\n        <EMAIL_ADDRESS></EMAIL_ADDRESS>\n        <DESCRIPTION></DESCRIPTION>\n        <LOGIN_DISABLED>false</LOGIN_DISABLED>\n        <DEPARTMENT></DEPARTMENT>\n    </OBJECT>\n</EBS_EVENT>"
+    }
+  ]
+}
