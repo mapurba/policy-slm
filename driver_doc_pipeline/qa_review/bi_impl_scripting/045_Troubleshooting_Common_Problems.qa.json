@@ -1,0 +1,89 @@
+{
+  "driver": "Bi Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "summarization",
+      "instruction": "Summarize the common troubleshooting topics covered for the Bi Impl Scripting driver.",
+      "input": "",
+      "output": "The Bi Impl Scripting driver troubleshooting guide covers:\n- Driver shim installation failure\n- Driver rules installation failure\n- Driver certificate setup failure\n- Driver start failure\n- Driver shim startup or communication failure\n- Users or groups not provisioned to the connected system\n- Users or groups not provisioned to the Identity Vault\n- Identity Vault user passwords not provisioned to the connected system\n- Connected system user passwords not provisioned to the Identity Vault\n- Metadirectory objects not modified, deleted, renamed, or moved"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken when the Bi Impl Scripting driver shim installation fails?",
+      "input": "",
+      "output": "To resolve a Bi Impl Scripting driver shim installation failure:\n1. Verify you are using the correct installation program for your operating system and that the OS is supported (see Section 2.0, Planning for the Scripting Driver).\n2. Run the installer as root on Linux/UNIX or as Administrator on Windows (or an equivalent privileged account).\n3. On Linux/UNIX, ensure your package‑management tool (e.g., RPM) is installed and up‑to‑date."
+    },
+    {
+      "category": "config",
+      "instruction": "Which command configures the SSL certificate for the Bi Impl Scripting driver shim on a Linux/UNIX system?",
+      "input": "",
+      "output": "Use the command `/opt/novell/usdrv/bin/usdrv -s` to configure the certificate for the Bi Impl Scripting driver shim on Linux/UNIX."
+    },
+    {
+      "category": "config",
+      "instruction": "Which command configures the SSL certificate for the Bi Impl Scripting driver shim on a Windows system?",
+      "input": "",
+      "output": "Use the command `wsdriver -s` to configure the certificate for the Bi Impl Scripting driver shim on Windows."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually install a certificate for the Bi Impl Scripting driver when LDAP over SSL cannot be used?",
+      "input": "",
+      "output": "To manually install a certificate for the Bi Impl Scripting driver:\n1. In iManager, browse to the Security container and locate the tree’s Certificate Authority (typically named *treeName* CA).\n2. Click the Certificate Authority object.\n3. Click **Modify Object**.\n4. Select the **Certificates** tab.\n5. Click **Public Key Certificate**.\n6. Click **Export**.\n7. Choose **No** to export without the private key, then click **Next**.\n8. Select **Base64** format and click **Next**.\n9. Click **Save**, choose a location, and save the exported file.\n10. Transfer the file to the connected system (e.g., via FTP) and place it as `ca.pem` in the *keys* directory under the Bi Impl Scripting driver installation directory."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What are the common causes of a Driver Start Failure for the Bi Impl Scripting driver and how can they be addressed?",
+      "input": "",
+      "output": "Common causes of a Driver Start Failure for the Bi Impl Scripting driver include:\n- Errors in the status log or DSTRACE output – examine these logs for details.\n- The driver not being set as a Remote Loader driver – set this option in the iManager Driver Edit Properties window.\n- The driver or Identity Manager not being activated within 90 days – activate both using the Driver Set Overview and Driver Overview pages in iManager.\nResolving the issue involves checking the logs, ensuring the Remote Loader setting is enabled, and activating the driver/Identity Manager within the required timeframe."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default port for the Remote Loader connection of the Bi Impl Scripting driver and where can it be changed?",
+      "input": "",
+      "output": "The default Remote Loader port for the Bi Impl Scripting driver is **8090**. It can be changed in the `usdrv.conf` file on Linux/UNIX or the `wsdrv.conf` file on Windows."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you resolve a Driver Shim Startup or Communication Failure for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "To resolve a Driver Shim Startup or Communication Failure for the Bi Impl Scripting driver:\n1. Examine the trace file for error details.\n2. Verify that the connected system’s OS version is supported (see Section 2.0, Planning for the Scripting Driver) and that all OS patches are applied.\n3. Ensure the Remote Loader and Driver object passwords you entered during driver setup match the encrypted passwords stored on the shim. Update them with `/opt/novell/usdrv/bin/usdrv -sp` on Linux/UNIX or `wsdriver -sp` on Windows.\n4. On the Metadirectory server, update the driver configuration via iManager if needed.\n5. Confirm the host name and port number for the connected system are correct in the Remote Loader connection parameters; adjust the port (default 8090) in `usdrv.conf` or `wsdrv.conf` as required."
+    },
+    {
+      "category": "config",
+      "instruction": "Where are the encrypted password files stored for the Bi Impl Scripting driver shim and what are their filenames?",
+      "input": "",
+      "output": "The encrypted password files are stored under the *keys* directory in the Bi Impl Scripting driver installation directory. The filenames are:\n- `dpwdlf40` – contains the encrypted Driver object password.\n- `lpwdlf40` – contains the encrypted Remote Loader password."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If users or groups are not being provisioned to the connected system by the Bi Impl Scripting driver, what checks should you perform?",
+      "input": "",
+      "output": "When the Bi Impl Scripting driver does not provision users or groups to the connected system, perform the following checks:\n1. Review the status log, DSTRACE output, trace file, and script output file for errors.\n2. Ensure the identities reside in the appropriate base container (check and modify the base containers on the Global Configuration Values page of the Driver Edit Properties window in iManager).\n3. Verify that the driver Data Flow property is set to **Bidirectional** or **Identity Vault to Application**; if not, re‑import the driver rules file.\n4. Confirm that the user account the driver runs as (security equivalent) has read rights on the base container (see Table 2‑1 for required rights)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If users or groups are not being provisioned to the Identity Vault by the Bi Impl Scripting driver, what steps should you take?",
+      "input": "",
+      "output": "To address provisioning failures from the connected system to the Identity Vault for the Bi Impl Scripting driver:\n1. Examine the status log, DSTRACE output, and trace file.\n2. Check the User Base Container and Group Base Container Global Configuration Values (GCVs) on the Global Configuration Values page.\n3. Ensure the driver Data Flow property is set to **Bidirectional** or **Application to Identity Vault**; re‑import the driver rules file if needed.\n4. Verify that the driver’s security‑equivalent user has update rights on the base containers (refer to Table 2‑1 for required rights)."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Global Configuration Value controls whether a Universal Password policy is applied during password synchronization for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "The Global Configuration Value **Synchronize Distribution Password When Setting Universal Password** must be enabled on the Universal Password policy assigned to the user’s container for the Bi Impl Scripting driver to synchronize passwords from the Identity Vault to the connected system."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What driver properties must be configured for Connected System User Passwords to be provisioned to the Identity Vault by the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "For the Bi Impl Scripting driver to provision connected system passwords to the Identity Vault, ensure at least one of the following properties on the Global Configuration Values page is enabled:\n- **Identity Vault Accepts Passwords from the Connected System**\n- **Identity Vault Accepts Administrative Password Resets from the Connected System**\nAdditionally, if the **Require Password Policy Validation before Publishing Passwords** GCV is set, the password must satisfy the password policy assigned to the user’s container."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the Bi Impl Scripting driver be configured as a Remote Loader driver even when the Identity Vault and connected system reside on the same machine?",
+      "input": "",
+      "output": "The Bi Impl Scripting driver must be set as a Remote Loader driver because the driver architecture requires a Remote Loader process to manage communication between the Metadirectory server and the driver shim. This setting enables the driver to correctly handle provisioning, synchronization, and security functions regardless of whether the Identity Vault and the connected system are on the same physical host."
+    }
+  ]
+}

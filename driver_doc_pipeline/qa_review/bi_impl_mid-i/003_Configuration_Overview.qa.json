@@ -1,0 +1,53 @@
+{
+  "driver": "IBM i driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the Data Flow options available in the IBM i driver and what does each option control?",
+      "input": "",
+      "output": "The IBM i driver supports three Data Flow options, which are selected during driver import and determine how filters and policies behave:\n\n* **Bidirectional** – Synchronizes the selected classes and attributes on both the Subscriber (connected system) and Publisher (Identity Vault) channels.\n* **Application to Identity Vault** – Synchronizes the selected classes and attributes only on the Publisher channel, sending data from the IBM i system to the Identity Vault.\n* **Identity Vault to Application** – Synchronizes the selected classes and attributes only on the Subscriber channel, sending data from the Identity Vault to the IBM i system."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default attribute mapping between eDirectory User objects and IBM i UserProfile attributes in the IBM i driver?",
+      "input": "",
+      "output": "The default eDirectory → IBM i UserProfile attribute mapping used by the IBM i driver is:\n\n| eDirectory User Attribute | i5/OS UserProfile Attribute |\n|---|---|\n| CN | USRPRF |\n| Description | TEXT |\n| company | CMPNY |\n| Facsimile Telephone Number | FAXTELNBR |\n| Full Name | FULNAM |\n| Given Name | FSTNAM |\n| Home Directory | HOMEDIR |\n| Login Disabled | STATUS |\n| Postal Address | ADDR1 |\n| preferredName | PREFNAM |\n| Telephone Number | TELNBR1 |\n| UID | UID |\n| departmentNumber | DEPT |\n| Initials | INITIALS |\n| Title | TITLE |\n| Password Expiration Interval | PWDEXPITV |\n| Surname | LSTNAM |\n| Generational Qualifier | GENQUAL |\n| Group Membership | GroupMembership |\n| nspmDistributionPassword | PASSWORD |"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default attribute mapping between eDirectory Group objects and IBM i GroupProfile attributes in the IBM i driver?",
+      "input": "",
+      "output": "The default eDirectory → IBM i GroupProfile attribute mapping used by the IBM i driver is:\n\n| eDirectory Group Attribute | IBM i GroupProfile Attribute |\n|---|---|\n| CN | USRPRF |\n| Description | TEXT |\n| Member | Members |\n| GID | GID |\n\n*Note: The virtual attributes **GroupMembership** (on the User side) and **Members** (on the Group side) are used to populate the IBM i GRPPRF and SUPGRPPRF profile fields when group membership synchronization is enabled.*"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the i5os.sch file provided by the IBM i driver?",
+      "input": "",
+      "output": "The IBM i driver includes the file **i5os.sch**, which defines auxiliary classes that can be added to eDirectory User and Group objects. These auxiliary classes allow the eDirectory schema to store additional IBM i‑specific attributes that are not covered by the default mapping, enabling richer synchronization of IBM i user and group information."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable synchronization of IBM i group membership using the IBM i driver?",
+      "input": "",
+      "output": "To synchronize IBM i group membership with the IBM i driver:\n1. Import the IBM i driver and select the desired Data Flow option (e.g., Bidirectional).\n2. Ensure the default filter configuration is used, which includes the virtual attributes **GroupMembership** (for users) and **Members** (for groups).\n3. Verify that the schema mapping includes the auxiliary classes from **i5os.sch** so the virtual attributes are available on eDirectory objects.\n4. Confirm that the **Subscriber Output** policy is enabled; it sends e‑mail notifications for password failures and converts information formats, which includes group membership data.\n5. After these steps, the driver will populate the IBM i GRPPRF and SUPGRPPRF fields based on the eDirectory group membership information."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which policies are defined for the IBM i driver in its default configuration and what does each policy do?",
+      "input": "",
+      "output": "The default IBM i driver configuration defines the following policies:\n\n| Policy | Description |\n|---|---|\n| Mapping | Maps the Identity Vault User and Group objects and selected attributes to an IBM i user or group. |\n| Publisher Event | None is provided. |\n| Publisher Matching | Restricts privileged accounts and defines matching criteria for placement in the Identity Vault. |\n| Publisher Create | Defines creation rules for users and groups before provisioning into the Identity Vault. |\n| Publisher Placement | Defines where new users and groups are placed in the Identity Vault. |\n| Publisher Command | Defines password publishing policies. |\n| Subscriber Matching | Defines rules for matching users and groups in the connected system. |\n| Subscriber Create | Defines required creation criteria. |\n| Subscriber Command | Transforms IBM i attributes and defines password subscribing policies. |\n| Subscriber Output | Sends e‑mail notifications for password failures and converts information formats from the Identity Vault to the connected system. |\n| Subscriber Event | Restricts events to a specified container. |"
+    },
+    {
+      "category": "config",
+      "instruction": "Which policy in the IBM i driver controls password publishing behavior?",
+      "input": "",
+      "output": "The **Publisher Command** policy in the IBM i driver defines password publishing policies."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the configuration overview for the IBM i driver.",
+      "input": "",
+      "output": "The IBM i driver configuration overview describes how to control data flow with three Data Flow options (Bidirectional, Application → Identity Vault, Identity Vault → Application), maps eDirectory User and Group attributes to IBM i UserProfile and GroupProfile attributes via default filters and the optional **i5os.sch** schema extensions, and outlines the default set of Metadirectory policies that manage mapping, matching, creation, placement, command handling, and event processing for both publishing (to the Identity Vault) and subscribing (from the IBM i system)."
+    }
+  ]
+}

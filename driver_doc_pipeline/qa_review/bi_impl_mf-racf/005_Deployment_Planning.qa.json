@@ -1,0 +1,53 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you decide whether to follow the installation or upgrade procedures for the RACF driver?",
+      "input": "",
+      "output": "First, determine if you are performing a new installation or an upgrade of the RACF driver. If it is a new installation, use Section 3.0, Installing the RACF Driver, as your main procedural reference. If you are upgrading an existing system that already uses a RACF driver, begin with Section 4.0, Upgrading the Driver, which includes instructions for upgrading from both the Fan‑Out RACF driver and the Java‑based bidirectional RACF driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to plan the component installation for the RACF driver across multiple systems sharing a security system database?",
+      "input": "",
+      "output": "1. Install the driver libraries (samples library, load library, and REXX exec library) on a volume that is shared by each system that shares the security system database.\n2. Run the driver shim started task on only one system that shares the security system database.\n3. Create the change log data set on a volume that is shared by all systems that share the security system database.\n4. Run the change log started task on each system that shares the security system database.\n5. Install the exit routines on each system that shares the security system database."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the driver shim started task be run on only one system that shares the security system database for the RACF driver?",
+      "input": "",
+      "output": "The RACF driver shim acts as a single point of communication between the Metadirectory engine and the security system database. Running the shim started task on only one system prevents duplicate connections, reduces contention, and ensures consistent handling of change‑log data across all systems that share the security system database."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default TCP port numbers used by the RACF driver and what purpose does each serve?",
+      "input": "",
+      "output": "Table 2‑1 lists the default TCP port numbers for the RACF driver:\n\n| Purpose                                                | TCP Port Number |\n|--------------------------------------------------------|-----------------|\n| Driver shim connection to the Metadirectory engine     | 8090            |\n| Driver shim HTTP services for log viewing              | 8091            |\n| Secure LDAP port                                       | 636             |\n| Non‑secure LDAP port                                   | 389             |"
+    },
+    {
+      "category": "howto",
+      "instruction": "During RACF driver installation, how do you provide the required connected system schema file and where can you find a sample?",
+      "input": "",
+      "output": "You must supply a connected system schema file during installation. A sample file containing the required classes and attributes is provided in the driver samples library member named **SCHEMDEF**. For details about the format and required content, refer to the \"The Connected System Schema File\" documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you supply a driver shim configuration file during RACF driver installation and where is a customizable sample located?",
+      "input": "",
+      "output": "During installation you must provide a driver shim configuration file. A customizable sample file is available in the driver samples library member named **DRVCONF**. Review the \"The Driver Shim Configuration File\" documentation for details on customizing this file to meet your environment’s requirements."
+    },
+    {
+      "category": "howto",
+      "instruction": "What is the purpose of the include/exclude file in the RACF driver installation and where can you find a basic template?",
+      "input": "",
+      "output": "The include/exclude file limits the initial deployment of the RACF driver to a small set of users and groups on the connected system. A basic suggested content file is provided in the driver samples library member named **INCEXC**. See the \"The Connected System Include/Exclude File\" documentation for guidance on tailoring this file."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key planning considerations outlined for deploying the RACF driver.",
+      "input": "",
+      "output": "The deployment planning for the RACF driver includes: determining whether you are performing a new installation or an upgrade; installing driver libraries on a shared volume; running the driver shim started task on a single system; creating a shared change‑log data set and running the change‑log task on every system; installing exit routines on each system; providing a connected system schema file (SCHEMDEF), a driver shim configuration file (DRVCONF), and an include/exclude file (INCEXC) during installation; planning prototype, testing, and rollout strategies; identifying Metadirectory server and shim host names or IP addresses; and deciding whether to use the default TCP ports (8090, 8091, 636, 389)."
+    }
+  ]
+}

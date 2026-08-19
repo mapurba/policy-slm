@@ -1,0 +1,71 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key troubleshooting steps for the RACF driver described in the documentation.",
+      "input": "",
+      "output": "The RACF driver troubleshooting guide lists common problems and their resolutions: use binary mode for FTP when installing driver samples, ensure iManager version matches Identity Manager, verify schema parameters and network connectivity, set up SSL certificates via LDAP (port 636) or manually export a CA certificate to /opt/novell/racfdrv/keys/ca.pem, confirm the driver is configured as a Remote Loader driver and activated within 90 days, make the driver load library APF‑authorized and authorize LDXSERV and SAFQUERY TSO commands, match Remote Loader and driver object passwords using the SETPWDS REXX exec, verify host name, port (default 8090) and started task setup, ensure only one shim task runs per security system complex, check base containers and Data Flow settings for provisioning, confirm security‑equivalent user rights, verify change‑log started task is running and initialized, and use LDXSERV STATUS to view change‑log data set information."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the RACF driver shim installation fail if the driver samples library is not transferred in binary mode?",
+      "input": "",
+      "output": "The RACF driver shim installation requires the driver samples library, load library, and REXX exec library XMT files to be transferred in binary mode because these files contain non‑text binary data. Transferring them in ASCII mode corrupts the files, causing the shim installation to fail."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually install the certificate for the RACF driver when SSL over LDAP cannot be configured?",
+      "input": "",
+      "output": "To install the certificate manually for the RACF driver:\n1. In iManager, browse to the Security container and locate your tree’s certificate authority (usually named *treeName* CA).\n2. Click the certificate authority object and select **Modify Object**.\n3. Open the **Certificates** tab.\n4. Click **Public Key Certificate** and then **Export**.\n5. Choose **No** to export without the private key and click **Next**.\n6. Select **Base64** format and click **Next**.\n7. Save the exported certificate file to a local location.\n8. Use FTP or another transfer method to copy the file to the connected system as **/opt/novell/racfdrv/keys/ca.pem**.\nAfter the file is placed, the RACF driver shim can use it for SSL communication."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default Remote Loader port for the RACF driver and where can it be changed?",
+      "input": "",
+      "output": "The RACF driver uses port **8090** as the default Remote Loader port. This port number can be changed in the driver shim configuration file located under **/opt/novell/racfdrv/**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you verify that the RACF driver load library is APF‑authorized?",
+      "input": "",
+      "output": "To verify that the RACF driver load library is APF‑authorized, run the following operator command on the mainframe:\n```\nDISPLAY PROG,APF\n```\nThe command lists all APF‑authorized libraries; confirm that the RACF driver load library appears in the output."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you update the driver object password and Remote Loader password for the RACF driver shim?",
+      "input": "",
+      "output": "To update the passwords for the RACF driver shim:\n1. On the connected system, run the **SETPWDS** REXX exec. This updates the encrypted password files located in **/opt/novell/racfdrv/keys**:\n   - **dpwdlf40** stores the driver object password.\n   - **lpwdlf40** stores the Remote Loader password.\n2. On the Metadirectory server, open iManager, locate the driver configuration, and modify the password fields under the driver settings. Save the changes.\nAfter both sides are updated, restart the driver shim to apply the new passwords."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take if the RACF driver fails to start because it is not specified as a Remote Loader driver?",
+      "input": "",
+      "output": "If the RACF driver fails to start because it is not set as a Remote Loader driver, follow these steps:\n1. Open iManager and navigate to the **Driver Edit Properties** window for the RACF driver.\n2. Locate the option that specifies the driver type and select **Remote Loader driver**.\n3. Save the configuration.\n4. Verify that the driver is activated within the required 90‑day window.\n5. Ensure the driver load library is APF‑authorized and that the LDXSERV and SAFQUERY commands are authorized TSO commands.\n6. Restart the RACF driver and examine the status log and DSTRACE output for any remaining errors."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the RACF driver and Identity Manager be activated within 90 days of installation?",
+      "input": "",
+      "output": "The RACF driver and Identity Manager must be activated within 90 days because the product licenses are time‑bound; activation records the installation date and starts the licensed usage period. If activation does not occur within this window, the software will refuse to start, and the Driver Set Overview and Driver Overview pages in iManager will indicate that activation is required."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you display the status of the change log data set for the RACF driver?",
+      "input": "",
+      "output": "To display the change log data set status for the RACF driver, execute the following TSO command, ensuring that the driver load library is included in your STEPLIB concatenation:\n```\nLDXSERV STATUS\n```\nThe command returns information about the change log data set, confirming that it is initialized and active."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain why moving a user or group is not supported by the RACF driver.",
+      "input": "",
+      "output": "Moving a user or group is not supported by the RACF driver because RACF does not provide a mechanism to change the distinguished name or container of an existing identity. When a move event occurs, the RACF driver interprets it as a delete because the identity disappears from the monitored base container, and the driver cannot create a new entry at the target location."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you verify if the RACF driver reports change log errors?",
+      "input": "",
+      "output": "If the RACF driver reports change log errors, verify the following:\n1. The change log started task messages for any failures.\n2. That the change log started task is running on all systems sharing the security system database.\n3. The started task has been set up correctly (see the \"Setting Up the Started Tasks\" documentation).\n4. The change log data set was initialized during installation (refer to \"Allocating and Initializing the Change Log Data Set\").\n5. Use the **LDXSERV STATUS** command to confirm the data set is present and functional."
+    }
+  ]
+}

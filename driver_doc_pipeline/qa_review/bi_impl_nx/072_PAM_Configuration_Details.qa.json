@@ -1,0 +1,71 @@
+{
+  "driver": "Linux and UNIX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the PAM module in the Linux and UNIX driver?",
+      "input": "",
+      "output": "The PAM module in the Linux and UNIX driver obtains the password during normal password change operations that use PAM‑enabled tools (such as the passwd command) so that the password can be published to the Identity Vault via the driver shim."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the PAM module for the Linux and UNIX driver?",
+      "input": "",
+      "output": "Run the driver installation program and select the option to install the PAM or LAM Module. The installation script will copy the appropriate PAM module file for your operating system and, if you answer the prompt, add an entry for the module to the system’s PAM configuration file for the password facility."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the PAM module after it has been installed for the Linux and UNIX driver?",
+      "input": "",
+      "output": "Use the nxdrv-config command to configure the PAM module. This command will add the required PAM module entry with the proper command‑line options to the PAM configuration file for the password facility. You can also edit the PAM configuration file manually and insert the module entry below the module that obtains the new password."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default file locations of the PAM module for each supported operating system in the Linux and UNIX driver?",
+      "input": "",
+      "output": "The installation script places the PAM module at the following locations:\n\n| Operating System | PAM Module |\n|------------------|------------|\n| AIX              | /usr/lib/security/pam_nxdrv |\n| HP‑UX            | /usr/lib/security/libpam_nxdrv.1 |\n| Linux            | /lib/security/pam_nxdrv.so |\n| Solaris          | /usr/lib/security/pam_nxdrv.so.1 |"
+    },
+    {
+      "category": "config",
+      "instruction": "Which command‑line options are supported by the Linux and UNIX driver PAM module and what do they do?",
+      "input": "",
+      "output": "The Linux and UNIX driver PAM module supports the following options:\n\n| Option | Description |\n|--------|-------------|\n| debug=* | Logs PAM module activity to /usr/local/nxdrv/logs/pam_nxdrv.log |\n| host=hostName | Required for SOAP; specifies the host name or IP address of the driver shim system |\n| mechanism=api | Uses the API to send password change information to the driver shim (used when the PAM module runs on the same system as the driver shim) |\n| mechanism=soap | Uses SOAP to send password change information to the driver shim (used when the PAM module runs on a different system, e.g., NIS or NIS+ clients) |\n| port=portNumber | Required for SOAP; specifies the TCP port of the driver shim system (default is 8091) |\n| LC_ALL=locale | Specifies the locale of the connected system to ensure correct conversion to UTF‑8 (e.g., LC_ALL=iso8559-1) |"
+    },
+    {
+      "category": "config",
+      "instruction": "What option must be supplied when using the SOAP mechanism with the Linux and UNIX driver PAM module?",
+      "input": "",
+      "output": "When using mechanism=soap, you must also supply the host=hostName option to indicate the driver shim’s host name or IP address, and optionally the port=portNumber option (default 8091)."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default TCP port used by the Linux and UNIX driver PAM module when communicating via SOAP?",
+      "input": "",
+      "output": "The default TCP port for SOAP communication is 8091."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the difference between mechanism=api and mechanism=soap in the Linux and UNIX driver PAM module?",
+      "input": "",
+      "output": "mechanism=api tells the PAM module to use the local API to send password change information directly to the driver shim when both are on the same system. mechanism=soap tells the PAM module to send the information over a SOAP‑based secure TCP/IP channel to a remote driver shim, which is required for NIS or NIS+ client scenarios."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually add the PAM module entry to a PAM configuration file for the Linux and UNIX driver?",
+      "input": "",
+      "output": "Edit the appropriate PAM configuration file for the password facility (as defined by your system’s PAM documentation). Insert a line that references the PAM module file (e.g., /lib/security/pam_nxdrv.so) with the required command‑line options, and place this line **below** the module that obtains the new password during a password change. Example syntax:\n\n```\npassword   sufficient   /lib/security/pam_nxdrv.so mechanism=api debug=* host=driverShimHost port=8091\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What happens if the Linux and UNIX driver PAM module cannot send a password change event to the driver shim, and how is the failure reported?",
+      "input": "",
+      "output": "If the password change event cannot be sent to the driver shim, the PAM module writes a message to the system log indicating the failure."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration steps and options for the Linux and UNIX driver PAM module.",
+      "input": "",
+      "output": "The Linux and UNIX driver PAM module is installed via the driver’s installation program, which places the module in an OS‑specific directory and optionally adds an entry to the password facility’s PAM configuration file. You can also configure it later with the nxdrv-config command or by editing the PAM file manually. The module requires a command‑line option specifying the communication mechanism (mechanism=api for local API, mechanism=soap for remote SOAP). For SOAP, you must provide host=hostName and optionally port=portNumber (default 8091). Additional options include debug=* for logging and LC_ALL=locale for character‑set conversion. The entry must be placed below the module that prompts for the new password, and failures to send events are logged to the system log."
+    }
+  ]
+}

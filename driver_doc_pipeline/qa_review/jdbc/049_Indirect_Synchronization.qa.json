@@ -1,0 +1,89 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is indirect synchronization in the JDBC driver and how does it map Identity Vault objects to database objects?",
+      "input": "",
+      "output": "In the JDBC driver, indirect synchronization maps Identity Vault (eDirectory) objects to relational database structures. Identity Vault classes become database tables, attributes become columns, and a single class maps to one parent table plus optional child tables. Single‑value attributes are stored in parent table columns, while multivalue attributes are stored in either a parent column that holds delimited values or, preferably, in a child table column. This mapping enables the driver to translate changes between the directory and the database."
+    },
+    {
+      "category": "config",
+      "instruction": "How are Identity Vault objects mapped to database objects in indirect synchronization for the JDBC driver?",
+      "input": "",
+      "output": "The JDBC driver uses the following mapping rules in indirect synchronization:\n\n| Identity Vault Object | Database Object |\n|----------------------|-----------------|\n| Classes              | Tables |\n| Attributes           | Columns |\n| 1 Class              | 1 parent table and 0 or more child tables |\n| Single-value attribute | Parent table column |\n| Multivalue attribute | Parent table column (delimited values) or Child table column (preferred) |\n\nThese mappings are defined in a Schema Mapping Rule XML snippet that links eDirectory class and attribute names to the corresponding table and column names."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you map the eDirectory class User to a logical database class usr using the JDBC driver?",
+      "input": "",
+      "output": "To map the eDirectory class **User** to the logical database class **usr** with the JDBC driver:\n1. **Create the parent table** `indirect.usr` with a primary key column `idu` and the desired attribute columns (e.g., `fname`, `lname`, `pwdminlen`, etc.). Include a primary‑key constraint `pk_usr_idu` on `idu`.\n2. **Create child tables** for multivalue attributes, such as `indirect.usr_phone` (columns `idu`, `phoneno`) and `indirect.usr_fax` (columns `idu`, `faxno`). Each child table must have a foreign‑key constraint referencing `indirect.usr(idu)`.\n3. **Define a Schema Mapping Rule** XML that maps the eDirectory class and its attributes to the tables/columns, for example:\n```xml\n<rule name=\"Schema Mapping Rule\">\n    <attr-name-map>\n        <class-name>\n            <nds-name>User</nds-name>\n            <app-name>indirect.usr</app-name>\n        </class-name>\n        <attr-name class-name=\"User\">\n            <nds-name>Given Name</nds-name>\n            <app-name>fname</app-name>\n        </attr-name>\n        ...\n        <attr-name class-name=\"User\">\n            <nds-name>Telephone Number</nds-name>\n            <app-name>usr_phone.phoneno</app-name>\n        </attr-name>\n    </attr-name-map>\n</rule>\n```\n4. Load the rule into the JDBC driver configuration. The driver will then synchronize the User objects with the `usr`, `usr_phone`, and `usr_fax` tables."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the requirements for a parent table in the JDBC driver for indirect synchronization?",
+      "input": "",
+      "output": "For the JDBC driver, a parent table must:\n* Contain an **explicit primary‑key constraint** that includes one or more columns (e.g., `CONSTRAINT pk_usr_idu PRIMARY KEY (idu)`).\n* Include the primary‑key column(s) in the table definition so the driver can construct association values (e.g., `idu=1,table=usr,schema=indirect`).\n* Have columns that will store single‑value eDirectory attributes; these columns are implicitly prefixed with the schema and table name, so `indirect.usr.fname` can be referenced simply as `fname` in the mapping rule.\n* Not require the parent table columns to be NOT NULL, but they should be defined to accept the expected data types."
+    },
+    {
+      "category": "config",
+      "instruction": "How should parent table columns be referenced in a Schema Mapping Rule for the JDBC driver?",
+      "input": "",
+      "output": "In a Schema Mapping Rule for the JDBC driver, parent table columns are referenced **without an explicit table prefix** because they are implicitly prefixed with the schema and parent table name. For example, to map the eDirectory attribute **Given Name** to the column `fname` in table `indirect.usr`, the rule uses:\n```xml\n<attr-name class-name=\"User\">\n    <nds-name>Given Name</nds-name>\n    <app-name>fname</app-name>\n</attr-name>\n```\nThe driver treats `fname` as `indirect.usr.fname` during synchronization."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you map a single‑value eDirectory attribute to a parent table column in the JDBC driver?",
+      "input": "",
+      "output": "To map a single‑value eDirectory attribute (e.g., **Password Minimum Length**) to a parent table column in the JDBC driver:\n1. Ensure the parent table (e.g., `indirect.usr`) has a column that can hold a single value (e.g., `pwdminlen`).\n2. Add a mapping entry in the Schema Mapping Rule XML:\n```xml\n<attr-name class-name=\"User\">\n    <nds-name>Password Minimum Length</nds-name>\n    <app-name>pwdminlen</app-name>\n</attr-name>\n```\n3. Load the rule. The driver will store the value of the eDirectory attribute `Password Minimum Length` in the `pwdminlen` column of the `usr` parent table."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you map a multivalue eDirectory attribute to a child table column in the JDBC driver?",
+      "input": "",
+      "output": "For a multivalue attribute (e.g., **Telephone Number**) the JDBC driver mapping uses a child table column:\n* **Child table** must have a foreign‑key column referencing the parent table primary key (e.g., `idu`).\n* The **unconstrained column** stores the multivalue data (e.g., `phoneno`).\n* In the Schema Mapping Rule, reference the child table and column with a dot notation:\n```xml\n<attr-name class-name=\"User\">\n    <nds-name>Telephone Number</nds-name>\n    <app-name>usr_phone.phoneno</app-name>\n</attr-name>\n```\nThe driver will insert each telephone number into a separate row of `usr_phone` linked to the parent `usr` row via `idu`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why are large binary and string data types preferably mapped to parent table columns in the JDBC driver?",
+      "input": "",
+      "output": "Large binary and string data types (e.g., `LONG RAW`, large `VARCHAR`) are preferably mapped to parent table columns because:\n* They **cannot be compared efficiently** in SQL statements, which limits the driver's ability to detect changes.\n* Mapping them to parent tables avoids the need for comparison; the driver simply replaces the column value on update.\n* If they must be stored in a child table, additional policy transformations are required: each `<remove-value>` event must be turned into a `<remove-all-values>` element followed by an `<add-value>` element, which adds complexity."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure a child table for multivalue attributes in the JDBC driver?",
+      "input": "",
+      "output": "To configure a child table for multivalue attributes with the JDBC driver:\n1. **Create the child table** with a foreign‑key column that references the parent table primary key (e.g., `idu` referencing `indirect.usr(idu)`).\n2. Define the **unconstrained column** that will hold the multivalue data (e.g., `phoneno`).\n3. **Set all columns NOT NULL** to satisfy driver expectations.\n4. Example DDL:\n```sql\nCREATE TABLE indirect.usr_phone (\n    idu      INTEGER NOT NULL,\n    phoneno  VARCHAR2(64) NOT NULL,\n    CONSTRAINT fk_phone_idu FOREIGN KEY (idu) REFERENCES indirect.usr(idu)\n);\n```\n5. Add a mapping entry in the Schema Mapping Rule using the child‑table.column notation:\n```xml\n<attr-name class-name=\"User\">\n    <nds-name>Telephone Number</nds-name>\n    <app-name>usr_phone.phoneno</app-name>\n</attr-name>\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are referential attributes and how are they represented in the JDBC driver?",
+      "input": "",
+      "output": "Referential attributes are eDirectory attributes that store references to other objects. In the JDBC driver they are represented as **foreign‑key columns** in the database:\n* **Single‑value referential attributes** use a parent table column that has a foreign‑key constraint pointing to another parent table’s primary key (e.g., a `manager` column in `usr` referencing another `usr` row).\n* **Multivalue referential attributes** use a child table that contains two foreign‑key columns, each referencing the primary key of a different parent table (e.g., a `grp_member` table linking users to groups)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you map a single‑value referential attribute (manager) using the JDBC driver?",
+      "input": "",
+      "output": "To map the single‑value referential attribute **manager**:\n1. Ensure the parent table `indirect.usr` includes a column `manager` and a foreign‑key constraint referencing its own primary key:\n```sql\nCREATE TABLE indirect.usr (\n    idu INTEGER NOT NULL,\n    manager INTEGER,\n    CONSTRAINT pk_usr_idu PRIMARY KEY (idu),\n    CONSTRAINT fk_usr_manager FOREIGN KEY (manager) REFERENCES indirect.usr(idu)\n);\n```\n2. In the Schema Mapping Rule, map the eDirectory attribute to the column:\n```xml\n<attr-name class-name=\"User\">\n    <nds-name>manager</nds-name>\n    <app-name>manager</app-name>\n</attr-name>\n```\nThe column is **nullable** because a user may not have a manager."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you map a multivalue referential attribute using a child table in the JDBC driver?",
+      "input": "",
+      "output": "To map a multivalue referential attribute such as **Group Membership**:\n1. **Create parent tables** for users and groups:\n```sql\nCREATE TABLE indirect.usr (idu INTEGER NOT NULL, CONSTRAINT pk_usr_idu PRIMARY KEY (idu));\nCREATE TABLE indirect.grp (idg INTEGER NOT NULL, CONSTRAINT pk_grp_idg PRIMARY KEY (idg));\n```\n2. **Create a child table** that links the two, with both columns NOT NULL and foreign‑key constraints:\n```sql\nCREATE TABLE indirect.grp_member (\n    idg INTEGER NOT NULL,\n    idu INTEGER NOT NULL,\n    CONSTRAINT fk_member_idg FOREIGN KEY (idg) REFERENCES indirect.grp(idg),\n    CONSTRAINT fk_member_idu FOREIGN KEY (idu) REFERENCES indirect.usr(idu)\n);\n```\n3. Add a mapping rule that points the eDirectory attribute **Member** (for class Group) to the child‑table column:\n```xml\n<attr-name class-name=\"Group\">\n    <nds-name>Member</nds-name>\n    <app-name>grp_member.idu</app-name>\n</attr-name>\n```\nIf you prefer the relationship to appear under the User class, reverse the column order or rename the child table (e.g., `usr_mbr_of.idg`)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points of indirect synchronization mapping for the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver supports indirect synchronization by mapping eDirectory classes to database tables (one parent table plus optional child tables). Single‑value attributes map to parent table columns, while multivalue attributes map to child table columns, which must have a foreign‑key to the parent. Parent tables require an explicit primary‑key constraint; child tables must have all columns NOT NULL and a foreign‑key linking to the parent. Referential attributes are represented with foreign‑key columns—single‑value referential attributes use a nullable parent column, and multivalue referential attributes use a child table containing two foreign‑key columns. Schema Mapping Rules (XML) define the class‑to‑table and attribute‑to‑column mappings, using dot notation for child‑table columns."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a Schema Mapping Rule snippet for the JDBC driver that maps the eDirectory attribute \"Email\" to a parent table column \"email\" in the table \"indirect.usr\".",
+      "input": "",
+      "output": "<rule name=\"Schema Mapping Rule\">\n    <attr-name-map>\n        <class-name>\n            <nds-name>User</nds-name>\n            <app-name>indirect.usr</app-name>\n        </class-name>\n        <attr-name class-name=\"User\">\n            <nds-name>Email</nds-name>\n            <app-name>email</app-name>\n        </attr-name>\n    </attr-name-map>\n</rule>"
+    }
+  ]
+}

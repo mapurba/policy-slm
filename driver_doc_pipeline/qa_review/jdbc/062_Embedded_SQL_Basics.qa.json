@@ -1,0 +1,59 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What XML elements does the JDBC driver use to embed SQL statements inside XDS events?",
+      "input": "",
+      "output": "The JDBC driver uses the <jdbc:statement> element, which can contain one or more <jdbc:sql> elements, to embed SQL statements inside XDS events."
+    },
+    {
+      "category": "config",
+      "instruction": "How must the namespace be declared for embedded SQL elements when using the JDBC driver?",
+      "input": "",
+      "output": "For the JDBC driver, you must bind a prefix to the namespace URI urn:dirxml:jdbc. A typical declaration is xmlns:jdbc=\"urn:dirxml:jdbc\" on the root element. The prefix can be any name, but it must be bound to that exact URI."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver require namespace‑prefixed embedded SQL elements and attributes?",
+      "input": "",
+      "output": "The JDBC driver looks for elements and attributes that are bound to the namespace urn:dirxml:jdbc. If the elements are not namespace‑prefixed, the driver does not recognize them and will ignore the embedded SQL."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you embed an UPDATE statement using the JDBC driver in an XDS input XML document?",
+      "input": "",
+      "output": "1. Declare the JDBC namespace on the root element, e.g. <input xmlns:jdbc=\"urn:dirxml:jdbc\">.\n2. Add any other XDS events you need (e.g., <add> to insert data).\n3. Insert a <jdbc:statement> element where you want the SQL to run.\n4. Inside the <jdbc:statement>, place one or more <jdbc:sql> elements containing the raw SQL text.\n\nExample:\n```\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <jdbc:statement>\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'John'</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you create an XDS input that adds a user record and then updates that record using the JDBC driver?",
+      "input": "",
+      "output": "1. Declare the JDBC namespace on the root element.\n2. Use an <add> event to insert the new user record.\n3. Follow the <add> with a <jdbc:statement> that contains a <jdbc:sql> UPDATE.\n\nExample XML:\n```\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\">\n        <add-attr name=\"lname\">\n            <value>Doe</value>\n        </add-attr>\n    </add>\n    <jdbc:statement>\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'John'</jdbc:sql>\n    </jdbc:statement>\n</input>\n```\nWhen processed by the JDBC driver, this resolves to:\n```\nSET AUTOCOMMIT OFF\nINSERT INTO indirect.usr(lname)VALUES('Doe');\nCOMMIT; --explicit commit\nUPDATE indirect.usr SET fname = 'John';\nCOMMIT; --explicit commit\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What namespace URI must be used for the JDBC driver’s embedded SQL elements?",
+      "input": "",
+      "output": "The required namespace URI for the JDBC driver’s embedded SQL elements is urn:dirxml:jdbc."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What is the result if you omit the namespace prefix on embedded SQL elements when using the JDBC driver?",
+      "input": "",
+      "output": "If you omit the namespace prefix, the JDBC driver does not recognize the embedded SQL elements, and the SQL statements will be ignored during processing."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the <jdbc:statement> element represent in the JDBC driver’s embedded SQL syntax?",
+      "input": "",
+      "output": "In the JDBC driver’s embedded SQL syntax, the <jdbc:statement> element acts as a container that can hold one or more <jdbc:sql> elements, each of which contains a raw SQL command to be executed."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points of the Embedded SQL Basics section for the JDBC driver.",
+      "input": "",
+      "output": "The Embedded SQL Basics for the JDBC driver define two key elements: <jdbc:statement> (a container) and <jdbc:sql> (the actual SQL). These elements must be namespace‑prefixed using a prefix bound to urn:dirxml:jdbc; the prefix can be any name but must be correctly declared. An example shows adding a user with <add> and then updating it with <jdbc:statement>/<jdbc:sql>. The driver resolves the events to explicit SQL statements with AUTOCOMMIT OFF and explicit COMMIT statements."
+    }
+  ]
+}

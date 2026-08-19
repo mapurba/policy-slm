@@ -1,0 +1,65 @@
+{
+  "driver": "BI Implementation Middleware I driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the password level limitations for the BI Implementation Middleware I driver?",
+      "input": "",
+      "output": "In the BI Implementation Middleware I driver, password levels are governed by the i5/OS QPWDLVL system value. Levels 0 and 1 allow a maximum password length of ten characters and only accept uppercase letters (A–Z), digits (0–9), and the symbols $, @, #, and _. When level 0 or 1 is used, the Subscriber channel CL programs convert passwords to uppercase and truncate them to ten characters, while the Publisher shim converts passwords to lowercase. Levels 2 and higher support mixed‑case passwords up to 128 characters long. The documentation recommends using password level 2 or higher for best integration with Identity Manager."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the BI Implementation Middleware I driver to use a password level of 2 or higher?",
+      "input": "",
+      "output": "To configure the BI Implementation Middleware I driver to use password level 2 or higher, set the i5/OS system value QPWDLVL to 2 (or a higher number) on the IBM i system. This can be done with the command `CHGSYSVAL QPWDLVL 2`. After changing the system value, restart the driver shim job so that the new password level is applied."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the allowable characters and maximum length for passwords at password level 0 or 1 in the BI Implementation Middleware I driver?",
+      "input": "",
+      "output": "For password levels 0 and 1 in the BI Implementation Middleware I driver, passwords may contain only uppercase letters (A–Z), digits (0–9), the dollar sign ($), the at sign (@), the octothorpe (#), and the underscore (_). The maximum password length at these levels is ten characters."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the BI Implementation Middleware I driver handle character set conversion for data fields?",
+      "input": "",
+      "output": "The BI Implementation Middleware I driver converts data to the default coded character set identifier (CCSID) for the driver shim job. By default, this CCSID is taken from the QCCSID system value. The conversion ensures that character data matches the CCSID expected by the driver shim."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you specify a different CCSID for the driver shim job used by the BI Implementation Middleware I driver?",
+      "input": "",
+      "output": "To specify a different CCSID for the driver shim job in the BI Implementation Middleware I driver, use the CHGUSRPRF command to change the CCSID of the user profile that runs the shim job. For example: `CHGUSRPRF USER(I5OSDRV) CCSID(1208)` sets the CCSID to UTF‑8 for the default profile I5OSDRV created by the installation program."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default user profile name created for the driver shim job in the BI Implementation Middleware I driver, and what CCSID does it use by default?",
+      "input": "",
+      "output": "The installation program for the BI Implementation Middleware I driver creates a user profile named **I5OSDRV** for the driver shim job. By default, this profile uses the system value QCCSID as its CCSID."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the limits for user ID, user address, and user profile name lengths in distribution directory entries for the BI Implementation Middleware I driver?",
+      "input": "",
+      "output": "In the BI Implementation Middleware I driver, distribution directory entries link to user profiles using a two‑element USRID value composed of a user ID and a user address, each limited to a maximum of eight characters. User profile names can be up to ten characters long, but the Subscriber shim CL programs truncate the profile name to eight characters for the user ID and set the user address to the system name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you name user profiles to avoid collisions in the distribution directory when using the BI Implementation Middleware I driver?",
+      "input": "",
+      "output": "To avoid collisions in the distribution directory when using the BI Implementation Middleware I driver, limit user profile names to eight characters. IBM recommends this practice because the Subscriber shim truncates profile names to eight characters for the user ID component of the USRID value."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might passwords be truncated to ten characters in the BI Implementation Middleware I driver, and how can this issue be resolved?",
+      "input": "",
+      "output": "Passwords are truncated to ten characters when the driver is operating with password level 0 or 1, because the Subscriber channel CL programs convert passwords to uppercase and enforce the ten‑character limit. To resolve this issue, change the i5/OS QPWDLVL system value to level 2 or higher, which allows mixed‑case passwords up to 128 characters."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key driver limitations described for the BI Implementation Middleware I driver.",
+      "input": "",
+      "output": "The BI Implementation Middleware I driver has three main limitations: (1) Password levels 0 and 1 restrict passwords to ten uppercase characters and a limited character set, while levels 2+ allow mixed case up to 128 characters; (2) All character data is converted to the driver shim job’s default CCSID, usually QCCSID, but can be changed with CHGUSRPRF on the I5OSDRV profile; (3) Distribution directory entries use an 8‑character user ID and address, with profile names limited to ten characters, so IBM recommends limiting profile names to eight characters to prevent USRID collisions."
+    }
+  ]
+}

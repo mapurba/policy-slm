@@ -1,0 +1,77 @@
+{
+  "driver": "Top Secret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the embedded Remote Loader in the Top Secret driver and why does it eliminate the need for Java on the connected system?",
+      "input": "",
+      "output": "The Top Secret driver includes an embedded Remote Loader, which means all necessary driver components are loaded directly by the driver shim itself. Because the loader handles the required runtime functionality, you do not need to install a separate Java runtime on the connected z/OS system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upload and extract the Top Secret driver libraries on the z/OS target system?",
+      "input": "",
+      "output": "1. Use FTP from a workstation to upload the three transmission files to the target system:\n```\nc:\\> ftp Your-z/OS-Host\nUser: Your-User-ID\nPassword:\nftp> quote site lrecl=80 recfm=fb\nftp> binary\nftp> put samplib.xmt\nftp> put tssexec.xmt\nftp> quote site pri=30 sec=5 cyl\nftp> put idmload.xmt\nftp> quit\n```\n2. Log on to z/OS with the same user ID used for the FTP session.\n3. Use the TSO RECEIVE command for each file, specifying the target data set name and volume. Example for the sample library:\n```\nREADY\nreceive indataset(samplib.xmt)\nINMR901I Dataset IDM.SAMPLIB from ADMIN on SYSB\nINMR906A Enter restore parameters or 'DELETE' or 'END' +\n dsname('sys3.ts.samplib') volume(work0a)\n... many IEBCOPY messages ...\nINMR001I Restore successful to dataset 'SYS3.TS.SAMPLIB'\nREADY\n```\nRepeat the RECEIVE command for `idmload.xmt` and `tssexec.xmt`, adjusting the dsname and volume values for each.\n4. After the datasets are created, add the Top Secret driver load library to the APF list and protect it as described in the next steps."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add the Top Secret driver load library to the APF list and restrict access to it?",
+      "input": "",
+      "output": "1. Add the driver load library to the APF list by editing the appropriate PARMLIB member (IEAAPFxx or PROGxx). If you use the dynamic APF facility, execute the command `SET PROG` to activate the change; otherwise, perform an IPL for the change to take effect.\n2. Restrict access to the driver load library. **Warning:** Do not place the driver load library in the linklist unless you have program protection (APF) enabled, because an unprotected library could be exploited and create a security exposure."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you authorize the Top Secret driver TSO commands LDXSERV, SAFQUERY, and TSSLPBK?",
+      "input": "",
+      "output": "1. Edit the SYS1.PARMLIB member `IKJTSOxx` (or equivalent) and add the three commands to the `AUTHCMD NAMES(...)` statement, for example:\n```\nAUTHCMD NAMES(\n  ...\n  LDXSERV SAFQUERY TSSLPBK)\n```\n2. Activate the change with the PARMLIB command:\n```\nPARMLIB CHECK(00)\nPARMLIB UPDATE(00)\n```\nThese steps ensure the Top Secret driver commands are authorized for TSO use."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you secure the Top Secret driver shim with SSL using the SETCERT REXX exec?",
+      "input": "",
+      "output": "1. Run the REXX exec `SETCERT` located in the driver REXX exec library.\n2. When prompted, enter the eDirectory server host name (or IP address) and the secure LDAP port (default 636).\n3. When prompted to accept the certificate authority, type `Y`.\nThe interaction looks like this:\n```\nYou are about to connect to the eDirectory LDAP server to retrieve\nthe eDirectory Tree Trusted Root public certificate.\n\nEnter the LDAP Server Host Address [localhost]: sr.digitalairlines.com\nEnter the LDAP Server Port [636]:\n\nCertificate Authority:\n   Subject:       ou=Organizational CA,o=TREENAME\n   Not Before:    20160821144845Z\n   Not After:     20260821144845Z\nDo you accept the Certificate Authority? (Y/N) y\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Remote Loader and driver object passwords for the Top Secret driver?",
+      "input": "",
+      "output": "Run the REXX exec `SETPWDS` located in the driver REXX exec library and respond to the prompts. Use the same passwords that were set on the Metadirectory server during the driver installation on that side."
+    },
+    {
+      "category": "config",
+      "instruction": "What JCL customizations are required to allocate and initialize the change log data set for the Top Secret driver?",
+      "input": "",
+      "output": "1. Customize the samples library member `LOGINIT`:\n   * Set the name of your Top Secret driver load library.\n   * Set a name for the change log data set.\n   * Set the shared disk volume (and unit name if needed) where the data set will be allocated.\n2. Run the `LOGINIT` job. An `IEC031I D37` message is expected and can be ignored.\n3. After allocation, protect the change log data set appropriately because it contains sensitive information.\n**Warning:** Initializing a change log data set that already contains data will erase that data."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create the user IDs for the change log and driver shim started tasks for the Top Secret driver?",
+      "input": "",
+      "output": "1. Create the change‑log ACID:\n```\nTSS CREATE(LDXLOGR) TYPE(USER) NAME('CHANGE LOG ACID')\n  DEPARTMENT(deptname)\n  PASSWORD(NOPW,0) FACILITY(STC)\n```\n2. Create the driver‑shim ACID:\n```\nTSS CREATE(TSDRV) TYPE(DCA) NAME('DRIVER SHIM ACID')\n  DEPARTMENT(deptname)\n  PASSWORD(NOPW,0) FACILITY(STC)\n```\nBoth commands use `NOPW` to create the IDs without a password; a password can be set later if required."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you assign OMVS attributes and administrator privileges to the driver shim ACID for the Top Secret driver?",
+      "input": "",
+      "output": "1. Assign OMVS attributes:\n```\nTSS ADDTO(TSDRV) ID(0) HOME(/) OMVSPGM(/bin/sh) DFLTGRP(OMVSGRP)\n\nTSS MODIFY(OMVSTABS)\n```\n2. Grant full administrator privileges:\n```\nTSS ADMIN(TSDRV) ACID(ALL) MISC1(ALL) MISC2(ALL) MISC9(ALL)\n  DATA(RESOURCE, XAUTH, INSTDATA, CICS, PROFILE, ADMIN, NAMES, ACID,\n  PASSWORD, ALL)\n```\nThese steps enable the driver shim ACID to run the started task and manage ACIDs and related data."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "When initializing the change log data set for the Top Secret driver you receive an IEC031I D37 message. What does this indicate and what action should you take?",
+      "input": "",
+      "output": "The `IEC031I D37` message is a normal informational message that occurs during the execution of the `LOGINIT` job. It does not indicate an error, so you can safely ignore it and continue with the installation."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the assembly code fragment that must be added to the TSSINSTX source for Exit Installation Procedure 2 of the Top Secret driver.",
+      "input": "",
+      "output": "```\n            GETMAIN R,LV=72            Get standard savearea\n            LR    R11,R13              Save original R13\n            LR    R13,R1               New savearea addr into R13\n            LR    R1,R9                Copy parmlist base to R1\n            L     R15,=V(IDMTSSIX)     Get addr of IDM module\n            BALR  R14,R15              Call it\n            LR    R1,R13               Copy temp savearea ptr to R1\n            LR    R13,R11              Restore R13\n            FREEMAIN R,LV=72,A=(1)     Get rid of savearea\n            B     EXIT0\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete installation process for the Top Secret driver shim on a connected z/OS system.",
+      "input": "",
+      "output": "The Top Secret driver shim installation involves:\n1. Uploading the driver’s transmission files (`samplib.xmt`, `idmload.xmt`, `tssexec.xmt`) via FTP and extracting them with TSO RECEIVE to create the Sample, Load, and REXX exec libraries.\n2. Adding the driver load library to the APF list and protecting it.\n3. Authorizing the driver TSO commands (LDXSERV, SAFQUERY, TSSLPBK) by updating `AUTHCMD NAMES(...)` in `IKJTSOxx` and issuing `PARMLIB CHECK/UPDATE`.\n4. Securing the shim with SSL using the `SETCERT` REXX exec.\n5. Configuring Remote Loader and driver object passwords with the `SETPWDS` REXX exec.\n6. Allocating and initializing a shared change‑log data set using the customized `LOGINIT` job.\n7. Creating the ACIDs for the change‑log (`LDXLOGR`) and driver shim (`TSDRV`) started tasks, assigning OMVS attributes, and granting full administrator privileges.\n8. Adding the ACIDs to the STC table and excluding them from provisioning.\n9. Installing and configuring the change‑log started task and the driver shim started task (copying JCL members, setting library, configuration, schema, include/exclude, and change‑log data set names, and adding them to startup/shutdown procedures).\n10. Testing the installation with `LDXSERV STATUS` before installing the security system exit.\n11. Installing the driver security system exit `IDMTSSIX` using the appropriate exit installation procedure for the Top Secret version (including possible assembly modifications to `TSSINSTX`).\n12. Performing a final test by generating security events and confirming that `LDXSERV STATUS` shows the exit loaded and a non‑empty change log.\nFollowing these steps fully installs and validates the Top Secret driver shim on the connected z/OS system."
+    }
+  ]
+}

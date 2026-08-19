@@ -1,0 +1,59 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does adding users using the default configuration on the subscriber channel cause an error for the Sybase driver in direct mode in the JDBC driver?",
+      "input": "",
+      "output": "The default configuration for the Sybase driver in direct mode does not match the requirements of the subscriber channel, so when users are added the driver cannot generate or retrieve the necessary identifiers, resulting in an error. The configuration must be changed to use subscriber‑generated values and appropriate retrieval timing."
+    },
+    {
+      "category": "config",
+      "instruction": "What value should be set for the Generation/retrieval method (table‑global) in the JDBC driver for the Sybase driver in direct mode?",
+      "input": "",
+      "output": "Set the Generation/retrieval method (table‑global) to **Subscriber-generated**."
+    },
+    {
+      "category": "config",
+      "instruction": "What value should be set for the Retrieval timing (table‑global) in the JDBC driver for the Sybase driver in direct mode?",
+      "input": "",
+      "output": "Set the Retrieval timing (table‑global) to **after row insertion**."
+    },
+    {
+      "category": "config",
+      "instruction": "What should be left blank for the Method and timing (table‑local) settings in the JDBC driver for the Sybase driver in direct mode?",
+      "input": "",
+      "output": "Leave the Method and timing (table‑local) fields **blank**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you modify the default configuration for the Sybase driver in direct mode using the JDBC driver to avoid errors when adding users?",
+      "input": "",
+      "output": "1. Open the driver settings for the Sybase driver in direct mode.\n2. Change **Generation/retrieval method (table‑global)** to **Subscriber-generated**.\n3. Change **Retrieval timing (table‑global)** to **after row insertion**.\n4. Ensure the **Method and timing (table‑local)** fields are left blank.\n5. Save the configuration.\n6. If you later change the Method and timing option, edit the sample procedures as described in the next steps."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you edit the sample procedures when you change the Method and timing option for the Sybase driver in the JDBC driver?",
+      "input": "",
+      "output": "1. Set the Method and timing option to the desired view calls, for example:\n   `view_usr(\"indirect.proc_idu(pk_idu)\"); view_grp(\"indirect.proc_idg(pk_idg)\")`\n2. Open the **indirect.proc_idu** procedure and modify it so that it returns a unique value for the **idu** column.\n3. Open the **indirect.proc_idg** procedure and modify it so that it returns a unique value for the **idg** column.\n4. Save both procedures.\n5. Test the configuration by adding a user to confirm that unique identifiers are now generated correctly."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error might you encounter when adding users with the default configuration on the subscriber channel for the Sybase driver in direct mode, and how can you resolve it in the JDBC driver?",
+      "input": "",
+      "output": "You may see an error indicating that the driver cannot generate or retrieve identifier values for new users. Resolve the issue by changing the driver settings: set **Generation/retrieval method (table‑global)** to **Subscriber-generated**, set **Retrieval timing (table‑global)** to **after row insertion**, and leave **Method and timing (table‑local)** blank. If you have customized the Method and timing option, also edit the **indirect.proc_idu** and **indirect.proc_idg** procedures to return unique **idu** and **idg** values."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the required configuration changes for the Sybase driver in direct mode using the JDBC driver.",
+      "input": "",
+      "output": "To avoid errors when adding users, configure the Sybase driver in direct mode as follows: set Generation/retrieval method (table‑global) to Subscriber-generated, set Retrieval timing (table‑global) to after row insertion, and leave Method and timing (table‑local) blank. If you modify the Method and timing option, update the indirect.proc_idu and indirect.proc_idg procedures to return unique idu and idg values."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact syntax to set the Method and timing option to use indirect procedures for the Sybase driver in the JDBC driver.",
+      "input": "",
+      "output": "view_usr(\"indirect.proc_idu(pk_idu)\"); view_grp(\"indirect.proc_idg(pk_idg)\")"
+    }
+  ]
+}

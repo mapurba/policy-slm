@@ -1,0 +1,53 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is native SQL query processing in the JDBC driver and why is it useful?",
+      "input": "",
+      "output": "In the JDBC driver, native SQL query processing allows you to embed standard SELECT statements directly inside XDS documents, just like any other SQL statement. This feature lets you execute database queries without having to translate the native SQL into the XDS query language, simplifying development and ensuring full support for the database's own query capabilities."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you embed a SELECT statement in an XDS document for the JDBC driver?",
+      "input": "",
+      "output": "To embed a SELECT statement in an XDS document for the JDBC driver, follow these steps:\n1. Create an <input> element and declare the JDBC namespace: `xmlns:jdbc=\"urn:dirxml:jdbc\"`.\n2. Inside the input, add a <jdbc:statement> element with the attribute `jdbc:type=\"query\"`.\n3. Within the statement, place a <jdbc:sql> element containing the full SELECT statement.\n4. Close all elements.\n\nExample:\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <jdbc:statement jdbc:type=\"query\">\n        <jdbc:sql>SELECT * FROM indirect.usr</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What attributes are included in the <jdbc:column> element returned by the JDBC driver and what do they represent?",
+      "input": "",
+      "output": "Each <jdbc:column> element returned by the JDBC driver includes the following attributes:\n- `jdbc:name`: the name of the column as defined in the database table.\n- `jdbc:position`: the 1‑based ordinal position of the column in the result set.\n- `jdbc:type`: the Java SQL type constant (e.g., `java.sql.Types.BIGINT`, `java.sql.Types.VARCHAR`) that describes the column's data type.\nThese attributes allow policies to reference column metadata directly."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the JDBC driver indicate the number of rows in a result set and what value is used for an empty result set?",
+      "input": "",
+      "output": "The JDBC driver reports the row count in the `jdbc:number-of-rows` attribute of the `<jdbc:result-set>` element. If the query returns no rows, the attribute is set to `0`.\nExample for an empty set:\n```xml\n<jdbc:result-set jdbc:number-of-rows=\"0\"/>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you construct an event that sends a SQL query via the Command Processor using the Parse XML token for the JDBC driver?",
+      "input": "",
+      "output": "To build an event that sends a SQL query through the Command Processor with the JDBC driver, use the following procedure:\n1. In a policy rule, create a local variable (e.g., `sqlstatement`).\n2. Set the variable using a `<do-set-local-variable>` action whose argument is a `<token-xml-parse>` token.\n3. Inside the token, concatenate the XML fragments that make up the input document, inserting the desired SQL text.\n4. After the variable is set, invoke the command processor with `cmd:execute($destCommandProcessor, $sqlstatement)` inside a `<do-trace-message>` or another appropriate action.\n5. Optionally add a `<do-veto/>` to stop further processing.\n\nThe sample logic from the documentation demonstrates this approach.\n```xml\n<do-set-local-variable name=\"sqlstatement\">\n  <arg-node-set>\n    <token-xml-parse>\n      <token-text xml:space=\"preserve\">&lt;input xmlns:jdbc=\"urn:dirxml:jdbc\">&lt;jdbc:statement jdbc:type=\"query\">&lt;jdbc:sql></token-text>\n      <token-text xml:space=\"preserve\">SELECT * FROM lab.users;</token-text>\n      <token-text xml:space=\"preserve\">&lt;/jdbc:sql>&lt;/jdbc:statement>&lt;/input></token-text>\n    </token-xml-parse>\n  </arg-node-set>\n</do-set-local-variable>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you expect if a SQL query executed by the JDBC driver returns no rows?",
+      "input": "",
+      "output": "If a SQL query executed by the JDBC driver returns no rows, the driver still produces a single `<jdbc:result-set>` element, but the `jdbc:number-of-rows` attribute will be set to `0`. No `<jdbc:row>` elements will be present inside the result set."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main capabilities and constraints of SQL query handling in the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver supports native SQL query processing, allowing SELECT statements to be embedded directly in XDS documents. Every query yields one `<jdbc:result-set>` element, with `jdbc:number-of-rows` indicating row count (zero for empty sets). Columns are returned with `jdbc:name`, `jdbc:position`, and `jdbc:type` attributes. Multiple queries can be placed in a single document, and queries do not require the tables or views to be part of the synchronization schema. When sending queries via the Command Processor, the XML must be built in a nodeset variable and parsed with the Parse XML token. Publisher‑channel queries are scheduled on the Subscriber channel and do not pause script execution."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XDS document that uses the JDBC driver to query the table \"employees\" for columns \"emp_id\" and \"name\", and show the expected result‑set element format for a single returned row.",
+      "input": "",
+      "output": "XDS input document:\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <jdbc:statement jdbc:type=\"query\">\n        <jdbc:sql>SELECT emp_id, name FROM employees</jdbc:sql>\n    </jdbc:statement>\n</input>\n```\n\nIf the query returns one row with `emp_id = 101` and `name = \"Alice\"`, the JDBC driver will produce the following output:\n```xml\n<output xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <jdbc:result-set jdbc:number-of-rows=\"1\">\n        <jdbc:row jdbc:number=\"1\">\n            <jdbc:column jdbc:name=\"emp_id\" jdbc:position=\"1\" jdbc:type=\"java.sql.Types.INTEGER\">\n                <jdbc:value>101</jdbc:value>\n            </jdbc:column>\n            <jdbc:column jdbc:name=\"name\" jdbc:position=\"2\" jdbc:type=\"java.sql.Types.VARCHAR\">\n                <jdbc:value>Alice</jdbc:value>\n            </jdbc:column>\n        </jdbc:row>\n    </jdbc:result-set>\n    <status level=\"success\"/>\n</output>\n```"
+    }
+  ]
+}

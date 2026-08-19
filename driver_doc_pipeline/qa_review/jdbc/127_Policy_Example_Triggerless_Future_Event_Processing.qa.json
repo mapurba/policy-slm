@@ -1,0 +1,35 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Triggerless Future Event Processing policy in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, the Triggerless Future Event Processing policy is an example that checks a user's \"commence\" attribute, determines whether the associated event time is in the future relative to the database's current time, and, if so, returns a retry status so the event can be processed later. It demonstrates how to retrieve attribute values, parse timestamps, compare them, and conditionally control processing flow without triggering an explicit event."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the rule \"Break if commencement date unavailable\" function within the JDBC driver policy?",
+      "input": "",
+      "output": "In the JDBC driver policy, the \"Break if commencement date unavailable\" rule checks the local variable named \"commence\" that was set earlier. The condition `<if-local-variable name=\"commence\" op=\"equal\"/>` evaluates to true when the variable is empty or not set. When the condition matches, the `<do-break/>` action stops further rule execution, preventing the policy from attempting to parse or compare timestamps when no commencement date exists."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you construct a policy in the JDBC driver to detect and retry future events based on a \"commence\" attribute?",
+      "input": "",
+      "output": "To construct such a policy in the JDBC driver, follow these steps:\n1. Define the policy XML and include the required namespaces for Timestamp, TimestampUtil, and jdbc.\n2. Add a rule that retrieves the \"commence\" attribute from the user object and stores it in a local variable named `commence` using `<do-set-local-variable>`.\n3. Add a second rule that checks if `commence` is empty; if it is, use `<do-break/>` to stop further processing.\n4. Add a rule to parse the database time and the event time:\n   - Use `<do-set-local-variable name=\"dbTime\">` with `<token-xpath expression=\"Timestamp:valueOf(@jdbc:database-local-time)\"/>`.\n   - Use `<do-set-local-variable name=\"eventTime\">` with `<token-xpath expression=\"Timestamp:valueOf($commence)\"/>`.\n5. Add a rule to compare the two timestamps:\n   - Use `<do-set-local-variable name=\"after\">` with `<token-xpath expression=\"TimestampUtil:after($eventTime, $dbTime)\"/>`.\n6. Add a final rule that checks if the variable `after` equals \"true\"; if so, return a retry status using `<do-status level=\"retry\">` with a message like \"Future event detected.\".\n7. Close the policy element.\nThis sequence implements triggerless future event detection and retry handling in the JDBC driver."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps of the example policy for triggerless future event processing in the JDBC driver.",
+      "input": "",
+      "output": "The example policy for triggerless future event processing in the JDBC driver performs the following steps: (1) Retrieves the user’s `commence` attribute into a local variable; (2) Breaks execution if `commence` is missing; (3) Parses the database’s current time and the event’s commencement time into `Timestamp` objects; (4) Uses `TimestampUtil:after` to determine if the event time is later than the database time; (5) If the event is in the future, issues a retry status with the message \"Future event detected.\"."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the complete XML policy example for triggerless future event processing as used in the JDBC driver.",
+      "input": "",
+      "output": "<policy    xmlns:Timestamp=\"http://www.novell.com/nxsl/java/java.sql.Timestamp\"\n  xmlns:TimestampUtil=\"http://www.novell.com/nxsl/java/com.novell.nds.dirxml.driver.jdbc.db.TimestampUtil\"\n  xmlns:jdbc=\"urn:dirxml:jdbc\">\n<rule>\n<description>Get commencement date from datasource.</description>\n  <conditions>\n    <and>\n      <if-xpath op=\"true\">.</if-xpath>\n    </and>\n  </conditions>\n  <actions>\n    <do-set-local-variable name=\"commence\">\n      <arg-string>\n        <token-src-attr class-name=\"User\" name=\"commence\"/>\n      </arg-string>\n    </do-set-local-variable>\n  </actions>\n</rule>\n\n<rule>\n  <description>Break if commencement date unavailable.</description>\n  <conditions>\n    <and>\n      <if-local-variable name=\"commence\" op=\"equal\"/>\n    </and>\n  </conditions>\n  <actions>\n    <do-break/>\n  </actions>\n</rule>\n\n<rule>\n<description>Parse times.</description>\n  <conditions>\n    <and>\n      <if-xpath op=\"true\">.</if-xpath>\n    </and>\n  </conditions>\n  <actions>\n    <do-set-local-variable name=\"dbTime\">\n      <arg-object>\n        <token-xpath expression=\"Timestamp:valueOf(@jdbc:database-local-time)\"/>\n      </arg-object>\n    </do-set-local-variable>\n    <do-set-local-variable name=\"eventTime\">\n      <arg-object>\n        <token-xpath expression=\"Timestamp:valueOf($commence)\"/>\n      </arg-object>\n    </do-set-local-variable>\n  </actions>\n</rule>\n<rule>\n<description>Is commencement date after database time?</description>\n  <conditions>\n    <and>\n      <if-xpath op=\"true\">.</if-xpath>\n    </and>\n  </conditions>\n  <actions>\n    <do-set-local-variable name=\"after\">\n      <arg-string>\n        <token-xpath expression=\"TimestampUtil:after($eventTime, $dbTime)\"/>\n      </arg-string>\n    </do-set-local-variable>\n  </actions>\n</rule>\n\n<rule>\n<description>Retry if future event.</description>\n  <conditions>\n    <and>\n      <if-local-variable name=\"after\" op=\"equal\">true</if-local-variable>\n    </and>\n  </conditions>\n  <actions>\n    <do-status level=\"retry\">\n      <arg-string>\n        <token-text xml:space=\"preserve\">Future event detected.</token-text>\n      </arg-string>\n    </do-status>\n  </actions>\n</rule>\n</policy>"
+    }
+  ]
+}

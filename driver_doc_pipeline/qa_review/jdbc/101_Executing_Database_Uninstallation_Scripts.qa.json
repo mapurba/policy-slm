@@ -1,0 +1,65 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the directory context used for when uninstalling databases with the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, the directory context is the file system location where the uninstallation SQL scripts and related files are stored for each supported database. Each database has its own sub‑directory under `install-dir\\DirXMLUtilities\\jdbc\\sql\\<database>\\install`. For example, the DB2 scripts reside in `install-dir\\DirXMLUtilities\\jdbc\\sql\\db2_udbl\\install`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall IBM DB2 Universal Database using the JDBC driver?",
+      "input": "",
+      "output": "To uninstall IBM DB2 Universal Database with the JDBC driver, follow these steps:\n1. Locate the DB2 directory context at `install-dir\\DirXMLUtilities\\jdbc\\sql\\db2_udbl\\install`.\n2. Drop the `idm`, `indirect`, and `direct` operating system user accounts.\n3. Change the administrator account name and password in the uninstall scripts if you have not already done so.\n4. Open the Command Line Processor (CLP) and run the uninstall script with the command `db2 -f uninstall.sql`.\n   *Note: The script uses the `\\` line‑continuation character and will not run in Command Center versions newer than 7.*\n5. After successful execution, delete the `idm_db2.jar` file."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall Informix Dynamic Server (IDS) using the JDBC driver?",
+      "input": "",
+      "output": "To uninstall Informix Dynamic Server with the JDBC driver, perform the following:\n1. Navigate to the Informix script directory at `install-dir\\DirXMLUtilities\\jdbc\\sql\\informix_ids\\install`.\n2. Drop the `idm` operating system user account.\n3. Start a client such as SQL Editor and log on to the server as the `informix` user (default password is `informix`) or another DBA‑privileged user.\n4. If you use a non‑default DBA account, modify the DBA account name and password in the uninstall scripts.\n5. Open and execute the appropriate `uninstall.sql` script from the `ansi`, `log`, or `no_log` subdirectory, depending on the type of database you originally installed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall Microsoft SQL Server using the JDBC driver?",
+      "input": "",
+      "output": "To uninstall Microsoft SQL Server with the JDBC driver, follow these steps:\n1. Go to the Microsoft SQL Server script directory: `install-dir\\DirXMLUtilities\\jdbc\\sql\\mssql\\install`.\n2. Launch a client such as Query Analyzer.\n3. Log on to the database server as the `sa` user (by default, `sa` has no password).\n4. Open `uninstall.sql` and execute it. In Query Analyzer, you can run the script using the F5 hotkey."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall MySQL using the JDBC driver?",
+      "input": "",
+      "output": "To uninstall MySQL with the JDBC driver, do the following:\n1. Locate the MySQL script directory: `install-dir\\DirXMLUtilities\\jdbc\\sql\\mysql\\install`.\n2. From a MySQL client (e.g., the `mysql` command‑line tool), log on as `root` or another administrative user. Example command: `mysql -u root -p` (default root has no password).\n3. Execute the uninstall script with the command `\\. c:\\uninstall.sql`.\n   *Do not terminate the statement with a semicolon.*"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall Oracle using the JDBC driver?",
+      "input": "",
+      "output": "To uninstall Oracle with the JDBC driver, follow these steps:\n1. Open the Oracle script directory at `install-dir\\DirXMLUtilities\\jdbc\\sql\\oracle\\install`.\n2. Using an Oracle client such as SQL*Plus, log on as the `SYSTEM` user (default password is `MANAGER`).\n3. If you run the scripts with a different user/password, modify all references to `SYSTEM` in the scripts before execution.\n4. Run the uninstall script with the command `@c:\\uninstall.sql`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall PostgreSQL using the JDBC driver?",
+      "input": "",
+      "output": "To uninstall PostgreSQL with the JDBC driver, execute these steps:\n1. Find the PostgreSQL script directory: `install-dir\\DirXMLUtilities\\jdbc\\sql\\postgres\\install`. The PostgreSQL binaries are typically in `postgres-install-dir/pgsql/bin`.\n2. From a PostgreSQL client such as `psql`, log on as the `postgres` user to the `idm` database. Example: `./psql -d idm postgres` (default `postgres` user has no password).\n3. Inside `psql`, run the uninstall script: `\\i uninstall.sql`.\n4. Drop the `idm` database from the command line: `./dropdb idm`.\n5. Edit `pg_hba.conf` to remove or comment out entries for the `idm` user, e.g., `#host    idm         idm    255.255.255.255   255.255.255.0`.\n6. Restart the PostgreSQL server to apply the `pg_hba.conf` changes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall Sybase Adaptive Server Enterprise (ASE) using the JDBC driver?",
+      "input": "",
+      "output": "To uninstall Sybase ASE with the JDBC driver, proceed as follows:\n1. Navigate to the Sybase script directory: `install-dir\\DirXMLUtilities\\jdbc\\sql\\sybase_ase\\install`.\n2. Open a Sybase client such as `isql`.\n3. Log on as the `sa` user (default `sa` has no password).\n4. Execute the uninstall script with the command `isql -U sa -P -i uninstall.sql`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the `uninstall.sql` script for IBM DB2 not run in the Command Center interface beyond version 7 when using the JDBC driver?",
+      "input": "",
+      "output": "The IBM DB2 `uninstall.sql` script uses the backslash (`\\`) line‑continuation character. Versions of the Command Center newer than version 7 no longer recognize this character, causing the script to fail when executed in that interface. Therefore, the script must be run from the Command Line Processor (CLP) instead."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to execute database uninstallation scripts for the JDBC driver across all supported databases.",
+      "input": "",
+      "output": "The JDBC driver provides a set of uninstallation SQL scripts for each supported database. For every database you must:\n1. Locate the appropriate script directory under `install-dir\\DirXMLUtilities\\jdbc\\sql\\<database>\\install`.\n2. Drop any IDM‑related operating system user accounts.\n3. Log on to the database with a privileged (often default) administrative account, adjusting usernames/passwords in the scripts if you use custom credentials.\n4. Open and execute the `uninstall.sql` script using the native client tool for that database (e.g., CLP for DB2, Query Analyzer for SQL Server, mysql client for MySQL, SQL*Plus for Oracle, psql for PostgreSQL, isql for Sybase). Follow any database‑specific syntax notes (e.g., avoid a semicolon in MySQL, use `\\i` in PostgreSQL).\n5. Perform any additional cleanup required by the database, such as deleting driver JAR files (DB2), dropping the IDM database (PostgreSQL), or editing configuration files like `pg_hba.conf` and restarting the server (PostgreSQL).\nBy following these steps for each platform, you can fully remove the JDBC driver’s database schema and related artifacts."
+    }
+  ]
+}

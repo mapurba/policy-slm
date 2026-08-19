@@ -1,0 +1,59 @@
+{
+  "driver": "Bidirectional driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the Bidirectional driver, what is the purpose of the auth_type setting in /etc/security/login.cfg on AIX systems?",
+      "input": "",
+      "output": "The auth_type setting in /etc/security/login.cfg tells the Bidirectional driver which authentication mechanism to use for publishing password changes on AIX. The valid values are STD_AUTH, which requires LAM, and PAM_AUTH, which requires PAM. The choice determines whether LAM or PAM is used to publish password changes."
+    },
+    {
+      "category": "config",
+      "instruction": "List the default TCP port numbers used by the Bidirectional driver for its various services.",
+      "input": "",
+      "output": "Default TCP Port Numbers for the Bidirectional driver:\n\n| Purpose                                                          | TCP Port Number |\n|------------------------------------------------------------------|-----------------|\n| Driver shim connection to Metadirectory engine                     | 8090            |\n| Driver shim HTTP services for log viewing and remote NIS/NIS+ PAM | 8091            |\n| Secure LDAP port                                                  | 636             |\n| Non‑secure LDAP port                                              | 389             |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you decide whether to use PAM or LAM for publishing password changes on AIX when planning a deployment of the Bidirectional driver?",
+      "input": "",
+      "output": "To decide between PAM and LAM for the Bidirectional driver on AIX:\n1. Identify the AIX version you will install on.\n2. If the version is 5.3 or newer, you can choose either PAM or LAM.\n3. If the version is older than 5.3, you must use LAM because PAM is not supported.\n4. Review your requirement for NIS or NIS+ support:\n   - LAM supports only the files database type and does **not** support NIS or NIS+.\n   - If you need NIS/NIS+ on AIX 5.2, either upgrade to AIX 5.3+ and use PAM, or require users to change passwords on the Identity Vault.\n5. After selecting the authentication method, set the appropriate value (STD_AUTH for LAM, PAM_AUTH for PAM) in /etc/security/login.cfg.\n6. Ensure the chosen method aligns with any external considerations that may affect the auth_type setting."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If you are running AIX 5.2 and need to support NIS or NIS+ with the Bidirectional driver, what options does the documentation provide?",
+      "input": "",
+      "output": "For AIX 5.2 with the Bidirectional driver, the documentation offers two options to support NIS or NIS+:\n1. Upgrade the operating system to AIX 5.3 or newer and then use PAM for publishing password changes.\n2. Keep AIX 5.2 but require users to change their passwords directly on the Identity Vault, bypassing the need for LAM (which does not support NIS/NIS+)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key deployment planning considerations outlined for the Bidirectional driver.",
+      "input": "",
+      "output": "The Bidirectional driver deployment planning page advises you to:\n- Review installation and configuration sections before proceeding.\n- Determine whether the deployment is new or an upgrade from a NIS or Fan‑Out driver.\n- Plan prototype, testing, and rollout strategies, possibly using an include/exclude file to limit initial deployment.\n- Decide on password‑change publishing method for AIX (PAM vs. LAM) based on AIX version and NIS/NIS+ requirements.\n- Replace the standard comm utility on AIX/HP‑UX if needed.\n- Identify all hostnames or IP addresses that will participate.\n- Decide whether to use the default TCP ports (8090, 8091, 636, 389) or custom ports."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When should you use an include/exclude file with the Bidirectional driver during deployment?",
+      "input": "",
+      "output": "You should use an include/exclude file with the Bidirectional driver when you want to limit the initial deployment to a small, controlled set of users and groups. This helps prototype, test, and roll out the driver safely before expanding to the full environment."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you determine if your deployment of the Bidirectional driver is a new installation or a replacement of an existing NIS or Fan‑Out driver?",
+      "input": "",
+      "output": "To determine whether you are performing a new installation or replacing an existing NIS or Fan‑Out driver for the Bidirectional driver:\n1. Review the existing Identity Manager environment to see if a NIS driver or Fan‑Out driver is already installed.\n2. Check the current driver configuration and version numbers.\n3. Consult Section 4.0, Upgrading from Another Driver, to understand the upgrade path if a previous driver is present.\n4. Based on this assessment, decide whether to follow the new installation procedures or the upgrade procedures."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the valid values for the auth_type setting in /etc/security/login.cfg for the Bidirectional driver, and what does each value require?",
+      "input": "",
+      "output": "The valid values for the auth_type setting in /etc/security/login.cfg for the Bidirectional driver are:\n- **STD_AUTH** – Requires the use of LAM to publish password changes.\n- **PAM_AUTH** – Requires the use of PAM to publish password changes."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What is the consequence of selecting STD_AUTH for auth_type on an AIX system using the Bidirectional driver?",
+      "input": "",
+      "output": "If you select STD_AUTH for auth_type on an AIX system with the Bidirectional driver, you must use LAM to publish password changes. LAM only supports the files database type and does not support NIS or NIS+. Therefore, password changes for NIS/NIS+ clients cannot be published unless you meet the additional requirements (e.g., upgrade to AIX 5.3+ and use PAM)."
+    }
+  ]
+}

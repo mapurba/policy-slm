@@ -1,0 +1,53 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the ACFQUERY tool in the ACF2 driver and what purpose does it serve?",
+      "input": "",
+      "output": "The ACFQUERY tool is the query processor used by the ACF2 driver to retrieve information from an ACF2 security system via the ACF2 API. The Metadirectory engine invokes ACFQUERY for matching and merging operations, and the tool returns name=value pairs that the driver shim converts into XDS documents for further processing."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "In the ACF2 driver, what does the SCOPE operand indicate for ACFQUERY commands?",
+      "input": "",
+      "output": "In the ACF2 driver, the SCOPE operand tells ACFQUERY what portion of the security database to query. \"SCOPE(entry)\" is used for read operations that request a single, specific profile, while \"SCOPE(subtree)\" is used for search operations that may return zero or more profiles from the entire hierarchy."
+    },
+    {
+      "category": "config",
+      "instruction": "For the ACF2 driver, what value must the CLASS operand have in an ACFQUERY read command and why?",
+      "input": "",
+      "output": "In the ACF2 driver, the CLASS operand must always be set to \"Logonid\" for read operations because the driver is designed to retrieve Logonid profile information, and the ACF2 API expects this class name when accessing individual user profiles."
+    },
+    {
+      "category": "config",
+      "instruction": "Which operands can be used in an ACF2 driver ACFQUERY read command to specify which attributes are returned?",
+      "input": "",
+      "output": "The ACF2 driver ACFQUERY read command supports two operands for attribute selection:\n- READATTRS(attrs…) – a comma‑separated list of specific attributes to return.\n- ALLREADATTRS – a keyword that tells ACFQUERY to return every attribute for the requested profile."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you construct an ACFQUERY read command in the ACF2 driver to retrieve the ACCOUNT attribute for a specific Logonid profile and display the results?",
+      "input": "",
+      "output": "To retrieve the ACCOUNT attribute for a specific Logonid profile and print the results in the ACF2 driver:\n1. Use the SCOPE operand set to \"entry\" because you are reading a single profile.\n2. Set CLASS to \"Logonid\".\n3. Set ASSOCIATION to the Logonid value you want (e.g., IBMUSER).\n4. Include READATTRS(ACCOUNT) to request only the ACCOUNT attribute.\n5. Append the PRINT operand to have ACFQUERY output the name=value pairs.\nThe resulting command looks like:\n```\nACFQUERY SCOPE(entry) CLASS(Logonid) ASSOCIATION(IBMUSER) READATTRS(ACCOUNT) PRINT\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you perform a search operation with the ACF2 driver ACFQUERY to find all Logonid profiles where the ACCOUNT attribute is true and print the results?",
+      "input": "",
+      "output": "To search for all Logonid profiles with ACCOUNT set to true in the ACF2 driver:\n1. Use SCOPE(subtree) to indicate a hierarchical search.\n2. Set SEARCHCLASSES to \"Logonid\" to limit the search to Logonid objects.\n3. Provide SEARCHATTRS('ACCOUNT=true') to specify the search filter.\n4. Optionally omit READATTRS/ALLREADATTRS if you only need the association names.\n5. Append the PRINT operand to display each matching result.\nThe complete command is:\n```\nACFQUERY SCOPE(subtree) SEARCHCLASSES(Logonid) SEARCHATTRS('ACCOUNT=true') PRINT\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using the ACFQUERY tool with the ACF2 driver.",
+      "input": "",
+      "output": "The ACF2 driver uses the ACFQUERY TSO command to read or search the ACF2 database. Read operations require SCOPE(entry), CLASS set to Logonid, an ASSOCIATION value, and either READATTRS or ALLREADATTRS, with optional PRINT to display results. Search operations use SCOPE(subtree), specify SEARCHCLASSES and SEARCHATTRS, and can also include READATTRS/ALLREADATTRS and PRINT. The command returns name=value lines that the driver converts into XDS documents for the Metadirectory engine."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write the exact ACFQUERY command to retrieve the ACCOUNT attribute for the Logonid profile IBMUSER and print the output, using the syntax of the ACF2 driver.",
+      "input": "",
+      "output": "```\nACFQUERY SCOPE(entry) CLASS(Logonid) ASSOCIATION(IBMUSER) READATTRS(ACCOUNT) PRINT\n```"
+    }
+  ]
+}

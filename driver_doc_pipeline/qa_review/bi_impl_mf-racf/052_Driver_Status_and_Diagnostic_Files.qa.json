@@ -1,0 +1,59 @@
+{
+  "driver": "Bi Impl MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the System Log in the Bi Impl MF RACF driver and why is it important for troubleshooting?",
+      "input": "",
+      "output": "The System Log in the Bi Impl MF RACF driver is used by the driver shim to record urgent, informational, and debug messages. Examining these messages should be the first step in troubleshooting because they provide the most immediate insight into driver operation and issues. Detailed message documentation is found in Section B.0, System and Error Messages."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you view the Trace File for the Bi Impl MF RACF driver using a web browser?",
+      "input": "",
+      "output": "To view the Trace File for the Bi Impl MF RACF driver:\n1. Open a web browser and navigate to the driver shim at https://<driver-address>:8091, replacing <driver-address> with the DNS name or IP address of your Bi Impl MF RACF driver.\n2. Authenticate using any user name and the password you specified as the Remote Loader password.\n3. Click the **Trace** link on the driver shim page. The trace file (default location /opt/novell/racfdrv/logs/trace.log) will be displayed."
+    },
+    {
+      "category": "config",
+      "instruction": "What trace level settings are available in the Bi Impl MF RACF driver shim and what does each level describe?",
+      "input": "",
+      "output": "The Bi Impl MF RACF driver shim supports trace levels from 0 to 10. Their meanings are:\n\n| Trace Level | Description |\n|-------------|-------------|\n| 0 | No debugging. |\n| 1–3 | Identity Manager messages. Higher levels within this range provide more detail. |\n| 4 | Includes level 1–3 plus Remote Loader, driver, driver shim, and driver connection messages. |\n| 5–7 | Includes level 4 plus change log and loopback messages. Higher levels within this range provide more detail. |\n| 8 | Includes level 5–7 plus driver status log, driver parameters, driver security, driver Web server, driver schema, driver encryption, and driver include/exclude file messages. |\n| 9 | Includes level 8 plus low‑level networking and operating system messages. |\n| 10 | Includes level 9 plus maximum low‑level program details (all options). |"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you set the trace level to 9 in the Bi Impl MF RACF driver shim configuration file?",
+      "input": "",
+      "output": "Add the following line to the Bi Impl MF RACF driver shim configuration file:\n```\n  -trace 9\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you view the Status Log for the Bi Impl MF RACF driver via a web browser?",
+      "input": "",
+      "output": "To view the Status Log for the Bi Impl MF RACF driver:\n1. Open a web browser and go to https://<driver-address>:8091, substituting the DNS name or IP address of your Bi Impl MF RACF driver.\n2. Authenticate with any user name and the Remote Loader password you defined.\n3. Click the **Status** link. The status log (default location /opt/novell/racfdrv/logs/dirxml.log) will be displayed, showing a condensed summary of events on the Subscriber and Publisher channels."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Operational Log in the Bi Impl MF RACF driver and where is its location defined?",
+      "input": "",
+      "output": "The Operational Log in the Bi Impl MF RACF driver contains important and informational messages that indicate the operational status of the driver shim. It records items that are not urgent enough to require immediate operator response but are useful for tracking driver progress. The location of the Operational Log is specified by the **DRVLOG** DD statement in the driver shim started task JCL."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is DSTRACE and how is it used with the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "DSTRACE is a facility on the Metadirectory server that allows you to view Identity Manager information. With the Bi Impl MF RACF driver, you can set the trace level using iManager (e.g., level 2 shows Identity Vault events in XML, level 5 shows policy execution results). Because DSTRACE can generate a high volume of output, it is recommended to capture the trace output to a file for analysis."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you capture DSTRACE output to a file when working with the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "When using DSTRACE with the Bi Impl MF RACF driver, set the desired trace level in iManager, then redirect the trace output to a file. The documentation recommends capturing the output to a file because high trace levels produce a large volume of data. The exact method of redirection depends on your operating system, but the key step is to ensure the DSTRACE output is written to a persistent file for later review."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main log files available for troubleshooting the Bi Impl MF RACF driver and how to access each one.",
+      "input": "",
+      "output": "The Bi Impl MF RACF driver provides several log files for troubleshooting:\n- **System Log**: Records urgent, informational, and debug messages; primary source for troubleshooting.\n- **Trace File** (/opt/novell/racfdrv/logs/trace.log): Contains detailed debug information; viewable via the driver shim web UI (click **Trace**) and controlled by the `-trace` setting.\n- **REXX Exec Output File**: Captures standard error from REXX execs in DDNAME SYSTSPRT of the driver shim started task.\n- **DSTRACE**: Identity Manager trace facility on the Metadirectory server; set level in iManager and capture output to a file.\n- **Status Log** (/opt/novell/racfdrv/logs/dirxml.log): Condensed summary of subscriber/publisher events; viewable via the driver shim UI (click **Status**) or in iManager.\n- **Operational Log**: Contains informational messages about driver shim operation; location defined by the DRVLOG DD statement in the started task JCL.\n- **Change Log Started Task Message Log**: Writes important and informational messages to DDNAME SYSPRINT of the change log started task.\nEach log can be accessed either through the driver shim web interface, iManager, or by locating the file paths on the system as indicated."
+    }
+  ]
+}

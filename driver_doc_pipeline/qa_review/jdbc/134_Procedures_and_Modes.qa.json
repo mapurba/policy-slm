@@ -1,0 +1,59 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the chained and unchained modes in the JDBC driver and how do they relate to SQL compatibility?",
+      "input": "",
+      "output": "In the JDBC driver, unchained mode is Sybase's native way of executing SQL, while chained mode is a later addition that makes the database compatible with SQL standards. According to Table N-1, chained mode is the SQL‑compatible mode and unchained mode is the Sybase native mode."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver switch between chained and unchained mode when Connection.setAutoCommit is called?",
+      "input": "",
+      "output": "The JDBC driver (jConnect) uses the Connection.setAutoCommit(boolean) method to control its execution mode. When setAutoCommit(true) is called, the driver switches to unchained mode; when setAutoCommit(false) is called, it switches to chained mode, as shown in Table N-2."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the 'Use Manual Transactions?' parameter affect the mode of the JDBC driver?",
+      "input": "",
+      "output": "If the 'Use Manual Transactions?' parameter is set to False, the JDBC driver invokes Connection.setAutoCommit(true) and enters unchained mode, which is the normal processing mode for SELECT statements and automatic transactions. If the parameter is set to True, the driver invokes Connection.setAutoCommit(false) and enters chained mode, which is used for all statements except SELECT statements and manual‑transaction policies."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you alter a stored procedure to run in a specific mode using the sp_procxmode procedure in the JDBC driver environment?",
+      "input": "",
+      "output": "To alter a stored procedure's mode for the JDBC driver, invoke the sp_procxmode procedure with two arguments: the procedure name and the desired mode. From the ISQL command line, run:\n\n```\nclient:sp_procxmode my_procedure, anymode go\n```\nReplace `my_procedure` with the actual procedure name and `anymode` with either `chained` or `unchained` as required."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the 'Use Manual Transactions?' driver parameter in the JDBC driver and what are its valid values?",
+      "input": "",
+      "output": "The 'Use Manual Transactions?' parameter controls whether the JDBC driver operates in automatic or manual transaction mode. Valid values are:\n\n- **False** – The driver calls Connection.setAutoCommit(true) and uses unchained mode (default for SELECT statements and auto‑transaction policies).\n- **True** – The driver calls Connection.setAutoCommit(false) and uses chained mode (used for non‑SELECT statements and manual‑transaction policies)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the JDBC driver produce error 7112 when invoking a chained stored procedure, and how can this be resolved?",
+      "input": "",
+      "output": "Error 7112 occurs when the JDBC driver is in unchained mode (triggered by `Use Manual Transactions?` set to False) and it invokes a chained stored procedure. To resolve the error, either change the stored procedure to run in unchained mode using `sp_procxmode`, or set the 'Use Manual Transactions?' parameter to True so the driver switches to chained mode before invoking the procedure."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What causes error 7113 in the JDBC driver and what steps can be taken to avoid it?",
+      "input": "",
+      "output": "Error 7113 is raised when the JDBC driver is in chained mode (triggered by `Use Manual Transactions?` set to True) and it invokes an unchained stored procedure. To avoid this error, alter the stored procedure to run in chained mode using `sp_procxmode`, or set the 'Use Manual Transactions?' parameter to False so the driver operates in unchained mode."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about transaction modes and stored procedure handling in the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver supports two execution modes: chained (SQL‑compatible) and unchained (Sybase native). The default jConnect mode is unchained, and it switches modes via Connection.setAutoCommit. The 'Use Manual Transactions?' parameter determines which mode the driver uses: False → unchained, True → chained. Errors 7112 and 7113 arise when a stored procedure's mode does not match the driver’s current mode. To prevent these errors, either modify stored procedures with `sp_procxmode` to match the driver’s mode or adjust the 'Use Manual Transactions?' setting accordingly."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you change the JDBC driver to use manual transactions in a policy, ensuring it operates in chained mode?",
+      "input": "",
+      "output": "To make the JDBC driver use manual transactions (and therefore operate in chained mode) within a policy, set the driver‑specific parameter **Use Manual Transactions?** to **True**. The driver will then invoke `Connection.setAutoCommit(false)`, placing it in chained mode for all subsequent statements in the policy (except SELECT statements, which remain in auto mode)."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Data Flow option in the RACF driver and what impact does it have on synchronization?",
+      "input": "",
+      "output": "In the RACF driver, the Data Flow option is specified during driver import and determines how filters and policies behave for synchronizing objects. It has three possible settings: *Bidirectional* – synchronizes classes and attributes on both the Subscriber and Publisher channels; *Application to Identity Vault* – synchronizes only on the Publisher channel; and *Identity Vault to Application* – synchronizes only on the Subscriber channel."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Data Flow option when importing the RACF driver?",
+      "input": "",
+      "output": "During import of the RACF driver, follow these steps: 1. Launch the driver import wizard in Identity Manager. 2. When prompted for the Data Flow option, select one of the three choices that matches your integration needs: *Bidirectional*, *Application to Identity Vault*, or *Identity Vault to Application*. 3. Continue the import process to complete the configuration. The selected option will control how filters and policies synchronize data."
+    },
+    {
+      "category": "config",
+      "instruction": "Which pre‑configured OMVS attributes can be set in the RACF driver and what do they represent?",
+      "input": "",
+      "output": "The RACF driver’s Set Preconfigured OMVS Data option allows you to configure three OMVS attributes for new users:\n* **OMVSPGM** – the default program (login shell) assigned to the user.\n* **UID Assignment** – determines whether UID and GID numbers are assigned by the security system or by the Identity Vault.\n* **HOME** – the default home directory for the user."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Set Preconfigured TSO Data option control in the RACF driver?",
+      "input": "",
+      "output": "In the RACF driver, the Set Preconfigured TSO Data option, specified during driver import, determines whether the driver sets pre‑configured Time Sharing Option (TSO) information for new users in the RACF security system. The configurable TSO attributes are ACCT (default account number), PROC (default logon procedure), and UNIT (default unit name)."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default filter and schema mapping between eDirectory and RACF attributes for the RACF driver?",
+      "input": "",
+      "output": "The default filter and schema mapping for the RACF driver is:\n\n| eDirectory Class | eDirectory Attribute | RACF Class | RACF Attribute |\n|------------------|----------------------|------------|----------------|\n| User | CN | User | DirXML-RACF-userid |\n| User | Group Membership | User | DirXML-RACF-groups |\n| User | Login Disabled | User | DirXML-RACF-revoked |\n| User | Login Expiration Time | User | DirXML-RACF-revokedate |\n| User | Password Expiration Interval | User | DirXML-RACF-password-interval |\n| User | Password Expiration Time | User | DirXML-RACF-expired |\n| Group | CN | Group | DirXML-RACF-group |\n\nThis table defines which eDirectory classes and attributes are shared with the corresponding RACF classes and attributes."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the RACF driver support password phrases in z/OS 1.10?",
+      "input": "",
+      "output": "Starting with z/OS 1.10, RACF allows password phrases that can be case‑sensitive and up to 100 characters long, replacing the earlier limit of 8 non‑case‑sensitive characters. The RACF driver can be configured to capture and synchronize these password phrases by selecting the appropriate option during driver setup."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable the RACF driver to capture and synchronize RACF password phrases?",
+      "input": "",
+      "output": "To enable the RACF driver to capture and synchronize password phrases, import the driver and during the import process select the option that allows password phrase synchronization. This option activates the driver’s capability to handle the longer, case‑sensitive password phrases supported by z/OS 1.10."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Subscriber Event Transformation policy named NOVLRACFDCFG-sub-et in the RACF driver?",
+      "input": "",
+      "output": "The Subscriber Event Transformation policy NOVLRACFDCFG-sub-et in the RACF driver is designed to veto events that fall outside the configured container scope for Users and Groups and to veto move and rename events, which are not natively supported by RACF."
+    },
+    {
+      "category": "config",
+      "instruction": "What default Creation Policy does the RACF driver provide for the Subscriber channel and which fields does it require?",
+      "input": "",
+      "output": "The RACF driver provides the default Subscriber Creation Policy named **NOVLRACFDCFG-sub-cp**. This policy requires the RACF **password** and **NAME** fields to be present and automatically sets default **Group** and **Owner** fields for newly created objects."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration elements of the RACF driver as described in the documentation.",
+      "input": "",
+      "output": "The RACF driver configuration includes: (1) a Data Flow option (Bidirectional, Application to Identity Vault, or Identity Vault to Application) that controls synchronization direction; (2) Set Preconfigured OMVS Data and Set Preconfigured TSO Data options to define default OMVS (login shell, UID/GID assignment, home directory) and TSO (account number, logon procedure, unit name) attributes for new users; (3) a default filter and schema mapping table linking eDirectory classes/attributes to RACF classes/attributes; (4) support for RACF password phrases up to 100 characters, enabled via a driver option; (5) a set of Subscriber and Publisher policies—including event transformation, matching, creation, placement, and command transformation policies—that govern how objects, attributes, and passwords are processed and synchronized between the Identity Vault and RACF."
+    }
+  ]
+}

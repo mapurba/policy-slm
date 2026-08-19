@@ -1,0 +1,77 @@
+{
+  "driver": "Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the overall architecture of the Scripting driver and how does it synchronize data between the Identity Vault and a connected account management system?",
+      "input": "",
+      "output": "The Scripting driver synchronizes information between the Identity Vault and an external account management system by using two main channels: the Publisher channel and the Subscriber channel. The Identity Manager detects changes in the Identity Vault and notifies the driver’s Subscriber component, which after policy processing sends events to a Remote Loader process on the connected system. Custom scripts then perform the required actions. Conversely, a process on the connected system polls the external system for changes, writes them to an encrypted change log, and the Publisher shim reads this log, converts the entries to XDS event documents, and submits them to the Metadirectory engine, which ultimately updates the Identity Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Publisher channel of the Scripting driver operate, including its interaction with the change log and Metadirectory engine?",
+      "input": "",
+      "output": "In the Scripting driver, the Publisher channel provides identity change information to the Metadirectory engine as XDS event documents. It works with a change log that stores identity changes in encrypted form. Before scanning the change log, the driver executes the polling script to capture any recent changes. When events are found, the Publisher shim decrypts them, formats them as XDS, and sends them over an SSL link to the Metadirectory engine, which applies policies and posts the changes to the Identity Vault. Events remain in the change log if communication is lost, ensuring no data loss."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the change log in the Scripting driver and how are its contents stored?",
+      "input": "",
+      "output": "The change log in the Scripting driver stores identity changes in encrypted form. It acts as a temporary holding area for events detected by the polling script until the Publisher shim processes and submits them to the Metadirectory engine. Encrypted storage protects the data, and events are removed from the log only after successful submission. If the link to the Metadirectory engine is temporarily unavailable, events stay in the change log until connectivity is restored."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you record identity changes in the change log using the change log update command for the Scripting driver?",
+      "input": "",
+      "output": "To record identity changes in the change log for the Scripting driver, invoke the change log update command with the appropriate command‑line arguments and pipe the event data to its standard input. The command encrypts the supplied events and writes them to the encrypted change log. Any process that has rights to update the change log may execute this command, and the polling script typically calls it during each poll cycle."
+    },
+    {
+      "category": "config",
+      "instruction": "What command line inputs does the change log update command accept in the Scripting driver?",
+      "input": "",
+      "output": "The change log update command in the Scripting driver accepts command‑line arguments that define how the command should operate (such as specifying the target change log) and reads the event data to be encrypted from standard input. The exact arguments are not listed on the page, but the command requires both arguments and input data to function."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you set or modify the polling interval for the polling script used by the Scripting driver?",
+      "input": "",
+      "output": "You set the polling interval for the polling script of the Scripting driver during the driver’s installation wizard, where the interval is entered as a configuration value. After installation, you can change the interval by editing the Driver object’s configuration in the Identity Manager console and updating the polling interval property."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What role does the Publisher shim play in the Scripting driver’s workflow?",
+      "input": "",
+      "output": "The Publisher shim in the Scripting driver periodically scans the encrypted change log for pending events. Before each scan, it invokes the polling script to capture any newly changed identities. When events are found, the shim decrypts them, formats them as XDS documents, and transmits them over an SSL network link to the Metadirectory engine for policy processing and eventual update of the Identity Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Subscriber channel of the Scripting driver handle XDS command documents received from the Metadirectory engine?",
+      "input": "",
+      "output": "The Subscriber channel of the Scripting driver receives XDS command documents from the Metadirectory engine and then calls the appropriate customized script or scripts to process those commands. These scripts must be extended to understand and act on the events specific to the connected external system."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the schema file in the Scripting driver and how can it be extended?",
+      "input": "",
+      "output": "The schema file in the Scripting driver defines the class and attribute configuration for the connected system. It allows you to modify and extend the definitions to add new objects and attributes beyond those originally supplied with the driver, enabling the driver to recognize and handle additional data structures specific to the external system."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the include/exclude file influence provisioning in the Scripting driver on both Publisher and Subscriber channels?",
+      "input": "",
+      "output": "The include/exclude file in the Scripting driver provides a mechanism for local system policy to determine which objects are processed during provisioning. By listing objects to include or exclude, administrators can control object flow independently on the Publisher channel (outbound to the Metadirectory engine) and the Subscriber channel (inbound from the Metadirectory engine)."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What function do loopback state files serve in the Scripting driver?",
+      "input": "",
+      "output": "Loopback state files in the Scripting driver enable automatic loopback detection for external applications that lack built‑in loopback detection. They prevent events that originated from the Identity Vault from being published back to the Identity Vault, thereby avoiding duplicate processing."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key components and functions of the Scripting driver as described in the documentation.",
+      "input": "",
+      "output": "The Scripting driver synchronizes identity data between the Identity Vault and a connected external system using two channels. The Publisher channel records changes from the external system in an encrypted change log, which the Publisher shim reads, encrypts, and forwards as XDS events to the Metadirectory engine. The Subscriber channel receives XDS commands from the Metadirectory engine and invokes customized scripts to act on them. Supporting elements include a polling script (to detect external changes), a change log update command (to write encrypted events), a configurable schema file (defining objects and attributes), an include/exclude file (controlling provisioning scope), and loopback state files (preventing event loops)."
+    }
+  ]
+}

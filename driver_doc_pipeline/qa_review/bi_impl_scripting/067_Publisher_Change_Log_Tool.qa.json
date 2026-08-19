@@ -1,0 +1,53 @@
+{
+  "driver": "Bi Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the change log tool in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, the change log tool (usclh on UNIX or idmevent.exe on Windows) creates events that are picked up by the driver shim on a polling interval and published to the Identity Manager engine, where they can be processed by Policy. It allows the publisher channel to submit changes at any time, either from the polling script or from another mechanism, and ensures that events are queued and published when needed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you submit an add event for a User object using the Bi Impl Scripting driver change log tool from a script?",
+      "input": "",
+      "output": "To submit an add event for a User object from a script using the Bi Impl Scripting driver change log tool, follow these steps:\n1. Call the usclh utility with the -t add, -c User, and -a <association> options.\n2. Use a here‑document (<<EOF … EOF) to provide attribute name/value pairs on standard input.\n3. End the input with EOF (or Ctrl‑d if typed directly).\nExample script snippet:\n```\nusclh -t add -c User -a bob <<EOF\nADD_CN=bob\nADD_Login Disabled=true\nEOF\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What command‑line options are available for the usclh utility in the Bi Impl Scripting driver and what does each option do?",
+      "input": "",
+      "output": "The usclh utility for the Bi Impl Scripting driver supports the following options:\n| Option | Description |\n|---|---|\n| -t <type> | The command type: add, delete, modify, modify-password, rename, modify-association, status, xds. For xds, a raw XML document can be passed.\n| -c class | The class of the object being published.\n| -e event-id | Identifier for the event (timestamp or counter). If omitted, a default timestamp is used.\n| -a association | The association string value describing the event.\n| -s src-dn | Source distinguished name of the object, if hierarchical.\n| -o old-src-dn | Old distinguished name for move or rename events.\n| -p password | New password (valid for add or modify-password events).\n| -w old-password | Old password (valid for modify-password events).\n| -n new-name | New name for rename events.\n| -r | Remove the old name during a rename event.\n| -y old-association | Old association value for modify-association events.\n| -z new-association | New association value for modify-association events.\n| -l status-level | Status level for a status message: success, error, warning, retry, fatal.\n| -m status-message | Text of the status message.\n| -1 | Put the event on hold (do not publish) until a release is issued.\n| -2 | Release all events that are on hold, making them publishable.\n| -? | Display the help menu. |\nThese options can be combined as needed for the desired event type."
+    },
+    {
+      "category": "config",
+      "instruction": "Which values are valid for the status-level option in the Bi Impl Scripting driver change log tool?",
+      "input": "",
+      "output": "For the Bi Impl Scripting driver change log tool, the valid values for the -l status-level option are: success, error, warning, retry, fatal."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you place an event on hold and later release it using the Bi Impl Scripting driver change log tool?",
+      "input": "",
+      "output": "To place an event on hold with the Bi Impl Scripting driver change log tool, include the -1 flag when invoking usclh. The event will be queued but not published until released. To release all held events, invoke usclh with the -2 flag. Example:\n```\n# Put an event on hold\nusclh -t add -c User -a bob -1\n\n# Later, release all held events\nusclh -2\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If events submitted with the Bi Impl Scripting driver change log tool are not being published immediately, what mechanism controls their publishing?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, events that are not published immediately are queued in the change log and are published on the driver shim's polling interval or when a release command (-2) is issued. This queuing behavior ensures events are processed at the appropriate time."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps and considerations when using the usclh utility in the Bi Impl Scripting driver.",
+      "input": "",
+      "output": "The Bi Impl Scripting driver uses the usclh utility to create publishable events. Key steps:\n1. Choose the appropriate command type with -t (add, delete, modify, etc.).\n2. Specify object class (-c) and association (-a).\n3. Provide any additional required options (e.g., -p for new password, -n for rename).\n4. Use a here‑document (<<EOF … EOF) to feed attribute name/value pairs on standard input, keeping sensitive data out of command‑line arguments.\n5. End input with EOF (or Ctrl‑d).\n6. Optionally use -1 to hold events and -2 to release them, or -l and -m for status messages.\n7. Remember that events are queued and published on the driver shim’s polling interval unless released early."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample script that uses the Bi Impl Scripting driver change log tool to modify a password for user bob, including the required standard‑input lines.",
+      "input": "",
+      "output": "```bash\nusclh -t modify-password -c User -a bob <<EOF\nOLD_PASSWORD=secret\nPASSWORD=newsecret\nEOF\n```"
+    }
+  ]
+}

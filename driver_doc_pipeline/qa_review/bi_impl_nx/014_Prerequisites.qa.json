@@ -1,0 +1,59 @@
+{
+  "driver": "Unix Files driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Which account management systems are supported by the Unix Files driver?",
+      "input": "",
+      "output": "The Unix Files driver supports Linux or UNIX systems that manage accounts using local files such as /etc/passwd, as well as NIS and NIS+ directory services. For bidirectional password synchronization on AIX, either Pluggable Authentication Module (PAM) or Loadable Authentication Module (LAM) must be used. Remote NIS and NIS+ client systems that use PAM are also supported."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Unix Files driver require PAM or LAM on AIX for bidirectional password synchronization?",
+      "input": "",
+      "output": "The Unix Files driver uses PAM and LAM on AIX to intercept password changes made on the connected UNIX system. By intercepting these changes, the driver can synchronize the new password back to Identity Manager, enabling true bidirectional password synchronization."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you replace the comm utility on an HP-UX system for use with the Unix Files driver?",
+      "input": "",
+      "output": "To replace the comm utility on HP-UX for the Unix Files driver:\n1. Open a web browser and navigate to the HP-UX replacement link provided in the driver documentation: http://hpux.connect.org.uk/hppd/hpux/Gnu/coreutils-8.23/.\n2. Download the appropriate GNU coreutils package for your HP-UX version.\n3. Extract the package and locate the GNU version of the comm binary.\n4. Copy the GNU comm binary to a directory that is earlier in the system PATH than the standard /usr/bin (for example, /usr/local/bin).\n5. Verify the replacement by running `which comm` to ensure the path points to the GNU version.\n6. Test the utility with a sample /etc/group file to confirm it processes lines longer than 2000 characters without error."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you check whether your /etc/group file might cause issues with the Unix Files driver on AIX?",
+      "input": "",
+      "output": "To determine if your /etc/group file contains lines that could cause problems for the Unix Files driver on AIX:\n1. Log in to the AIX system as a privileged user.\n2. Run the command `awk '{ if (length($0) > 2000) print NR, length($0) }' /etc/group`.\n3. If the command returns any line numbers, those lines exceed 2000 characters and may cause the standard comm utility to fail.\n4. For each reported line, edit /etc/group to split the long entry into shorter lines or replace the comm utility with the GNU version as described in the driver documentation."
+    },
+    {
+      "category": "config",
+      "instruction": "What software requirements must be met to use the Unix Files driver?",
+      "input": "",
+      "output": "The Unix Files driver requires that you consult the Identity Manager 4.8 Drivers Documentation website for supported platforms and operating environments. From the index page (https://www.netiq.com/documentation/identity-manager-47-drivers), select the readme file that corresponds to the specific operating system version on which you plan to run the driver."
+    },
+    {
+      "category": "config",
+      "instruction": "Which authentication modules does the Unix Files driver rely on for password change interception on AIX?",
+      "input": "",
+      "output": "On AIX, the Unix Files driver relies on either the Pluggable Authentication Module (PAM) or the Loadable Authentication Module (LAM) to intercept password changes and enable bidirectional password synchronization."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What problem might occur if the standard comm utility on AIX processes a line longer than 2000 characters, and how can it be resolved for the Unix Files driver?",
+      "input": "",
+      "output": "If the standard comm utility on AIX processes a line longer than 2000 characters, it can fail to correctly compare the /etc/group file, causing the Unix Files driver to miss group information. The documented solution is to replace the OS‑provided comm utility with a vendor‑approved GNU version (IBM package for AIX) as listed in the driver documentation."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the prerequisites for deploying the Unix Files driver in Identity Manager.",
+      "input": "",
+      "output": "To deploy the Unix Files driver, you must ensure that the target system runs a supported Linux or UNIX platform, use local files, NIS, or NIS+ for account data, and have PAM (or LAM on AIX) available for password change interception. Verify software compatibility via the Identity Manager 4.8 Drivers Documentation site. If using AIX or HP‑UX, replace the standard comm utility with the vendor‑approved GNU version when the /etc/group file contains lines longer than 2000 characters."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the markdown table that lists the vendor‑approved GNU packages for replacing the comm utility on AIX and HP‑UX as required by the Unix Files driver.",
+      "input": "",
+      "output": "```markdown\n| Operating System | Vendor Name and Link to Replacement Utilities |\n|------------------|-----------------------------------------------|\n| AIX              | IBM |\n| HP-UX            | [HP](http://hpux.connect.org.uk/hppd/hpux/Gnu/coreutils-8.23/) |\n```"
+    }
+  ]
+}

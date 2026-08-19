@@ -1,0 +1,53 @@
+{
+  "driver": "Top Secret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the driver shim started task and why must it run on only one system in the Top Secret driver deployment?",
+      "input": "",
+      "output": "The driver shim started task is a background process that enables the Top Secret driver to communicate with the Metadirectory engine. In a deployment where multiple systems share the security system database, the documentation specifies that you must run the driver shim started task on only one system that shares the database to avoid duplicate connections and potential conflicts."
+    },
+    {
+      "category": "config",
+      "instruction": "Which default TCP port numbers are assigned for the Top Secret driver’s shim connection and HTTP services?",
+      "input": "",
+      "output": "The Top Secret driver uses the following default TCP ports:\n\n| Purpose                                            | TCP Port Number |\n|----------------------------------------------------|-----------------|\n| Driver shim connection to the Metadirectory engine  | 8090            |\n| Driver shim HTTP services for log viewing           | 8091            |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the driver libraries for the Top Secret driver on a shared volume?",
+      "input": "",
+      "output": "To install the driver libraries for the Top Secret driver:\n1. Identify a volume that is shared by each system that shares the security system database.\n2. Copy the driver libraries (samples library, load library, and REXX exec library) to that shared volume.\n3. Verify that the libraries are accessible from all systems that will use the Top Secret driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps are required to set up the change log started task for the Top Secret driver on each system that shares the security system database?",
+      "input": "",
+      "output": "To configure the change log started task for the Top Secret driver:\n1. Create the change log data set on a volume that is shared by all systems sharing the security system database.\n2. On each system that shares the database, define and start the change log started task.\n3. Ensure the task runs under the user ID specified for change log operations (see the Started Task User IDs documentation for requirements)."
+    },
+    {
+      "category": "config",
+      "instruction": "What files must be supplied during installation of the Top Secret driver, and where can sample files be found?",
+      "input": "",
+      "output": "During installation of the Top Secret driver you must provide three files:\n1. **Connected system schema file** – a file containing the required classes and attributes. A sample is located in the driver samples library member `SCHEMDEF`.\n2. **Driver shim configuration file** – a customizable file for shim settings. A sample is located in the driver samples library member `DRVCONF`.\n3. **Include/exclude file** – used to limit initial deployment to selected users and groups. A basic suggested file is provided in the driver samples library member `INCEXC`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is an include/exclude file recommended during the initial deployment of the Top Secret driver?",
+      "input": "",
+      "output": "The include/exclude file allows administrators to limit the initial deployment of the Top Secret driver to a small subset of users and groups on the connected system. This controlled rollout helps verify functionality and performance before expanding the deployment to the entire environment."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you determine the user IDs to run the change log and driver shim started tasks for the Top Secret driver?",
+      "input": "",
+      "output": "To select appropriate user IDs for the started tasks in the Top Secret driver:\n1. Review the requirements outlined in the \"Started Task User IDs\" documentation.\n2. Choose a user ID that meets the security and permission criteria for the change log started task.\n3. Choose a separate user ID that satisfies the requirements for the driver shim started task.\n4. Configure each started task to run under its respective user ID during installation."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key considerations outlined in the Deployment Planning section for the Top Secret driver.",
+      "input": "",
+      "output": "The Deployment Planning section for the Top Secret driver advises you to:\n- Review installation and configuration guides and decide if this is a new install or an upgrade from the Fan‑Out driver.\n- Install driver libraries on a volume shared by all systems using the security system database.\n- Run the driver shim started task on only one shared system, but run the change log started task on each shared system.\n- Create a shared change log data set.\n- Install exit routines on every shared system.\n- Provide a connected system schema file (`SCHEMDEF`), a driver shim configuration file (`DRVCONF`), and an include/exclude file (`INCEXC`) during installation.\n- Plan prototype, testing, and rollout strategies.\n- Determine appropriate user IDs for the started tasks.\n- Identify host names or IP addresses for the Metadirectory server and shim host, and decide whether to use default TCP ports (8090, 8091, 636, 389)."
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "driver": "Nx Settings driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the getNextRangeValue method in the Nx Settings driver?",
+      "input": "",
+      "output": "In the Nx Settings driver, the getNextRangeValue method is used to retrieve the next value from a numeric range that is defined in a specific settings set. It assigns the next sequential ID (or similar value) based on the range information stored in the setting identified by the provided setting name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve a range value using a policy in the Nx Settings driver?",
+      "input": "",
+      "output": "To retrieve a range value with a policy in the Nx Settings driver, follow these steps:\n1. Set a local variable named **DriverDN** to the distinguished name (DN) of the Nx Settings driver, e.g. `\\MYD1\\mydriver\\drivers\\NxSettings`.\n2. Use the static `NxSettingsInstance:getInstance($DriverDN)` method to obtain a handle to the driver shim and store it in a local variable named **driverShimInstance**.\n3. Call the `driverShim:getNextRangeValue($driverShimInstance, \"DefaultSet\", \"uid\")` method, passing the shim handle, the name of the settings set (e.g., \"DefaultSet\"), and the name of the setting that contains the range information (e.g., \"uid\"). Store the returned string in a local variable such as **uid**.\nThe XML policy fragment looks like this:\n```\n<do-set-local-variable name=\"DriverDN\">\n  <arg-string>\n    <token-text xml:space=\"preserve\">\\MYD1\\mydriver\\drivers\\NxSettings</token-text>\n  </arg-string>\n</do-set-local-variable>\n<do-set-local-variable name=\"driverShimInstance\">\n  <arg-object>\n    <token-xpath expression=\"NxSettingsInstance:getInstance($DriverDN)\"/>\n  </arg-object>\n</do-set-local-variable>\n<do-set-local-variable name=\"uid\">\n  <arg-string>\n    <token-xpath expression='driverShim:getNextRangeValue($driverShimInstance,\"DefaultSet\", \"uid\")'/>\n  </arg-string>\n</do-set-local-variable>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What arguments are required by the getNextRangeValue method of the Nx Settings driver and what does each represent?",
+      "input": "",
+      "output": "The `getNextRangeValue` method of the Nx Settings driver requires three arguments:\n\n| Argument | Description |\n|---|---|\n| **driverShimInstance** | The handle to the shim object obtained via `NxSettingsInstance:getInstance`. |\n| **setName** | The name of the settings set from which to retrieve the range value. This corresponds to the value of the `name` attribute of the `<settings>` tag in the driver configuration. |\n| **SettingName** | The name of the specific setting that contains the range information used to generate the next ID (e.g., \"uid\"). |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the DriverDN local variable needed when retrieving values with the Nx Settings driver?",
+      "input": "",
+      "output": "In the Nx Settings driver, the **DriverDN** local variable holds the distinguished name (DN) of the driver instance. This DN is required by the static `NxSettingsInstance:getInstance` method to locate and retrieve the correct shim object from the Java virtual machine. Without the correct DN, the driver shim cannot be instantiated, and subsequent calls such as `getNextRangeValue` would fail."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the process for retrieving values with a policy in the Nx Settings driver.",
+      "input": "",
+      "output": "The Nx Settings driver enables value retrieval through a policy by:\n1. Storing the driver’s distinguished name in a local variable (**DriverDN**).\n2. Calling the static `NxSettingsInstance:getInstance($DriverDN)` method to obtain a shim handle (**driverShimInstance**).\n3. Invoking `driverShim:getNextRangeValue` on the shim, supplying the shim handle, the target settings set name, and the setting name that defines the numeric range.\nThe method returns the next sequential value from the defined range, which can be stored in a local variable for further use."
+    }
+  ]
+}

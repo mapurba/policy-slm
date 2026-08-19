@@ -1,0 +1,41 @@
+{
+  "driver": "BI Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of shared memory in the BI Impl Scripting driver on Linux/UNIX systems?",
+      "input": "",
+      "output": "In the BI Impl Scripting driver, shared memory is used by the driver shim to safely and securely exchange data with the scripts that run on Linux and UNIX platforms."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When can shared memory segments become unusable for the BI Impl Scripting driver?",
+      "input": "",
+      "output": "Shared memory segments can become unusable on some UNIX systems if the driver shim is improperly terminated without first detaching from the segments."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default size and permissions of the shared memory segments created by the BI Impl Scripting driver?",
+      "input": "",
+      "output": "The BI Impl Scripting driver shim generates shared memory segments that are 16384 bytes in size and have permissions set to 600."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you locate and manually clear unusable shared memory segments for the BI Impl Scripting driver on a UNIX system?",
+      "input": "",
+      "output": "To locate and clear unusable shared memory segments for the BI Impl Scripting driver, follow these steps:\n1. Run the `ipcs -m` command to list all shared memory segments.\n2. Identify the segment belonging to the driver shim (look for the default size of 16384 bytes and permissions 600).\n3. Note the segment ID (shmid) from the output.\n4. Use the `ipcrm -m <shmid>` command to remove the identified segment.\n\nExample:\n```\n> ipcs -m\n------ Shared Memory Segments --------\nkey        shmid    owner     perms     bytes    nattch    status\n0x2a065bbd 1802241  root      600       16384    1\n> ipcrm -m 1802241\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken if shared memory segments used by the BI Impl Scripting driver become unusable?",
+      "input": "",
+      "output": "If shared memory segments used by the BI Impl Scripting driver become unusable, you should:\n1. Shut down the BI Impl Scripting driver process to stop further access to the faulty segments.\n2. Use `ipcs -m` to locate the problematic shared memory segments.\n3. Clear the identified segments with `ipcrm -m <shmid>`.\n4. Restart the driver shim using the proper procedure described in the \"Starting and Stopping the Driver Shim\" documentation to ensure the shim detaches cleanly from any remaining segments."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how shared memory errors are handled for the BI Impl Scripting driver on Linux/UNIX.",
+      "input": "",
+      "output": "For the BI Impl Scripting driver on Linux/UNIX, shared memory is used by the driver shim for script communication. If the shim is terminated incorrectly, the segments may become unusable. To resolve this, stop the driver process, locate the 16384‑byte segments with `ipcs -m`, remove them with `ipcrm -m <shmid>`, and then restart the shim correctly."
+    }
+  ]
+}

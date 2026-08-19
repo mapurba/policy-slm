@@ -1,0 +1,77 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What criteria does the JDBC driver use to treat a table as an object class under schema‑aware mode when the Schema Name parameter is set to indirect?",
+      "input": "",
+      "output": "In the JDBC driver, when Schema Name is set to indirect, any table that contains a primary key constraint is considered an object class. The driver uses the column(s) defined in the primary key to build associations for that class."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the JDBC driver interpret a table that only has a foreign key constraint when Schema Name is set to indirect?",
+      "input": "",
+      "output": "The JDBC driver treats a table that has only a foreign key constraint as a multi‑valued attribute of the object class that holds the primary key referenced by that foreign key."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "In the JDBC driver, how are single‑valued DN‑type attributes that reference the same object class represented in the database schema?",
+      "input": "",
+      "output": "For a single‑valued DN‑type attribute that points back to the same object class, the JDBC driver adds a foreign key constraint on the same table that references its own primary key column and stores the value in a local column. The example is the *manager* attribute in the *usr* table."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How are multi‑valued DN‑type attributes that reference the same object class modeled by the JDBC driver?",
+      "input": "",
+      "output": "When a multi‑valued DN‑type attribute points to the same object class, the JDBC driver creates a separate child table. Each row in the child table contains the parent object's primary key and a column for the attribute value, and both columns have foreign key constraints back to the parent table. The example is the *usr_directReports* table."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Describe how the JDBC driver models a single‑valued DN‑type attribute that points to a different object class.",
+      "input": "",
+      "output": "The JDBC driver represents a single‑valued DN‑type attribute that points to a different object class by adding a foreign key constraint from the table of the source class to the table of the target class, together with a local column that stores the foreign key value. The example is the *hostsrv* attribute in the *volume* table referencing the *server* table."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the representation of a multi‑valued DN‑type attribute that points to a different object class in the JDBC driver.",
+      "input": "",
+      "output": "For a multi‑valued DN‑type attribute that points to a different object class, the JDBC driver creates a child table with two columns: one column contains the primary key of the source class and the other contains the primary key of the target class. Both columns have foreign key constraints to their respective parent tables. The example is the *usr_mbr_of* table linking *usr* and *grp*."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the JDBC driver to run remotely on the database server and enable SSL encryption between the Identity Vault and the Remote Loader service?",
+      "input": "",
+      "output": "1. Deploy the JDBC driver on the same host as the database server.\n2. In the Identity Vault configuration, set the driver’s execution mode to *remote* so that the driver runs on the database server.\n3. Configure the Remote Loader service to use SSL by enabling the appropriate SSL settings (e.g., set *sslEnabled* to true and provide the keystore/truststore files).\n4. Verify that the connection URL used by the JDBC driver includes the SSL parameters required by your database (for example, `?ssl=true`).\n5. Test the connection to ensure that traffic between the Identity Vault and the Remote Loader is encrypted."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter controls how the JDBC driver qualifies tables, and what value is used for indirect synchronization?",
+      "input": "",
+      "output": "The driver parameter is **Schema Name**. When set to **indirect**, the JDBC driver qualifies tables according to the schema‑aware rules described in the documentation (object class detection, foreign‑key handling, etc.)."
+    },
+    {
+      "category": "config",
+      "instruction": "What naming conventions should be applied to view columns and primary key columns for direct synchronization in the JDBC driver?",
+      "input": "",
+      "output": "For direct synchronization with the JDBC driver:\n- Prefix one or more view column names with **pk_** (case‑insensitive) to indicate they participate as primary keys.\n- Use different primary key column names for each logical database class when both direct and indirect synchronization are used.\n- Do not place primary key columns on child tables when operating in Synch Schema mode."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the JDBC driver fail in Synch Schema mode when primary keys are added to child tables, and how can this issue be resolved?",
+      "input": "",
+      "output": "By design, the JDBC driver does not allow primary keys on child tables in Synch Schema mode. Adding primary keys to child tables causes the driver to malfunction because it expects child tables to contain only multi‑valued attribute data without primary keys. To resolve the issue, run the driver in **Synch Tables/Views mode**, which permits primary keys on child tables and prevents those tables from being added to the list of synchronized tables."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main schema‑aware use cases and security recommendations for the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver, when Schema Name is set to indirect, treats tables with primary keys as object classes and tables with only foreign keys as multi‑valued attributes. It supports four DN‑type attribute patterns: (1) single‑valued self‑reference, (2) multi‑valued self‑reference, (3) single‑valued cross‑class reference, and (4) multi‑valued cross‑class reference, each mapped to specific foreign‑key arrangements. For security and performance, the driver should run remotely on the database server with SSL encryption enabled between Identity Vault and Remote Loader; if run remotely is not possible, SSL must still be enabled. In production, tracing should be disabled."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the SQL statements to create a child table for a multi‑valued attribute that points to a different object class, as required by the JDBC driver.",
+      "input": "",
+      "output": "```sql\nCREATE TABLE indirect.usr (\n  idu         INTEGER  NOT NULL,\n  fname       VARCHAR2(64),\n  lname       CHAR(64),\n  CONSTRAINT pk_usr_idu PRIMARY KEY (idu)\n);\n\nCREATE TABLE indirect.grp (\n  idg         INTEGER  NOT NULL,\n  for_insert  INTEGER,\n  CONSTRAINT pk_grp_idg PRIMARY KEY (idg)\n);\n\nCREATE TABLE indirect.usr_mbr_of (\n  idu  INTEGER NOT NULL,\n  idg  INTEGER NOT NULL,\n  CONSTRAINT fk_mbr_of_idu FOREIGN KEY (idu)\n    REFERENCES indirect.usr(idu) ON DELETE CASCADE,\n  CONSTRAINT fk_mbr_of_idg FOREIGN KEY (idg)\n    REFERENCES indirect.grp(idg) ON DELETE CASCADE\n);\n```"
+    }
+  ]
+}

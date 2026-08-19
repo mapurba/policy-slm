@@ -1,0 +1,65 @@
+{
+  "driver": "Top Secret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the four flow options that can be selected for an attribute in the filter of the Top Secret driver and what does each option do?",
+      "input": "",
+      "output": "The four flow options are:\n* **Synchronize** – Changes to this object are reported and automatically synchronized.\n* **Ignore** – Changes to this object are not reported and not automatically synchronized.\n* **Notify** – Changes to this object are reported, but not automatically synchronized.\n* **Reset** – Resets the object value to the value specified by the opposite channel. It can be set on either the Publisher or Subscriber channel, but not both."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add an additional attribute to the filter for the Top Secret driver?",
+      "input": "",
+      "output": "To add an additional attribute:\n1. On the iManager Driver Overview page for the Top Secret driver, click the Filter icon on either the Publisher or Subscriber channel (the same object is used for both).\n2. In the Filter Edit dialog, click the class that contains the attribute you want to add.\n3. Click **Add Attribute**, then select the desired attribute from the list.\n4. Choose the flow for the attribute (Synchronize, Ignore, Notify, or Reset) for the Publisher and Subscriber channels.\n5. Click **Apply** to save the changes."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Java class and method in the Top Secret driver registers a new parser with a unique name and driver string?",
+      "input": "",
+      "output": "The class is **TSOCommandParser** and the static method is **registerParser(String name, String driver)**. This method creates a new TSOCommandParser object with a uniquely specified name and driver string."
+    },
+    {
+      "category": "config",
+      "instruction": "What method of the TSOKeyword class in the Top Secret driver sets a keyword to be case‑sensitive?",
+      "input": "",
+      "output": "The method is **void sensitive()**. Calling this method sets the keyword to be case‑sensitive by using the XML attribute **is-sensitive=true**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you modify the REXX execs to process an additional attribute required for adds and modifies of users in the Top Secret driver?",
+      "input": "",
+      "output": "In the Subscriber channel of the Top Secret driver, edit the specific REXX execs that handle user events. For adds, modify **IDMADDU**; for modifies, modify **IDMMODU**. Add the logic needed to handle the new attribute in each exec so that the driver processes the attribute during add and modify operations."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must a new attribute be added to both the filter and the REXX execs when configuring the Top Secret driver?",
+      "input": "",
+      "output": "Adding the attribute to the filter makes the driver aware of the attribute and defines how changes are reported (Synchronize, Ignore, Notify, Reset). Updating the REXX execs ensures that the driver’s event handling logic processes the attribute’s value during add, modify, or delete events. Both steps are required for the attribute to be correctly captured, reported, and acted upon."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete process for managing additional attributes in the Top Secret driver.",
+      "input": "",
+      "output": "To manage additional attributes in the Top Secret driver you must:\n1. Modify the filter: open the Filter Edit dialog from the driver overview, select the class, add the attribute, set its flow (Synchronize, Ignore, Notify, or Reset), and apply.\n2. (Optional) Map the attribute to an existing schema attribute by editing the Schema Mapping policy.\n3. Update the relevant REXX execs (e.g., IDMADDU, IDMMODU) in the Subscriber channel to handle the new attribute for the required event types.\n4. For Publisher‑side fields, add the field names to the Top Secret Field Descriptor Table and, if needed, use the provided Java classes and XSLT scripts to parse and transform TSO commands.\nThese steps ensure the attribute is recognized, correctly synchronized, and processed by both Publisher and Subscriber channels."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an XSLT snippet that uses the Java extension call to register a parser named \"MyParser\" for the Top Secret driver.",
+      "input": "",
+      "output": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xsl:stylesheet version=\"1.0\"\n    xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n    xmlns:java=\"http://xml.apache.org/xalan/java\"\n    exclude-result-prefixes=\"java\">\n  <xsl:template match=\"/\">\n    <!-- Register a new TSOCommandParser for the Top Secret driver -->\n    <xsl:value-of select=\"java:com.example.TSOCommandParser.registerParser('MyParser', 'TopSecretDriver')\"/>\n  </xsl:template>\n</xsl:stylesheet>"
+    },
+    {
+      "category": "config",
+      "instruction": "If you need to map an additional attribute to an existing attribute in the connected system schema for the Top Secret driver, which policy should you modify?",
+      "input": "",
+      "output": "You should modify the **Schema Mapping policy** for the Top Secret driver."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "After setting the flow of a new attribute to Reset on both the Publisher and Subscriber channels in the Top Secret driver, the attribute does not synchronize. What is the likely cause?",
+      "input": "",
+      "output": "The Reset flow can be set on either the Publisher or the Subscriber channel, but not on both. Setting Reset on both channels prevents proper synchronization, so you must configure Reset on only one side."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "driver": "Bi Impl MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the migration feature in the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "The migration feature in the Bi Impl MF RACF driver allows administrators to move identity objects between the Identity Vault and the connected RACF system, either provisioning identities from the vault to RACF or importing identities from RACF into the vault, facilitating initial data load and synchronization."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you migrate identities from the Identity Vault to the connected system using the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "To migrate identities from the Identity Vault to the connected system with the Bi Impl MF RACF driver:\n1. In iManager, open the Identity Manager Driver Overview for the Bi Impl MF RACF driver.\n2. Click **Migrate from Identity Vault**; an empty list of objects to migrate appears.\n3. Click **Add** to open the browse and search dialog.\n4. Select the desired objects and click **OK**.\n5. After the migration runs, click **View the Driver Status Log** to see the results.\nNote that only Distribution Passwords are migrated as the user's password; other passwords are not transferred."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you migrate identities from the connected system to the Identity Vault using the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "To migrate identities from the connected RACF system to the Identity Vault with the Bi Impl MF RACF driver:\n1. In iManager, open the Identity Manager Driver Overview for the Bi Impl MF RACF driver.\n2. Click **Migrate into Identity Vault** to open the **Migrate Data into the Identity Vault** window.\n3. Specify your search criteria:\n   a. Click **Edit List** to view eDirectory classes and attributes.\n   b. Select **class User** or **class Group** (users must be migrated before groups so that group memberships can be created correctly).\n   c. Choose the attributes to use as search criteria, then click **OK**. The eDirectory attributes map to RACF attributes according to the driver schema (e.g., CN maps to DirXML‑RACF‑userid).\n   d. Enter values for the selected attributes and click **OK**.\n4. Click **OK** to start the migration.\n5. After completion, click **View the Driver Status Log** to review the results.\nBecause local RACF passwords cannot be retrieved, they are not submitted to the Metadirectory engine until changed; password changes are captured by the password change exit routine."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attribute mapping does the Bi Impl MF RACF driver use for the CN attribute?",
+      "input": "",
+      "output": "In the Bi Impl MF RACF driver, the eDirectory attribute **CN** maps to the RACF schema attribute **DirXML‑RACF‑userid** as defined in the driver’s default filter and schema mapping."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if passwords are not being migrated when using the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "If passwords are not being migrated with the Bi Impl MF RACF driver, verify that the source accounts have a Distribution Password. Only Distribution Passwords are transferred to the connected system as the user’s password; if an account lacks a Distribution Password, no password will be migrated. Review the Password Management Administration Guide for details on Universal and Distribution Passwords."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the migration and synchronization steps for the Bi Impl MF RACF driver.",
+      "input": "",
+      "output": "The Bi Impl MF RACF driver provides three main operations:\n1. **Migrate from Identity Vault to RACF** – Open the driver overview in iManager, click *Migrate from Identity Vault*, add objects, and run the migration; view results in the driver status log. Only Distribution Passwords are migrated.\n2. **Migrate from RACF to Identity Vault** – Open the driver overview, click *Migrate into Identity Vault*, define search criteria (select User before Group, choose attributes, set values), and start the migration; view results in the driver status log. Local RACF passwords cannot be retrieved and are only captured after a change.\n3. **Synchronize the driver** – Open the driver overview and click *Synchronize* to generate events for objects that changed since the last processing.\nThese steps enable initial data load and ongoing change propagation between the Identity Vault and the RACF system."
+    }
+  ]
+}

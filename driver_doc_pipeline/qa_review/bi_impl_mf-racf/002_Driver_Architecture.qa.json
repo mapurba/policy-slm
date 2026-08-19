@@ -1,0 +1,59 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Subscriber channel in the RACF driver and how does it work?",
+      "input": "",
+      "output": "In the RACF driver, the Subscriber channel represents the flow of data from Identity Manager to the RACF system on the connected z/OS host. Identity Manager detects changes in the Identity Vault, sends XDS command documents to the driver shim (RACFDRV) via the Subscriber channel, which translates the events into REXX variables, calls the appropriate REXX execs, and issues the corresponding RACF commands to add, modify, delete, or rename user and group objects. The channel thus makes RACF a subscriber to Identity Manager events."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the Publisher channel in the RACF driver and what does it accomplish?",
+      "input": "",
+      "output": "In the RACF driver, the Publisher channel carries data from RACF back to Identity Manager. Security system exit routines (LDXEVX01 and LDXRIX02) detect password changes or administrative commands in RACF, place events in a cross‑memory queue, and the change‑log started task (LDXLOGR) moves them to a change‑log data set. The Publisher component of the driver periodically polls this change log, decrypts the events, and sends them over an SSL link to the Metadirectory engine, which processes them and updates the central Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "Which components of the RACF driver are associated with the Publisher channel and what are their roles?",
+      "input": "",
+      "output": "The components of the RACF driver linked to the Publisher channel are:\n- **LDXEVX01** – Exit routine that detects RACF user/password updates, writes them to the cross‑memory queue, and notifies the change‑log task.\n- **LDXRIX02** – Exit routine that detects any RACF updates made by TSO commands, writes them to the cross‑memory queue, and notifies the change‑log task.\n- **LDXLOGR** – z/OS started task that responds to events in the cross‑memory queue, writes them to the change‑log data set.\n- **Change Log** – z/OS data set that holds the events until the Publisher component retrieves them.\n- **Publisher Component** – Polls the change log at configurable intervals, sends events to the Metadirectory engine, and clears processed entries.\n- **LDXSERV** – APF‑authorized TSO command used by the Publisher channel (e.g., with the STATUS parameter to display change‑log information)."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the available parameters for the LDXSERV command in the RACF driver and what do they do?",
+      "input": "",
+      "output": "The LDXSERV command in the RACF driver supports two key parameters:\n- **NOLOG** – Used when updates are passed to RACF via the Subscriber channel; it flags those items with a token in the Publisher event address space so that the exit routines ignore them, preventing redundant loopback to Identity Manager.\n- **STATUS** – When executed manually, it displays information contained in the change‑log data set, allowing administrators to view pending or processed events."
+    },
+    {
+      "category": "config",
+      "instruction": "Where is the memory queue used by the RACF driver located and what are its main characteristics?",
+      "input": "",
+      "output": "The RACF driver stores its cross‑memory queue in **Subpool 231**, which is a fetch‑protected ECSA (Extended Common Secure Area) subpool. The queue is **encrypted** and acts as an in‑storage buffer that records events sequentially. Events are added by the RACF exit routines (LDXEVX01, LDXRIX02) and removed by the change‑log started task (LDXLOGR)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you start the RACF driver shim (RACFDRV) as a z/OS started task during system initialization?",
+      "input": "",
+      "output": "To start the RACF driver shim (RACFDRV) during z/OS system initialization:\n1. Add a STARTED task definition for RACFDRV in the system's JES2/3 or STARTUP procedure.\n2. Ensure the driver load library is included in the STEPLIB concatenation of the start step.\n3. In the initialization script, issue the START command for the RACFDRV started task.\n4. Verify that the task is running by checking the system’s active task list.\n5. During system shutdown, issue a STOP command for the RACFDRV started task as part of the normal shutdown procedure."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you display the current contents of the change log data set using the RACF driver?",
+      "input": "",
+      "output": "To view the contents of the change log data set with the RACF driver, run the LDXSERV command with the STATUS parameter:\n1. Include the driver load library in the STEPLIB concatenation of your TSO session.\n2. At the TSO command line, type `LDXSERV STATUS` and press Enter.\n3. The command outputs information from the change‑log data set, showing pending events and their details."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the RACF driver?",
+      "input": "",
+      "output": "In the RACF driver, the include/exclude file is an optional configuration file that lists local RACF identities to be explicitly **included** or **excluded** from provisioning through the Subscriber channel. By using this file, administrators can enforce local system policy, ensuring that only approved objects are synchronized with the central Identity Vault while others are ignored."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key components and data flow of the RACF driver architecture.",
+      "input": "",
+      "output": "The RACF driver synchronizes Identity Vault data with a RACF security system on z/OS. It consists of a driver shim (RACFDRV) that hosts both Subscriber and Publisher channels. The Subscriber channel receives XDS events from Identity Manager, translates them to REXX variables, and invokes REXX execs to modify RACF objects, using the SAFQUERY command for queries. The Publisher channel relies on two security‑system exit routines (LDXEVX01, LDXRIX02) that capture RACF changes, place them in an encrypted cross‑memory queue (Subpool 231), and notify the change‑log started task (LDXLOGR). LDXLOGR writes events to a change‑log data set; the Publisher component polls this data set, sends events over SSL to the Metadirectory engine, and clears processed entries. The LDXSERV command provides loopback detection (NOLOG) and status reporting (STATUS). An optional include/exclude file controls which identities are provisioned via the Subscriber channel."
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "driver": "IBM i driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the overall architecture of the IBM i driver and how does it synchronize information between the Identity Vault and the IBM i security system?",
+      "input": "",
+      "output": "The IBM i driver synchronizes information between the Identity Vault and the IBM i security system using two channels: a Publisher channel and a Subscriber channel. The Identity Manager detects changes in the Identity Vault and notifies the Subscriber component of the driver. After customizable policy processing, events are sent to the Subscriber shim of the embedded Remote Loader process on the IBM i system, which passes the information to customizable CL programs via a user space. The driver also uses operating‑system exits on IBM i to capture identity and password changes, stores those changes in an encrypted change log, and a Publisher shim reads the change log, converts the data to XDS event documents, and forwards them over SSL to the Metadirectory engine for policy processing and posting back to the Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "Which exit programs are used by the Publisher shim for identity changes in the IBM i driver?",
+      "input": "",
+      "output": "The Publisher shim relies on the following standard operating‑system exit programs for identity changes in the IBM i driver:\n\n| Description                         | Exit Point Name |\n|-------------------------------------|-----------------|\n| Directory Maintenance Exit Program  | QIBM_QOK_NOTIFY |\n| Change User Profile Exit Program    | QIBM_QSY_CHG_PROFILE |\n| Create User Profile Exit Program    | QIBM_QSY_CRT_PROFILE |\n| Delete User Profile Exit Program    | QIBM_QSY_DLT_PROFILE |\n| Restore User Profile Exit Program   | QIBM_QSY_RST_PROFILE |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Publisher shim handle password changes in the IBM i driver?",
+      "input": "",
+      "output": "For password changes, the Publisher shim uses the IBM i exit program QIBM_QSY_VLD_PASSWRD (the Validate Password exit). This exit captures password change information and forwards it to the Publisher shim, which then stores the information in the encrypted change log for later processing and submission to the Metadirectory engine."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the step‑by‑step process the Publisher shim follows to submit events from the change log to the Metadirectory engine in the IBM i driver.",
+      "input": "",
+      "output": "1. The Publisher shim periodically scans the encrypted change log for pending events.\n2. When events are found, the shim decrypts each event.\n3. It compares the changed object state with the account snapshot files to determine the exact details of the change.\n4. The shim formats the event as an XDS event document.\n5. It sends the XDS document over a Secure Sockets Layer (SSL) network link to the Metadirectory engine.\n6. If the SSL link is unavailable, the events remain in the change log until communication is restored, at which point the shim retries submission."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What role do account snapshot files play in the IBM i driver’s Publisher shim operation?",
+      "input": "",
+      "output": "Account snapshot files store information about the current state of users and groups on the IBM i system. Because the operating‑system exits do not provide complete details about the changes, the Publisher shim references these snapshot files to compare the previous state with the new state of an object. This comparison enables the shim to determine the exact nature of the change (add, modify, delete, rename, etc.) before creating and submitting an XDS event."
+    },
+    {
+      "category": "howto",
+      "instruction": "Explain how the Subscriber channel processes XDS command documents in the IBM i driver.",
+      "input": "",
+      "output": "1. The Subscriber channel receives XDS command documents from the Metadirectory engine.\n2. It stores each command's name‑value pairs in a user space on the IBM i system.\n3. The Subscriber shim calls the appropriate customizable CL program based on the command type (add, modify, rename, delete, password sync, etc.).\n4. The CL program accesses the original command data securely by invoking the GETIDMVAR command, which reads the variables from the user space.\n5. The CL program executes the required action on the IBM i security objects.\n6. Additional CL programs can be created to support other object types or events as needed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the IBM i driver?",
+      "input": "",
+      "output": "The include/exclude file allows administrators to define local system policy that controls which objects are provisioned or ignored. It can be applied independently to both the Publisher channel and the Subscriber channel, enabling selective inclusion or exclusion of users, groups, or other objects from synchronization with the Identity Vault."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key components and data flow of the IBM i driver architecture.",
+      "input": "",
+      "output": "The IBM i driver consists of a Publisher channel and a Subscriber channel, both built on an embedded Remote Loader process. The Publisher shim captures identity and password changes via IBM i exit programs, stores them encrypted in a change log, and uses account snapshot files to determine change details. It periodically reads the change log, converts events to XDS format, and sends them over SSL to the Metadirectory engine, which applies policies and updates the Identity Vault. The Subscriber shim receives XDS command documents from the Metadirectory engine, places the data in a user space, and invokes customizable CL programs to perform adds, modifies, renames, deletes, and password synchronizations on the IBM i system. Supporting elements include a schema file defining object classes, an include/exclude file for provisioning control, and loopback state files to prevent event feedback loops."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "driver": "i5/OS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why would you use an SSH tunnel with the i5/OS driver?",
+      "input": "",
+      "output": "You use an SSH tunnel with the i5/OS driver when SSL cannot be used, in order to encrypt and protect the communications channel between the Metadirectory engine and the driver shim on the IBM i system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you start the SSH daemon on the IBM i box for the i5/OS driver?",
+      "input": "",
+      "output": "On the IBM i box, run the following command to start the SSH daemon:\n\n```\nSTRTCPSVR SERVER(*SSHD)\n```\nThis starts the SSHD server, which must also be configured to start automatically with TCP/IP."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you generate an SSH key pair for key‑based authentication when configuring the i5/OS driver on Windows or Linux?",
+      "input": "",
+      "output": "Perform the following steps on the Identity Vault server (the client side):\n\n1. Open a Command Prompt (Windows) or a terminal (Linux).\n2. Run the command:\n   ```\n   ssh-keygen\n   ```\n3. Press **Enter** to accept all default values.\n4. When prompted for a passphrase, press **Enter** to leave it empty.\n5. If asked whether to overwrite an existing key, answer **no**.\n6. The public key will be created as `id_rsa.pub` (Windows: `%HOMEPATH%\\.ssh\\id_rsa.pub`; Linux: `~/.ssh/id_rsa.pub`).\n7. Open `id_rsa.pub` and copy its entire contents; you will paste this into the IBM i box in a later step."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the IBM i box to accept the SSH public key for the i5/OS driver?",
+      "input": "",
+      "output": "On the IBM i box, log in as the user that will be used for SSH authentication and follow these steps in QSH:\n\n1. Run `QSH`.\n2. Create the `.ssh` directory:\n   ```\n   mkdir ~/.ssh\n   ```\n3. Restrict the home directory permissions:\n   ```\n   chmod 700 ~\n   ```\n4. Restrict the `.ssh` directory permissions:\n   ```\n   chmod 600 ~/.ssh\n   ```\n5. Create (or edit) the file `~/.ssh/authorized_keys` and paste the contents of the previously copied `id_rsa.pub` into it.\n6. Set the correct permissions on the authorized keys file:\n   ```\n   chmod 600 ~/.ssh/authorized_keys\n   ```\nThese steps allow password‑less SSH login for the i5/OS driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you start the SSH client on the Identity Vault server to create an SSH tunnel for the i5/OS driver on Linux and Windows?",
+      "input": "",
+      "output": "Use the following commands, replacing `<port>`, `<ssh-user>` and `<ibm-i-host>` with your values (default port is 8090):\n\n**Linux**\n```bash\nssh -fN -i ~/.ssh/id_rsa -L <port>:localhost:<port> <ssh-user>@<ibm-i-host>\n```\nThis runs the SSH client in the background (`-fN`) and forwards the local `<port>` to the IBM i host.\n\n**Windows** (you may need to install the OpenSSH client first)\n```cmd\nssh -i %HOMEPATH%\\.ssh\\id_rsa -L <port>:localhost<port> <ssh-user>@<ibm-i-host>\n```\nAfter running the appropriate command, the tunnel is ready for the i5/OS driver to connect."
+    },
+    {
+      "category": "config",
+      "instruction": "Which line must be edited in the I5OSDRV configuration file to disable SSL when using the i5/OS driver over an SSH tunnel?",
+      "input": "",
+      "output": "Open the I5OSDRV configuration file via `GO I5OSDRV/I5OSDRV`, choose option 3 to modify it, and **remove** the fragment `ca=/usr/local/i5osdrv/keys/ca.pem` from the `-connection` line. This disables the SSL certificate reference."
+    },
+    {
+      "category": "config",
+      "instruction": "What remote loader connection parameter should be removed in iManager for the i5/OS driver when configuring an SSH tunnel?",
+      "input": "",
+      "output": "In iManager, edit the configuration for the i5/OS driver and **remove** the parameter `kmo=\"SSL CertificateDNS\"` from the remote loader connection parameters. This disables the SSL mode that is incompatible with the SSH tunnel."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you change the hostname setting in iManager for the i5/OS driver to work with the SSH tunnel?",
+      "input": "",
+      "output": "In iManager, navigate to the configuration of the i5/OS driver, set the **Hostname** field to `localhost`, then restart the driver. This directs the driver to connect through the local SSH tunnel rather than directly to the IBM i host."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the connection to the IBM i box fails after configuring the SSH tunnel for the i5/OS driver, what steps should you verify?",
+      "input": "",
+      "output": "To troubleshoot a failed connection after setting up the SSH tunnel for the i5/OS driver, verify the following:\n\n1. The SSHD server is running on the IBM i box (`STRTCPSVR SERVER(*SSHD)`).\n2. The SSH tunnel is active on the Identity Vault server (check the SSH client process and port forwarding).\n3. The public key was correctly placed in `~/.ssh/authorized_keys` on the IBM i box with proper permissions (`chmod 600`).\n4. In the I5OSDRV configuration file, the `ca=` entry has been removed from the `-connection` line.\n5. In iManager, the `kmo=\"SSL CertificateDNS\"` parameter has been removed and the hostname is set to `localhost`.\n6. The i5/OS driver has been restarted after each configuration change.\n7. No firewall or network policy is blocking the chosen tunnel port (default 8090).\nCorrecting any of these points should restore a successful connection over the SSH tunnel."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete procedure for securing the i5/OS driver communication with an SSH tunnel.",
+      "input": "",
+      "output": "To secure i5/OS driver communication with an SSH tunnel:\n1. Ensure the SSH daemon is running on the IBM i box (`STRTCPSVR SERVER(*SSHD)`).\n2. On the Identity Vault server, generate an SSH key pair (`ssh-keygen`) and copy the public key.\n3. On the IBM i box, create `~/.ssh`, set proper permissions, and add the public key to `~/.ssh/authorized_keys`.\n4. Start an SSH tunnel from the Identity Vault server to the IBM i host (Linux: `ssh -fN -i ~/.ssh/id_rsa -L <port>:localhost:<port> <ssh-user>@<ibm-i-host>`; Windows: `ssh -i %HOMEPATH%\\.ssh\\id_rsa -L <port>:localhost<port> <ssh-user>@<ibm-i-host>`).\n5. Modify the I5OSDRV configuration file to remove `ca=/usr/local/i5osdrv/keys/ca.pem` from the `-connection` line and restart the driver shim.\n6. In iManager, delete the `kmo=\"SSL CertificateDNS\"` parameter, change the hostname to `localhost`, and restart the i5/OS driver.\nAfter these steps, the i5/OS driver communicates securely over the SSH tunnel."
+    }
+  ]
+}

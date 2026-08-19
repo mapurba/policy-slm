@@ -1,0 +1,65 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Third‑Party JDBC Driver Descriptor Import DTD in the JDBC driver?",
+      "input": "",
+      "output": "The Third‑Party JDBC Driver Descriptor Import DTD defines the XML structure that NetIQ Identity Manager uses to import descriptor files for external JDBC drivers. It specifies the allowed elements, attributes, and nesting so that the system can correctly interpret connection properties, error handling rules, type mappings, and other driver‑specific options."
+    },
+    {
+      "category": "config",
+      "instruction": "In the JDBC driver descriptor DTD, which element defines the list of connection properties and what sub‑elements does it contain?",
+      "input": "",
+      "output": "The element <connection-properties> defines the list of connection properties for the JDBC driver. Its content model is:\n\n```xml\n<!ELEMENT connection-properties (property*)>\n```\n\nIt can contain zero or more <property> elements."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the exact structure of a <property> element in the JDBC driver descriptor DTD?",
+      "input": "",
+      "output": "The <property> element is defined as:\n\n```xml\n<!ELEMENT property (key, value)>\n```\n\nIt must contain a <key> element followed by a <value> element, each holding character data (#PCDATA)."
+    },
+    {
+      "category": "config",
+      "instruction": "How are error conditions represented in the JDBC driver descriptor DTD, including any attributes?",
+      "input": "",
+      "output": "Error conditions can be described with several elements:\n\n- `<error-code>` with a required `<value>` child and an optional `description` attribute:\n  ```xml\n  <!ELEMENT error-code (value)>\n  <!ATTLIST error-code description CDATA #IMPLIED>\n  ```\n- `<error-code-range>` containing `<from>` and `<to>` children and an optional `description` attribute:\n  ```xml\n  <!ELEMENT error-code-range (from, to)>\n  <!ATTLIST error-code-range description CDATA #IMPLIED>\n  ```\n- `<sql-state>` with a `<value>` child and optional `description` attribute:\n  ```xml\n  <!ELEMENT sql-state (value)>\n  <!ATTLIST sql-state description CDATA #IMPLIED>\n  ```\n- `<sql-state-class>` with a `<value>` child and optional `description` attribute:\n  ```xml\n  <!ELEMENT sql-state-class (value)>\n  <!ATTLIST sql-state-class description CDATA #IMPLIED>\n  ```\nThese elements can be used inside `<errors>`, `<authentication>`, `<connectivity>`, `<retry>`, and `<fatal>` sections."
+    },
+    {
+      "category": "config",
+      "instruction": "Which element allows specifying an arbitrary SQL statement to execute, and what type of content does it hold in the JDBC driver descriptor DTD?",
+      "input": "",
+      "output": "The `<exec-sql>` element is used to specify an arbitrary SQL statement. Its content model is character data:\n\n```xml\n<!ELEMENT exec-sql (#PCDATA)>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What element defines the mapping between database types and IDM types in the JDBC driver descriptor DTD, and what child elements does it contain?",
+      "input": "",
+      "output": "The `<sql-type-map>` element defines the type mapping. It contains zero or more `<type>` elements:\n\n```xml\n<!ELEMENT sql-type-map (type*)>\n```\nEach `<type>` element has a `<from>` and a `<to>` child:\n\n```xml\n<!ELEMENT type (from, to)>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How can you specify a transaction isolation level in a JDBC driver descriptor import file according to the DTD?",
+      "input": "",
+      "output": "Use the `<transaction-isolation-level>` element, which holds character data representing the desired isolation level:\n\n```xml\n<!ELEMENT transaction-isolation-level (#PCDATA)>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which elements in the JDBC driver descriptor DTD allow you to reference custom Java classes, and what is their content model?",
+      "input": "",
+      "output": "Two elements allow referencing custom classes:\n\n- `<lock-generator-class>`\n  ```xml\n  <!ELEMENT lock-generator-class (#PCDATA)>\n  ```\n- `<time-translator-class>`\n  ```xml\n  <!ELEMENT time-translator-class (#PCDATA)>\n  ```\nBoth contain the fully‑qualified class name as character data."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the <options> element in the JDBC driver descriptor DTD and which child elements are permitted inside it?",
+      "input": "",
+      "output": "The `<options>` element aggregates optional driver‑specific settings. Its content model permits any of the following child elements (in any order, each zero or one time):\n\n- lock-generator-class\n- supports-schemas-in-metadata-retrieval\n- time-translator-class\n- column-position-comparator\n- use-manual-transactions\n- minimal-metadata\n- transaction-isolation-level\n- use-single-connection\n- exclude-table-filter\n- include-table-filter\n- left-outer-join-operator\n- current-timestamp-stmt\n- add-default-values-on-view-insert\n- reuse-statements\n- function-return-method\n- handle-stmt-results\n\nRepresented in the DTD as:\n\n```xml\n<!ELEMENT options (lock-generator-class | supports-schemas-in-metadata-retrieval | time-translator-class | column-position-comparator | use-manual-transactions | minimal-metadata | transaction-isolation-level | use-single-connection | exclude-table-filter | include-table-filter | left-outer-join-operator | current-timestamp-stmt | add-default-values-on-view-insert | reuse-statements | function-return-method | handle-stmt-results)*>\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the main elements defined in the Third‑Party JDBC Driver Descriptor Import DTD for the JDBC driver.",
+      "input": "",
+      "output": "The Third‑Party JDBC Driver Descriptor Import DTD defines the XML schema used to describe external JDBC drivers for NetIQ Identity Manager. Key elements include:\n- `<jdbc-driver>` as the root, containing optional `<metadata-override>`, `<connection-properties>`, `<sql-type-map>`, `<options>`, and `<errors>` sections.\n- `<connection-properties>` holds multiple `<property>` entries (each with a `<key>` and `<value>`).\n- `<sql-type-map>` maps database types via `<type>` elements (`<from>` → `<to>`).\n- `<options>` aggregates driver‑specific configuration such as `<lock-generator-class>`, `<time-translator-class>`, transaction settings, schema support flags, and statement handling options.\n- `<errors>` groups error‑handling rules using `<connectivity>`, `<authentication>`, `<retry>`, and `<fatal>` elements, each allowing patterns like `<regular-expression>`, `<sql-state>`, `<error-code>`, and associated `<actions>`.\n- Miscellaneous elements like `<exec-sql>`, `<fetch-metadata>`, `<rollback>`, and table filters (`<include-table-filter>`, `<exclude-table-filter>`) support advanced driver behavior.\nOverall, the DTD provides a comprehensive, extensible structure for importing and configuring third‑party JDBC drivers."
+    }
+  ]
+}

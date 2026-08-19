@@ -1,0 +1,77 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why must the ACF2 driver be specified as a Remote Loader driver in its configuration?",
+      "input": "",
+      "output": "The ACF2 driver must be specified as a Remote Loader driver because it relies on the Remote Loader framework to load and manage the driver shim process. Setting this option in the iManager Driver Edit Properties window ensures the driver is started and communicated with correctly, which is required for the driver to function."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the driver shim files for the ACF2 driver using FTP in binary mode?",
+      "input": "",
+      "output": "1. Open an FTP client and connect to the target system.\n2. Set the transfer mode to binary.\n3. Transfer the driver samples library to the target system.\n4. Transfer the driver load library to the target system.\n5. Transfer the REXX exec library XMT files to the target system.\n6. Verify that the files were copied correctly before proceeding."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default port number for the ACF2 driver shim and how can it be changed?",
+      "input": "",
+      "output": "The default port number for the ACF2 driver shim is **8090**. To change this value, edit the driver shim configuration file located on the connected system and modify the port number entry to the desired value."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you follow if the ACF2 driver shim fails to start due to a startup or communication failure?",
+      "input": "",
+      "output": "1. Examine the trace file for error messages.\n2. Verify that the connected system’s operating system and security system versions are supported and that all maintenance patches are applied.\n3. Ensure the Remote Loader and Driver object passwords stored under **/opt/novell/acf2drv/keys** (files **dpwdlf40** and **lpwdlf40**) match the passwords configured on the Metadirectory server; update them with the SETPWDS REXX exec if necessary.\n4. Confirm the correct host name and port number (default 8090) are specified in the Driver Configuration Remote Loader connection parameters; adjust the port in the driver shim configuration file if needed.\n5. Verify that the driver shim started task has been set up properly.\n6. Make sure only one system in the security system database complex is running the driver shim started task."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you resolve a Driver Certificate Setup Failure for the ACF2 driver?",
+      "input": "",
+      "output": "1. Ensure eDirectory is running LDAP with SSL enabled on port 636.\n2. Verify network connectivity from the connected system to the Metadirectory server.\n3. Use the driver REXX exec library member **SETCERT** to configure the certificate at any time.\n4. If SSL cannot be configured via LDAP, manually export the CA certificate from iManager (Security → certificate authority → Modify Object → Certificates tab → Public Key Certificate → Export → No for private key → Base64 format) and save it.\n5. Transfer the exported certificate to the connected system and place it at **/opt/novell/acf2drv/keys/ca.pem**."
+    },
+    {
+      "category": "config",
+      "instruction": "Which encrypted files store the Remote Loader and Driver object passwords for the ACF2 driver, and where are they located?",
+      "input": "",
+      "output": "The Remote Loader password is stored in the encrypted file **lpwdlf40** and the Driver object password is stored in the encrypted file **dpwdlf40**. Both files are located in the directory **/opt/novell/acf2drv/keys** on the connected system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you manually export and install the CA certificate required by the ACF2 driver?",
+      "input": "",
+      "output": "1. In iManager, navigate to the **Security** container and locate the tree’s certificate authority (usually named *treeName CA*).\n2. Click the certificate authority object and select **Modify Object**.\n3. Go to the **Certificates** tab.\n4. Click **Public Key Certificate** and then **Export**.\n5. Choose **No** to export without the private key and click **Next**.\n6. Select **Base64** format and click **Next**.\n7. Click **Save** and specify a location for the exported file.\n8. Use FTP or another method to copy the exported file to the connected system and place it at **/opt/novell/acf2drv/keys/ca.pem**."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If users are not being provisioned to the connected system by the ACF2 driver, what checks should you perform?",
+      "input": "",
+      "output": "1. Examine the status log, DSTRACE output, trace file, and REXX exec output file for error messages.\n2. Verify that the users reside in the appropriate base container; you can view and modify the base containers on the Global Configuration Values page of the Driver Edit Properties window in iManager.\n3. Ensure the driver Data Flow property is set to **Bidirectional** or **Identity Vault to Application**; re‑import the driver rules file if you need to change this value.\n4. Confirm that the security‑equivalent user for the driver has read rights on the base container (see Table 2‑2 for required rights)."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Data Flow property values enable bidirectional provisioning for the ACF2 driver, and how do you change them?",
+      "input": "",
+      "output": "The Data Flow property must be set to either **Bidirectional** or **Identity Vault to Application** to enable provisioning from the Identity Vault to the connected system, and to **Bidirectional** or **Application to Identity Vault** to enable provisioning in the opposite direction. To change the value, re‑import the driver rules file over your existing driver via iManager."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the ACF2 driver load library need to be APF‑authorized?",
+      "input": "",
+      "output": "The ACF2 driver load library must be APF‑authorized because the driver runs under elevated privileges on the mainframe. APF (Authorized Program Facility) authorization ensures the library can be executed in a privileged address space, which is required for the driver to interact securely with the Identity Manager engine and the security system."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key troubleshooting steps for common ACF2 driver problems.",
+      "input": "",
+      "output": "To troubleshoot common ACF2 driver issues, examine the status log, DSTRACE output, trace files, and REXX exec output files; verify configuration settings such as Remote Loader designation, APF authorization, and authorized TSO commands; ensure passwords in **/opt/novell/acf2drv/keys** match those on the Metadirectory server; confirm the correct host name, port (default 8090), and SSL certificates are in place; check base container placement and Data Flow properties for provisioning; and make sure required security‑system exits are installed, LLA refreshed, and started tasks (driver shim and change log) are running on all systems in the security system database."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact TSO command to display the status of the change log data set for the ACF2 driver.",
+      "input": "",
+      "output": "```text\nLDXSERV STATUS\n```"
+    }
+  ]
+}

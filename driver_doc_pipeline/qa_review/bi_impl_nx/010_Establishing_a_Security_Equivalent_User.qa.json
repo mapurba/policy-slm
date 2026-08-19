@@ -1,0 +1,65 @@
+{
+  "driver": "Bi Impl Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does security equivalence mean for the Bi Impl Nx driver and why is it required?",
+      "input": "",
+      "output": "Security equivalence for the Bi Impl Nx driver means the driver runs with the same rights as a specified eDirectory user. This user must have sufficient rights to perform the operations the driver needs, such as creating, modifying, and deleting objects in the Identity Vault. Running with security equivalence ensures the driver can act on behalf of the trusted user while respecting the least‑privilege principle, allowing administrators to limit the driver’s permissions to only what is necessary."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Entry Rights and All Attribute Rights must the security‑equivalent user have for creating objects in the Identity Vault with group synchronization in the Bi Impl Nx driver?",
+      "input": "",
+      "output": "For creating objects in the Identity Vault with group synchronization, the security‑equivalent user of the Bi Impl Nx driver must have:\n- Entry Rights: **Browse and Create**\n- All Attribute Rights: **Compare, Read, and Write**"
+    },
+    {
+      "category": "config",
+      "instruction": "List the required rights for the Bi Impl Nx driver when it needs to retrieve passwords from the Identity Vault.",
+      "input": "",
+      "output": "To retrieve passwords from the Identity Vault, the security‑equivalent user for the Bi Impl Nx driver requires:\n- Entry Rights: **Browse and Supervisor**\n- All Attribute Rights: **Compare and Read**"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the base container rights required by the Bi Impl Nx driver for modifying objects in the Identity Vault?",
+      "input": "",
+      "output": "For modifying objects in the Identity Vault, the Bi Impl Nx driver requires the security‑equivalent user to have:\n- Entry Rights: **Browse**\n- All Attribute Rights: **Compare, Read, and Write**"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the Bi Impl Nx driver to run with security equivalence to a minimal‑rights user instead of ADMIN?",
+      "input": "",
+      "output": "1. Identify or create a user in eDirectory that has only the minimal rights needed for the driver’s operations.\n2. In the Bi Impl Nx driver configuration, locate the **Security Equivalent User** setting.\n3. Enter the distinguished name (DN) of the minimal‑rights user.\n4. Save the driver configuration and restart the driver service for the change to take effect.\n5. Verify the user has the rights listed in Table 2‑2 (Entry Rights and All Attribute Rights) for the required operations."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable the Bi Impl Nx driver to set passwords by configuring the appropriate Entry Right?",
+      "input": "",
+      "output": "1. Open the eDirectory Administration tool.\n2. Navigate to the container where the driver’s security‑equivalent user resides.\n3. Edit the user's permissions and locate the **Entry Rights** section.\n4. Add the **Supervisor** right to the Entry Rights list.\n5. Save the changes and ensure inheritance is enabled for **Entry Rights** and **All Attribute Rights**.\n6. Restart the Bi Impl Nx driver to apply the new rights."
+    },
+    {
+      "category": "howto",
+      "instruction": "If you do not want the Bi Impl Nx driver to set passwords, how should you adjust the filter for the nspmDistributionPassword attribute?",
+      "input": "",
+      "output": "1. Open the relevant policy publication containing the filter for the User class.\n2. Locate the **nspmDistributionPassword** attribute within the filter.\n3. Change its **Subscribe** setting from the default to **Ignore**.\n4. Save the policy changes.\n5. Republish the policy and restart the Bi Impl Nx driver so the new filter takes effect."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the Bi Impl Nx driver fail to set passwords and how can you fix it?",
+      "input": "",
+      "output": "The driver cannot set passwords because the security‑equivalent user does not have the **Supervisor** entry right. To fix the issue, add the **Supervisor** right to the user’s Entry Rights, ensure inheritance is enabled for Entry Rights and All Attribute Rights, and then restart the driver."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error messages might appear if the Bi Impl Nx driver is configured to set passwords but the Subscribe setting for nspmDistributionPassword is not ignored, and how can you suppress them?",
+      "input": "",
+      "output": "If the driver is not intended to set passwords yet the Subscribe setting for the **nspmDistributionPassword** attribute is not set to **Ignore**, the driver will generate superfluous error messages about password operations it cannot perform. To suppress these messages, edit the filter for the User class and set the Subscribe setting for **nspmDistributionPassword** to **Ignore**, then republish the policy."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the security‑equivalent user requirements for the Bi Impl Nx driver.",
+      "input": "",
+      "output": "The Bi Impl Nx driver must run as a security‑equivalent user who is a trustee of the containers holding synchronized users and groups. This user needs specific Entry Rights and All Attribute Rights for each operation (e.g., Browse and Supervisor for password retrieval, Browse and Create for object creation). Inheritance must be set for both rights categories. If password setting is required, the Supervisor right is mandatory; otherwise, set the Subscribe flag for the nspmDistributionPassword attribute to Ignore to avoid unnecessary errors."
+    }
+  ]
+}

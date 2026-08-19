@@ -1,0 +1,47 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are logical operations in the JDBC driver and why are they needed?",
+      "input": "",
+      "output": "In the JDBC driver, a logical operation is a way to treat multiple transactions as a single unit. Because DML and DDL statements cannot normally be mixed in one transaction, a single event may consist of several separate transactions. By assigning the same jdbc:op-id to those transactions, the JDBC driver groups them into a logical operation so that status handling is unified: if any member fails, all members receive the same status level and type."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the jdbc:op-id attribute and how should it be used in the JDBC driver?",
+      "input": "",
+      "output": "The jdbc:op-id attribute identifies the logical operation to which an element belongs. All elements that share the same jdbc:op-id value are grouped together as members of the same logical operation. You place jdbc:op-id=\"<id>\" on each element (e.g., <add> and <jdbc:statement>) that you want to be processed as part of that single logical operation."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the jdbc:op-type attribute do and on which element does it have effect in the JDBC driver?",
+      "input": "",
+      "output": "The jdbc:op-type attribute specifies the type of logical operation (for example, \"password-set-operation\"). In the JDBC driver, this attribute is only evaluated on the first element of a logical operation; on all subsequent elements it is ignored."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you group multiple transactions into a single logical operation using the JDBC driver?",
+      "input": "",
+      "output": "To group multiple transactions into a single logical operation with the JDBC driver, follow these steps:\n1. Choose a unique identifier for the operation, e.g., \"0\".\n2. On the first element (such as an <add> element), add the attributes jdbc:op-id=\"0\" and jdbc:op-type=\"<operation-type>\".\n3. For each additional element that should be part of the same operation (for example, a <jdbc:statement>), add the attribute jdbc:op-id=\"0\".\n4. Ensure each element contains the appropriate child elements (e.g., <add-attr>, <password>, or <jdbc:sql>) for its task.\nAll elements with the same jdbc:op-id are then treated as a single logical operation, sharing status and error handling."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If one member of a logical operation encounters an error, what status is returned to all members in the JDBC driver?",
+      "input": "",
+      "output": "When a logical operation is used, the JDBC driver returns the same status level and status type to every member of the operation. Therefore, if any single member encounters an error, all members receive that error status."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the JDBC driver handles logical operations and status sharing.",
+      "input": "",
+      "output": "The JDBC driver allows you to group multiple transactions into a logical operation using the jdbc:op-id attribute. All elements sharing the same jdbc:op-id are processed as one unit. The optional jdbc:op-type attribute defines the operation type but is only read on the first element. Status handling is unified: if any member fails, every member receives the same status level and type."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML input snippet for the JDBC driver that creates a logical operation with op-id \"1\" and op-type \"user-creation-operation\", including an <add> element for a user and a <jdbc:statement> that creates the corresponding database user.",
+      "input": "",
+      "output": "<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\" jdbc:op-id=\"1\" jdbc:op-type=\"user-creation-operation\">\n        <add-attr name=\"fname\">\n            <value>Jane</value>\n        </add-attr>\n        <add-attr name=\"lname\">\n            <value>Smith</value>\n        </add-attr>\n        <password>Smith{$idu}</password>\n    </add>\n    <jdbc:statement jdbc:op-id=\"1\">\n        <jdbc:sql>CREATE USER jsmith IDENTIFIED BY {$$password}</jdbc:sql>\n    </jdbc:statement>\n</input>"
+    }
+  ]
+}

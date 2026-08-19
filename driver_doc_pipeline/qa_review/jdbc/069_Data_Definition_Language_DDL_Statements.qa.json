@@ -1,0 +1,47 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why can a Data Definition Language (DDL) statement not be executed inside a database trigger when using the JDBC driver?",
+      "input": "",
+      "output": "The JDBC driver cannot run a DDL statement inside a database trigger because most databases prohibit mixing DML (Data Manipulation Language) and DDL statements within a single transaction. Triggers execute within the transaction that fired them, and the transactional rules of the underlying database prevent DDL from being part of that transaction."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the effect of using virtual triggers with the JDBC driver for DDL statements?",
+      "input": "",
+      "output": "Virtual triggers do not overcome the transactional limitation of mixing DML and DDL, but they allow DDL statements to be executed as a side effect of an XDS event when using the JDBC driver. The DDL runs after the trigger processing, outside the original transaction."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you include a CREATE USER DDL statement in an XDS event using the JDBC driver?",
+      "input": "",
+      "output": "Create an XML input that contains the data insertion followed by a <jdbc:statement> element with the DDL. For example:\n\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\">\n        <add-attr name=\"fname\">\n            <value>John</value>\n        </add-attr>\n        <add-attr name=\"lname\">\n            <value>Doe</value>\n        </add-attr>\n    </add>\n    <jdbc:statement>\n        <jdbc:sql>CREATE USER jdoe IDENTIFIED BY novell</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes can be used to group DML and DDL statements in the JDBC driver, and what is their impact?",
+      "input": "",
+      "output": "The attributes `jdbc:transaction-id` and `jdbc:transaction-type` can be added to the XML elements to attempt grouping DML and DDL statements into a single logical transaction. However, because most databases execute DDL as separate transactions, using these attributes typically causes the whole transaction to roll back on most databases when a DDL statement is present."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What happens if you try to group an INSERT and a CREATE USER statement into a single transaction using the JDBC driver, and why?",
+      "input": "",
+      "output": "When you group the INSERT (DML) and CREATE USER (DDL) statements using `jdbc:transaction-id` and `jdbc:transaction-type`, the JDBC driver will roll back the transaction on most databases because DDL statements are executed as separate transactions. Consequently, the INSERT may succeed while the CREATE USER rolls back, and the driver stops processing further chained transactions as soon as the first rollback occurs."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the JDBC driver handles DDL statements in relation to DML and transactions.",
+      "input": "",
+      "output": "The JDBC driver does not allow DDL statements inside database triggers due to mixed DML/DDL transaction restrictions. Virtual triggers can invoke DDL as a side effect of an XDS event, but the DDL runs in its own implicit transaction. Attempting to group DML and DDL with `jdbc:transaction-id` and `jdbc:transaction-type` usually leads to a rollback of the entire transaction on most databases, with the driver halting further execution after the first rollback."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact XML snippet that inserts a user record and then creates a database user using the JDBC driver, as shown in the documentation.",
+      "input": "",
+      "output": "```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\">\n        <add-attr name=\"fname\">\n            <value>John</value>\n        </add-attr>\n        <add-attr name=\"lname\">\n            <value>Doe</value>\n        </add-attr>\n    </add>\n    <jdbc:statement>\n        <jdbc:sql>CREATE USER jdoe IDENTIFIED BY novell</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    }
+  ]
+}

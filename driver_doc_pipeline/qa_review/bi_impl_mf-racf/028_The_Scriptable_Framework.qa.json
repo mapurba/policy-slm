@@ -1,0 +1,83 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What components are included in the scriptable framework of the RACF driver?",
+      "input": "",
+      "output": "The RACF driver’s scriptable framework includes the following components:\n- Embedded Remote Loader (full SSL support and a certificate configuration installer, plus web access to debugging information)\n- Encrypted change log that stores changes from the application to the Identity Vault when communication problems occur\n- Loopback detection system to prevent subscribed events from being published back to the Identity Vault\n- z/OS name/token callable services helper programs for securely passing large variables to and from REXX execs\n- An easily extendable connected system schema file to support any application\n- Include/exclude file for simplified testing and deployment by the platform administrator\n- Event support for both applications that have exits or callouts and applications that must be polled for changes"
+    },
+    {
+      "category": "config",
+      "instruction": "List the Identity Vault command‑processing REXX execs provided by the RACF driver and the event each handles.",
+      "input": "",
+      "output": "| REXX Exec | Identity Vault Event |\n|-----------|----------------------|\n| IDMADDG   | Add Group |\n| IDMADDU   | Add User |\n| IDMDELG   | Delete Group |\n| IDMDELU   | Delete User |\n| IDMMODG   | Modify Group |\n| IDMMODU   | Modify User |\n| IDMMODPW  | Password Change |\n| IDMQUERY  | Query |\n| IDMCHOPW  | Check Password |\nThese execs are invoked by the RACF driver to process the corresponding events."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the purposes of the non‑command‑processing REXX execs shipped with the RACF driver?",
+      "input": "",
+      "output": "| REXX Exec | Purpose |\n|-----------|---------|\n| IDMSUB    | Calls the appropriate command‑processing exec based on the event type; executed for every Subscriber event |\n| IDMPOLL   | Not used for RACF; can be used to support custom applications that do not generate events |\n| IDMHRTBT  | Heartbeat exec |\n| IDMGLBLS  | Holds configurable global options used by all REXX execs |\n| IDMSTATS  | Sends a status document reporting the health of the application |\n| IDMTSOEX  | Executes a TSO command and returns the return code and command output |\n| SETPWDS   | Sets the Remote Loader and Driver object passwords for authentication between the driver shim and the Metadirectory system |\n| SETCERT   | Retrieves the certificate authority for the Metadirectory engine that uses SSL to communicate with the driver shim |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you check whether a variable named REMOVE_REVOKED was created by IDMGETV in a RACF driver REXX exec?",
+      "input": "",
+      "output": "Use the VariableList that IDMGETV creates and the WORDPOS function as follows:\n```\nif wordpos(\"REMOVE_REVOKED\", VariableList) > 0; then do;\n  /* REMOVE_REVOKED exists and was created by IDMGETV */\nend;\n```\nIf the condition is true, the variable REMOVE_REVOKED is present."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the steps to iterate over a multivalued stem variable named CLASSES in a RACF driver REXX exec.",
+      "input": "",
+      "output": "When IDMGETV creates a multivalued variable, it adds a count suffix \".0\" and individual values \".1\" to \".n\". To loop through the values:\n1. Retrieve the variables with `\"IDMGETV event\"` (or `sub`).\n2. Use a DO loop that runs from 1 to `CLASSES.0`.\n3. Inside the loop, reference each value as `CLASSES.i`.\nExample code:\n```\ndo i = 1 to CLASSES.0\n  class = CLASSES.i\nend;\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "Explain how to return a success status document from a RACF driver REXX exec using IDMSTATS.",
+      "input": "",
+      "output": "Call the IDMSTATS exec with three parameters: level, message, and event id. For a successful event, use the level \"success\". Example:\n```\nx = IDMSTATS(\"success\", \"Event was processed successfully\", EVENT_ID);\n```\nThe exec will generate an XML status document like:\n```\n<status level=\"success\" event-id=\"12345\">\n  Event was processed successfully\n</status>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable tracing of custom messages in the RACF driver REXX execs?",
+      "input": "",
+      "output": "Edit the global settings exec `IDMGLBLS` and set the variable `ENABLE_TRACE` to true (the default). Then use the `IDMTRACE` exec to write messages to the TSO print file. Example:\n```\nENABLE_TRACE = \"true\"   /* in IDMGLBLS */\n...\nx = IDMTRACE(\"IDMADDU is running for user <\"ADD_DIRXML_RACF_USERID\">.\");\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "Provide the sequence of commands to execute a TSO command within a RACF driver REXX exec and handle an error response.",
+      "input": "",
+      "output": "1. Build the TSO command string (e.g., `cmd = \"ALU IBMUSER NAME(IBMUSER)\"`).\n2. Call the `IDMTSOEX` exec with the command:\n```\nresponse = IDMTSOEX(cmd);\n```\n3. Check the first word of the response for a non‑zero return code:\n```\nif word(response, 1) > 0 then do;\n  /* An error occurred */\n  x = IDMSTATS(\"error\", response, EVENT_ID);\nend;\nelse do;\n  x = IDMSTATS(\"success\", response, EVENT_ID);\nend;\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "Summarize how to modify the IDMADDU exec to also create an OMVS home directory after adding a user in the RACF driver.",
+      "input": "",
+      "output": "To extend `IDMADDU` for OMVS home directory creation:\n1. Retrieve subscriber and event variables with `\"IDMGETV sub\"` and `\"IDMGETV event\"`.\n2. Optionally trace a start message using `IDMTRACE`.\n3. Verify that the `ADD_RACFCMD` variable exists; if not, return an error with `IDMSTATS`.\n4. Loop through each TSO command in `ADD_RACFCMD` and execute it via `IDMTSOEX`, returning success or error status documents.\n5. After the user is added, check for the presence of `ADD_DIRXML_RACF_OMVS_HOME` in `VariableList`.\n6. If present, build a `mkdir` command using the variable value and execute it with `IDMTSOEX`.\n7. If the `mkdir` command returns a non‑zero code, log a warning with `IDMSTATS`.\n8. Finally, set the association (`USER\\userid`) and return required variables using `IDMSETV` before exiting with code 0.\nThe full sample code is provided in the documentation."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should a RACF driver REXX exec do if the RACFCMD variable is missing from the event document?",
+      "input": "",
+      "output": "The exec should detect the missing variable via `wordpos(\"ADD_RACFCMD.0\", VariableList)`. If the variable is not present, it must return an error status document and exit. Example code from the documentation:\n```\nif wordpos(\"ADD_RACFCMD.0\", variablelist) <= 0; then do;\n  success = IDMSTATS(\"error\", \"No RACF command found\", EVENT_ID);\n  exit 0;\nend;\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Give a concise summary of the key points covered in the Scriptable Framework section of the RACF driver documentation.",
+      "input": "",
+      "output": "The RACF driver provides a scriptable framework that includes an SSL‑enabled Embedded Remote Loader, encrypted change logs, loopback detection, z/OS helper programs, an extensible schema file, include/exclude testing files, and event support. It supplies a set of REXX execs for handling add, delete, modify, and query events, along with utility execs (IDMGETV, IDMSETV, IDMSTATS, IDMTRACE, IDMTSOEX, etc.). Developers can customize these execs by inserting code before or after the generated TSO commands, using global settings in IDMGLBLS, and handling multivalued variables and status reporting. The framework also offers mechanisms for tracing, tracing control, and performance considerations."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a REXX snippet for the RACF driver that checks if the attribute REVOKED was removed from a user and logs a trace message using IDMTRACE.",
+      "input": "",
+      "output": "```\n/* Retrieve event variables */\n\"IDMGETV event\"\n\n/* Check if REVOKED was removed */\nif wordpos(\"REMOVE_REVOKED\", VariableList) > 0; then do;\n  /* Log a trace message */\n  call x = IDMTRACE(\"RACF driver detected removal of REVOKED attribute for user <\"ADD_DIRXML_RACF_USERID\">\");\nend;\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you disable REXX processing for the RACF driver using a driver shim option?",
+      "input": "",
+      "output": "Add the `-disablerexx` option to the driver shim command line. For example:\n```\n<driver shim command> -disablerexx\n```\nIncluding this option tells the RACF driver shim to skip execution of all REXX execs, thereby disabling scriptable processing."
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "driver": "Bi Implementation Mid I driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a security-equivalent user for the Bi Implementation Mid I driver and why is it needed?",
+      "input": "",
+      "output": "A security-equivalent user for the Bi Implementation Mid I driver is the eDirectory account under which the driver process executes. The driver must run with Security Equivalence to a user that possesses sufficient rights to perform its synchronization tasks. Using a security-equivalent user ensures the driver can access and modify objects in the Identity Vault while allowing administrators to limit the user’s rights to only what is required, thereby strengthening overall security."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Bi Implementation Mid I driver to run with a security-equivalent user that has only minimal rights?",
+      "input": "",
+      "output": "1. Create an eDirectory user account that will serve as the security-equivalent user for the Bi Implementation Mid I driver.\n2. Assign the user as a trustee of the base containers where synchronized users and groups reside.\n3. Set inheritance for both **[Entry Rights]** and **[All Attribute Rights]** on those containers.\n4. Grant the user only the rights listed in Table 2‑2 for the operations the driver must perform (e.g., Browse, Compare, Read, Write, Create, Rename, Erase, Supervisor as required).\n5. Verify that the driver configuration references this user as the security‑equivalent account.\n6. Test the driver to confirm it can perform its intended operations without excess privileges."
+    },
+    {
+      "category": "config",
+      "instruction": "What entry rights and all attribute rights are required for the Bi Implementation Mid I driver’s security-equivalent user when creating objects in the Identity Vault without group synchronization?",
+      "input": "",
+      "output": "For creating objects without group synchronization, the Bi Implementation Mid I driver’s security‑equivalent user must have:\n- **[Entry Rights]**: **Browse and Create**\n- **[All Attribute Rights]**: **Compare and Read**"
+    },
+    {
+      "category": "config",
+      "instruction": "What entry rights and all attribute rights are required for the Bi Implementation Mid I driver’s security-equivalent user to retrieve passwords from the Identity Vault?",
+      "input": "",
+      "output": "To retrieve passwords, the Bi Implementation Mid I driver’s security‑equivalent user must have:\n- **[Entry Rights]**: **Browse and Supervisor**\n- **[All Attribute Rights]**: **Compare and Read**"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the Supervisor entry right be granted to the Bi Implementation Mid I driver’s security-equivalent user if the driver needs to set passwords?",
+      "input": "",
+      "output": "The Supervisor entry right gives the Bi Implementation Mid I driver the authority to modify password attributes in the Identity Vault. Without the Supervisor right, the driver cannot set or update passwords, and attempts to do so will fail with error messages. Therefore, granting Supervisor is essential whenever the driver is expected to set passwords."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you avoid error messages when the Bi Implementation Mid I driver is not allowed to set passwords?",
+      "input": "",
+      "output": "If the Bi Implementation Mid I driver should not set passwords, edit the synchronization filter for the User class and set the **nspmDistributionPassword** attribute’s Subscribe setting to **Ignore**. This tells the driver to skip password processing for that attribute, preventing superfluous error messages."
+    },
+    {
+      "category": "config",
+      "instruction": "What entry rights and all attribute rights are required for the Bi Implementation Mid I driver’s security-equivalent user when deleting objects from the Identity Vault?",
+      "input": "",
+      "output": "For deleting objects, the Bi Implementation Mid I driver’s security‑equivalent user must have:\n- **[Entry Rights]**: **Browse and Erase**\n- **[All Attribute Rights]**: **Compare, Read, and Write**"
+    },
+    {
+      "category": "config",
+      "instruction": "What inheritance settings must be applied for the Bi Implementation Mid I driver’s security-equivalent user on the base containers?",
+      "input": "",
+      "output": "The Bi Implementation Mid I driver’s security‑equivalent user must have inheritance enabled for both **[Entry Rights]** and **[All Attribute Rights]** on the containers that hold synchronized users and groups."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key security configuration requirements for the Bi Implementation Mid I driver.",
+      "input": "",
+      "output": "The Bi Implementation Mid I driver must run under a security‑equivalent user that is a trustee of the synchronization containers with inheritance set for Entry Rights and All Attribute Rights. Required rights vary by operation (e.g., Browse/Create for object creation, Browse/Erase for deletion, Browse/Supervisor for password operations). Supervisor rights are needed to set passwords; if passwords are not to be set, the nspmDistributionPassword attribute should be ignored in the filter. Administrators should grant only the minimal rights listed in Table 2‑2 to follow the principle of least privilege."
+    }
+  ]
+}

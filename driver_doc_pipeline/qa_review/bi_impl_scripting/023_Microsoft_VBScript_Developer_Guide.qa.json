@@ -1,0 +1,77 @@
+{
+  "driver": "Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Scripting driver and what purpose does it serve in Identity Manager?",
+      "input": "",
+      "output": "The Scripting driver provides a complete Microsoft VBScript API for interacting with external identity management systems whose tools or APIs are available on Windows. It enables Identity Vault and Identity Manager to communicate with any supported system via an encrypted network connection, allowing custom scripts to handle synchronization, event processing, and deployment tasks."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you execute an external program using the IDMExecute function in the Scripting driver?",
+      "input": "",
+      "output": "In the Scripting driver you build a command line string and pass it to IDMExecute. For example:\n\n```\nCommandLine = \"appadd -n \" & UserName & \" -t \" & PhoneNumber\nExitCode = IDMExecute(CommandLine)\n```\n\nThe function returns the program's exit code, which you can test to determine success or failure."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you pass input to a command and capture its output using IDMExecuteIO in the Scripting driver?",
+      "input": "",
+      "output": "Create an array of input strings, then call IDMExecuteIO with the command name and the input array. The function returns an array whose first element is the exit code followed by lines from standard output and standard error. Example from the Scripting driver documentation:\n\n```\nDim Input(1)\nInput(0) = \"USERNAME=bobsmith\"\nInput(1) = \"TELEPHONE=818-555-2100\"\n\nOutput = IDMExecuteIO(\"appadd\", Input)\n\nExitCode = Output(0)\n```\n\n`Output` now contains the exit code and any output lines."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the two main methods for modifying application data supported by the Scripting driver?",
+      "input": "",
+      "output": "The Scripting driver supports (1) executing application command‑line tools (using IDMExecute or IDMExecuteIO) and (2) invoking Windows COM objects directly from VBScript via `WScript.CreateObject`. Both approaches rely on the external application exposing suitable automation interfaces."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameters are defined for the default Scripting driver and what are their meanings?",
+      "input": "",
+      "output": "The default Scripting driver defines the following parameters:\n\n| Parameter Name | Driver/Channel | Description | Values |\n|----------------|----------------|-------------|--------|\n| INSTALL_PATH | Driver | The installation path of the driver | string value |\n| auto-loopback-detection | Driver | Whether to enable automatic loopback detection | true/false |\n| script-command | Driver | The command to use to execute scripts | string value |\n| script-trace-file | Driver | The file, relative to the driver installation path, to which to write trace messages | string value |\n| subscriber-script | Subscriber | The script file for Subscriber events, relative to the driver installation path | string value |\n| polling-script | Publisher | The script file that runs when the Publisher polls for application events | string value |\n| heartbeat-script | Publisher | The script file that runs when the Publisher checks application status | string value |\n| pub-polling-interval | Publisher | The interval in seconds between Publisher polls for application events | number |\n| pub-heartbeat-interval | Publisher | The amount of idle time in seconds before a heartbeat event is issued | number |\n\nThese can be retrieved in scripts with functions such as `IDMGetDriverParam`, `IDMGetSubscriberParam`, and `IDMGetPublisherParam`."
+    },
+    {
+      "category": "config",
+      "instruction": "What command names can be passed to IDMPublishInit in the Scripting driver?",
+      "input": "",
+      "output": "IDMPublishInit accepts the following command names in the Scripting driver:\n\n| Command Name | Description |\n|--------------|-------------|\n| ADD | Create an identity. |\n| ADD_ASSOCIATION | Create an association for an identity. |\n| DELETE | Remove an identity permanently. |\n| MODIFY | Change an identity’s attributes. |\n| MODIFY_ASSOCIATION | Change an identity’s association. |\n| MODIFY_PASSWORD | Change an identity’s password. |\n| REMOVE_ASSOCIATION | Delete an identity’s association. |\n| RENAME | Change an identity’s naming attribute. |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How is event data formatted when it is passed to scripts in the Scripting driver?",
+      "input": "",
+      "output": "Event data is supplied to scripts as a series of name/value pairs, each on its own line in the form `NAME=VALUE`. Each name/value pair is unique, but the same name may appear multiple times with different values. Example:\n\n```\nASSOCIATION=BobUser\nADD_TELEPHONE=818-555-2100\nADD_TELEPHONE=818-555-9842\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve all values for a multi‑valued attribute using IDMGetEventValues in the Scripting driver?",
+      "input": "",
+      "output": "Call `IDMGetEventValues` with the attribute name. The function returns an array containing every value for that name. For example, to get all telephone numbers added in an event:\n\n```\nPhoneNumbers = IDMGetEventValues(\"ADD_TELEPHONE\")\nFor i = 0 To UBound(PhoneNumbers)\n    WScript.Echo PhoneNumbers(i)\nNext\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can a Subscriber script report a warning status to Identity Manager using the Scripting driver?",
+      "input": "",
+      "output": "The script should call the `IDMStatusWarning` subroutine with a descriptive message. For example:\n\n```\nIDMStatusWarning \"The telephone attribute is missing; proceeding with default value\"\n``` \n\nIdentity Manager logs the warning and continues processing the next event."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you implement a heartbeat script that reports success or error in the Scripting driver?",
+      "input": "",
+      "output": "Create a script (e.g., `Heartbeat.wsf`) that executes a health‑check command with `IDMExecute`. Then call the appropriate heartbeat subroutine based on the exit code. Example from the Scripting driver documentation:\n\n```\nExitCode = IDMExecute(\"apphealth\")\nIf ExitCode = 0 Then\n    IDMHeartbeatSuccess \"Heartbeat succeeded\"\nElse\n    IDMHeartbeatError \"Heartbeat failed with error code \" & ExitCode\nEnd If\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the required actions for a non‑Query Subscriber script in the Scripting driver.",
+      "input": "",
+      "output": "In the Scripting driver, a non‑Query Subscriber script should: 1) Gather event information using `IDMGetEventValues` (or `IDMGetEventValue` for single‑valued items) and verify required data; 2) Apply the change to the external application via command‑line tools or COM objects; 3) Set a command with `IDMSetCommand` (e.g., `ADD_ASSOCIATION`) and/or report a status using one of the `IDMStatus*` subroutines; 4) Return any needed values to Identity Manager with `IDMWriteValues`/`IDMWriteValue`; and 5) Ensure a status subroutine is called before the script ends."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a VBScript fragment for the Scripting driver that sets the command to ADD_ASSOCIATION and writes the ASSOCIATION and DEST_DN values.",
+      "input": "",
+      "output": "```vbscript\n' Example fragment for the Scripting driver\nSub SetAssociation\n    ' Assume CN and ClassName have been obtained earlier in the script\n    AssociationValue = CN & ClassName\n    IDMSetCommand \"ADD_ASSOCIATION\"\n    IDMWriteValue \"ASSOCIATION\", AssociationValue\n    IDMWriteValue \"DEST_DN\", IDMGetEventValue(\"SRC_DN\")\n    IDMStatusSuccess \"Association added successfully\"\nEnd Sub\n```"
+    }
+  ]
+}

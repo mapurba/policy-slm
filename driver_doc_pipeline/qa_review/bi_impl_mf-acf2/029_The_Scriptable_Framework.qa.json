@@ -1,0 +1,77 @@
+{
+  "driver": "Bi-Implementor MF ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the Bi-Implementor MF ACF2 driver, what components are included in the scriptable framework?",
+      "input": "",
+      "output": "The Bi-Implementor MF ACF2 driver’s scriptable framework includes:\n• Embedded Remote Loader with full SSL support and a certificate‑configuration installer, plus web access to debugging information.\n• Encrypted change log that stores changes from the application to the Identity Vault when communication problems occur.\n• Loopback detection system to stop subscribed events from being published back to the Identity Vault.\n• z/OS name/token callable services helper programs for securely passing large variables between REXX execs.\n• An easily extendable connected‑system schema file to support any application.\n• Include/exclude file for simplified testing and deployment by the platform administrator.\n• Event support for applications with exits/callouts and for applications that must be polled for changes."
+    },
+    {
+      "category": "config",
+      "instruction": "What global variables are defined in the IDMGLBLS script of the Bi-Implementor MF ACF2 driver and what are their default values?",
+      "input": "",
+      "output": "In the Bi-Implementor MF ACF2 driver, the IDMGLBLS script defines four global variables:\n\n| Variable | Description | Default Value |\n|----------|-------------|---------------|\n| SUBCOMMAND_SEPARATOR | Character used as delimiter between lines of TSO command output (EBCDIC newline). | EBCDIC newline |\n| MESSAGE_PREFIX | String that precedes lines in the TSO print file (SYSTSPRT) before a TSO command is executed. | -->TSO: |\n| DISPLAY_TSO_OUTPUT | Boolean that controls whether TSO command output is displayed in SYSTSPRT. | true |\n| ENABLE_TRACE | Boolean that controls whether IDMTRACE messages are printed. | true |\n\nNote: Disabling ENABLE_TRACE reduces output in the SYSTSPRT file, which can be helpful for troubleshooting."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you modify a REXX exec in the Bi-Implementor MF ACF2 driver to add custom code before and after the default ACF2 command execution?",
+      "input": "",
+      "output": "To modify a REXX exec in the Bi-Implementor MF ACF2 driver:\n1. Open the desired exec (e.g., IDMADDU) in an editor.\n2. Locate the section labelled `/* INSERT CUSTOM CODE HERE */` that appears before the ACF2 command block. Insert any REXX statements you need to run before the user is added to ACF2.\n3. Locate the second `/* INSERT CUSTOM CODE HERE */` comment that appears after the loop that processes the ACF2CMD commands. Insert any post‑processing REXX statements here (e.g., creating an OMVS home directory).\n4. Save the file and reload the driver if required.\nThe surrounding framework (IDMGETV, IDMTRACE, IDMTSOEX, IDMSTATS, etc.) remains unchanged, ensuring the exec still returns a proper status document."
+    },
+    {
+      "category": "howto",
+      "instruction": "In the Bi-Implementor MF ACF2 driver, how can you retrieve subscriber shim variables and event data variables inside a REXX exec?",
+      "input": "",
+      "output": "Inside any REXX exec of the Bi-Implementor MF ACF2 driver, retrieve variables with the following two statements:\n```\n\"IDMGETV sub\"   /* Retrieves subscriber shim variables */\n\"IDMGETV event\" /* Retrieves event data variables */\n```\nThese calls populate REXX variables and create a special variable named `VariableList` that contains the names of all variables created by IDMGETV."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the IDMSTATS utility in the Bi-Implementor MF ACF2 driver and what parameters does it require?",
+      "input": "",
+      "output": "In the Bi-Implementor MF ACF2 driver, IDMSTATS is used to generate a status document that tells Identity Manager whether an event was processed successfully or resulted in an error. The utility takes three parameters:\n1. **level** – one of `success`, `error`, `warning`, `retry`, or `fatal`.\n2. **message** – a human‑readable description of the result.\n3. **event id** – the EVENT_ID supplied by the driver shim.\nExample usage:\n```\nx = IDMSTATS(\"success\", \"Event was processed successfully\", EVENT_ID);\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you use IDMTRACE to write a trace message to the TSO print file in the Bi-Implementor MF ACF2 driver?",
+      "input": "",
+      "output": "To write a trace message in the Bi-Implementor MF ACF2 driver, call the IDMTRACE exec with the message string:\n```\nx = IDMTRACE(\"IDMADDU is running for user <\"ADD_LID\">.\");\n```\nThe message will be printed to SYSTSPRT only if the global variable `ENABLE_TRACE` in IDMGLBLS is set to `true`. The trace line is prefixed with the date, time, and the `MESSAGE_PREFIX` defined in IDMGLBLS."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When IDMGETV retrieves a multivalued attribute in the Bi-Implementor MF ACF2 driver, how are the values represented in REXX variables?",
+      "input": "",
+      "output": "For a multivalued attribute, IDMGETV creates a stem variable with a count suffix and indexed values:\n- `ATTRIBUTE.0` contains the number of values.\n- `ATTRIBUTE.1` … `ATTRIBUTE.n` contain each individual value, where `n` equals the count.\nFor example, if the attribute `CLASSES` has values `CLS1`, `CLS2`, `CLS3`, IDMGETV creates:\n```\nCLASSES.0=3\nCLASSES.1=CLS1\nCLASSES.2=CLS2\nCLASSES.3=CLS3\n```\nYou can iterate over them with a REXX `DO` loop: `do i = 1 to CLASSES.0; class = CLASSES.i; end;`"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do in a Bi-Implementor MF ACF2 driver REXX exec if the variable list does not contain an ACF2CMD variable?",
+      "input": "",
+      "output": "If a Bi-Implementor MF ACF2 driver exec cannot find an `ACF2CMD` variable, the sample code shows you should report an error and exit the script:\n```\nif wordpos(\"ADD_ACF2CMD.0\", variablelist) <= 0; then do;\n  success = IDMSTATS(\"error\", \"No ACF2 command found\", EVENT_ID);\n  exit 0;\nend;\n```\nThis uses IDMSTATS to return a status document with level `error` and halts further processing."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a REXX code snippet for the Bi-Implementor MF ACF2 driver that checks whether the attribute REVOKED has been removed from a user event.",
+      "input": "",
+      "output": "```\n/* Retrieve event variables */\n\"IDMGETV event\"\n/* VariableList now contains all variables created by IDMGETV */\nif wordpos(\"REMOVE_REVOKED\", VariableList) > 0; then do;\n  /* REVOKED field has been removed */\n  /* Custom handling code can be placed here */\nend;\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key features and usage guidelines presented on the scriptable framework page for the Bi-Implementor MF ACF2 driver.",
+      "input": "",
+      "output": "The Bi-Implementor MF ACF2 driver provides a scriptable framework that includes an SSL‑enabled Embedded Remote Loader, encrypted change log, loopback detection, helper programs for large variables, an extensible schema file, and include/exclude testing files. It offers a set of REXX execs for command processing (e.g., IDMADDU, IDMDELU) and utility execs (IDMGLBLS, IDMTRACE, IDMTSOEX, etc.). Execs use IDMGETV/IDMSETV to exchange variables, IDMSTATS to return status documents, and IDMTRACE for optional logging controlled by global settings in IDMGLBLS. Multivalued attributes are handled via stem variables, and the ACF2CMD variable holds the TSO commands generated by the transformation policy. The page includes step‑by‑step guidance for modifying execs, handling variables, and returning status."
+    },
+    {
+      "category": "config",
+      "instruction": "List the Identity Vault command processing REXX execs provided by the Bi-Implementor MF ACF2 driver and the events they handle.",
+      "input": "",
+      "output": "The Bi-Implementor MF ACF2 driver includes the following command processing execs:\n\n| REXX Exec | Identity Vault Event |\n|------------|----------------------|\n| IDMADDG   | Add Group |\n| IDMADDU   | Add User |\n| IDMDELG   | Delete Group |\n| IDMDELU   | Delete User |\n| IDMMODG   | Modify Group |\n| IDMMODU   | Modify User |\n| IDMMODPW  | Password Change |\n| IDMQUERY  | Query |\n| IDMCHOPW  | Check Password |"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the auxiliary REXX execs supplied with the Bi-Implementor MF ACF2 driver and their primary purposes?",
+      "input": "",
+      "output": "The Bi-Implementor MF ACF2 driver provides these additional execs:\n\n| REXX Exec | Purpose |\n|-----------|---------|\n| IDMSUB    | Calls the appropriate command processing exec based on the event type; runs for every subscriber event. |\n| IDMPOLL   | Not used for ACF2; can be repurposed to support applications that do not generate events. |\n| IDMHRTBT  | Heartbeat exec. |\n| IDMGLBLS  | Holds global configurable options used by all REXX execs. |\n| IDMSTATS  | Sends a status document reporting the health of the application. |\n| IDMTSOEX  | Executes a TSO command and returns its return code and output. |\n| SETPWDS   | Sets Remote Loader and Driver object passwords for authentication/authorization between driver shim and Metadirectory. |\n| SETCERT   | Retrieves the certificate authority for SSL communication between Metadirectory engine and driver shim. |"
+    }
+  ]
+}

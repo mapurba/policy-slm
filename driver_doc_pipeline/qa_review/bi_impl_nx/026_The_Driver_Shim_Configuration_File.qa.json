@@ -1,0 +1,83 @@
+{
+  "driver": "Bi Impl Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver shim configuration file in the Bi Impl Nx driver?",
+      "input": "",
+      "output": "In the Bi Impl Nx driver, the driver shim configuration file (/etc/nxdrv.conf) defines how the driver shim operates. It lets administrators set connection strings, HTTP service ports, file paths, passwords, trace levels, and trace file locations or size limits, either by listing options in the file (one per line) or by providing them on the command line."
+    },
+    {
+      "category": "config",
+      "instruction": "Which short and long command‑line options set the connection string for the Bi Impl Nx driver, and how must the string be formatted?",
+      "input": "",
+      "output": "Use `-conn <connString>` or `-connection <connString>` to set the connection string. Enclose the entire string in double quotes (\"). If the string contains multiple sub‑options, separate them with spaces, e.g., `-connection \"ca=/path/to/ca.pem port=8090\"`. Supported sub‑options include `port=<driverShimPort>` and `ca=<Certificate Authority Key File>`."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you specify the HTTP services port in the Bi Impl Nx driver, and what is the default port number?",
+      "input": "",
+      "output": "Use `-hp <httpPort>` or `-httpport <httpPort>` to set the HTTP services port. The default HTTP services port for the Bi Impl Nx driver is 8091. This port can be used to view log files via a web browser."
+    },
+    {
+      "category": "config",
+      "instruction": "What option defines the driver files path for the Bi Impl Nx driver and what is its default value?",
+      "input": "",
+      "output": "The option `-path <driverPath>` defines the directory where driver files are located. If omitted, the Bi Impl Nx driver defaults to `/usr/local/nxdrv`."
+    },
+    {
+      "category": "config",
+      "instruction": "Which options set the Remote Loader and Driver object passwords in the Bi Impl Nx driver?",
+      "input": "",
+      "output": "Use `-sp <password>` or `-setpassword <password>` to specify the password for both the Remote Loader and the Driver object in the Bi Impl Nx driver."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you configure the trace level for the Bi Impl Nx driver and what are the valid range values?",
+      "input": "",
+      "output": "Set the trace level with `-t <traceLevel>` or `-trace <traceLevel>`. The valid range is from 0 (no tracing) to 10 (all tracing)."
+    },
+    {
+      "category": "config",
+      "instruction": "Which option sets the trace file location for the Bi Impl Nx driver and what is the default location?",
+      "input": "",
+      "output": "Use `-tf <fileName>` or `-tracefile <fileName>` to specify where the trace file will be written. The default location is `/usr/local/nxdrv/logs/trace.log`."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you limit the size of the trace file for the Bi Impl Nx driver, and what is the minimum allowed size?",
+      "input": "",
+      "output": "The options `-tfm <size>` or `-tracefilemax <size>` set a maximum size for the trace file. Size can be expressed with K, M, or G suffixes (e.g., `100K`, `100M`, `10G`). The minimum allowed value is 100K. When this option is present, the driver creates up to nine roll‑over files, each 1/10th of the total size, named with the base filename plus `_n` where n = 1‑9."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Bi Impl Nx driver shim using /etc/nxdrv.conf to set a custom connection string, enable trace level 3, and limit the trace file to 500M?",
+      "input": "",
+      "output": "1. Open `/etc/nxdrv.conf` with a text editor.\n2. Add a line for the connection string, e.g.: `-connection \"ca=/usr/local/nxdrv/keys/ca.pem port=8090\"`.\n3. Add a line to set the trace level: `-trace 3`.\n4. Add a line to limit the trace file size: `-tracefilemax 500M`.\n5. (Optional) Adjust other options such as `-httpport` or `-path` as needed.\n6. Save the file and restart the driver shim service to apply the changes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the Remote Loader password to 'Secret123' in the Bi Impl Nx driver shim configuration file?",
+      "input": "",
+      "output": "1. Open `/etc/nxdrv.conf` for editing.\n2. Add the line `-setpassword Secret123` (or `-sp Secret123`).\n3. Save the file.\n4. Restart the driver shim so the new password takes effect."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the trace file for the Bi Impl Nx driver is larger than the configured maximum when the driver shim starts, what behavior should you expect and how can you ensure roll‑over occurs?",
+      "input": "",
+      "output": "When the driver shim starts, if the existing trace file exceeds the `-tracefilemax` limit, the file will remain larger than the limit until the shim writes enough data to fill all ten files (the main file plus nine roll‑over files). The roll‑over process only begins after the combined size of the ten files reaches the configured maximum. To ensure roll‑over occurs promptly, you can:\n1. Reduce the current trace file size manually (e.g., truncate or delete it) before restarting the shim.\n2. Restart the driver shim after adjusting the `-tracefilemax` value so the shim can start fresh with the correct size limits."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration options available in the Bi Impl Nx driver shim configuration file.",
+      "input": "",
+      "output": "The Bi Impl Nx driver shim configuration file (`/etc/nxdrv.conf`) supports the following key options:\n- `-conn`/`-connection <connString>`: Connection string (quoted, with sub‑options like `port=` and `ca=`).\n- `-hp`/`-httpport <httpPort>`: HTTP service port (default 8091).\n- `-path <driverPath>`: Path to driver files (default `/usr/local/nxdrv`).\n- `-sp`/`-setpassword <password>`: Sets Remote Loader and Driver passwords.\n- `-t`/`-trace <traceLevel>`: Debug trace level (0‑10).\n- `-tf`/`-tracefile <fileName>`: Trace file location (default `/usr/local/nxdrv/logs/trace.log`).\n- `-tfm`/`-tracefilemax <size>`: Maximum trace file size with roll‑over (minimum 100K, supports K, M, G suffixes).\nEach option can be placed on its own line in the file or supplied on the command line."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a sample /etc/nxdrv.conf file for the Bi Impl Nx driver that sets the connection to use CA file /etc/ca.pem on port 8080, enables HTTP port 9090, uses a trace level of 5, stores trace logs in /var/log/nxdrv/trace.log, and limits the trace file size to 200M.",
+      "input": "",
+      "output": "```bash\n-connection \"ca=/etc/ca.pem port=8080\"\n-httpport 9090\n-trace 5\n-tracefile /var/log/nxdrv/trace.log\n-tracefilemax 200M\n```"
+    }
+  ]
+}

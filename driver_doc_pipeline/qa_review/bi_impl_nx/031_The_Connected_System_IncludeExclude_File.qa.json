@@ -1,0 +1,65 @@
+{
+  "driver": "Linux/UNIX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the Linux/UNIX driver?",
+      "input": "",
+      "output": "In the Linux/UNIX driver, the optional include/exclude file located at /usr/local/nxdrv/conf/include-exclude.conf controls which identities are synchronized between the Identity Vault and the connected Linux or UNIX system. Identities matching exclude rules are omitted from synchronization, while those matching include rules (or not matching any rule) are processed normally."
+    },
+    {
+      "category": "config",
+      "instruction": "Where is the include/exclude file located for the Linux/UNIX driver and what is the recommended maximum number of entries?",
+      "input": "",
+      "output": "The include/exclude file for the Linux/UNIX driver resides at **/usr/local/nxdrv/conf/include-exclude.conf**. For optimal performance, the file should contain no more than **50 entries total**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply changes made to the include/exclude file for the Linux/UNIX driver?",
+      "input": "",
+      "output": "After editing /usr/local/nxdrv/conf/include-exclude.conf, you must **restart the driver shim** for the Linux/UNIX driver. This forces the driver to reread the file and apply the new include/exclude rules."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the rule‑matching priority order used by the Linux/UNIX driver when processing the include/exclude file?",
+      "input": "",
+      "output": "The Linux/UNIX driver matches identities in the following priority order:\n1. Channel‑specific (Publisher or Subscriber) **exclude** rules\n2. Channel‑specific **include** rules\n3. General **exclude** rules\n4. General **include** rules\nWithin each level, rules are evaluated sequentially as they appear in the file; the first matching rule determines inclusion or exclusion."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Linux/UNIX driver treat identities that do not match any include or exclude rule?",
+      "input": "",
+      "output": "Identities that do not match an include rule **or** an exclude rule are **included** by default. The Linux/UNIX driver processes them normally through both the Subscriber and Publisher shims."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you create a subscriber‑specific exclude rule in the include/exclude file for the Linux/UNIX driver?",
+      "input": "",
+      "output": "Wrap the rule inside a **SUBSCRIBER** block and use an **EXCLUDE** section. Example syntax:\n```\nSUBSCRIBER\nEXCLUDE\n  CLASS User\n    loginName=guest\n  ENDCLASS\nENDEXCLUDE\nENDSUBSCRIBER\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the syntax for defining a class matching rule within an INCLUDE section of the Linux/UNIX driver?",
+      "input": "",
+      "output": "A class matching rule starts with **CLASS <className>**, contains optional attribute matching lines, and ends with **ENDCLASS**. Example:\n```\nINCLUDE\n  CLASS Group\n    groupName=admin.*\n  ENDCLASS\nENDINCLUDE\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If a newly added include rule is not taking effect in the Linux/UNIX driver, what steps should you follow to resolve the issue?",
+      "input": "",
+      "output": "1. Verify the rule syntax conforms to the Include/Exclude File Syntax (correct SECTION, CLASS, ENDCLASS, etc.).\n2. Ensure the rule appears **before** any conflicting exclude rule, as the first matching rule wins.\n3. Check that the total number of entries does not exceed the recommended 50‑entry limit.\n4. Restart the driver shim so the Linux/UNIX driver rereads the file.\n5. Review the driver logs for any parsing errors related to the include-exclude.conf file."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using the include/exclude file with the Linux/UNIX driver.",
+      "input": "",
+      "output": "The Linux/UNIX driver uses an optional include/exclude file (/usr/local/nxdrv/conf/include-exclude.conf) to filter synchronized identities. It supports channel‑specific and general include/exclude sections, class, attribute, and association matching, and single‑line rules. Rules are evaluated in a defined priority (channel‑specific exclude, channel‑specific include, general exclude, general include) and the first match wins. The file should contain ≤ 50 entries, is case‑insensitive except for class/attribute names and values, and changes require a driver shim restart."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a single‑line rule for the Linux/UNIX driver that excludes the group named \"auditGroup\" on both Publisher and Subscriber channels.",
+      "input": "",
+      "output": "```\nEXCLUDE Group auditGroup\n```"
+    }
+  ]
+}

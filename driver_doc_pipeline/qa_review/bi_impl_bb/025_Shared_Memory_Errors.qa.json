@@ -1,0 +1,47 @@
+{
+  "driver": "Binary Interface driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the role of shared memory in the Binary Interface driver on Linux?",
+      "input": "",
+      "output": "In the Binary Interface driver, shared memory is used by the driver shim to safely and securely exchange data with the scripts that run on Linux. It provides a fast, inter‑process communication mechanism that the shim and scripts rely on for normal operation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why can shared memory segments become unusable for the Binary Interface driver on some Linux systems?",
+      "input": "",
+      "output": "Shared memory segments can become unusable when the driver shim is improperly terminated without detaching from the segments. This leaves orphaned segments in the system that can no longer be accessed by a new shim instance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you locate and manually clear orphaned shared memory segments for the Binary Interface driver using command‑line tools?",
+      "input": "",
+      "output": "1. Open a terminal on the Linux host where the Binary Interface driver shim runs.\n2. Run `ipcs -m` to list all shared memory segments. Example output shows columns such as key, shmid, owner, perms, bytes, nattch, and status.\n3. Identify the segment created by the shim (default size is 16384 bytes with permissions 600).\n4. Use `ipcrm -m <shmid>` to remove the identified segment, replacing `<shmid>` with the numeric ID shown in the `shmid` column.\n   Example:\n   ```\n   > ipcs -m\n   ------ Shared Memory Segments --------\n   key        shmid    owner     perms     bytes    nattch    status\n   0x2a065bbd 1802241  root      600       16384    1\n   > ipcrm -m 1802241\n   ```"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default size and permission settings for the shared memory segments created by the Binary Interface driver shim?",
+      "input": "",
+      "output": "The driver shim generates shared memory segments with a default size of **16384 bytes** and permission mode **600**."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If shared memory segments become unusable for the Binary Interface driver, what steps should you follow to recover?",
+      "input": "",
+      "output": "1. Shut down the Binary Interface driver shim process to stop any further access to the bad segments.\n2. Use `ipcs -m` to list the existing shared memory segments.\n3. Identify the segment(s) created by the shim (they will have a size of 16384 bytes and permissions 600).\n4. Remove the orphaned segment(s) with `ipcrm -m <shmid>`.\n5. Restart the driver shim, ensuring it is stopped correctly as described in Section 5.0, Managing the Driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should the Binary Interface driver shim be properly stopped to avoid shared memory problems?",
+      "input": "",
+      "output": "To avoid shared memory problems, the Binary Interface driver shim must be terminated using the procedure documented in Section 5.0, Managing the Driver. That procedure ensures the shim detaches from its shared memory segments before exiting, preventing orphaned segments."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points for handling shared memory errors in the Binary Interface driver.",
+      "input": "",
+      "output": "Shared memory enables the Binary Interface driver shim to communicate with Linux scripts. If the shim is terminated incorrectly, shared memory segments may become unusable. To fix the issue, stop the shim, locate the orphaned segments with `ipcs -m`, clear them using `ipcrm -m <shmid>`, and then restart the shim using the proper shutdown method from Section 5.0. The default segment size is 16384 bytes with permissions set to 600."
+    }
+  ]
+}

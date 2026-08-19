@@ -65,12 +65,16 @@ def generate(
     process_boilerplate: bool = typer.Option(
         False, "--process-boilerplate", help="Also process Legal Notice / Messages pages."
     ),
+    no_review: bool = typer.Option(
+        False, "--no-review", help="Auto-approve all files without interactive prompts."
+    ),
 ) -> None:
     """Stage 2: interactively generate + review Q&A, resuming from progress."""
     review.run(
         drivers=driver or None,
         auto_approve_cache_hits=auto_approve_cache_hits,
         skip_boilerplate=not process_boilerplate,
+        no_review=no_review,
     )
 
 

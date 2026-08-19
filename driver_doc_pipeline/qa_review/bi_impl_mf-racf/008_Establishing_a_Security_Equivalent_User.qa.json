@@ -1,0 +1,47 @@
+{
+  "driver": "BI Implementation MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a security‑equivalent user for the BI Implementation MF RACF driver and why is it required?",
+      "input": "",
+      "output": "In the BI Implementation MF RACF driver, a security‑equivalent user is the user account under which the driver object runs. This account must have rights equivalent to an administrator or another user with sufficient privileges so that the driver can create, modify, rename, delete, and manage passwords for objects in the Identity Vault. Using a dedicated security‑equivalent user allows you to enforce the principle of least privilege by granting only the minimal rights needed for the driver’s operations."
+    },
+    {
+      "category": "config",
+      "instruction": "What base container rights are required for the security‑equivalent user of the BI Implementation MF RACF driver for each supported operation?",
+      "input": "",
+      "output": "The BI Implementation MF RACF driver requires the following base container rights for the security‑equivalent user. Inheritance must be enabled for both **Entry Rights** and **All Attribute Rights**.\n\n| Operation | Entry Rights | All Attribute Rights |\n|---|---|---|\n| Subscriber notification of account changes (recommended minimum) | Browse | Compare and Read |\n| Creating objects in the Identity Vault without group synchronization | Browse and Create | Compare and Read |\n| Creating objects in the Identity Vault with group synchronization | Browse and Create | Compare, Read, and Write |\n| Modifying objects in the Identity Vault | Browse | Compare, Read, and Write |\n| Renaming objects in the Identity Vault | Browse and Rename | Compare and Read |\n| Deleting objects from the Identity Vault | Browse and Erase | Compare, Read, and Write |\n| Retrieving passwords from the Identity Vault | Browse and Supervisor | Compare and Read |\n| Updating passwords in the Identity Vault | Browse and Supervisor | Compare, Read, and Write |\n\nIf the **Supervisor** right is not granted under Entry Rights, the driver will be unable to set passwords."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the security‑equivalent user for the BI Implementation MF RACF driver to have only the minimal necessary rights?",
+      "input": "",
+      "output": "To configure a minimal‑privilege security‑equivalent user for the BI Implementation MF RACF driver:\n1. Choose or create a user account that will act as the driver’s security‑equivalent user.\n2. Assign the driver equivalent to **Admin** or another user with sufficient rights, then reduce rights to the minimal set required (see the rights table in the config answer).\n3. Make the chosen user a **trustee** of the containers that hold synchronized users and groups.\n4. Set **Inheritance** for both **[Entry Rights]** and **[All Attribute Rights]** on those containers.\n5. Grant the specific rights listed in the table for each operation the driver must perform, ensuring **Supervisor** is granted only if password setting is needed.\n6. Save the changes and verify that the driver can perform its intended operations without excess privileges."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the BI Implementation MF RACF driver fail to set passwords and how can this be fixed?",
+      "input": "",
+      "output": "The BI Implementation MF RACF driver cannot set passwords if the security‑equivalent user does not have the **Supervisor** right under **[Entry Rights]**. To fix the issue, edit the security‑equivalent user’s rights and add **Supervisor** to the Entry Rights for the relevant base containers. If you do not need the driver to set passwords, you can instead configure the filter to ignore password updates (see the next how‑to entry)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you prevent unnecessary password‑related error messages when the BI Implementation MF RACF driver is not intended to set passwords?",
+      "input": "",
+      "output": "If you do not want the BI Implementation MF RACF driver to set passwords, modify the driver’s filter as follows:\n1. Open the filter editor for the driver (see the Identity Manager 4.8 Documentation for details on accessing and editing the filter).\n2. Locate the **User** class attribute **nspmDistributionPassword**.\n3. Set the **Subscribe** setting for this attribute to **Ignore**.\n4. Save the filter.\nBy ignoring the password attribute, the driver will skip password handling and avoid superfluous error messages."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the security‑equivalent user be a trustee of the containers that hold synchronized users and groups for the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "The security‑equivalent user must be a trustee of those containers because the BI Implementation MF RACF driver needs to read, create, modify, rename, and delete objects within them. Being a trustee grants the driver the necessary entry and attribute rights (as defined in the rights table) and allows inheritance of those rights, ensuring the driver can operate on synchronized users and groups without permission errors."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key requirements for configuring a security‑equivalent user for the BI Implementation MF RACF driver.",
+      "input": "",
+      "output": "The BI Implementation MF RACF driver must run under a security‑equivalent user that has sufficient rights to manage objects in the Identity Vault. The user should be a trustee of the base containers for synchronized users and groups, with inheritance enabled for Entry Rights and All Attribute Rights. Required rights vary by operation, ranging from Browse to Supervisor and Write permissions as detailed in the rights table. If password management is not needed, the Supervisor right can be omitted and the nspmDistributionPassword attribute can be set to Ignore in the driver filter to suppress errors."
+    }
+  ]
+}

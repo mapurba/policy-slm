@@ -24,7 +24,7 @@ _bedrock_client = boto3.client(
 )
 
 _openai_client = openai.OpenAI(
-    api_key="",
+    api_key="sk-ePqkNbz03bDMfVmuR8Jfww",
     base_url="https://model-broker.aviator-model.bp.anthos.otxlab.net" # LiteLLM Proxy is OpenAI compatible, Read More: https://docs.litellm.ai/docs/proxy/user_keys
 )
 

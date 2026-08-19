@@ -1,0 +1,65 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is token substitution in the JDBC driver and why is it used?",
+      "input": "",
+      "output": "In the JDBC driver, token substitution allows you to embed placeholders in an <jdbc:sql> statement that are automatically replaced with values from a preceding association element or password element. This avoids having to parse field values manually and lets you write dynamic SQL that references object attributes, such as updating a row based on the object's identifier."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which syntax must token placeholders follow for field values in the JDBC driver?",
+      "input": "",
+      "output": "Token placeholders for field values must follow the XSLT attribute value template syntax {$field-name}, where the field name corresponds to one of the naming RDN attribute names defined in the association value."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the JDBC driver allow you to substitute a password value in an embedded SQL statement?",
+      "input": "",
+      "output": "The JDBC driver provides two password substitution tokens: {$$password} replaces the contents of the immediately preceding <password> element in the same XDS document, and {$$$driver-password} substitutes the driver’s database authentication password that is configured via the Application Password parameter."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you reference an association attribute named 'idu' in a JDBC driver SQL statement using token substitution?",
+      "input": "",
+      "output": "1. Include an <association> element that defines the naming attribute, for example:\n   `<association>idu=1,table=usr,schema=indirect</association>`\n2. Place the <association> element before the <jdbc:statement> element (or copy it as a child of <jdbc:statement> or use src-entry-id to reference it).\n3. In the <jdbc:sql> text, insert the token `{$idu}` where the attribute value should appear, e.g.\n   `<jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE idu = {$idu}</jdbc:sql>`\nWhen the XDS document is processed, the JDBC driver replaces `{$idu}` with the actual value (1 in this example)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you use the JDBC driver to substitute a password from a preceding <password> element into a CREATE USER statement?",
+      "input": "",
+      "output": "1. Add a <password> element before the <jdbc:statement> element, for example:\n   `<password>some password</password>`\n2. Ensure the <password> element either precedes the <jdbc:statement> or is included as a child of it, or copy the src-entry-id of the element containing the password onto the <jdbc:statement>.\n3. In the <jdbc:sql> text, use the token `{$$password}` where the password should be inserted, e.g.\n   `<jdbc:sql>CREATE USER jdoe IDENTIFIED BY {$$password}</jdbc:sql>`\nDuring processing, the JDBC driver replaces `{$$password}` with \"some password\"."
+    },
+    {
+      "category": "config",
+      "instruction": "Which token should be used in a JDBC driver SQL statement to refer to the driver’s Application Password, and where is this token documented?",
+      "input": "",
+      "output": "The token `{$$$driver-password}` is used to refer to the driver’s database authentication password that is set via the Application Password parameter. This token is documented in the JDBC driver parameters section titled “Application Password”."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does a JDBC driver statement fail to substitute the {$idu} token, and how can the problem be resolved?",
+      "input": "",
+      "output": "The substitution fails if the <association> element that defines the 'idu' naming attribute does not precede the <jdbc:statement> element and is not present as a child of the <jdbc:statement>. To resolve the issue, move the <association> element so that it comes before the <jdbc:statement>, or copy the <association> element inside the <jdbc:statement>, or add a src-entry-id attribute on the <jdbc:statement> that references the element containing the association."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error occurs if you try to use the {$$password} token before a <password> element in the JDBC driver, and what is the correct ordering?",
+      "input": "",
+      "output": "If the {$$password} token appears in a <jdbc:sql> before the corresponding <password> element, the JDBC driver cannot locate the password value and the substitution fails, often resulting in a SQL syntax error or an empty password being used. The correct ordering is to place the <password> element before the <jdbc:statement> (or as a child of it, or reference it via src-entry-id) so that the driver can substitute the token successfully."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the token substitution rules for the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver supports token substitution using {$field-name} for association attributes and {$$password} or {$$$driver-password} for password values. Tokens must follow XSLT attribute value template syntax. The associated <association> or <password> element must precede the <jdbc:statement> or be included as a child, or be referenced via src-entry-id. Tokens cannot appear before the element they reference, except that an <add> event does not require an association because the association is not yet created. This mechanism enables dynamic SQL without manual parsing."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an XDS snippet that updates a user's first name using the {$uid} token from an association and creates a new database user using the {$$password} token from a preceding password element, using the JDBC driver syntax.",
+      "input": "",
+      "output": "<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <modify class-name=\"usr\" src-entry-id=\"0\">\n        <association>uid=42,table=usr,schema=indirect</association>\n        <modify-attr name=\"lname\">\n            <add-value>\n                <value>Doe</value>\n            </add-value>\n        </modify-attr>\n    </modify>\n    <add class-name=\"usr\" src-entry-id=\"1\">\n        <password>Secret123!</password>\n        <add-attr name=\"fname\">\n            <value>John</value>\n        </add-attr>\n    </add>\n    <jdbc:statement src-entry-id=\"0\">\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE uid = {$uid}</jdbc:sql>\n    </jdbc:statement>\n    <jdbc:statement src-entry-id=\"1\">\n        <jdbc:sql>CREATE USER jdoe IDENTIFIED BY {$$password}</jdbc:sql>\n    </jdbc:statement>\n</input>"
+    }
+  ]
+}

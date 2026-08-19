@@ -1,0 +1,59 @@
+{
+  "driver": "Bi Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the IDMGetDriverParam function do in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, the Function IDMGetDriverParam(ParamName) returns the string value of a driver parameter whose name is supplied in the ParamName argument."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you retrieve a driver parameter and write it to the trace file in a Bi Impl Scripting driver script?",
+      "input": "",
+      "output": "1. Call IDMGetDriverParam with the name of the parameter, e.g.:\n   ```vbscript\n   paramValue = IDMGetDriverParam(\"PollingInterval\")\n   ```\n2. Build a message string that includes the retrieved value, e.g.:\n   ```vbscript\n   msg = \"Polling Interval = \" & paramValue\n   ```\n3. Append the message to the trace file using IDMTrace:\n   ```vbscript\n   IDMTrace msg\n   ```\nThese steps retrieve the driver parameter and log it via the Bi Impl Scripting driver trace facility."
+    },
+    {
+      "category": "config",
+      "instruction": "Which General Functions are provided by the Bi Impl Scripting driver and what are their basic purposes?",
+      "input": "",
+      "output": "The Bi Impl Scripting driver defines the following General Functions:\n- **Function IDMGetDriverParam(ParamName)** – Returns the string value of the specified driver parameter.\n- **Sub IDMTrace Message** – Appends the given Message to the user‑defined trace file.\n- **Function IDMExecute(Command)** – Executes an external program with the supplied command line and returns its numeric exit code.\n- **Function IDMExecuteIO(Command, Input)** – Executes an external program, optionally feeds an array of strings to its standard input, and returns an array containing the exit code followed by each line of output from stdout and stderr.\n- **Sub IDMStatus(Level, Message)** – Sets the status level and message that the script returns to the Identity Manager engine.\n- **Sub IDMStatusSuccess(Message)** – Convenience wrapper to set a successful status.\n- **Sub IDMStatusWarning(Message)** – Convenience wrapper to set a warning status.\n- **Sub IDMStatusRetry(Message)** – Convenience wrapper to set a retry status.\n- **Sub IDMStatusError(Message)** – Convenience wrapper to set an error status.\n- **Sub IDMStatusFatal(Message)** – Convenience wrapper to set a fatal status."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why would you use IDMStatusError instead of IDMStatusWarning in a Bi Impl Scripting driver script?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, IDMStatusError sets the status level to **Error**, indicating that the script encountered a problem that prevents successful processing and should be treated as a failure by the Identity Manager engine. IDMStatusWarning sets the level to **Warning**, which signals a non‑critical issue that does not stop the operation. Use IDMStatusError when the error should abort the transaction; use IDMStatusWarning for informational problems that allow the script to continue."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set a command and write a single attribute value in a subscriber script for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "1. Call IDMSetCommand with the command string that you want the subscriber to return, e.g.:\n   ```vbscript\n   IDMSetCommand \"CreateAccount\"\n   ```\n2. After setting the command, write the attribute value using IDMWriteValue, specifying the attribute name and its value:\n   ```vbscript\n   IDMWriteValue \"accountName\", \"jdoe\"\n   ```\nBoth calls must be made before the script finishes so that the Bi Impl Scripting driver can return the command and attribute to the Identity Manager engine."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main categories of built‑in functions available in the Bi Impl Scripting driver.",
+      "input": "",
+      "output": "The Bi Impl Scripting driver provides five groups of built‑in functions:\n1. **General Functions** – utilities for retrieving driver parameters, tracing, executing external programs, and setting status levels.\n2. **Subscriber Functions** – helpers for handling subscriber events, retrieving event data, setting commands, and writing values back to the engine.\n3. **Publisher Functions** – functions to set up publication commands and values and to submit them to the Identity Vault.\n4. **Query Functions** – a set of procedures to build and execute queries against the Identity Vault and to retrieve instance information.\n5. **Heartbeat Functions** – simple subs to report success, warning, or error status from the Heartbeat script."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a VBScript snippet for the Poll.wsf file of the Bi Impl Scripting driver that sets a publish command to \"UpdateAccount\" and publishes an attribute named \"status\" with the value \"active\".",
+      "input": "",
+      "output": "```vbscript\n'--- Poll.wsf snippet for the Bi Impl Scripting driver ---\n\n' Initialize the publish command\nIDMPublishInit \"UpdateAccount\"\n\n' Set the attribute to publish\nIDMPublishValue \"status\", \"active\"\n\n' Submit the publish request to the Identity Manager engine\nresult = IDMPublish()\n\nIf result Then\n    IDMTrace \"Poll successful: status published.\"\nElse\n    IDMTrace \"Poll failed: unable to publish status.\"\nEnd If\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the IDMQueryAddSearchAttr function in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, Sub IDMQueryAddSearchAttr(Name, Value) adds a search condition to a query. The condition is of the form *Name=Value*; Name is the attribute to search on and Value is the required value. All added conditions must be satisfied for an object to be returned by the subsequent IDMQuery call."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you initialize a query to retrieve a single object from the identity vault using the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "1. Call **IDMQueryInit** to start a new query.\n2. Specify either the association or the distinguished name (DN) of the object:\n   - To set the association, use **IDMQuerySetAssociation(Association)**.\n   - To set the DN, use **IDMQuerySetSearchRoot(SearchRoot)**.\n3. (Optional) Add any required search conditions with **IDMQueryAddSearchAttr(Name, Value)**.\n4. (Optional) Indicate which attributes to read with **IDMQueryAddReadAttr(Name)**.\n5. Execute the query with **IDMQuery**; the function returns **True** if an object is found.\nThese steps allow the Bi Impl Scripting driver to query a single identity vault object."
+    }
+  ]
+}

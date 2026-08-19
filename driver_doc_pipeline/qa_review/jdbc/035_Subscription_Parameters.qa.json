@@ -1,0 +1,77 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the Disable Subscriber? parameter control in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, the Disable Subscriber? parameter (tag name **disable**) determines whether the Subscriber channel is active. Setting the parameter to a Boolean True (values 1, yes, true) disables the Subscriber channel; setting it to Boolean False (values 0, no, false) leaves the channel active. The default value is 0 (no)."
+    },
+    {
+      "category": "config",
+      "instruction": "List the properties of the Disable Statement-Level Locking? parameter for the JDBC driver.",
+      "input": "",
+      "output": "The Disable Statement-Level Locking? parameter for the JDBC driver has the following properties:\n\n| Property | Value |\n|----------|-------|\n| Tag Name | disable-locking |\n| Required? | no |\n| Default Value | 0 (no) |\n| Legal Values | 1, yes, true (yes) 0, no, false (no) |\n| Schema-Dependent | True |\n\nThis parameter is only active when the Enable Statement-Level Locking? parameter is set to Boolean True."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the Generation/Retrieval Method (Table-Global) parameter for the JDBC driver?",
+      "input": "",
+      "output": "To set the Generation/Retrieval Method (Table-Global) parameter in the JDBC driver, follow these steps:\n1. Locate the subscription configuration file for your JDBC driver.\n2. Add or modify the tag **key-gen-method** with one of the legal values: `none`, `driver`, or `auto`.\n   * Example to use driver‑generated keys: `<key-gen-method>driver</key-gen-method>`\n   * Example to use auto‑generated identity columns (supported only by MySQL Connector/J): `<key-gen-method>auto</key-gen-method>`\n3. Save the configuration file and restart the subscription channel for the change to take effect.\n\nThe default value is `none` (subscription event)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the Check Update Counts? parameter cause errors on Microsoft SQL Server, and how should it be configured in the JDBC driver?",
+      "input": "",
+      "output": "When using Microsoft SQL Server, the Check Update Counts? parameter can cause errors because trigger logic errors are not propagated back to the Subscriber channel. The recommended configuration is to keep the default value of **1 (yes)** so that update counts are checked. If you experience exceptions due to trigger failures, set the parameter to Boolean False (values 0, no, false) to ignore update counts. This avoids the error propagation issue specific to Microsoft SQL Server."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the subscriber‑level parameters available in the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver provides the following subscriber‑level parameters:\n- **Disable Subscriber?** (`disable`): disables or enables the Subscriber channel.\n- **Generation/Retrieval Method (Table‑Global)** (`key-gen-method`): selects how primary keys are generated or retrieved (`none`, `driver`, `auto`).\n- **Retrieval Timing (Table‑Global)** (`key-gen-timing`): sets when primary keys are retrieved (`before`, `after`).\n- **Method and Timing (Table‑Local)** (`key-gen`): overrides global settings per table/view using a procedural syntax.\n- **Disable Statement‑Level Locking?** (`disable-locking`): controls explicit locking before each SQL statement.\n- **Check Update Counts?** (`check-update-count`): determines whether the channel verifies that rows were actually updated.\n- **Add Default Values on Insert?** (`add-default-values-on-view-insert`): provides default values for NOT NULL view columns, mainly for SQL Server 2000 compatibility.\nAll parameters are optional, have default values, and may be schema‑dependent."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the BNF syntax for the Method and Timing (Table‑Local) parameter of the JDBC driver.",
+      "input": "",
+      "output": "```bnf\n<key-gen> ::= <table-or-view-name> \"(\" <generation-retrieval-method>,\n                          <retrieval-timing> \")\" {[<delimiter>] <key-gen>}\n\n<generation-retrieval-method> ::= none | driver | auto |\n                                  \"\"\" <procedure-signature> \"\"\" |\n                                  \"\"\" <function-signature>  \"\"\"\n\n<table-or-view-name> ::= <legal-undelimited-database-table-or-view-identifier>\n\n<delimiter> ::= \";\" | \",\" | <white-space>\n\n<procedure-signature> ::= <schema-qualifier> \".\" <stored-routine-name>\"(\"<argument-list>\")\"\n\n<function-signature> ::= \"?=\" <procedure-signature>\n\n<schema-qualifier> ::= <legal-undelimited-database-username-identifier>\n\n<stored-routine-name> ::= <legal-undelimited-database-stored-routine-identifier>\n\n<argument-list> ::= <column-name>{\",\" <column-name>}\n\n<column-name> ::= <column-from-table-or-view-name-previously-specified>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the legal values for the key-gen-method tag in the JDBC driver?",
+      "input": "",
+      "output": "The **key-gen-method** tag in the JDBC driver accepts the following legal values:\n- `none` (subscription event)\n- `driver` (Subscriber‑generated)\n- `auto` (auto‑generated/identity column)\nThese values are case‑insensitive and the parameter is schema‑dependent. The default value is `none`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the Retrieval Timing (Table‑Global) parameter for the JDBC driver?",
+      "input": "",
+      "output": "To configure Retrieval Timing (Table‑Global) for the JDBC driver:\n1. Open the subscription configuration file for the JDBC driver.\n2. Locate or add the tag **key-gen-timing**.\n3. Set its value to either `before` (default) or `after`.\n   * Example for before timing: `<key-gen-timing>before</key-gen-timing>`\n   * Example for after timing: `<key-gen-timing>after</key-gen-timing>`\n4. Save the file and restart the subscription channel.\n\nThe parameter is schema‑dependent and overrides per‑table timing when the Method and Timing (Table‑Local) parameter is not used."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the Add Default Values on Insert? parameter needed for Microsoft SQL Server 2000 in the JDBC driver?",
+      "input": "",
+      "output": "Microsoft SQL Server 2000 requires that columns defined as NOT NULL in a view receive a non‑NULL value in an INSERT statement. The **Add Default Values on Insert?** parameter (tag **add-default-values-on-view-insert**) tells the JDBC driver to supply default values for such columns when they are not explicitly provided. Setting this parameter to Boolean True enables the behavior, ensuring compatibility with SQL Server 2000's NOT NULL constraint enforcement."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default value behavior for the Add Default Values on Insert? property in the JDBC driver?",
+      "input": "",
+      "output": "The **Add Default Values on Insert?** property in the JDBC driver has a dynamic default value. At runtime, the default is derived from descriptor files, so the actual default may vary depending on the environment. The tag name is **add-default-values-on-view-insert**, and the legal values are `1, yes, true` (True) or `0, no, false` (False)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Which third‑party JDBC driver supports the auto method for primary key generation in the JDBC driver, and what method does it use?",
+      "input": "",
+      "output": "Only the MySQL Connector/J JDBC driver supports the **auto** method for primary key generation in the JDBC driver. It uses the JDBC 3 interface method `java.sql.Statement.getGeneratedKeys():java.sql.ResultSet` to retrieve automatically generated identity column values."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you specify a stored‑procedure based primary key generation for a table named usr in the JDBC driver?",
+      "input": "",
+      "output": "To configure a stored‑procedure based primary key generation for table **usr** in the JDBC driver, use the Method and Timing (Table‑Local) parameter with a function signature. Example value:\n```\nusr(\"?=func_last_usr_idu()\")\n```\nIf you also need to specify retrieval timing, include it after a comma, e.g.:\n```\nusr(\"?=func_last_usr_idu()\", before)\n```\nPlace this value in the **key-gen** tag of the subscription configuration. Ensure that the function `func_last_usr_idu` exists in the database and returns the last generated primary key."
+    }
+  ]
+}

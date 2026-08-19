@@ -1,0 +1,59 @@
+{
+  "driver": "i5/OS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of specifying the i5/OS driver as a Remote Loader driver?",
+      "input": "",
+      "output": "In the i5/OS driver, the driver must be specified as a Remote Loader driver so that it can be loaded and managed by the Identity Manager Remote Loader service. This setting enables the driver shim to communicate with the Metadirectory server and allows the driver to be started, stopped, and updated through the standard Identity Manager mechanisms."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually install a certificate for the i5/OS driver?",
+      "input": "",
+      "output": "To manually install a certificate for the i5/OS driver:\n1. In iManager, browse the Security container to locate your tree’s Certificate Authority (typically named *treeName* CA).\n2. Click the Certificate Authority object.\n3. Click **Modify Object**.\n4. Select the **Certificates** tab.\n5. Click **Public Key Certificate**.\n6. Click **Export**.\n7. Choose **No** to export the certificate without the private key, then click **Next**.\n8. Select **Base64** format, then click **Next**.\n9. Click **Save** and specify a location for the exported file.\n10. Transfer the file to the connected system (e.g., via FTP).\n11. Place the file in the driver IFS path under `keys/ca.pem`. If the driver was installed with the default IFS path, store it as `/usr/local/i5osdrv/keys/ca.pem`."
+    },
+    {
+      "category": "config",
+      "instruction": "Which global configuration values must be set for the i5/OS driver to provision passwords from the Identity Vault to the connected system?",
+      "input": "",
+      "output": "For the i5/OS driver to provision Identity Vault user passwords to the connected system, configure the following Global Configuration Values (GCVs) on the Driver Edit Properties page:\n- **Identity Vault Accepts Passwords from the i5/OS Connected System** – set this GCV to **Yes**.\n- **Synchronize Distribution Password When Setting Universal Password** – enable this option for the Universal Password policy assigned to the user’s container.\n- Ensure the appropriate password management properties (as listed on the Global Configuration Values page) reflect that the connected system accepts passwords from the Identity Vault."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take when the i5/OS driver fails to start?",
+      "input": "",
+      "output": "When the i5/OS driver fails to start, follow these steps:\n1. Examine the **status log** and **DSTRACE** output for error messages.\n2. Verify that the driver is specified as a **Remote Loader driver** in the iManager Driver Edit Properties window.\n3. Confirm that both Identity Manager and the driver have been activated within the required 90‑day period (check the Driver Set Overview and Driver Overview pages in iManager for activation status).\n4. If activation is needed, follow the activation procedure described in the Identity Manager Installation Guide.\n5. Review the Identity Manager engine error troubleshooting documentation for additional guidance."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you resolve a driver shim startup or communication failure for the i5/OS driver?",
+      "input": "",
+      "output": "To resolve a driver shim startup or communication failure for the i5/OS driver:\n1. Examine the **trace file** referenced in the troubleshooting documentation.\n2. Apply all operating‑system patches to ensure compatibility.\n3. Verify that the **Remote Loader password** and **Driver object password** stored in the driver IFS path match the passwords configured in the driver shim. These passwords are stored in encrypted files `dpwdlf40` (Driver object password) and `lpwdlf40` (Remote Loader password) inside the `keys` directory.\n4. To update the passwords on the connected system, use the **I5OSDRV** menu. To update them on the Metadirectory server, modify the driver configuration in iManager.\n5. Ensure the correct host name and port number of the connected system are specified in the Driver Configuration Remote Loader connection parameters. The default port is **8090**, but it can be changed in the driver shim configuration file."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why are users or groups not being provisioned to the connected system by the i5/OS driver, and how can you fix it?",
+      "input": "",
+      "output": "When users or groups are not provisioned to the connected system by the i5/OS driver, check the following:\n1. Review the **status log**, **DSTRACE**, **trace file**, and **job log** for errors.\n2. Ensure the identities reside in the appropriate **base container**; the base containers can be viewed and changed on the **Global Configuration Values** page of the Driver Edit Properties window.\n3. Confirm that the driver **Data Flow** property is set to **Bidirectional** or **Identity Vault to Application**. If not, re‑import the driver rules file to change the Data Flow setting.\n4. Verify that the driver’s security‑equivalent user has read rights on the base container (see Table 2‑2, *Base Container Rights Required by the Driver Security‑Equivalent User*). Grant the necessary rights if they are missing."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why are users or groups not being provisioned to the Identity Vault by the i5/OS driver, and how can you fix it?",
+      "input": "",
+      "output": "If users or groups are not being provisioned to the Identity Vault by the i5/OS driver:\n1. Check the **status log**, **DSTRACE**, and **trace file** for clues.\n2. Examine the **User Base Container** and **Group Base Container** GCV values on the Global Configuration Values page to ensure they point to the correct containers.\n3. Verify that the driver **Data Flow** property is set to **Bidirectional** or **Application to Identity Vault**. Change the setting by re‑importing the driver rules file if needed.\n4. Ensure the driver’s security‑equivalent user has **update** rights on the base container (refer to Table 2‑2, *Base Container Rights Required by the Driver Security‑Equivalent User*). Grant update rights where missing."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why are Identity Vault user passwords not being provisioned to the connected system by the i5/OS driver, and what configuration should be verified?",
+      "input": "",
+      "output": "When Identity Vault user passwords are not reaching the connected system via the i5/OS driver:\n1. Review the **status log**, **DSTRACE**, and **job log** for error messages.\n2. On the Driver Edit Properties **Global Configuration Values** page, ensure the appropriate **password management properties** are set so that the connected system accepts passwords from the Identity Vault.\n3. Confirm that the user’s container has an assigned **Universal Password policy** and that the **Synchronize Distribution Password When Setting Universal Password** option is enabled for that policy.\n4. Verify that the connected system can accept the password format and that any required password synchronization options are correctly configured."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main troubleshooting steps for common problems with the i5/OS driver.",
+      "input": "",
+      "output": "Common troubleshooting for the i5/OS driver involves:\n- Verifying compatibility of iManager with the Identity Manager version.\n- Checking logs (status log, DSTRACE, trace file, job log) for error details.\n- Ensuring the driver is configured as a Remote Loader driver and is activated within 90 days.\n- Confirming SSL/LDAP certificate setup, either via the I5OSDRV menu or by manually exporting the CA certificate to `keys/ca.pem`.\n- Matching Remote Loader and driver object passwords in the encrypted files `dpwdlf40` and `lpwdlf40`.\n- Validating host name and port (default 8090) in the Remote Loader connection parameters.\n- Ensuring base containers are correct and that the driver’s security‑equivalent user has appropriate read or update rights.\n- Setting the driver **Data Flow** property correctly for the desired direction of provisioning.\n- Configuring password management GCVs, including enabling the Identity Vault password acceptance GCV and synchronizing universal passwords.\n- Applying OS patches and reviewing activation status on the Driver Set Overview and Driver Overview pages."
+    }
+  ]
+}

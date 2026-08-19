@@ -1,0 +1,47 @@
+{
+  "driver": "Blackboard driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the NTIQBBRTDC-ctp-TransformLoginDisabled command transform in the Blackboard driver?",
+      "input": "",
+      "output": "The NTIQBBRTDC-ctp-TransformLoginDisabled command transform in the Blackboard driver converts changes to the user object attribute “Login Disabled” into corresponding attribute values on the Blackboard DirXML-BB-Person object, specifically setting the DirXML-BB-p-row-status and DirXML-BB-p-available-ind attributes according to a predefined mapping."
+    },
+    {
+      "category": "config",
+      "instruction": "What attribute value mapping does the NTIQBBRTDC-ctp-TransformLoginDisabled command transform use in the Blackboard driver?",
+      "input": "",
+      "output": "The NTIQBBRTDC-ctp-TransformLoginDisabled command transform uses the following attribute value mapping (see Table A-5):\n\n| Login Disabled | DirXML-BB-p-row-status | DirXML-BB-p-available-ind |\n|----------------|------------------------|---------------------------|\n| True           | ENABLED                | True                      |\n| False          | ENABLED                | False                     |\n\nWhen Login Disabled is True, DirXML-BB-p-row-status is set to ENABLED and DirXML-BB-p-available-ind to True; when Login Disabled is False, DirXML-BB-p-row-status remains ENABLED and DirXML-BB-p-available-ind is set to False."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the NTIQBBRTDC-ctp-SetClassnameForGroups command transform exist in the Blackboard driver?",
+      "input": "",
+      "output": "The NTIQBBRTDC-ctp-SetClassnameForGroups command transform exists to assign the correct Blackboard object class to group operation objects. It reads the BBObjectType operation property—set earlier by the NTIQBBRTDC-evt-DetermineBBObjectType policy—and uses that value to set the operation object class. This is necessary because group objects may represent either a Blackboard Course or a Blackboard Organization, and the object class determines which type the operation will map to."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What role does the BBObjectType operation property play in the NTIQBBRTDC-ctp-SetClassnameForGroups command transform of the Blackboard driver?",
+      "input": "",
+      "output": "In the NTIQBBRTDC-ctp-SetClassnameForGroups command transform of the Blackboard driver, the BBObjectType operation property provides the specific Blackboard object class type (e.g., Course or Organization) that should be applied to a group operation. The transform reads this property—populated by the NTIQBBRTDC-evt-DetermineBBObjectType policy—and sets the operation object class accordingly, ensuring the group is correctly identified as a Course or an Organization in Blackboard."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the function of the NTIQBBRTGBE-sub-ctp-TransformGroupAttrsToEnrollmentObjects command transform in the Blackboard driver?",
+      "input": "",
+      "output": "The NTIQBBRTGBE-sub-ctp-TransformGroupAttrsToEnrollmentObjects command transform in the Blackboard driver converts changes on group attributes—specified in the “attribute_role_map” global configuration value (GCV)—into DirXML-BB-Enrollment object events. This enables enrollment objects to be created or updated automatically based on modifications to group attributes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the attribute_role_map GCV for the NTIQBBRTGBE-sub-ctp-TransformGroupAttrsToEnrollmentObjects command transform in the Blackboard driver?",
+      "input": "",
+      "output": "To configure the attribute_role_map GCV for the NTIQBBRTGBE-sub-ctp-TransformGroupAttrsToEnrollmentObjects command transform in the Blackboard driver, follow these steps:\n1. Open the Identity Manager console and navigate to the Global Configuration Values (GCV) section.\n2. Create or edit the GCV named \"attribute_role_map\" under the appropriate policy package for the Blackboard driver.\n3. In the GCV definition, list the group attribute names you want to monitor, mapping each to the corresponding role or enrollment property required by the DirXML-BB-Enrollment object.\n4. Save the GCV and ensure the policy containing the NTIQBBRTGBE-sub-ctp-TransformGroupAttrsToEnrollmentObjects command transform is enabled.\n5. Test the configuration by modifying a listed group attribute and verifying that a DirXML-BB-Enrollment event is generated."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the command transforms provided for the Blackboard driver.",
+      "input": "",
+      "output": "The Blackboard driver defines three command transforms:\n1. **NTIQBBRTDC-ctp-TransformLoginDisabled** – maps the user attribute “Login Disabled” to the Blackboard DirXML-BB-Person attributes DirXML-BB-p-row-status (always ENABLED) and DirXML-BB-p-available-ind (True or False based on the source value).\n2. **NTIQBBRTDC-ctp-SetClassnameForGroups** – sets the operation object class for groups (Course or Organization) by reading the BBObjectType operation property, which is determined earlier by the NTIQBBRTDC-evt-DetermineBBObjectType policy.\n3. **NTIQBBRTGBE-sub-ctp-TransformGroupAttrsToEnrollmentObjects** – converts changes on group attributes listed in the \"attribute_role_map\" GCV into DirXML-BB-Enrollment object events, enabling enrollment synchronization based on group attribute updates."
+    }
+  ]
+}

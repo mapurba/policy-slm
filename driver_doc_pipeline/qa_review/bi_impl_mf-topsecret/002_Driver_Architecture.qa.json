@@ -1,0 +1,65 @@
+{
+  "driver": "Top Secret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the overall architecture of the Top Secret driver and how does it synchronize information between the Identity Vault and the security system?",
+      "input": "",
+      "output": "The Top Secret driver uses a two‑channel architecture to keep the Identity Vault and the z/OS security system in sync. Identity Manager detects changes in the Identity Vault and notifies the driver’s Subscriber component. After optional policy processing, events are sent to the Subscriber channel of the driver shim started task on the z/OS system, which invokes customizable REXX execs to enact the changes. Conversely, standard security system exit routines capture password and other changes, place them on an encrypted memory queue, and a change‑log started task moves those events to a change‑log data set. The Publisher shim periodically polls this change‑log, decrypts the events, and sends them in XDS format over an SSL link to the Metadirectory engine, which applies policies and posts the resulting updates back to the Identity Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What responsibilities does the Publisher shim have in the Top Secret driver?",
+      "input": "",
+      "output": "In the Top Secret driver, the Publisher shim periodically examines the change‑log data set for new events. When it finds events, it decrypts them, converts the object names to lowercase (Publisher Placement policy), and transmits the events to the Metadirectory engine in XDS format over a Secure Sockets Layer (SSL) network link. The Metadirectory engine then processes the events with policies and posts any resulting changes to the Identity Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Subscriber shim in the Top Secret driver?",
+      "input": "",
+      "output": "The Subscriber shim of the Top Secret driver receives XDS command documents from the Metadirectory engine, stores them using z/OS name/token callable services, and then invokes the appropriate REXX execs to carry out the command. Before processing, the Subscriber Creation policy converts object names to uppercase (z/OS requirement). The shim also calls the LDXSERV command with the NOTSSLOG parameter at startup to identify itself to the security system exit routines, preventing those routines from generating events for actions taken by the Subscriber shim (loopback detection)."
+    },
+    {
+      "category": "config",
+      "instruction": "Where is the memory queue for the Top Secret driver located and what are its key properties?",
+      "input": "",
+      "output": "The memory queue used by the Top Secret driver is an encrypted, in‑storage buffer located in Subpool 231 (fetch‑protected ECSA). It holds events placed by the security system exit routines and is read by the change‑log started task, which removes the events for further processing."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the requirements for the change log data set used by the Top Secret driver?",
+      "input": "",
+      "output": "The change log data set for the Top Secret driver must be a standard z/OS direct‑access data set (DSORG=DA). There is a single change log data set for all systems that share the security system database. It must reside on a shared device unless the security system database itself is not shared. The change‑log started task writes encrypted events to this data set, and the Publisher shim reads from it at configurable intervals."
+    },
+    {
+      "category": "config",
+      "instruction": "Which command does the Subscriber shim call at startup for loopback detection in the Top Secret driver, and what parameter must be supplied?",
+      "input": "",
+      "output": "At startup, the Subscriber shim of the Top Secret driver calls the LDXSERV command with the NOTSSLOG parameter. This creates a token via z/OS name/token callable services; when the security system exit routines find the token, they suppress event generation for actions performed by the Subscriber shim, thereby preventing loopback."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you display the Publisher channel status for the Top Secret driver using the LDXSERV command?",
+      "input": "",
+      "output": "To display information about the Publisher channel event subsystem for the Top Secret driver, issue the command:\n\n    LDXSERV STATUS\n\nThe driver load library must be included in the STEPLIB concatenation of the logon procedure for the command to be recognized."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you ensure the driver shim started task runs on a z/OS system that shares a security system database for the Top Secret driver?",
+      "input": "",
+      "output": "For the Top Secret driver, configure the driver shim as a started task and include it in the normal z/OS system initialization procedure (e.g., in the appropriate JES2 or JES3 start-up scripts). Because only one system that shares the security system database may run the driver shim started task, make sure that this task is defined on a single system and that it is stopped during normal system shutdown."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you create and use an include/exclude file to control provisioning objects for the Top Secret driver?",
+      "input": "",
+      "output": "To control which objects are processed by the Subscriber channel of the Top Secret driver, create an include/exclude file referenced by the driver configuration. List the object names or patterns you want to include or exclude, one per line, using the appropriate keyword (e.g., INCLUDE or EXCLUDE). Place the file in a location accessible to the driver shim and ensure the driver’s policy configuration points to this file. The driver will then consult the file during provisioning to enforce the local inclusion or exclusion rules instead of relying solely on Metadirectory engine policies."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the key components and processes described on the architecture page for the Top Secret driver.",
+      "input": "",
+      "output": "The Top Secret driver synchronizes the Identity Vault with a z/OS security system using two channels. The Subscriber shim receives XDS commands from the Metadirectory engine, calls REXX execs, and uses LDXSERV NOTSSLOG for loopback detection. Security system exit routines place events in an encrypted memory queue (Subpool 231); a change‑log started task moves them to a DSORG=DA change‑log data set on a shared device. The Publisher shim periodically reads this data set, decrypts events, converts object names to lowercase, and sends them over SSL to the Metadirectory engine in XDS format. Policies, schema files, and an include/exclude file allow customization of object handling."
+    }
+  ]
+}

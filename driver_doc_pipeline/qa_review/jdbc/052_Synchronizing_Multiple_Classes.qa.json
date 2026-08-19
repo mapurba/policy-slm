@@ -1,0 +1,41 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver require each logical database class to have a unique primary key column name when synchronizing multiple eDirectory classes?",
+      "input": "",
+      "output": "In the JDBC driver, the Publisher channel uses the primary key column name to locate all rows in the event log table that belong to a specific logical database class. If two classes shared the same primary key column name, the Publisher could not reliably distinguish which rows belong to which class, leading to synchronization errors. Therefore, each logical database class must have a unique primary key column name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you synchronize multiple eDirectory classes with the JDBC driver so that each class uses a different parent table or view?",
+      "input": "",
+      "output": "To synchronize multiple eDirectory classes with the JDBC driver:\n1. Create a separate parent table or view for each logical database class you want to synchronize.\n2. Ensure that each table has a unique primary key column name (e.g., `idu` for the `usr` class and `idg` for the `grp` class).\n3. Define the primary key constraint on each table (e.g., `CONSTRAINT pk_usr_idu PRIMARY KEY(idu)` for the `usr` table).\n4. Configure the JDBC driver to map each eDirectory class to its corresponding table or view.\n5. Run the synchronization; the Publisher channel will use the unique primary key column names to identify rows for each class."
+    },
+    {
+      "category": "config",
+      "instruction": "What naming rule must be followed for primary key columns when configuring multiple classes in the JDBC driver?",
+      "input": "",
+      "output": "When configuring multiple classes in the JDBC driver, each logical database class must have a **unique primary key column name**. The column name is used by the Publisher channel to identify rows belonging to a specific class in the event log table."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What issue can arise if two logical database classes are configured with the same primary key column name in the JDBC driver, and how can it be resolved?",
+      "input": "",
+      "output": "If two logical database classes share the same primary key column name, the Publisher channel cannot correctly differentiate rows in the event log table for each class, leading to synchronization failures or data being written to the wrong class. To resolve the issue, assign a distinct primary key column name to each class (e.g., `idu` for `usr` and `idg` for `grp`)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the recommendations for synchronizing multiple classes using the JDBC driver.",
+      "input": "",
+      "output": "When synchronizing multiple eDirectory classes with the JDBC driver, map each class to a separate parent table or view, ensure each class has a unique primary key column name, and define a primary key constraint on that column. The Publisher channel relies on these unique column names to correctly associate event log rows with the appropriate logical database class."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a CREATE TABLE statement for a new logical database class named \"dept\" that follows the JDBC driver conventions shown in the documentation.",
+      "input": "",
+      "output": "```sql\nCREATE TABLE dept\n(\n    idd INTEGER NOT NULL,\n    dept_name VARCHAR2(64) NOT NULL,\n    -- additional columns as needed\n    CONSTRAINT pk_dept_idd PRIMARY KEY(idd)\n);\n```"
+    }
+  ]
+}

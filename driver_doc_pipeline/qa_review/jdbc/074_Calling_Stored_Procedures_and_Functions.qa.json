@@ -1,0 +1,65 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the jdbc:call-procedure element in the JDBC driver and when should it be used?",
+      "input": "",
+      "output": "In the JDBC driver, the <jdbc:call-procedure> element is used inside a <jdbc:statement> to invoke a stored procedure via a CallableStatement. It abstracts vendor‑specific call syntax, allowing the policy to call procedures without knowing each database’s proprietary syntax. The element requires only the procedure’s qualified name via the jdbc:name attribute; parameters are supplied with nested <jdbc:param> elements."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver recommend using CallableStatement (jdbc:call-procedure or jdbc:call-function) instead of a plain SQL statement?",
+      "input": "",
+      "output": "The JDBC driver recommends using CallableStatement because it eliminates the need to know vendor‑specific call syntax, makes it easier to build calls in the Policy Builder, allows differentiation between Null and empty string values, supports function calls on all database platforms (e.g., Oracle does not allow functions via a plain statement), and enables retrieval of OUT parameter values from stored procedures."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you call a stored procedure with no parameters using the JDBC driver?",
+      "input": "",
+      "output": "To call a stored procedure with no parameters in the JDBC driver:\n1. Create a <jdbc:statement> element.\n2. Inside it, add a <jdbc:call-procedure> element.\n3. Set the jdbc:name attribute to the fully qualified procedure name.\n4. Do not include any <jdbc:param> elements.\n\nExample XML:\n```\n<jdbc:statement>\n    <jdbc:call-procedure jdbc:name=\"schema.procedure-name\"/>\n</jdbc:statement>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you invoke a stored procedure with a Null parameter using the JDBC driver?",
+      "input": "",
+      "output": "To pass a Null value to a stored procedure parameter in the JDBC driver:\n1. Within a <jdbc:call-procedure> element, add a <jdbc:param> element for the Null parameter.\n2. Do not include a <jdbc:value> child element; an empty <jdbc:param/> signals a Null.\n\nExample XML:\n```\n<jdbc:call-procedure jdbc:name=\"schema.procedure-name\">\n    <jdbc:param/>\n</jdbc:call-procedure>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you call a stored procedure with an empty string parameter using the JDBC driver?",
+      "input": "",
+      "output": "To pass an empty string to a stored procedure parameter in the JDBC driver:\n1. Inside the <jdbc:call-procedure>, add a <jdbc:param> element.\n2. Include an empty <jdbc:value/> element inside the <jdbc:param>.\n\nExample XML:\n```\n<jdbc:call-procedure jdbc:name=\"schema.procedure-name\">\n    <jdbc:param>\n        <jdbc:value/>\n    </jdbc:param>\n</jdbc:call-procedure>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you invoke a stored procedure with a literal value parameter using the JDBC driver?",
+      "input": "",
+      "output": "To pass a literal value to an IN or INOUT parameter of a stored procedure in the JDBC driver:\n1. Add a <jdbc:param> element inside <jdbc:call-procedure>.\n2. Inside that <jdbc:param>, include a <jdbc:value> element containing the literal text.\n\nExample XML (passing literal \"literal\"):\n```\n<jdbc:call-procedure jdbc:name=\"schema.procedure-name\">\n    <jdbc:param>\n        <jdbc:value>literal</jdbc:value>\n    </jdbc:param>\n</jdbc:call-procedure>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you call a stored procedure that has an OUT parameter using the JDBC driver?",
+      "input": "",
+      "output": "To invoke a stored procedure with an OUT parameter in the JDBC driver:\n1. Determine the order of parameters declared in the procedure.\n2. For each OUT parameter, include an empty <jdbc:param/> placeholder (no <jdbc:value>).\n3. For each IN or INOUT parameter, include a <jdbc:param> with a <jdbc:value> if you need to supply a literal.\n\nExample XML for a procedure where the first parameter is OUT and the second is IN:\n```\n<jdbc:call-procedure jdbc:name=\"schema.procedure-name\">\n    <!-- OUT parameter placeholder -->\n    <jdbc:param/>\n    <!-- IN parameter with literal -->\n    <jdbc:param>\n        <jdbc:value>literal</jdbc:value>\n    </jdbc:param>\n</jdbc:call-procedure>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What attributes can be set on the jdbc:call-function element in the JDBC driver and what is each attribute’s purpose?",
+      "input": "",
+      "output": "The <jdbc:call-function> element in the JDBC driver supports the following attributes:\n- **jdbc:name** – The fully qualified name of the function to invoke (schema-qualified if the database supports schemas).\n- **jdbc:return-format** – When provided, formats the first row of a returned result set as stored‑procedure‑style OUT parameters. This attribute is used only when **jdbc:return-type** is not specified.\n- **jdbc:return-type** – Allows Oracle functions to return a result set by specifying a JDBC type such as `OracleTypes.CURSOR`. This is required for Oracle’s proprietary mechanism for returning cursors.\nThese attributes control function identification and how any returned data (scalar value, result set, or formatted OUT parameters) is represented in the policy output."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the ways the JDBC driver can invoke stored procedures and functions and capture their results.",
+      "input": "",
+      "output": "The JDBC driver supports four main invocation methods:\n1. **Statement with vendor‑specific SQL** – Direct SQL strings (e.g., `CALL schema.procedure-name` for Oracle or `EXECUTE FUNCTION schema.function-name` for Informix).\n2. **CallableStatement via <jdbc:call-procedure>** – Vendor‑agnostic call of stored procedures; parameters are expressed with <jdbc:param> and can be IN, INOUT, or OUT.\n3. **CallableStatement via <jdbc:call-function>** – Vendor‑agnostic call of functions; parameters are supplied with <jdbc:param>. Functions return a single scalar value or a result set.\n4. **Special attributes on <jdbc:call-function>** – `jdbc:return-type` enables Oracle cursor result sets; `jdbc:return-format` formats the first row of a result set as OUT parameters.\nResult handling includes OUT/INOUT parameter values returned in `<jdbc:out-parameters>` and result sets returned in `<jdbc:result-set>` elements, each carrying an event‑id for correlation."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an XML snippet using the JDBC driver to call a function named \"schema.myFunc\" with two IN parameters (the string \"test\" and the integer 5) and format the first row of the result set as OUT parameters.",
+      "input": "",
+      "output": "```xml\n<jdbc:statement>\n    <jdbc:call-function jdbc:name=\"schema.myFunc\" jdbc:return-format=\"return value\">\n        <jdbc:param>\n            <jdbc:value>test</jdbc:value>\n        </jdbc:param>\n        <jdbc:param>\n            <jdbc:value>5</jdbc:value>\n        </jdbc:param>\n    </jdbc:call-function>\n</jdbc:statement>\n```"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What limitation does the JDBC driver have regarding time and timestamp syntaxes?",
+      "input": "",
+      "output": "In the JDBC driver, the Identity Vault time and timestamp syntaxes cannot express the full range and granularity of the database time-related types, which often support a wider range and nanosecond granularity. This mismatch is a publication problem because the database types can store more precise values than the Identity Vault syntax can represent."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable the JDBC driver to handle proprietary database timestamp formats?",
+      "input": "",
+      "output": "To enable the JDBC driver to handle proprietary database timestamp formats, implement a custom class that implements the DBTimestampTranslator interface (the interface is documented in the JavaDoc tool shipped with the JDBC driver). Then configure the driver to use your custom translator class. The driver already includes default implementations for DB2 native format and Sybase style 109, but your custom implementation will allow parsing of any other proprietary format without reformatting timestamps in the database or style sheets."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter should you avoid setting above read committed to mitigate blocking in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, you should avoid setting the Transaction Isolation Level parameter to any level higher than \"read committed\". Keeping the isolation level at read committed reduces the chance of statements being blocked indefinitely due to exclusive locks."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What can cause statements executed by the JDBC driver to block indefinitely and how can you address it?",
+      "input": "",
+      "output": "In the JDBC driver, statements may block indefinitely when a database resource is exclusively locked. Because lock mechanisms differ by database, the general remedy is to implement a custom DBLockStatementGenerator class and configure the driver to use it. The driver already ships with a default implementation for Oracle. Additionally, setting the Transaction Isolation Level parameter no higher than read committed helps reduce blocking."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the JDBC driver display “User is unassociated” when performing a Modify or Delete event with dest-dn?",
+      "input": "",
+      "output": "The JDBC driver displays the exception error “User is unassociated” during a Modify or Delete event with dest-dn because the JDBC driver does not support CRUD operations for those actions."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why can the JDBC Fan-Out driver fail to update the target database after a Cached Priority Synchronisation modify event?",
+      "input": "",
+      "output": "In the JDBC Fan-Out driver, if a Cached Priority Synchronisation event modifies a referential attribute, the driver incorrectly sends a Success status to the source but does not actually apply the change to the target database, resulting in the target remaining unchanged."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main known issues of the JDBC driver and JDBC Fan-Out driver.",
+      "input": "",
+      "output": "The JDBC driver has several known issues: (1) its time and timestamp syntaxes cannot represent the full range and granularity of database types; (2) it cannot parse proprietary database timestamp formats without a custom DBTimestampTranslator; (3) statements may block indefinitely due to exclusive locks, mitigated by a custom DBLockStatementGenerator and limiting Transaction Isolation Level to read committed; (4) the java.sql.Statement.setQueryTimeout method is unreliable across drivers; (5) it shows a “User is unassociated” error for Modify/Delete operations with dest-dn because CRUD is unsupported; (6) in MSSQL, views based on multiple base tables cannot be updated. The JDBC Fan-Out driver adds an issue where a Cached Priority Synchronisation modify of a referential attribute reports success but does not update the target database."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample implementation skeleton of a custom DBTimestampTranslator class for the JDBC driver.",
+      "input": "",
+      "output": "```java\nimport com.niq.identity.jdbc.DBTimestampTranslator;\nimport java.sql.Timestamp;\nimport java.text.ParseException;\nimport java.text.SimpleDateFormat;\n\n/**\n * Custom DBTimestampTranslator implementation for handling proprietary\n * database timestamp formats.\n */\npublic class MyCustomTimestampTranslator implements DBTimestampTranslator {\n\n    // Example format pattern for a proprietary timestamp, adjust as needed\n    private static final String PROPRIETARY_PATTERN = \"yyyy/MM/dd HH:mm:ss.SSSSSS\";\n    private final SimpleDateFormat formatter = new SimpleDateFormat(PROPRIETARY_PATTERN);\n\n    /**\n     * Translates a proprietary timestamp string into a java.sql.Timestamp.\n     *\n     * @param timestampString the timestamp value retrieved from the database\n     * @return a java.sql.Timestamp representing the same point in time\n     * @throws ParseException if the string cannot be parsed with the proprietary format\n     */\n    @Override\n    public Timestamp translate(String timestampString) throws ParseException {\n        // Parse the proprietary format into a java.util.Date\n        java.util.Date date = formatter.parse(timestampString);\n        // Convert to java.sql.Timestamp (nanosecond precision may be lost depending on source)\n        return new Timestamp(date.getTime());\n    }\n}\n```"
+    }
+  ]
+}

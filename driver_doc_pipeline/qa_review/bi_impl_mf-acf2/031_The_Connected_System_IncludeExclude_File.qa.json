@@ -1,0 +1,77 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the ACF2 driver?",
+      "input": "",
+      "output": "In the ACF2 driver, the optional include/exclude file on the connected system controls which identities are synchronized from the Identity Vault to the connected system, allowing administrators to filter events before they reach the Identity Manager Metadirectory engine."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add an exclude rule for a specific ACF2 LID in the include/exclude file for the ACF2 driver?",
+      "input": "",
+      "output": "To add an exclude rule for a specific ACF2 LID in the ACF2 driver include/exclude file, follow these steps:\n1. Open the include/exclude file that is referenced by the INCEXC DD statement in the driver shim JCL.\n2. Insert an EXCLUDE section if one does not already exist:\n```\nEXCLUDE\n    CLASS Logonid\n        LID=YOUR_LID_VALUE\n    ENDCLASS\nENDEXCLUDE\n```\n3. Replace `YOUR_LID_VALUE` with the exact LID you want to exclude (use uppercase, as the driver converts names to uppercase).\n4. Save the file.\n5. Restart the driver shim so the new rule is read.\nThe identity with the specified LID will now be excluded from synchronization."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the syntax for a class matching rule within an include section in the ACF2 driver?",
+      "input": "",
+      "output": "In the ACF2 driver, a class matching rule inside an INCLUDE section uses the following syntax:\n```\nINCLUDE\n    CLASS className\n        ... (attribute or association rules) ...\n    ENDCLASS\nENDINCLUDE\n```\nReplace `className` with the actual class name from the schema (e.g., `Logonid`)."
+    },
+    {
+      "category": "config",
+      "instruction": "How are attribute matching rules formatted in the ACF2 driver include/exclude file?",
+      "input": "",
+      "output": "An attribute matching rule in the ACF2 driver include/exclude file consists of an attribute name, an equals sign, and an expression:\n```\nattributeName=expression\n```\nThe expression can be an exact value or a limited regular expression. Multiple attribute rules within a class are logically ANDed."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the maximum recommended number of entries in an ACF2 driver include/exclude file?",
+      "input": "",
+      "output": "For optimal performance, the ACF2 driver include/exclude file should contain no more than 50 entries total."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If changes to the include/exclude file are not taking effect in the ACF2 driver, what must you do?",
+      "input": "",
+      "output": "The include/exclude file is read only when the driver shim starts. After modifying the file for the ACF2 driver, you must restart the driver shim so the new rules are loaded."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "In what order does the ACF2 driver prioritize exclude and include rules when processing identities?",
+      "input": "",
+      "output": "The ACF2 driver matches identities using the following priority: first it applies exclude rules, then include rules. Within each priority level, rules are evaluated in the order they appear in the file, and the first matching rule determines the outcome."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the ACF2 driver treat identities that match neither include nor exclude rules?",
+      "input": "",
+      "output": "If an identity does not match any include rule or exclude rule in the ACF2 driver include/exclude file, the identity is treated as included and processed normally by the Subscriber shim."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you write a single-line exclude rule for the ADMIN user in the ACF2 driver?",
+      "input": "",
+      "output": "Add the following single-line rule to the ACF2 driver include/exclude file:\n```\nEXCLUDE ADMIN\n```\nThis rule tells the driver to exclude events for the user with the association name `ADMIN`."
+    },
+    {
+      "category": "config",
+      "instruction": "What character is used to start a comment line in the ACF2 driver include/exclude file?",
+      "input": "",
+      "output": "Lines that begin with an octothorpe (`#`) are treated as comments in the ACF2 driver include/exclude file."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using the include/exclude file with the ACF2 driver.",
+      "input": "",
+      "output": "The ACF2 driver uses an optional include/exclude file (a sequential or partitioned data set) to filter which identities are synchronized. Exclude rules have higher priority than include rules, and rules are processed in file order. The file can contain INCLUDE/EXCLUDE sections, class matching rules, attribute matching rules, association rules, and single-line rules. It must be no more than 50 entries for optimal performance, is case‑insensitive except for class/attribute names, and must be reloaded by restarting the driver shim after any changes."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample include/exclude file for the ACF2 driver that excludes any Logonid whose LID starts with TEMP and includes all other users.",
+      "input": "",
+      "output": "```\n# Exclude Logonid objects whose LID starts with TEMP\nEXCLUDE\n    CLASS Logonid\n        LID=TEMP.*\n    ENDCLASS\nENDEXCLUDE\n\n# Include all remaining users (implicit include)\n# No explicit INCLUDE section is needed because identities not matched by an EXCLUDE rule are included by default.\n```"
+    }
+  ]
+}

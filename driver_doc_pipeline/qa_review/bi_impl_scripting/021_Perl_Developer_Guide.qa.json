@@ -1,0 +1,77 @@
+{
+  "driver": "Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Scripting driver and why would you use it in NetIQ Identity Manager?",
+      "input": "",
+      "output": "The Scripting driver provides a complete Perl API for interacting with identity management systems whose tools (including APIs) are available on Linux and UNIX. It enables Identity Manager to communicate with any supported system via an encrypted network connection and lets developers write custom driver logic in Perl (or other command‑line scripting languages) to synchronize data, handle events, and execute external commands."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you execute an external command from a Perl script using the Scripting driver?",
+      "input": "",
+      "output": "In the Scripting driver you create an IDMLib object and call its exec method with the command line string. Example:\n\n```perl\nmy $CommandLine = \"appadd -n $; UserName -t $PhoneNumber\";\nmy $idmlib = new IDMLib();\n$idmlib->exec($CommandLine);\n```\nThe exec function runs the external program, logs the command, and produces a status document."
+    },
+    {
+      "category": "config",
+      "instruction": "Which item names can be retrieved from event data in the Scripting driver and what do they represent?",
+      "input": "",
+      "output": "The Scripting driver defines many item names that can be obtained with `$idmlib->idmgetvar()`. Key names include:\n\n| Name | Description |\n|------|-------------|\n| COMMAND | Event type (add, modify, delete, rename, modify‑password, check‑object‑password) |\n| ASSOCIATION | Identifier that distinguishes an identity on both systems |\n| CLASS_NAME | Identity class, e.g., User or Group |\n| SRC_DN | Source distinguished name in slash format |\n| EVENT_ID | Internal event identifier |\n| SRC_ENTRY_ID | Source entry identifier |\n| DEST_DN | Destination distinguished name |\n| DEST_ENTRY_ID | Destination entry identifier |\n| ADD_{attr_name} | Value to be added to attribute `{attr_name}` |\n| REMOVE_{attr_name} | Value to be removed from attribute `{attr_name}` |\n| ADD_REF_{attr_name} | Association value to add to attribute `{attr_name}` |\n| REMOVE_REF_{attr_name} | Association value to remove from attribute `{attr_name}` |\n| OLD_PASSWORD | Previous password (modify‑password events) |\n| PASSWORD | New password (add and modify‑password events) |\n| OLD_SRC_DN | DN before a Move or Rename |\n| REMOVE_OLD_NAME | Flag to delete or retain old RDN (Rename events) |\n| STATUS_LEVEL | Status of the event (success, warning, retry, error, fatal) |\n| STATUS_MESSAGE | Message to report with a status |\n| STATUS_TYPE | Type of status, e.g., heartbeat |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can a script set an association for an identity using the Scripting driver?",
+      "input": "",
+      "output": "In the Scripting driver you use `$idmlib->idmsetvar()` to set the required name/value pairs and then return a status. Example for adding an association:\n\n```perl\nmy $idmlib = new IDMLib();\n$idmlib->idmsetvar(\"COMMAND\", \"ADD_ASSOCIATION\");\n$idmlib->idmsetvar(\"ASSOCIATION\", $MyAssociation);\n$idmlib->idmsetvar(\"EVENT_ID\", $EVENT_ID);\n$idmlib->idmsetvar(\"DEST_DN\", $SRC_DN);\n$idmlib->idmsetvar(\"DEST_ENTRY_ID\", $SRC_ENTRY_ID);\n$idmlib->status_success(\"Association added\");\n```\nSimilar commands exist for `MODIFY_ASSOCIATION` and `REMOVE_ASSOCIATION`."
+    },
+    {
+      "category": "config",
+      "instruction": "What driver parameters are available in the default Scripting driver and what do they control?",
+      "input": "",
+      "output": "The default Scripting driver defines the following parameters (see Table 5‑11):\n\n| Parameter Name | Driver/Channel | Description | Values |\n|----------------|----------------|-------------|--------|\n| INSTALL_PATH | Driver | Installation path of the driver | string |\n| auto-loopback-detection | Driver | Enables automatic loopback detection | true/false |\n| subscriber-script | Subscriber | Root script file for Subscriber events, relative to the driver installation path | string |\n| pub-polling-interval | Publisher | Interval in seconds between Publisher polls for application events | number |\n| pub-heartbeat-interval | Publisher | Idle time in seconds before a heartbeat event is issued | number |\n| pub-disabled | Publisher | Whether the Publisher Channel (e.g., polling) is disabled | true/false |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve the Publisher polling interval within a Perl script using the Scripting driver?",
+      "input": "",
+      "output": "Use the `$idmlib->idmgetpubvar()` function with the parameter name `pub-polling-interval`:\n\n```perl\nmy $PollingInterval = $idmlib->idmgetpubvar(\"pub-polling-interval\");\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can a script query the Identity Vault for a user's address and ZIP code using the Scripting driver?",
+      "input": "",
+      "output": "In the Scripting driver you call `$idmlib->idmquery()` with the class, association, and a comma‑separated list of attributes, then read the results with `$idmlib->idmgetqvar()`. Example:\n\n```perl\nmy $idmlib = new IDMLib();\n$idmlib->idmquery(\"User\", \"Bob\", \"SA,Postal Code\");\nmy $Address = $idmlib->idmgetqvar(\"SA\");\nmy $ZIPCode = $idmlib->idmgetqvar(\"Postal Code\");\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you write a poll.pl script that detects password changes and submits them using the usclh change‑log tool in the Scripting driver?",
+      "input": "",
+      "output": "A typical `poll.pl` for the Scripting driver might look like this:\n\n```perl\n#!/usr/bin/perl\n\nuse IDMLib;\nmy $idmlib = new IDMLib();\nmy $Results = `appchg --passwd-changes`;\nforeach my $Result (split(\"\\n\", $Results)) {\n    # Expected format: association:password\n    my ($Association, $Password) = split(\":\", $Result);\n    `usclh -t modify-password -a $Association <<EOF\n$Password\nEOF`;\n}\n```\nThe script uses the external tool `appchg --passwd-changes` to obtain changed passwords, then feeds each association and password to the `usclh` change‑log tool with a `modify-password` event."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you indicate a successful heartbeat from a heartbeat.pl script using the Scripting driver?",
+      "input": "",
+      "output": "In a heartbeat script for the Scripting driver you call one of the heartbeat status subroutines. Example:\n\n```perl\nmy $idmlib = new IDMLib();\nmy $rc = `apphealth`;\nif ($rc == 0) {\n    $idmlib->heartbeat_success(\"Heartbeat succeeded\");\n} else {\n    $idmlib->heartbeat_error(\"Heartbeat failed with error code $rc\");\n}\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if a script using the Scripting driver repeatedly receives a retry status and causes a backlog?",
+      "input": "",
+      "output": "The Scripting driver’s `status_retry()` subroutine should be used cautiously because it causes Identity Manager to resubmit the event. If a script returns `status_retry()` too often and creates a backlog, modify the script to return `status_error()` with a detailed message when the external application is unavailable, or implement logic to limit retries (e.g., check an offline flag and return `status_error()` after a certain number of attempts)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main steps required to develop, configure, and deploy a custom driver using the Scripting driver.",
+      "input": "",
+      "output": "To develop a custom driver with the Scripting driver, first evaluate the external application’s command‑line tools and event‑monitoring capabilities. Implement Perl scripts that (1) retrieve event data via `$idmlib->idmgetvar()`, (2) invoke external tools using `$idmlib->exec()`, (3) set return values or associations with `$idmlib->idmsetvar()`, and (4) report status using `status_success()`, `status_warning()`, `status_error()`, etc. Configure driver parameters (e.g., `pub-polling-interval`, `subscriber-script`) in `usdrv.conf` and `Scripting.xml`. Deploy the driver by installing the default Scripting driver shim, copying custom scripts and configuration files into the appropriate directories under `/opt/novell/usdrv`, and optionally running `usdrv -s` and `usdrv -sp` to set SSL certificates and passwords. Finally, start the driver shim and monitor logs, trace files, and the status log for verification."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a Perl subscriber script for the Scripting driver that handles a modify event to add a new telephone number attribute (ADD_Telephone) to a user, using the external tool `appmod` and returning a success status.",
+      "input": "",
+      "output": "```perl\n#!/usr/bin/perl\n\nuse IDMLib;\nmy $idmlib = new IDMLib();\n\n# Retrieve required event data\nmy $association = $idmlib->idmgetvar(\"ASSOCIATION\");\nmy $newPhone    = $idmlib->idmgetvar(\"ADD_Telephone\");\nmy $event_id    = $idmlib->idmgetvar(\"EVENT_ID\");\n\n# Validate that we have the needed values\nif (!$association || !$newPhone) {\n    $idmlib->status_error(\"Modify event: missing ASSOCIATION or ADD_Telephone\");\n    exit;\n}\n\n# Build and execute the external command to add the telephone number\nmy $cmd = \"appmod -a $association -add Telephone=$newPhone\";\nmy $rc  = $idmlib->exec($cmd);\n\nif ($rc == 0) {\n    # Optionally set any return variables (none needed for a simple modify)\n    $idmlib->status_success(\"Telephone number added successfully for $association\");\n} else {\n    $idmlib->status_error(\"Failed to add telephone number for $association, rc=$rc\");\n}\n```"
+    }
+  ]
+}

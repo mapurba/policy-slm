@@ -1,0 +1,65 @@
+{
+  "driver": "Blackboard driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver shim in the Blackboard driver installation?",
+      "input": "",
+      "output": "The driver shim for the Blackboard driver is a lightweight service that runs on the target Linux server and communicates securely with the NetIQ Identity Manager engine. It handles password verification, SSL certificate retrieval, and provides the interface through which the Blackboard driver exchanges data with the engine."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Blackboard driver shim on a Red Hat Linux server?",
+      "input": "",
+      "output": "1. Log in to the target Linux server as root.\n2. Ensure Perl 5 is installed by running `yum install perl`.\n3. Install the required Perl modules with yum:\n   - `yum install perl-JSON perl-JSON-XS perl-libwww-perl`\n   - For Red Hat 8.1, also run `yum install perl-LWP-Protocol-https`.\n4. If any modules are unavailable via yum, install them from CPAN using:\n   - `cpan JSON`\n   - `cpan JSON::XS`\n   - `cpan LWP::UserAgent`\n5. Copy the `linux_x86_64_bbdriver_install.bin` file from the installation media to the server and execute it.\n6. Follow the prompts to select a language, accept the license agreement, and enter the Remote Loader and Driver Object passwords.\n7. When prompted, retrieve the SSL certificate by providing the eDirectory DNS name or IP, the LDAP secure port (default 636), and accepting the certificate with \"Y\".\n8. Finish the installation and optionally start the Driver Shim Service."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the required Perl modules for the Blackboard driver on a SLES system?",
+      "input": "",
+      "output": "1. Log in as root on the SLES server.\n2. Ensure Perl 5 is installed by running `zypper install perl`.\n3. Install the required Perl modules with zypper:\n   - `zypper install perl-JSON`\n   - `zypper install perl-JSON-XS`\n   - `zypper install perl-libwww-perl`\n4. If any of these modules are not available via zypper, install them from CPAN using the commands:\n   - `cpan JSON`\n   - `cpan JSON::XS`\n   - `cpan LWP::UserAgent`."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Perl modules are required for the Blackboard driver, and how are they installed via a package manager?",
+      "input": "",
+      "output": "The Blackboard driver requires the following Perl modules:\n- `perl-JSON`\n- `perl-JSON-XS`\n- `perl-libwww-perl`\nOn Red Hat, install them with `yum install perl-JSON perl-JSON-XS perl-libwww-perl`. On SLES, use `zypper install perl-JSON perl-JSON-XS perl-libwww-perl`. For Red Hat 8.1, also install `perl-LWP-Protocol-https`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve and accept an SSL certificate during the Blackboard driver shim installation?",
+      "input": "",
+      "output": "During the Blackboard driver shim installation, after the package is installed, you will be prompted to retrieve an SSL certificate. Follow these steps:\n1. Specify the DNS name or IP address of the eDirectory server.\n2. Specify the LDAP secure port (default 636).\n3. When prompted, enter `Y` to accept the certificate.\nThis enables SSL encryption between the Identity Manager engine and the driver shim."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is extending the schema necessary when using the Identity Vault with the Blackboard driver?",
+      "input": "",
+      "output": "Extending the schema is necessary because the Blackboard driver may need to store Blackboard‑specific user and group attributes that are not represented by standard eDirectory attributes. By extending the schema, auxiliary classes are added to eDirectory User and Group objects, and a class called `DirXML-BB-Enrollment` is created to represent enrollments in Blackboard courses or organizations. Without this extension, the Identity Vault could not manage those connected‑system attributes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you extend the eDirectory schema for the Blackboard driver using iManager?",
+      "input": "",
+      "output": "1. Obtain the `blackboard.sch` file:\n   - On Linux or Solaris, copy it from `/opt/netiq/eDirectory/lib/lib/nds-schema/` on the Blackboard application server.\n   - On Windows, copy it from the `Additional_Drivers/Blackboard` directory in the ISO image.\n2. In iManager, select **Extend Schema** under **Schema**.\n3. Choose **Import data from file on disk** and click **Next**.\n4. Set **File type** to **Schema File**.\n5. Browse to the `blackboard.sch` file and click **Next**.\n6. Specify the host name or IP address and LDAP port of the Metadirectory server.\n7. Ensure the **Require TLS for Simple Binds with Password** option is disabled on the LDAP Group if you are using the non‑secure LDAP port (389). Adjust this via the **LDAP Options** task if needed.\n8. Select **Authenticated login** and log in as Admin or a user with schema‑extension rights.\n9. Click **Next** to view the summary, then **Finish** to complete the schema extension."
+    },
+    {
+      "category": "config",
+      "instruction": "What privileges must be assigned to the Blackboard System Role used by the Blackboard driver?",
+      "input": "",
+      "output": "The Blackboard System Role used by the Blackboard driver must have the following privileges:\n- Administrator Panel (Courses) > Courses > Create Course\n- Administrator Panel (Courses) > Courses > Delete Courses\n- Administrator Panel (Courses) > Courses > Edit\n- Administrator Panel (Courses) > Courses > Edit > Enrollments > Add Enrollment\n- Administrator Panel (Courses) > Courses > Edit > Enrollments > Delete Enrollment\n- Administrator Panel ( Courses) > Courses > Edit > Enrollments > Edit Enrollment\n- Administrator Panel (Organizations) > Organizations > Create Organization\n- Administrator Panel (Organizations) > Organizations > Delete Organization\n- Administrator Panel (Organizations) > Organizations > Edit > Enrollments > Add Enrollment\n- Administrator Panel (Organizations) > Organizations > Edit > Enrollments > Delete Enrollment\n- Administrator Panel (Organizations) > Organizations > Edit > Enrollments > Edit Enrollment\n- Administrator Panel (Users) > Users > Create User\n- Administrator Panel ( Users) > Users > Delete Users\n- Administrator Panel ( Users) > Users > Edit > Change Password\n- Administrator Panel ( Users) > Users > Edit > User Properties\n- Administrator Panel ( Users) > Users > Edit > View Course Enrollments\n- Administrator Panel ( Users) > Users > Edit > View Organization Enrollments\n- Course/Organization Control Panel (Users and Groups) > Users > Remove Users from Course/Organization\n- Course/Organization Control Panel (Users and Groups) > Users > Change User’s availability in Course/Organization"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a Blackboard Learn Application Key and Secret for the Blackboard driver?",
+      "input": "",
+      "output": "1. Log in to https://developer.blackboard.com (create an account if needed).\n2. Register a new application.\n3. Fill in the first three fields:\n   - **Application Name:** NetIQ Blackboard Driver\n   - **Description:** Provisions users and courses to Blackboard.\n   - **Domain(s):** your Blackboard server domain (e.g., myschool.edu).\n4. After registration, note the generated **Application Key**, **Secret**, and **Application ID**. These values are required for configuring the Blackboard driver’s REST integration."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key installation and configuration steps for the Blackboard driver.",
+      "input": "",
+      "output": "To install and configure the Blackboard driver:\n1. Install Perl 5 and required Perl modules (`perl-JSON`, `perl-JSON-XS`, `perl-libwww-perl`, and on Red Hat 8.1 `perl-LWP-Protocol-https`) via the system package manager or CPAN.\n2. Execute the `linux_x86_64_bbdriver_install.bin` shim installer, set language, accept the license, and define Remote Loader and Driver Object passwords.\n3. Optionally retrieve an SSL certificate by providing the eDirectory server name/IP and LDAP secure port (636), then accept the certificate.\n4. Extend the eDirectory schema by importing `blackboard.sch` through iManager’s Extend Schema task.\n5. In Blackboard Learn, create an Application Key and Secret, register a System Role with the extensive list of administrator privileges, and create a Learn user assigned to that role.\n6. Configure the REST integration in Blackboard, specifying the Learn user and ensuring End User Access is set to No, then enter the Application ID from step 5.\nFollowing these steps completes the driver shim installation, schema extension, and REST API configuration needed for the Blackboard driver to provision users and courses."
+    }
+  ]
+}

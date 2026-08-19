@@ -1,0 +1,53 @@
+{
+  "driver": "BI Implementation Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the built‑in functions provided by idmLib.py for the BI Implementation Scripting driver?",
+      "input": "",
+      "output": "The BI Implementation Scripting driver supplies a set of built‑in functions in idmLib.py, grouped by purpose:\n\n**General Functions**: idmgetvar, idmtrace, exec, status, status_success, status_warning, status_retry, status_error, status_fatal.\n**Subscriber Functions**: idmgetsubvar, idmgetvar (for subscriber items), idmsetvar.\n**Publisher Functions**: idmgetpubvar.\n**Query Functions**: idmquery, idmgetqva.\n**Heartbeat Functions**: heartbeat_success, heartbeat_error, heartbeat_warning.\nEach function returns values or sends status documents to the Identity Manager engine as described in the documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you modify the script that handles add subscriber events in the BI Implementation Scripting driver?",
+      "input": "",
+      "output": "To change the behavior for add subscriber events in the BI Implementation Scripting driver, follow these steps:\n1. Navigate to the driver installation folder (default /opt/novell/usdrv/).\n2. Open the **scripts** subfolder.\n3. Locate the file named **add.py** – this script is invoked by subscriber.py for add events.\n4. Edit **add.py** with your desired logic, using the built‑in functions from idmLib.py as needed.\n5. Save the file and ensure it has executable permissions (e.g., `chmod +x add.py`).\n6. Test the change by triggering an add event and reviewing the driver logs or trace file."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you change the polling interval for the poll.py script in the BI Implementation Scripting driver?",
+      "input": "",
+      "output": "To adjust the polling interval used by poll.py in the BI Implementation Scripting driver:\n1. Open the Identity Manager console and locate the driver configuration for the BI Implementation Scripting driver.\n2. Find the driver parameter named **Polling Interval**.\n3. Set the desired number of seconds (the default is 60 seconds).\n4. Save the configuration.\n5. The next time poll.py runs, it will use the new interval value retrieved via the idmgetvar('Polling Interval') function."
+    },
+    {
+      "category": "config",
+      "instruction": "Which built‑in function returns the value of a driver parameter in the BI Implementation Scripting driver, and what is its syntax?",
+      "input": "",
+      "output": "The function **idmgetvar(VariableName)** returns the string value of a driver parameter. Its syntax is `idmgetvar('ParameterName')`, where *VariableName* is the exact name of the driver parameter you wish to retrieve."
+    },
+    {
+      "category": "config",
+      "instruction": "What function should be used in heartbeat.py to indicate a warning status for the BI Implementation Scripting driver, and what XML format does it produce?",
+      "input": "",
+      "output": "Use the function **heartbeat_warning(Message)** in heartbeat.py to send a warning status. The function generates a heartbeat document in the following XML format:\n\n<status level=\"warning\" type=\"heartbeat\">Your warning message</status>"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the Identity Manager engine receives no heartbeat from the BI Implementation Scripting driver, what function can you add to heartbeat.py to report an error status?",
+      "input": "",
+      "output": "Add a call to **heartbeat_error(Message)** inside heartbeat.py when the external system cannot be reached or returns an unexpected result. This will send a heartbeat document with `<status level=\"error\" type=\"heartbeat\">Your error message</status>` to the engine, allowing you to diagnose the missing heartbeat issue."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the Python scripting reference for the BI Implementation Scripting driver.",
+      "input": "",
+      "output": "The BI Implementation Scripting driver uses Python scripts located in /opt/novell/usdrv/scripts to handle subscriber events (add, modify, delete, etc.) and publisher actions (polling, heartbeat). Functions defined in idmLib.py provide utilities for retrieving driver, subscriber, and publisher variables, executing external commands, sending status documents, performing queries, and reporting heartbeat statuses. Each script can be edited to customize behavior, and the polling interval is configurable via a driver parameter."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a short Python snippet for poll.py in the BI Implementation Scripting driver that retrieves the Polling Interval driver parameter and logs it using idmtrace.",
+      "input": "",
+      "output": "```python\n# poll.py snippet for the BI Implementation Scripting driver\nfrom idmLib import idmgetvar, idmtrace\n\n# Retrieve the configured polling interval\npoll_interval = idmgetvar('Polling Interval')\n\n# Log the interval to the driver’s trace file\nidmtrace('Current polling interval is {} seconds'.format(poll_interval))\n```"
+    }
+  ]
+}

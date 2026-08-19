@@ -1,0 +1,65 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Subscriber channel in the ACF2 driver?",
+      "input": "",
+      "output": "In the ACF2 driver, the Subscriber channel carries data flowing from Identity Manager to the connected z/OS system and ultimately to ACF2. It receives XDS command documents from the Metadirectory engine, translates them into REXX variables, and invokes customizable REXX execs that apply the requested adds, modifies, deletes, renames, and password synchronizations to ACF2 objects."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the roles of the exit routines LDXPOST, LDXNPXIT, and LDXNPHXT in the ACF2 driver?",
+      "input": "",
+      "output": "In the ACF2 driver, the exit routines LDXPOST, LDXNPXIT, and LDXNPHXT are security‑system exits that detect changes in the ACF2 Logonid database. Each routine writes a record of the detected change (such as a logon‑id update, a password change, or a password‑phrase change) to an encrypted cross‑memory queue and notifies the change‑log started task (LDXLOGR) that a new event is available."
+    },
+    {
+      "category": "config",
+      "instruction": "Which components are associated with each data channel in the ACF2 driver as listed in Table 1‑1?",
+      "input": "",
+      "output": "Table 1‑1 of the ACF2 driver documentation maps components to data channels:\n\n- **Subscriber channel:**\n  - Schema Map – reference to ACF2 hierarchy; read at startup and used by the Policy Editor.\n  - Include/Exclude File – optional file that lists local ACF2 identities to include or exclude from provisioning.\n  - REXX Execs – mainframe scripts that execute standard TSO commands to add, modify, delete, rename User objects and synchronize passwords.\n\n- **Publisher channel:**\n  - LDXPOST – exit that detects changes to the ACF2 Logonid database.\n  - LDXNPXIT – exit that detects password changes to ACF2.\n  - LDXNPHXT – exit that detects password‑phrase changes to ACF2.\n  - LDXLOGR – z/OS started task that moves events from the cross‑memory queue to the change‑log data set.\n  - Change Log – z/OS data set where events are stored before the Publisher component submits them to Identity Manager.\n\n- **Both channels:**\n  - ACF2DRV (Driver Shim) – z/OS started task that encapsulates the Remote Loader and maintains network connectivity.\n  - Remote Loader – enables communication between Identity Manager and ACF2 as if they share a common environment.\n  - Subscriber Component – translates XDS events to REXX variables and replies with status documents.\n  - Publisher Component – polls the change log, sends events to the Metadirectory engine, and clears processed entries.\n  - LDXSERV – APF‑authorized TSO command providing NOLOG and STATUS services for loopback detection and manual status display.\n  - ACFQUERY – tool used by both channels to query the ACF2 Logonid database.\n  - Token Address Space – memory space used to flag updates initiated by the Subscriber channel.\n  - Cross Memory Queue – encrypted buffer (Subpool 231) that holds events before they are moved to the change log."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you start the driver shim started task for the ACF2 driver during normal z/OS system initialization?",
+      "input": "",
+      "output": "To start the driver shim started task for the ACF2 driver, add a step that launches the ACF2DRV task to the system’s normal z/OS initialization procedure (e.g., the startup JCL). Ensure the step is executed during the standard system boot and that the corresponding stop step is included in the normal shutdown procedure so the shim is stopped cleanly."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the ACF2 driver prevent loopback events when updates are sent through the Subscriber channel?",
+      "input": "",
+      "output": "The ACF2 driver prevents loopback by invoking the LDXSERV command with the **NOLOG** parameter when the Subscriber shim starts. LDXSERV places a token in the Publisher event address space for each update that originates from the Subscriber channel. The presence of this token causes the security‑system exit routines (LDXPOST, LDXNPXIT, LDXNPHXT) to ignore those updates, thereby avoiding redundant events being sent back to Identity Manager."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the Include/Exclude file in the ACF2 driver and how is it used?",
+      "input": "",
+      "output": "In the ACF2 driver, the Include/Exclude file is an optional configuration file that lists local ACF2 identities to be explicitly included in or excluded from provisioning via the Subscriber channel. By editing this file, administrators can enforce local system policies that dictate which objects are allowed to receive provisioning updates from Identity Manager, rather than relying on global Metadirectory policies."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What function does the Remote Loader provide in the ACF2 driver?",
+      "input": "",
+      "output": "The Remote Loader in the ACF2 driver enables communication between Identity Manager and ACF2 as if both systems were running in a common environment. The ACF2 driver contains an embedded Remote Loader that replaces the standard version bundled with Identity Manager, improving efficiency by handling the network connectivity and data exchange required for provisioning and event publishing."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the overall architecture and data flow of the ACF2 driver.",
+      "input": "",
+      "output": "The ACF2 driver is a bidirectional connector that synchronizes identity data between the Identity Vault and an ACF2 security system on z/OS. Changes in the Identity Vault are sent over the Subscriber channel; the driver’s Subscriber component receives XDS events, translates them to REXX variables, and runs customizable REXX execs to update ACF2. Conversely, ACF2 exit routines (LDXPOST, LDXNPXIT, LDXNPHXT) capture password and logon‑id changes, place them in an encrypted cross‑memory queue, and a change‑log started task writes them to a change‑log data set. The Publisher component polls this change log, decrypts events, and forwards them via SSL to the Metadirectory engine, which posts them to the Identity Vault. The driver shim (ACF2DRV) encapsulates the Remote Loader and maintains network connectivity, while LDXSERV provides loopback prevention and manual status reporting."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If events are not being sent from the ACF2 driver to Identity Manager, which component should be verified as running and correctly configured?",
+      "input": "",
+      "output": "If events are not reaching Identity Manager, verify that the **change log started task (LDXLOGR)** is running. This task is responsible for moving events from the encrypted cross‑memory queue to the change‑log data set. Ensure it is started as part of the normal z/OS initialization and that the change‑log data set (a DSORG=DA data set on a shared device) is accessible. Also confirm that the Publisher component is scheduled to poll the change log at the configured intervals."
+    },
+    {
+      "category": "config",
+      "instruction": "What parameters can be passed to the LDXSERV command in the ACF2 driver and what does each parameter do?",
+      "input": "",
+      "output": "The LDXSERV command in the ACF2 driver accepts two parameters:\n\n- **NOLOG** – Used by the Subscriber shim when updates are passed to ACF2; it flags the updated items with a token in the Publisher event address space so that the exit routines ignore those changes, preventing loopback to Identity Manager.\n- **STATUS** – Allows an administrator to execute LDXSERV manually to display information contained in the change‑log data set, providing visibility into queued events."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What mappings does the JDBC driver perform in a direct synchronization model?",
+      "input": "",
+      "output": "In a direct synchronization model, the JDBC driver maps Identity Vault objects to database objects as shown in Table 9‑4: Identity Vault Classes map to database Views; Identity Vault Attributes map to View Columns; a single Identity Vault Class maps to a View; a single‑value attribute maps to a View Column; and a multivalue attribute also maps to a View Column. This mapping enables the JDBC driver to treat database views as logical representations of IDM objects."
+    },
+    {
+      "category": "config",
+      "instruction": "Which constraint prefixes can be embedded in view column names for the JDBC driver and what do they represent?",
+      "input": "",
+      "output": "The JDBC driver recognizes four case‑insensitive constraint prefixes that can be embedded in view column names (Table 9‑5):\n\n- **pk_** – primary key\n- **fk_** – foreign key\n- **sv_** – single‑value\n- **mv_** – multivalue\n\nThese prefixes are used to simulate database constraints at the application level."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you define a primary‑key column in a view for the JDBC driver using meta‑identifiers?",
+      "input": "",
+      "output": "To define a primary‑key column in a view for the JDBC driver, prefix the column name with **pk_** (case‑insensitive). For example, in the view definition you can write:\n\n```sql\nCREATE VIEW direct.view_usr (\n    pk_idu,            -- primary key column; implicitly single‑valued\n    ...\n) AS\n-- ...\n```\nThe **pk_** prefix tells the JDBC driver that the column is the primary key for that view."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a view be unusable for subscription in the JDBC driver and how can this be resolved?",
+      "input": "",
+      "output": "If a view is read‑only, the JDBC driver cannot use it for subscription because it cannot write back changes. To resolve this, either use a database that supports updateable views (typically views based on a single base table) or enable update logic via **instead‑of‑triggers**. If the database does not support instead‑of‑triggers, the JDBC driver can simulate the logic with **embedded SQL virtual triggers** as described in the Virtual Triggers documentation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the difference between the database native form and the schema mapping form of view meta‑identifiers in the JDBC driver?",
+      "input": "",
+      "output": "The JDBC driver provides two normalized forms for view meta‑identifiers:\n\n- **Database native form** – the full column name as declared in the database, containing all meta information (e.g., `fk_mv__idg__mbr_of`).\n- **Schema mapping form** – a concise version returned when the driver returns the application schema; only the referential prefixes (`pk_` and `fk_`) are preserved (e.g., `fk_mbr_of`).\nThe schema mapping form is shorter because other meta information (single‑value or multivalue) is represented in XDS XML rather than in the identifier."
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the BNF notation for view column meta‑identifiers used by the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver defines view column meta‑identifiers using the following BNF (Backus‑Naur Form):\n\n```\n<view-column-name> ::= [<meta-info>] <column-name>\n\n<column-name> ::= <legal-unquoted-database-identifier>\n<meta-info> ::= <referential> | <non-referential>\n\n<non-referential> ::= [<single-value> | <multiple-value>]\n<single-value> ::= \"sv_\"\n<multiple-value> ::= \"mv_\"\n\n<referential> ::= <primary-key> | <foreign-key>\n<primary-key> ::= \"pk_\" [<single-value>] [<column-group-id>]\n                  [<referenced-column-name>]\n\n<column-group-id> ::= <non-negative-integer> \"_\"\n<referenced-column-name> ::= \"_\" <column-name> \"__\"\n\n<foreign-key> ::= \"fk_\" [<non-referential>] [<column-group-id>]\n                  <referenced-column-name>\n```\nThese rules describe how prefixes and optional group identifiers compose a view column name for the JDBC driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable meta‑identifier support for the JDBC driver if you need meta‑information to be treated as part of the effective column name?",
+      "input": "",
+      "output": "To make the JDBC driver treat meta‑information as part of the effective view column name, set the **Enable Meta‑Identifier Support?** parameter in the driver configuration. This parameter is documented under *Configure JDBC driver‑specific parameters* and toggles the backward‑compatibility mode that includes prefixes such as `pk_`, `fk_`, `sv_`, and `mv_` in the effective name comparison."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why are explicit `sv_` prefixes considered redundant in view column names for the JDBC driver?",
+      "input": "",
+      "output": "By default, all view column names are interpreted as single‑valued by the JDBC driver. Therefore, adding the `sv_` prefix does not add any new information; `sv_fname` and `fname` are equivalent. The driver normalizes both to the same effective name, making the explicit `sv_` prefix redundant."
+    },
+    {
+      "category": "config",
+      "instruction": "What uniqueness requirement does the JDBC driver enforce for primary‑key column names across views?",
+      "input": "",
+      "output": "The JDBC driver requires that primary‑key column names be **unique among all views** in the synchronization schema. This ensures that each primary‑key column can be unambiguously identified across the entire set of views used for direct synchronization."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about view column meta‑identifiers and schema mapping in the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver uses view column meta‑identifiers prefixed with `pk_`, `fk_`, `sv_`, and `mv_` to simulate database constraints on logical views. Primary‑key column names must be unique across all views. View column names can be expressed in a verbose database native form or a concise schema mapping form that retains only referential prefixes. Redundant prefixes (e.g., `sv_`) are optional, and meta‑information can be included in effective name matching via the *Enable Meta‑Identifier Support?* driver parameter. If views are read‑only, they cannot be used for subscription unless update logic is provided via instead‑of‑triggers or virtual triggers."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an example CREATE VIEW statement that includes all four constraint prefixes for the JDBC driver.",
+      "input": "",
+      "output": "```sql\nCREATE VIEW direct.example_view (\n    pk_id,                -- primary key column (implicitly single‑valued)\n    sv_firstname,         -- single‑valued column\n    mv_email,             -- multivalue column\n    fk_department,        -- foreign key column (implicitly single‑valued)\n    fk_mv__proj__member   -- foreign key with multivalue group, referencing proj view\n) AS\n-- view definition goes here\n```\nThis view illustrates the use of `pk_`, `sv_`, `mv_`, and `fk_` prefixes that the JDBC driver recognizes for meta‑identifiers."
+    }
+  ]
+}

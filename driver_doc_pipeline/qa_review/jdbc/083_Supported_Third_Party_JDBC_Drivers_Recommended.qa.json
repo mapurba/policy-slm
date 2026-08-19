@@ -1,0 +1,77 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What features does the JDBC driver provide regarding encrypted transport and retrieval of auto‑generated keys for supported third‑party databases?",
+      "input": "",
+      "output": "In the JDBC driver, the supported third‑party drivers have the following capabilities:\n\n| Driver | Supports Encrypted Transport? | Supports Retrieval of Auto‑Generated Keys? |\n|--------|------------------------------|--------------------------------------------|\n| IBM DB2 UDB Type 4 | No | No |\n| Informix | No | No |\n| MySQL Connector/J | Yes | Yes |\n| jTDS | Yes | Yes |\n| Oracle Thin Client | Yes | No |\n| Oracle OCI | Yes | No |\n| PostgreSQL | Yes (for JDBC 3/Java 1.4 and later) | No |\n| Sybase jConnect | Yes | No |\n\nThis table shows which drivers can use SSL (encrypted transport) and which can retrieve auto‑generated keys when used with the JDBC driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the JDBC URL syntax for the Oracle Thin Client driver in the JDBC driver?",
+      "input": "",
+      "output": "For the Oracle Thin Client driver, the JDBC driver uses the following URL syntaxes:\n\n- SID format: `jdbc:oracle:thin:@ip-address:1521:<sid>`\n- CDB (service) format: `jdbc:oracle:thin:@ip-address:1521/<service>`\n\nThese syntaxes are specified in the JDBC driver documentation under the Oracle Thin Client driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What fully qualified Java class name should be configured for the MySQL Connector/J driver in the JDBC driver?",
+      "input": "",
+      "output": "The JDBC driver expects the class name `com.mysql.cj.jdbc.Driver` for the MySQL Connector/J driver."
+    },
+    {
+      "category": "config",
+      "instruction": "Where must third‑party JDBC driver JAR files be placed on an Identity Manager server for the JDBC driver?",
+      "input": "",
+      "output": "For the JDBC driver, third‑party JDBC driver JAR files should be placed in the following directories on an Identity Manager server (default installation paths):\n\n- **Solaris, Linux, or AIX**: `/opt/novell/eDirectory/lib/dirxml/classes`\n- **Windows**: `novell\\NDS\\lib`\n\nAfter copying the JAR files, restart eDirectory for the changes to take effect."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install a third‑party JDBC driver JAR file on a Remote Loader server for the JDBC driver?",
+      "input": "",
+      "output": "To install a third‑party JDBC driver JAR on a Remote Loader server for the JDBC driver, follow these steps:\n1. Locate the appropriate JAR file for the desired driver (e.g., `db2jcc.jar` for IBM DB2, `mysql-connector-java‑8.0.xx.jar` for MySQL, etc.).\n2. Copy the JAR file to the platform‑specific directory:\n   - **Solaris, Linux, or AIX**: `/opt/novell/eDirectory/lib/dirxml/classes`\n   - **Windows**: `novell\\RemoteLoader\\lib`\n3. Verify that the file permissions allow the eDirectory process to read the JAR.\n4. Restart the eDirectory service on the Remote Loader server so the JDBC driver is loaded.\n5. Confirm the driver is available by checking the driver class name in the JDBC driver configuration."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is it recommended to use a supported third‑party JDBC driver with the JDBC driver?",
+      "input": "",
+      "output": "Using a supported third‑party JDBC driver with the JDBC driver is recommended because supported drivers have been tested and validated by NetIQ. They provide known compatibility, documented security features (such as encrypted transport), and reliable error handling. Unsupported drivers may lack these assurances, leading to unpredictable behavior, limited support, and additional troubleshooting effort."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps can you take to resolve high CPU utilization caused by the Oracle Thin Client driver in the JDBC driver?",
+      "input": "",
+      "output": "To mitigate high CPU utilization when using the Oracle Thin Client driver with the JDBC driver:\n1. **Do not override the `Number of Returned Result Sets` compatibility parameter.** Ensure the parameter `handle‑stmt‑results` remains at its dynamic default value of `single`.\n2. **Add a `jdbc:type` attribute** to every embedded `<jdbc:statement>` element in your configuration (e.g., `<jdbc:statement jdbc:type=\"select\">`).\n3. **Verify the JDBC namespace** is correctly mapped to `urn:dirxml:jdbc` in the XML configuration.\n4. **Avoid setting any custom value** for the result‑set handling parameter; let the driver use its default.\nFollowing these actions prevents the driver from repeatedly indicating more results are available, which eliminates the infinite loop that leads to high CPU usage."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameters must be set for the Informix JDBC driver to interoperate with ANSI‑compliant databases in the JDBC driver?",
+      "input": "",
+      "output": "For the Informix JDBC driver, the JDBC driver requires the following compatibility parameters when connecting to ANSI‑compliant databases:\n\n| Display Name | Tag Name | Value |\n|--------------|----------|-------|\n| Supports schemas in metadata retrieval? | `supports-schemas-in-metadata-retrieval` | `false` |\n| Force username case: | `force-username-case` | `upper` |\n\nThese settings ensure correct metadata handling and username casing for ANSI‑compliant Informix databases."
+    },
+    {
+      "category": "config",
+      "instruction": "What parameter must be set for MySQL Connector/J when using MyISAM tables in the JDBC driver?",
+      "input": "",
+      "output": "When using MySQL Connector/J with MyISAM tables, the JDBC driver requires the following parameter:\n\n| Display Name | Tag Name | Value |\n|--------------|----------|-------|\n| Use manual transactions? | `use-manual-transactions` | `false` |\n\nSetting `use-manual-transactions` to `false` allows the driver to work correctly with MyISAM tables."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the legal values for the `integratedSecurity` URL property of the Microsoft JDBC Driver for SQL Server in the JDBC driver?",
+      "input": "",
+      "output": "The `integratedSecurity` property for the Microsoft JDBC Driver for SQL Server accepts the following values:\n\n- `false` – Default; uses JDBC authentication.\n- `true` – Uses Windows process‑level authentication.\n\nThese values are specified in the JDBC driver URL as part of the connection string."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the legal values for the SSL URL property of the jTDS driver in the JDBC driver?",
+      "input": "",
+      "output": "The jTDS driver supports the following values for its SSL URL property:\n\n| Legal Value | Description |\n|-------------|-------------|\n| `off` | SSL is not used (default). |\n| `request` | SSL is used if the server supports it. |\n| `require` | SSL is required; an exception is thrown if the server does not support SSL. |\n| `authenticate` | SSL is required and the server’s certificate must be signed by a trusted authority; otherwise an exception is thrown. |\n\nThese values are added to the jTDS connection URL, separated by semicolons."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the key points covered for the JDBC driver in this documentation page.",
+      "input": "",
+      "output": "The JDBC driver documentation outlines supported third‑party drivers, their features (encrypted transport and auto‑generated key support), URL syntaxes, class names, and required JAR file locations for Identity Manager and Remote Loader servers. It details driver‑specific information—including compatibility, security, known issues, and required configuration parameters—for IBM DB2, Informix, Microsoft SQL Server, jTDS, MySQL, Oracle Thin and OCI, PostgreSQL, Sybase, and MariaDB drivers. It also provides guidance on installing JAR files, setting compatibility parameters (e.g., for Informix and MyISAM tables), and troubleshooting issues such as high CPU usage with the Oracle Thin Client driver."
+    }
+  ]
+}

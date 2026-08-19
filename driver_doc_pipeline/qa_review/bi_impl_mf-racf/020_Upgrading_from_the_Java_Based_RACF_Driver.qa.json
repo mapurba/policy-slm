@@ -1,0 +1,95 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What architectural change was introduced in Identity Manager 4.8 for the RACF driver?",
+      "input": "",
+      "output": "In Identity Manager 4.8 the RACF driver moved from a Java‑based architecture that used the TELNET/TSO interface to a new native design that runs as a started task (RACFDRV) on z/OS. This new design is more efficient, easier to configure, and eliminates the need for a Java remote loader."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the RACF Event Subsystem for the RACF driver?",
+      "input": "",
+      "output": "To upgrade the RACF Event Subsystem for the RACF driver:\n1. Copy the new archives **idmload.xmt**, **samplib.xmt**, and **racfexec.xmt** to your RACF system.\n2. Unpack the archives following the instructions in \"Setting Up the Libraries on Your z/OS System\".\n3. NetIQ recommends unpacking them to new physical data set locations to avoid name and version confusion.\n4. After the new driver is verified as running, delete the older LOAD and SAMPLIB data sets.\n5. Ensure the new LOAD and SAMPLIB libraries are referenced in any JCL that uses them."
+    },
+    {
+      "category": "config",
+      "instruction": "Which archive files must be copied and unpacked when upgrading the RACF driver?",
+      "input": "",
+      "output": "The required archive files for the upgrade are:\n- **idmload.xmt**\n- **samplib.xmt**\n- **racfexec.xmt**\nThese files must be copied to the RACF system and unpacked, preferably into new data set locations."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create the default HFS path for the RACF driver?",
+      "input": "",
+      "output": "To create the default HFS path for the RACF driver:\n1. Locate the Job Card named **HFSINST** in the SAMPLIB data set.\n2. Edit the path definitions in HFSINST to match your environment (the default path is **/opt/novell/racfdrv**).\n3. Submit the edited Job Card as a JCL job.\n4. If you change the path, also update the **DRVCONF** member to reflect the new install path."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps are required to install the new password exit LDXRIX02 for the RACF driver?",
+      "input": "",
+      "output": "To install the new password exit LDXRIX02 for the RACF driver:\n1. Decide whether you want to synchronize RACF password phrases. If you do not, you can skip this step.\n2. Follow step 2 in the \"Installing the Driver Security System Exits\" documentation (section referenced as b3xehpq.html#cegbjdbc) to install the ICHRIX02 exit, which supports LDXRIX02."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you replace the old Java Remote Loader with the new Driver Shim for the RACF driver?",
+      "input": "",
+      "output": "To replace the old Java Remote Loader with the new Driver Shim for the RACF driver:\n1. Stop the old job **LDXDRVRP** and remove it from the system’s startup routines.\n2. Install the new Driver Shim **RACFDRV** by following the \"Setting Up the Started Tasks\" guide (b3xehpq.html#b6gwofm).\n3. Customize the RACFDRV JCL to include:\n   - **RACFDSN** – data set name for LOAD, SAMPLIB, and EXEC.\n   - **LOGFILE** – location of the existing change‑log data set.\n   - The appropriate code page if needed (see International Considerations).\n4. Configure the started task with an SSL certificate for secure communication (see Securing the Driver Shim with SSL).\n5. Migrate or set passwords for the Remote Loader and the RACF driver (copy **lpwd1f40** and **dpwd1f40** to **/opt/novell/racfdrv/keys** or run the **SETPWDS** script)."
+    },
+    {
+      "category": "config",
+      "instruction": "What SSL configuration must be performed for the RACF driver Shim started task?",
+      "input": "",
+      "output": "For the RACF driver Shim started task you must:\n- Obtain an SSL certificate suitable for communication between the Identity Vault and the RACF system.\n- Install the certificate on the started task as described in the \"Securing the Driver Shim with SSL\" documentation.\n- Note that even if a certificate was installed for a previous driver version, you must repeat the installation because the new driver uses a different certificate format."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you migrate the Remote Loader and RACF driver passwords to the new location for the RACF driver?",
+      "input": "",
+      "output": "To migrate passwords for the RACF driver:\n1. Copy the files **lpwd1f40** and **dpwd1f40** from the previous driver location to **/opt/novell/racfdrv/keys**.\n2. Ensure the file permissions are owner‑only read/write (mode **600**) – owner ID 0 by default.\n3. If you have not previously set passwords, run the **SETPWDS** script found in the SAMPLIB data set to create and protect the new password files.\n4. Assign a user ID to the RACFDRV started task that has these UNIX permissions (see step 5 in \"Setting Up the Started Tasks\")."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the TSO Administrative RACF ID no longer required in the new RACF driver release?",
+      "input": "",
+      "output": "The TSO Administrative RACF ID was previously used to log on to the RACF system and issue commands via TSO. In the new RACF driver release the Remote Loader executes commands directly through the **IKJEFTSR** service routine interface, eliminating the need for a separate RACF ID. Therefore the ID can be removed from the RACF system."
+    },
+    {
+      "category": "config",
+      "instruction": "What APF authorization steps are required for the new LOAD library of the RACF driver?",
+      "input": "",
+      "output": "To authorize the new LOAD library for the RACF driver:\n1. Identify the member that contains the new LOAD library (includes **LDXSERV** and **SAFQUERY**).\n2. Add this member to the APF list using either the **PARMLIB IEAAPFxx** or **PROGxx** member, depending on your configuration.\n3. If you use the dynamic APF facility, run the **SET PROG** command to activate the change immediately.\n4. If you rely on static APF, you must IPL (restart) the system for the change to take effect."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you replace RACF.jar with zOS.jar on a Linux Identity Vault for the RACF driver?",
+      "input": "",
+      "output": "To replace RACF.jar with zOS.jar on Linux for the RACF driver:\n1. Remove the old RACF driver Java archive:\n   ```\n   rpm -e novell-DXMLracf\n   ```\n2. Install the updated Java archive:\n   ```\n   rpm -ivh novell-DXMLracf-4.8-3.rpm\n   ```\n3. Verify that **RACF.jar** is no longer present in **/novell/nds/lib** and that the newer **zOS.jar** is installed in the same directory.\n4. Restart eDirectory to refresh the Metadirectory engine’s Java classes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you replace RACF.jar with zOS.jar on a Windows Identity Vault for the RACF driver?",
+      "input": "",
+      "output": "To replace RACF.jar with zOS.jar on Windows for the RACF driver:\n1. Locate and delete **RACF.jar** from the directory **\\novell\\nds\\lib**.\n2. Copy the new **zOS.jar** file into **\\novell\\nds\\lib**.\n3. Verify that **RACF.jar** is no longer present and that **zOS.jar** exists in the directory.\n4. Restart eDirectory to load the new Java classes."
+    },
+    {
+      "category": "config",
+      "instruction": "Which new policies must be selected when importing the updated XML configuration for the RACF driver?",
+      "input": "",
+      "output": "When importing the updated XML configuration for the RACF driver you must select at least the following new policies:\n- **TSO (RACF) Input Transform**\n- **RACF Back Patch Transform**\n- **Final TSO Input Transform**\n- **Subscriber Append RACFCMD**\nThese policies are required for proper conversion of change‑log events and XDS documents."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if you receive a -613 error after selecting required policies during the RACF driver import?",
+      "input": "",
+      "output": "If a -613 error appears after selecting the required policies during the RACF driver import, you can ignore the message and continue, or you can manually link the required policies:\n1. Go to the Driver Overview page.\n2. Open the Input Transform policies list.\n3. Insert the new policies (**Final TSO Input Transform**, **RACF Back Patch Transform**, **TSO (RACF) Input Transform**) using the \"Insert > Use an existing policy\" option.\n4. Remove the placeholder policies **Input Transformation** and **Input Transformation Script**.\n5. Repeat the insertion process for the Subscriber Output Transformation policies, inserting **Subscriber Append RACFCMD** as the first policy.\nThis manual linking resolves the -613 error."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to upgrade from the Java‑based RACF driver to the new RACF driver version.",
+      "input": "",
+      "output": "To upgrade from the Java‑based RACF driver to the new RACF driver you must:\n1. Replace the RACF Event Subsystem archives (**idmload.xmt**, **samplib.xmt**, **racfexec.xmt**) and unpack them to new data set locations.\n2. Create or adjust the HFS path (default **/opt/novell/racfdrv**) using the **HFSINST** job card and update **DRVCONF** if needed.\n3. Install the new password exit **LDXRIX02** (step 2 of the security exits guide) if you wish to sync password phrases.\n4. Remove the old Java Remote Loader (**LDXDRVRP**) and install the native Driver Shim (**RACFDRV**) as a started task, customizing JCL with **RACFDSN**, **LOGFILE**, and code‑page settings, and configure SSL.\n5. Migrate or set Remote Loader and driver passwords (copy **lpwd1f40/dpwd1f40** or run **SETPWDS**).\n6. Remove the obsolete TSO Administrative RACF ID.\n7. Update APF authorization for the new LOAD library using **IEAAPFxx/PROGxx** or **SET PROG**.\n8. Remove the old **RACF.jar** from the Identity Vault and install **zOS.jar** (Linux via RPM, Windows via file copy), then restart eDirectory.\n9. Import the new driver XML configuration, selecting the four required policies (**TSO (RACF) Input Transform**, **RACF Back Patch Transform**, **Final TSO Input Transform**, **Subscriber Append RACFCMD**). If a -613 error occurs, manually insert the policies as described.\n10. Restore any custom policies after the import completes.\nFollowing these steps ensures a complete migration to the new, native RACF driver."
+    }
+  ]
+}

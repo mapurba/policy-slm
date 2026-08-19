@@ -1,0 +1,101 @@
+{
+  "driver": "IBM i driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Data Flow property in the IBM i driver and what are its possible options?",
+      "input": "",
+      "output": "In the IBM i driver, the Data Flow property determines the direction of identity synchronization between the Identity Vault and the connected IBM i system. The possible options are:\n* **Bidirectional** – Identities are synchronized both ways; after processing pending events the Vault and the IBM i system mirror each other.\n* **Application to Identity Vault** – Identities flow only from the IBM i system to the Identity Vault. Identities created in the Vault are not automatically created on the IBM i system.\n* **Identity Vault to Application** – Identities flow only from the Identity Vault to the IBM i system. Changes made on the IBM i system are not synchronized back to the Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Enable Entitlements property control in the IBM i driver?",
+      "input": "",
+      "output": "The Enable Entitlements property in the IBM i driver specifies whether the driver uses either Approval Flow or Roles‑Based Entitlements with the Entitlements Service driver. Set it to **Yes** only if you plan to use the User Application or Roles‑Based Entitlements with the IBM i driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Use SSL property in the IBM i driver?",
+      "input": "",
+      "output": "The Use SSL property in the IBM i driver determines whether the driver encrypts the connection between the Identity Vault and the IBM i system using Secure Sockets Layer (SSL). The recommended setting is **Yes**; when set to **No**, identity data, including passwords, is transmitted in clear text."
+    },
+    {
+      "category": "config",
+      "instruction": "List the import‑only parameters for the IBM i driver and the values or formats they accept.",
+      "input": "",
+      "output": "The IBM i driver import‑only parameters are:\n\n| Property Name | Values or Format |\n|---|---|\n| Data Flow | *Bidirectional* • *Application to Identity Vault* • *Identity Vault to Application* |\n| Enable Entitlements | *Yes* • *No* |\n| Use SSL | *Yes* • *No* |\n\nThese properties can be set only during driver import and require re‑import of the i5os.xml file to change."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you edit driver configuration properties for the IBM i driver using iManager?",
+      "input": "",
+      "output": "To edit the IBM i driver configuration properties in iManager:\n1. In iManager, select **Identity Manager Overview** from the task list on the left.\n2. Locate your Driver Set by searching the tree or entering its name.\n3. Click the driver to open its overview.\n4. Click the driver icon.\n5. Choose **Driver Configuration** (or **Global Config Values** as needed).\n6. Modify the desired property values and click **OK**.\nRemember that changing these values requires a driver restart."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the configurable properties on the Driver Configuration page of the IBM i driver and what formats or default values do they use?",
+      "input": "",
+      "output": "The IBM i driver Configuration page includes the following properties:\n\n| Property Name | Values or Format |\n|---|---|\n| Driver Module | **Connect to Remote Loader** must be selected. |\n| Driver Object Password | Text value |\n| Authentication ID | Not used by the IBM i driver |\n| Authentication Context | Not used by the IBM i driver |\n| Remote Loader Connection Parameters | Host name or IP address, port number, and RDN of the server‑certificate object |\n| Driver Cache Limit | Recommended value: **0** |\n| Application Password | Not used by the IBM i driver |\n| Remote Loader Password | Text value |\n| Startup Option | *Auto start* • *Manual* |\n| Automatic Loopback Detection | *Yes* • *No* |\n| Polling Interval | Number of seconds (default **60**) |\n| Heartbeat Interval | Number of seconds (set **0** to disable) |\n| Publisher Disabled | *Yes* • *No* |"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the required format for Remote Loader Connection Parameters in the IBM i driver and provide an example string.",
+      "input": "",
+      "output": "The Remote Loader Connection Parameters for the IBM i driver must be supplied as a space‑separated list of key=value pairs:\n* **host=hostName** – the connected system host name or IP address.\n* **port=portNumber** – the TCP port number (default **8090**).\n* **kmo=objectRDN** – the RDN of the object containing the server certificate. Enclose the RDN in double quotes if it contains spaces.\n\nExample:\n```\nhostname=192.168.17.41 port=8090 kmo=\"SSL CertificateDNS\"\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which values can be set for the Startup Option property in the IBM i driver?",
+      "input": "",
+      "output": "The Startup Option property of the IBM i driver can be set to either **Auto start** or **Manual**."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible settings for Automatic Loopback Detection in the IBM i driver?",
+      "input": "",
+      "output": "Automatic Loopback Detection in the IBM i driver can be set to **Yes** or **No**."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the Polling Interval property represent in the IBM i driver and what is its default value?",
+      "input": "",
+      "output": "The Polling Interval property in the IBM i driver specifies the number of seconds the Publisher shim waits after running the polling CL program and sending events to the Metadirectory engine. The default interval is **60 seconds**."
+    },
+    {
+      "category": "config",
+      "instruction": "How is the Heartbeat Interval property used in the IBM i driver and how can it be disabled?",
+      "input": "",
+      "output": "The Heartbeat Interval property defines how often, in seconds, the driver shim contacts the Metadirectory engine to verify connectivity. Setting the value to **0** disables the heartbeat."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the Publisher Disabled property control in the IBM i driver and when should it be set to Yes?",
+      "input": "",
+      "output": "The Publisher Disabled property determines whether the Publisher shim is active. Set it to **Yes** when using an Identity Vault‑to‑Application (one‑way) data flow, as this saves processing time."
+    },
+    {
+      "category": "config",
+      "instruction": "List the Global Configuration Values for the IBM i driver and the values each can accept.",
+      "input": "",
+      "output": "Global Configuration Values for the IBM i driver:\n\n| Property Name | Values or Format |\n|---|---|\n| Connected System or Driver Name | Text value |\n| Synchronize Group Membership | *Yes* • *No* |\n| The IBM i Connected System Accepts Passwords from the Identity Vault | *Yes* • *No* |\n| The Identity Vault Accepts Passwords from the IBM i Connected System | *Yes* • *No* |\n| Publish Passwords to NDS Password | *Yes* • *No* |\n| Publish Passwords to Distribution Password | *Yes* • *No* |\n| Require Password Policy Validation before Publishing Passwords | *Yes* • *No* |\n| Reset User’s External System Password to the Identity Manager Password on Failure | *Yes* • *No* |\n| Notify the User of Password Synchronization Failure via E‑Mail | *Yes* • *No* |\n| User Base Container | Identity Vault container object (e.g., `users.myorg`) |\n| Group Base Container | Identity Vault container object (e.g., `groups.myorg`) |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Connected System or Driver Name global configuration value in the IBM i driver?",
+      "input": "",
+      "output": "The Connected System or Driver Name global configuration value in the IBM i driver specifies the name of the driver. This name is used by e‑mail notification templates to identify the source of notifications."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Synchronize Group Membership property affect the IBM i driver?",
+      "input": "",
+      "output": "The Synchronize Group Membership property in the IBM i driver determines whether group membership information is synchronized between the connected IBM i system and the Identity Vault. Setting it to **Yes** enables two‑way group membership synchronization; **No** disables it."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key driver parameters and global configuration values available for the IBM i driver.",
+      "input": "",
+      "output": "The IBM i driver can be configured through import‑only parameters (Data Flow, Enable Entitlements, Use SSL) that require a driver re‑import, Driver Configuration page settings (e.g., Driver Module, Remote Loader Connection Parameters, Startup Option, Automatic Loopback Detection, Polling Interval, Heartbeat Interval, Publisher Disabled), and Global Configuration Values (e.g., Connected System or Driver Name, Synchronize Group Membership, password flow options, password policy enforcement, error‑handling flags, and User/Group Base Containers). Changes to most properties require a driver restart."
+    }
+  ]
+}

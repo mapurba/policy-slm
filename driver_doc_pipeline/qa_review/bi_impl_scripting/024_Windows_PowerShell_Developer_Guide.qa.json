@@ -1,0 +1,71 @@
+{
+  "driver": "Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Scripting driver and what functionality does it provide for Windows PowerShell?",
+      "input": "",
+      "output": "The Scripting driver is a NetIQ Identity Manager driver that provides a complete Windows PowerShell API for interacting with external identity management systems whose tools or APIs are available on Windows. It enables the Identity Vault and Identity Manager to communicate with any supported system via an encrypted network connection, and it can be adapted to support other scripting languages that operate via the command line."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you execute a command‑line tool from a PowerShell script when using the Scripting driver?",
+      "input": "",
+      "output": "1. Assign any needed values to PowerShell variables.\n2. Call the external program with its parameters, using the variables for the arguments.\n3. Capture the exit code from the program in the `$LASTEXITCODE` variable.\n\nExample for the Scripting driver:\n```\n   $name = \"Bob Smith\"\n   $phone = \"818-555-2100\"\n   appadd -n $name -t $phone\n   $exitcode = $LASTEXITCODE\n```\nThe script can then test `$exitcode` to determine success or failure."
+    },
+    {
+      "category": "config",
+      "instruction": "What driver parameters are defined in the default Scripting driver and what are their possible values?",
+      "input": "",
+      "output": "Table of driver parameters for the default Scripting driver:\n\n| Parameter Name | Driver/Channel | Description | Values |\n|---|---|---|---|\n| INSTALL_PATH | Driver | The installation path of the driver | string value |\n| auto-loopback-detection | Driver | Whether to enable automatic loopback detection | true/false |\n| script-command | Driver | The command to use to execute scripts | string value |\n| script-trace-file | Driver | The file, relative to the driver installation path, to which to write trace messages | string value |\n| subscriber-script | Subscriber | The script file for Subscriber events, relative to the driver installation path | string value |\n| polling-script | Publisher | The script file that runs when the Publisher polls for application events | string value |\n| heartbeat-script | Publisher | The script file that runs when the Publisher checks application status | string value |\n| pub-polling-interval | Publisher | The interval in seconds between Publisher polls for application events | number |\n| pub-heartbeat-interval | Publisher | The amount of idle time in seconds before a heartbeat event is issued | number |\n\nThese parameters can be retrieved in scripts using the functions `idm_getdriverparam`, `idm_getsubscriberparam`, and `idm_getpublisherparam`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you retrieve the Publisher polling interval inside a PowerShell script for the Scripting driver?",
+      "input": "",
+      "output": "Use the `idm_getpublisherparam` function with the parameter name `pub-polling-interval`:\n```\n  $pollinginterval = idm_getpublisherparam(\"pub-polling-interval\")\n```\nThe variable `$pollinginterval` now contains the numeric value defined in the driver configuration."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How is event data formatted when it is passed to scripts in the Scripting driver?",
+      "input": "",
+      "output": "Event data is supplied to scripts in name/value pair format. Each line contains a name, an equal sign (`=`), and a value, for example:\n```\n   ASSOCIATION=BobUser\n   ADD_TELEPHONE=818-555-2100\n   ADD_TELEPHONE=818-555-9842\n```\nEach name/value pair is unique, but the same name may appear on multiple lines with different values. The Scripting driver provides helper functions such as `idm_geteventvalue` and `idm_geteventvalues` to retrieve these values."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you write an Add event handler script for the Scripting driver using the provided idm_* functions?",
+      "input": "",
+      "output": "Create a PowerShell function (e.g., `idm_add`) that follows these steps:\n1. Retrieve required values with `idm_geteventvalue` (e.g., `CLASS_NAME`, `CN`, `Telephone`).\n2. Validate the required fields; if missing, call `idm_statuserror`.\n3. Invoke the external tool (e.g., `appadd`) with the retrieved values.\n4. Check `$LASTEXITCODE` to determine success.\n5. On success, call `idm_setcommand \"ADD_ASSOCIATION\"`, write the new association and any other required values with `idm_writevalue`, and finish with `idm_statussuccess`.\n6. On failure, call `idm_statuserror` with an appropriate message.\n\nThe page includes a complete example:\n```\nfunction idm_add {\n  $classname = idm_geteventvalue \"CLASS_NAME\"\n  $cn = idm_geteventvalue \"CN\"\n  $phone = idm_geteventvalue \"Telephone\"\n  if ($classname -eq \"\" -or $cn -eq \"\") {\n    idm_statuserror \"Add event: missing CLASS_NAME and/or CN\"\n  } else {\n    appadd -n \"$cn\" -t \"$phone\"\n    if ($LASTEXITCODE -eq 0) {\n      idm_setcommand \"ADD_ASSOCIATION\"\n      idm_writevalue \"ASSOCIATION\" \"$cn$classname\"\n      idm_writevalue \"DEST_DN\" (idm_geteventvalue \"SRC_DN\")\n      idm_statussuccess \"Add event succeeded\"\n    } else {\n      idm_statuserror \"Add event failed with error code $LASTEXITCODE\"\n    }\n  }\n}\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "When a subscriber script for the Scripting driver encounters an error, how should it report the failure back to Identity Manager?",
+      "input": "",
+      "output": "The script should call the `idm_statuserror` subroutine with a descriptive message. This marks the event as failed and prevents it from being retried. Example:\n```\nidm_statuserror \"Add event failed with error code $LASTEXITCODE\"\n```\nAfter calling `idm_statuserror`, the script should exit; no further status or value functions are needed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What command names can be used with the idm_publishinit function in the Publisher channel of the Scripting driver?",
+      "input": "",
+      "output": "The valid command names for `idm_publishinit` are:\n\n| Command Name | Description |\n|---|---|\n| ADD | Create an identity. |\n| ADD_ASSOCIATION | Create an association for an identity. |\n| DELETE | Remove an identity permanently. |\n| MODIFY | Change an identity’s attributes. |\n| MODIFY_ASSOCIATION | Change an identity’s association. |\n| MODIFY_PASSWORD | Change an identity’s password. |\n| REMOVE_ASSOCIATION | Delete an identity’s association. |\n| RENAME | Change an identity’s naming attribute. |\nThese names are passed as the single parameter to `idm_publishinit` before publishing values."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you implement a heartbeat script for the Publisher channel in the Scripting driver?",
+      "input": "",
+      "output": "Create a PowerShell script (e.g., `Heartbeat.ps1`) that runs the external health‑check tool, examines `$LASTEXITCODE`, and calls the appropriate heartbeat subroutine:\n```\napphealth\nif ($LASTEXITCODE -eq 0) {\n  idm_heartbeatsuccess \"Heartbeat succeeded\"\n} else {\n  idm_heartbeaterror \"Heartbeat failed with error code $LASTEXITCODE\"\n}\n```\nThe script is referenced by the driver parameter `heartbeat-script` and is executed when the Publisher channel is idle for the interval defined by `pub-heartbeat-interval`."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main steps required to develop a custom driver using the Scripting driver.",
+      "input": "",
+      "output": "To develop a custom driver with the Scripting driver you:\n1. Evaluate the external application's command‑line tools, COM/.NET objects, and event‑monitoring capabilities.\n2. Define the data to synchronize and list the tools needed for each event type.\n3. Create Subscriber scripts (Add.ps1, Modify.ps1, etc.) that retrieve event values with `idm_geteventvalue(s)`, invoke the external tools, set commands with `idm_setcommand`, write return values with `idm_writevalue(s)`, and report status with the `idm_status*` subroutines.\n4. Create a Publisher polling script (Poll.ps1) that detects external events, initializes publishing with `idm_publishinit`, sets values with `idm_publishvalue`, and submits them using `idm_publish`.\n5. Optionally implement a Heartbeat script to monitor external system availability.\n6. Configure driver parameters (paths, script filenames, intervals) in `wsdrv.conf` and define any additional parameters in the driver’s XML configuration.\n7. Deploy the driver by running the Windows Scripting driver installer, placing custom scripts and configuration files in the appropriate directories, and installing the driver as a service with `wsdriver.exe -installService`."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a PowerShell code snippet that uses idm_geteventvalue to retrieve the CLASS_NAME and CN values for an Add event in the Scripting driver, and then logs them with idm_trace.",
+      "input": "",
+      "output": "```powershell\nfunction Log-AddEventInfo {\n  # Retrieve required event values\n  $className = idm_geteventvalue \"CLASS_NAME\"\n  $cn        = idm_geteventvalue \"CN\"\n\n  # Build a trace message\n  $msg = \"Add event received: CLASS_NAME=$className, CN=$cn\"\n\n  # Write the message to the script trace file\n  idm_trace $msg\n}\n\n# Call the function when the Add script is invoked\nLog-AddEventInfo\n```"
+    }
+  ]
+}

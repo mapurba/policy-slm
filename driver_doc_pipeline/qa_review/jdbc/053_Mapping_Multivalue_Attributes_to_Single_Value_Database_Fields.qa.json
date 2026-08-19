@@ -1,0 +1,59 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver assume that all eDirectory attributes mapped to parent table columns or view columns have a single value?",
+      "input": "",
+      "output": "The JDBC driver does not have visibility into the eDirectory schema, so it cannot determine whether an attribute is single‑valued or multivalued. Because of this lack of schema awareness, the driver treats every attribute that is mapped to a parent table column or a view column as if it were single‑valued. This default behavior simplifies the mapping logic but can cause issues when multivalued attributes are mapped to single‑value database fields."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the Most Recently Touched (MRT) algorithm used by the JDBC driver and when is it appropriate?",
+      "input": "",
+      "output": "The Most Recently Touched (MRT) algorithm stores the value that was most recently added or most recently deleted for a given attribute in the database column. It is appropriate for single‑value attributes because there is only one value to track; the most recent change accurately reflects the current state of the attribute."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "In the JDBC driver, why does a database column become NULL after deleting a value from a multivalue eDirectory attribute, and how can this be avoided?",
+      "input": "",
+      "output": "When a multivalue attribute is mapped to a single‑value column, the MRT algorithm sets the column to NULL when any value is deleted, and the column remains NULL until another value is added. This behavior is undesirable for multivalue attributes. To avoid it, you should either redesign the eDirectory schema so that only single‑value attributes are mapped to parent table or view columns, or use one of the alternative solutions such as mapping the multivalue attribute to a child table, delimiting multiple values with a policy, or applying a first‑value‑per‑replica (FPR) or last‑value‑per‑replica (LPR) mapping policy."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you map a multivalue eDirectory attribute to its own child table using the JDBC driver for indirect synchronization?",
+      "input": "",
+      "output": "1. Identify the multivalue attribute in eDirectory that you want to synchronize.\n2. In the JDBC driver configuration, create a child table definition that will hold the values of this attribute.\n3. Map the attribute to the child table by specifying the child table name and the column that will store the attribute values.\n4. Ensure the synchronization mode is set to indirect so that the driver writes each attribute value as a separate row in the child table.\n5. Save the configuration and restart the synchronization process; each value of the multivalue attribute will now be stored in its own row in the child table."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the JDBC driver to use a policy that delimitates multiple values before inserting them into a single‑value column?",
+      "input": "",
+      "output": "1. Open the JDBC driver configuration file.\n2. Locate the policy definition section for attribute mapping.\n3. Add or edit a policy entry that specifies a delimiter (for example, a comma) to combine multiple attribute values into a single string.\n4. Assign this policy to the relevant attribute mapping by referencing the policy name in the attribute’s mapping definition.\n5. Save the configuration file and reload the driver configuration. The driver will now concatenate multivalue attribute values using the defined delimiter before writing them to the single‑value column."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable a first‑value‑per‑replica (FPR) mapping policy for multivalue attributes in the JDBC driver?",
+      "input": "",
+      "output": "1. Ensure the com.novell.nds.indirect.driver.jdbc.util.MappingPolicy class is available in the driver classpath.\n2. In the JDBC driver’s global configuration values, set the mapping policy parameter (e.g., `mappingPolicy=FPR`).\n3. Verify that the policy is placed within the Subscriber Command Transformation policy container.\n4. Save the configuration and restart the synchronization service. With the FPR policy, the first attribute value encountered on each eDirectory replica will be synchronized to the database column."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the JDBC driver to use a last‑value‑per‑replica (LPR) mapping policy for multivalue attributes?",
+      "input": "",
+      "output": "1. Confirm that the com.novell.nds.indirect.driver.jdbc.util.MappingPolicy class is on the driver’s classpath.\n2. Edit the JDBC driver’s global configuration values and set the mapping policy parameter to `LPR` (for example, `mappingPolicy=LPR`).\n3. Ensure the policy definition resides in the Subscriber Command Transformation policy container.\n4. Save the changes and restart the driver. The LPR policy will cause the last attribute value seen on each eDirectory replica to be synchronized to the target column."
+    },
+    {
+      "category": "config",
+      "instruction": "Where are multivalue‑to‑single‑value attribute mapping policies stored in the JDBC driver configuration?",
+      "input": "",
+      "output": "Multivalue‑to‑single‑value attribute mapping policies are stored in the Subscriber Command Transformation policy container of the JDBC driver configuration."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the JDBC driver handles multivalue attributes mapped to single‑value database fields.",
+      "input": "",
+      "output": "The JDBC driver assumes all attributes mapped to parent table or view columns are single‑valued and applies a Most Recently Touched (MRT) algorithm, which works well for single‑value attributes but can cause a column to become NULL when a value is deleted from a multivalue attribute. Preferred remediation is to limit mappings to single‑value attributes, but alternatives include mapping each multivalue attribute to a child table, using a delimiting policy, or applying first‑value‑per‑replica (FPR) or last‑value‑per‑replica (LPR) policies via the MappingPolicy class. These policies are configured through global configuration values and are stored in the Subscriber Command Transformation policy container."
+    }
+  ]
+}

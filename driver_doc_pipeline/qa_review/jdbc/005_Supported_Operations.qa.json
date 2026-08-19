@@ -1,0 +1,71 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the JDBC driver, what is the difference between the indirect and direct data synchronization models?",
+      "input": "",
+      "output": "The JDBC driver supports two data synchronization models. The indirect model is usually associated with tables; it uses intermediate staging tables because the target database tables often do not match the structure required by the driver. The direct model is usually associated with views; views provide an abstraction that matches the driver’s required structure, allowing direct synchronization without staging tables."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does indirect synchronization operate on the Subscriber channel in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, indirect synchronization on the Subscriber channel updates the intermediate staging tables that reside in the synchronization schema. These updates then trigger an update to the customer tables elsewhere in the database."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Describe the flow of the Publisher channel during indirect synchronization in the JDBC driver.",
+      "input": "",
+      "output": "During indirect synchronization, the Publisher channel in the JDBC driver detects updates to the target database tables and inserts rows into the event log table. The Publisher then reads those rows, may retrieve additional information from the intermediate staging tables, updates the Identity Vault accordingly, and finally deletes or marks the processed rows."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does direct synchronization work on the Subscriber channel in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, direct synchronization on the Subscriber channel updates existing customer tables through a view that resides in the synchronization schema. Direct synchronization can also use tables, but only if those tables already match the structure required by the JDBC driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the Publisher channel behavior for direct synchronization in the JDBC driver.",
+      "input": "",
+      "output": "For direct synchronization, the Publisher channel of the JDBC driver inserts rows into the event log table when a target database table is updated. It then reads those rows, may retrieve extra data from the view before updating the Identity Vault, and finally deletes or marks the rows as processed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What password synchronization capabilities does the JDBC driver provide?",
+      "input": "",
+      "output": "The JDBC driver supports password set and password check operations on the Subscriber channel only. It does not support bidirectional password synchronization."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When is triggerless publication advantageous in the JDBC driver?",
+      "input": "",
+      "output": "Triggerless publication in the JDBC driver is advantageous when database triggers cannot be used—such as when support contracts forbid triggers on application tables—or when rapid prototyping is required. It reduces database‑side dependencies and simplifies implementation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the main disadvantages of triggerless publication compared to triggered publication in the JDBC driver?",
+      "input": "",
+      "output": "Triggerless publication is less efficient because the driver must calculate changes before processing events. It does not preserve event order, does not provide historical data (old values), and only reports the current state of an object."
+    },
+    {
+      "category": "config",
+      "instruction": "Does the JDBC driver require database triggers to log events for the Publisher channel?",
+      "input": "",
+      "output": "No, the JDBC driver does not require database triggers to log events for the Publisher channel. It can operate in a triggerless mode, deriving changes by inspecting the database data."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the JDBC driver is moved without moving its state files, what action must be taken to restore synchronization?",
+      "input": "",
+      "output": "When the JDBC driver is moved without moving the state files, the driver must rebuild the state files by performing a full resynchronization. Refer to the State Directory documentation for details."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key supported operations of the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver supports the following key operations: (1) password set and check on the Subscriber channel (no bidirectional sync); (2) two data synchronization models—indirect (using staging tables) and direct (using views); (3) both Subscriber and Publisher channel flows for indirect and direct synchronization; (4) triggered and triggerless publication, with triggerless useful when triggers are prohibited; and (5) requires resynchronization if the driver is moved without its state files."
+    }
+  ]
+}

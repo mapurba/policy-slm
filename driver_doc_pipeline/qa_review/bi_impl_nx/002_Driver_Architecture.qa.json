@@ -1,0 +1,65 @@
+{
+  "driver": "Linux and UNIX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Publisher shim in the Linux and UNIX driver?",
+      "input": "",
+      "output": "In the Linux and UNIX driver, the Publisher shim periodically scans the encrypted change log, decrypts any pending identity change events, and sends them to the Metadirectory engine as XDS event documents over an SSL network link. This allows the Metadirectory engine to apply policies and post the changes to the Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the name of the command that updates the change log in the Linux and UNIX driver, and what are its key characteristics?",
+      "input": "",
+      "output": "In the Linux and UNIX driver, the change log update command is called **nxclh**. It encrypts and writes events to the change log, accepts command‑line arguments and standard input, and can be used by any process that has rights to update the change log."
+    },
+    {
+      "category": "config",
+      "instruction": "List the default attributes defined for the User class in the schema file of the Linux and UNIX driver.",
+      "input": "",
+      "output": "In the Linux and UNIX driver, the default User class attributes are:\n- loginName\n- uidNumber\n- gidNumber\n- gecos\n- homeDirectory\n- loginShell\nThese correspond to the fields in the passwd map and are represented by the line:\n```\nloginName:x:uidNumber:gidNumber:gecos:homeDirectory:loginShell\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "List the default attributes defined for the Group class in the schema file of the Linux and UNIX driver.",
+      "input": "",
+      "output": "In the Linux and UNIX driver, the default Group class attributes are:\n- groupName\n- gidNumber\n- memberUid\nThese map to the fields in the group map and are represented by the line:\n```\ngroupName:!:gidNumber:memberUid\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the polling interval for the Linux and UNIX driver?",
+      "input": "",
+      "output": "In the Linux and UNIX driver, you can set the polling interval during the initial installation of the driver and later modify it by configuring the Driver object in the Identity Manager console."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the steps to extend the Linux and UNIX driver to support a new object type.",
+      "input": "",
+      "output": "To extend the Linux and UNIX driver to support a new object type:\n1. Edit the connected system **schema file** to add a new class definition and its attributes.\n2. Create or modify the appropriate **shell scripts** in the scriptable framework to handle add, modify, delete, move, or rename commands for the new object.\n3. If needed, update the **include/exclude file** to control provisioning of the new object type.\n4. Ensure the **shared memory tool (nxsmh)** can access any additional command data required by the new scripts.\n5. Test the end‑to‑end flow by triggering a change on the connected system and verifying that the Publisher and Subscriber channels process the event correctly."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Linux and UNIX driver capture password changes from local applications?",
+      "input": "",
+      "output": "In the Linux and UNIX driver, password changes are intercepted by Pluggable Authentication Modules (PAM) on most Linux systems and by AIX Loadable Authentication Modules (LAM) on AIX systems. These modules monitor password‑changing commands such as **passwd**, write the changes to the encrypted change log, and later the Publisher shim presents them to the Metadirectory engine."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you check if events remain in the change log and are not being sent to the Metadirectory engine in the Linux and UNIX driver?",
+      "input": "",
+      "output": "If events stay in the change log of the Linux and UNIX driver, verify that the network connection between the driver’s Publisher shim and the Metadirectory engine is operational. Temporary loss of communication causes events to remain in the change log until the link is restored. Checking SSL connectivity, firewall rules, and the Publisher shim’s scheduling interval can help resolve the issue."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the architecture of the Linux and UNIX driver.",
+      "input": "",
+      "output": "The Linux and UNIX driver synchronizes identity data between the Identity Vault and local account databases (files, NIS, NIS+). Changes detected in the vault are sent to a Subscriber shim, which passes them via shared memory to customizable shell scripts. A polling script on the connected system detects local changes, writes them encrypted to a change log using the **nxclh** command, and the Publisher shim later reads, decrypts, and forwards those events to the Metadirectory engine over SSL. PAM/LAM modules capture password changes, and a schema file defines supported object classes and attributes."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Show the default mapping line for the User class as defined in the schema file of the Linux and UNIX driver.",
+      "input": "",
+      "output": "```\nloginName:x:uidNumber:gidNumber:gecos:homeDirectory:loginShell\n```"
+    }
+  ]
+}

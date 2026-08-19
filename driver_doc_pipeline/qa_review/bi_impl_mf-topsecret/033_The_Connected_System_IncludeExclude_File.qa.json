@@ -1,0 +1,71 @@
+{
+  "driver": "Bi Impl MF Topsecret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the Bi Impl MF Topsecret driver?",
+      "input": "",
+      "output": "The include/exclude file in the Bi Impl MF Topsecret driver is an optional sequential or partitioned data set that lets you control which identities are synchronized from the Identity Vault to the connected system and which are excluded. It allows you to phase in deployment by initially excluding most users and groups and then adding more as confidence grows."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the file type and JCL reference requirements for the include/exclude file used by the Bi Impl MF Topsecret driver?",
+      "input": "",
+      "output": "The include/exclude file for the Bi Impl MF Topsecret driver must be a sequential file or a member of a partitioned data set. It is identified in the driver shim started task JCL through the INCEXC DD statement."
+    },
+    {
+      "category": "config",
+      "instruction": "How many total entries should an include/exclude file contain for optimal performance in the Bi Impl MF Topsecret driver?",
+      "input": "",
+      "output": "For optimal performance, an include/exclude file used by the Bi Impl MF Topsecret driver should contain no more than 50 entries total."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply changes made to the include/exclude file for the Bi Impl MF Topsecret driver?",
+      "input": "",
+      "output": "After editing the include/exclude file for the Bi Impl MF Topsecret driver, you must restart the driver shim because the file is read only when the shim starts."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the matching priority order for identities in the include/exclude file of the Bi Impl MF Topsecret driver.",
+      "input": "",
+      "output": "In the Bi Impl MF Topsecret driver, identities are matched against the include/exclude file with the following priority: first, exclude rules are evaluated; second, include rules are evaluated. Within each priority level, rules are processed in the order they appear in the file, and the first matching rule determines whether the identity is included or excluded."
+    },
+    {
+      "category": "config",
+      "instruction": "What syntax is used for a comment line in the include/exclude file for the Bi Impl MF Topsecret driver?",
+      "input": "",
+      "output": "A comment line in the include/exclude file for the Bi Impl MF Topsecret driver begins with an octothorpe (#). For example:\n```\n# This is a comment.\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Show the exact syntax required to define an include section in the include/exclude file of the Bi Impl MF Topsecret driver.",
+      "input": "",
+      "output": "An include section in the Bi Impl MF Topsecret driver include/exclude file starts with the line `INCLUDE` and ends with `ENDINCLUDE`. Example:\n```\nINCLUDE\n  .\n  .\n  .\nENDINCLUDE\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How are attribute matching rules expressed inside a class matching rule for the Bi Impl MF Topsecret driver?",
+      "input": "",
+      "output": "Inside a class matching rule for the Bi Impl MF Topsecret driver, an attribute matching rule is written as `attributeName=expression`. Multiple attribute rules can be listed, and they are logically ANDed together. Example:\n```\nCLASS USER\n    ACID=USER01\n    STATUS=ACTIVE\nENDCLASS\n```"
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an include/exclude file for the Bi Impl MF Topsecret driver that (1) excludes all users whose ACID starts with TEMP, (2) excludes the ROOT user, and (3) includes only users in the class ADMIN with ACID exactly ADMIN01.",
+      "input": "",
+      "output": "```\n# Exclude users whose ACID starts with TEMP\nEXCLUDE\n    CLASS USER\n        ACID=TEMP.*\n    ENDCLASS\nENDEXCLUDE\n\n# Exclude the ROOT user\nEXCLUDE\n    ROOT\nENDEXCLUDE\n\n# Include only ADMIN class user with ACID ADMIN01\nINCLUDE\n    CLASS ADMIN\n        ACID=ADMIN01\n    ENDCLASS\nENDINCLUDE\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might identities not be excluded as expected when using the Bi Impl MF Topsecret driver’s include/exclude file, and how can this be resolved?",
+      "input": "",
+      "output": "If identities are not being excluded as expected, it is likely because the driver shim has not been restarted after modifying the include/exclude file. The Bi Impl MF Topsecret driver reads the file only at shim start-up, so you must restart the driver shim to apply any changes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using the include/exclude file with the Bi Impl MF Topsecret driver.",
+      "input": "",
+      "output": "The Bi Impl MF Topsecret driver uses an optional sequential or partitioned include/exclude file, referenced via the INCEXC DD statement, to control identity synchronization. The file supports include and exclude sections, class and attribute matching rules, association rules, and single‑line rules. Exclude rules have higher priority than include rules, and matching stops at the first rule that applies. The file should have no more than 50 entries, be case‑insensitive except for class/attribute names, and must be re‑read only after restarting the driver shim."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What types of database objects can the JDBC driver synchronize?",
+      "input": "",
+      "output": "The JDBC driver can synchronize only tables that have explicit primary key constraints and views that contain at least one column whose name starts with \"pk_\" (case‑insensitive). It uses these constraints to determine which fields to use when constructing associations and ignores any tables without a primary key."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable the JDBC driver to see a table that currently lacks a primary key?",
+      "input": "",
+      "output": "To make a table visible to the JDBC driver, add an explicit primary key constraint to the table. If you cannot modify the original table, create an intermediate table that includes the same data and define a primary key on that intermediate table, then synchronize to the intermediate table instead."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure a view so the JDBC driver can synchronize it?",
+      "input": "",
+      "output": "To allow the JDBC driver to synchronize a view, ensure the view returns at least one column whose name begins with \"pk_\" (case‑insensitive). If the view does not already contain such a column, modify the view definition to include a column with the required prefix, then the JDBC driver will be able to use it for association construction."
+    },
+    {
+      "category": "config",
+      "instruction": "Which column naming convention does the JDBC driver require for view columns used in associations?",
+      "input": "",
+      "output": "The JDBC driver requires that any column in a view that will be used for association purposes be prefixed with \"pk_\" (case‑insensitive). Columns without this prefix are ignored when the JDBC driver evaluates the view."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "The JDBC driver cannot see my tables or views; what are the possible reasons and how can I resolve the issue?",
+      "input": "",
+      "output": "The JDBC driver may be unable to see tables or views for two main reasons:\n1. **Missing constraints**: Tables without explicit primary key constraints or views without a column prefixed with \"pk_\" are ignored. Resolve by adding a primary key to the table or adding a \"pk_\"‑prefixed column to the view, or synchronize to an intermediate table that meets these requirements.\n2. **Insufficient privileges**: The database user may lack the SELECT privilege for the objects. Grant the SELECT privilege to the user performing the synchronization."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the visibility requirements for the JDBC driver when synchronizing tables and views.",
+      "input": "",
+      "output": "The JDBC driver only sees tables that have explicit primary key constraints and views that contain at least one column whose name starts with \"pk_\" (case‑insensitive). Additionally, the database user must have the SELECT privilege on those objects; otherwise the driver cannot detect them."
+    }
+  ]
+}

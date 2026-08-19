@@ -1,0 +1,47 @@
+{
+  "driver": "Blackboard driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the mapping between eDirectory objects and Blackboard objects in the Blackboard driver?",
+      "input": "",
+      "output": "In the Blackboard driver, User objects in eDirectory map directly to Person objects in Blackboard, while Group objects in eDirectory map directly to Course and Organization objects in Blackboard. The distinction between Course and Organization objects is made by the NTIQBBRTDC-sub-evt-DetermineBBObjectType Event Transform Policy."
+    },
+    {
+      "category": "config",
+      "instruction": "Which eDirectory attributes are used to represent Blackboard enrollments in the Blackboard driver and what limitation does this approach have?",
+      "input": "",
+      "output": "The Blackboard driver uses the Group Member and Owner attributes to represent enrollments in Blackboard. The limitation of this approach is that enrollments can only be removed; they cannot be disabled."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you modify the policy that vetoes move events for the Blackboard driver?",
+      "input": "",
+      "output": "The sample Subscriber Event policy in the Blackboard driver vetoes move events. To change this behavior, edit the Subscriber Event policy (the sample policy) and replace the veto rule with custom logic that performs installation‑specific processing of move events, then activate the modified policy."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What happens if a move command is issued for an object managed by the Blackboard driver, and how does the driver respond?",
+      "input": "",
+      "output": "When a move command is issued, the Subscriber channel of the Blackboard driver rejects the command because Blackboard is a flat system with no move function. The sample Subscriber Event policy explicitly vetoes move events, so the operation is blocked."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Blackboard driver not support rename operations for objects?",
+      "input": "",
+      "output": "Blackboard is a flat system without hierarchical structure, and it does not provide a rename function. Consequently, the Blackboard driver cannot perform rename operations on Blackboard objects."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How are passwords from eDirectory passed to Blackboard by the Blackboard driver?",
+      "input": "",
+      "output": "The Blackboard driver uses the nspmDistributionPassword attribute in eDirectory to supply passwords. A preconfigured mapping policy maps nspmDistributionPassword to the DirXML-BB-p-password attribute used by Blackboard."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key differences between eDirectory and Blackboard as handled by the Blackboard driver.",
+      "input": "",
+      "output": "The Blackboard driver reflects several key differences: eDirectory objects map to Blackboard Person, Course, and Organization objects (with a specific Event Transform Policy for Course vs. Organization); Blackboard is flat, so move and rename operations are not supported and are vetoed by the Subscriber Event policy; deletions in eDirectory propagate to deletions of the corresponding Blackboard objects; enrollments are represented using Group Member and Owner attributes, which only allow removal, not disabling; and passwords are transferred using the nspmDistributionPassword attribute mapped to DirXML-BB-p-password."
+    }
+  ]
+}

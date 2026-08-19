@@ -1,0 +1,71 @@
+{
+  "driver": "Azure AD driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Azure AD driver in the Office365 to Azure AD migration process?",
+      "input": "",
+      "output": "The Azure AD driver replaces the deprecated Office365 driver and is used to manage all Office365/Azure resources after migration. The migration tool moves resource definitions, roles, and assignments from the Office365 driver to the Azure AD driver while preserving historical data."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually migrate license resources from the Office365 driver to the Azure AD driver?",
+      "input": "",
+      "output": "1. Record every license resource that was created with the Office365 driver.\n2. Log in to the Identity Manager Dashboard.\n3. Using the Azure AD driver, create a separate resource for each service plan required.\n4. Create a role that represents each license and map the newly created resources to that role (repeat for multiple licenses).\n5. Assign the role, with its entitled licenses, to each user."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually migrate custom license resources from the Office365 driver to the Azure AD driver?",
+      "input": "",
+      "output": "1. Review all custom license resources in the Office365 driver and note their assignments and restricted service plans.\n2. Remove the existing assignments of license and custom license resources that were created with the Office365 driver.\n3. Using the Azure AD driver, create new resources for each service plan (license).\n4. In the Identity Manager Dashboard, create a role and map all license resources **except** the one that is excluded by the custom license.\n5. Repeat step 4 for every custom license resource you need to grant permissions for.\n\nExample: If a custom license excludes *EXCEL_PREMIUM*, create a role that includes all other license resources and assign that role to the desired users."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you export custom policies from the Office365 driver for later import into the Azure AD driver?",
+      "input": "",
+      "output": "1. Open the project in Designer.\n2. In the Outline view, navigate to the Office365 driver and select the custom policies you wish to export.\n3. Right‑click the selected policies and choose **Export to Configuration File**.\n4. Choose a location on your file system to save the exported file.\n5. Click **Save** and then **OK**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import custom policies into the Azure AD driver after exporting them from the Office365 driver?",
+      "input": "",
+      "output": "1. Open the project in Designer.\n2. In the Outline view, right‑click the Azure AD driver and select **Import from Configuration File**.\n3. Click **Browse**, navigate to the location of the exported policy file, and select it.\n4. Click **Open** and then **OK** to complete the import."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the system requirements for running the migration tool that moves resources from the Office365 driver to the Azure AD driver?",
+      "input": "",
+      "output": "• Identity Manager installed on Linux or Windows.\n• Python 3.6 or later.\n• The Python modules **request**, **ldap3**, and **urllib3** must be available."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you verify if the migration tool reports missing Python modules when preparing to migrate from the Office365 driver to the Azure AD driver?",
+      "input": "",
+      "output": "Run the appropriate pip command to list installed modules:\n* If both Python 2 and 3 are present, execute `pip3 list`.\n* If only Python 3 is present, execute `pip list`.\nCheck that **request**, **ldap3**, and **urllib3** appear in the output. If any are missing, install them with `pip install <module name>` or `pip3 install <module name>`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you flush the Identity Manager Dashboard cache before running the migration tool for the Azure AD driver?",
+      "input": "",
+      "output": "Option 1 – Use the Dashboard UI:\n1. Log in to the Identity Manager Dashboard.\n2. Navigate to **Configuration**.\n3. Click **Cache and Cluster**.\n4. Select **All Cache** (if not already selected).\n5. Click **Flush Cache**.\n\nOption 2 – Delete the Tomcat temporary index:\n1. Stop the Tomcat service.\n2. Delete the *permindex* directory from the Tomcat temp location:\n   * Linux: `/opt/netiq/idm/apps/tomcat/temp`\n   * Windows: `C:\\NetIQ\\IDM\\apps\\tomcat\\temp`\n3. Restart the Tomcat service."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the NCPCLIENT_REQ_TIMEOUT environment variable on Linux and Windows before executing the migration tool for the Azure AD driver?",
+      "input": "",
+      "output": "Linux:\n1. Define the timeout value, e.g., `NCPCLIENT_REQ_TIMEOUT=9000`.\n2. Export the variable with `export NCPCLIENT_REQ_TIMEOUT`.\n   (The setting remains active for the current session only.)\n\nWindows:\n1. Right‑click the Windows icon on the taskbar and select **System**.\n2. Click **Advanced system settings**.\n3. In the **Advanced** tab, click **Environment Variables**.\n4. Click **New**, enter `NCPCLIENT_REQ_TIMEOUT` as the variable name and the desired timeout in seconds as the value, then click **OK** twice to close the dialogs."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you execute the migration script to move resources from the Office365 driver to the Azure AD driver, including the required command‑line arguments?",
+      "input": "",
+      "output": "1. Unzip the migrationtool.zip archive to a dedicated directory.\n2. Run the script with Python 3.6, providing all required parameters. Example command:\n```\npython36 Driv-AzureAD-Office365MigrationTool.py \\\n  -host 192.168.0.25 \\\n  -user cn=admin,ou=sa,o=system \\\n  -password novell \\\n  -ncp 524 \\\n  -ssl Yes \\\n  -ldaps 636 \\\n  -uauser uaadmin \\\n  -uapass novell \\\n  -container o=data \\\n  -log DEBUG \\\n  -url https://identityapplications.example.com/IDMProv \\\n  -o365 \"cn=MSOffice365,cn=driverset1,o=system\" \\\n  -azure cn=\"AzureDriver,cn=driverset1,o=system\"\n```\n\nAlternatively, run the script without arguments and answer the interactive prompts for the same values.\n\nFor help with the script options, execute:\n`python36 Driv-AzureAD-Office365MigrationTool.py -h`"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the steps required to migrate from the Office365 driver to the Azure AD driver using the migration tool.",
+      "input": "",
+      "output": "The Azure AD driver migration process requires (1) deploying the Azure AD driver and disabling the Office365 driver, (2) flushing the Identity Manager Dashboard cache, (3) optionally setting a higher NCPCLIENT_REQ_TIMEOUT, (4) ensuring Python 3.6+ with request, ldap3, and urllib3 modules, (5) manually recreating license and custom license resources in the Azure AD driver, (6) manually exporting and importing custom policies, and (7) running the `Driv-AzureAD-Office365MigrationTool.py` script with the appropriate connection and driver parameters. The tool then maps entitlements and updates LDAP attributes to complete the migration without data loss."
+    }
+  ]
+}

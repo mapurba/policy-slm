@@ -1,0 +1,77 @@
+{
+  "driver": "Linux/UNIX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the nxdrv-config command for the Linux/UNIX driver?",
+      "input": "",
+      "output": "The nxdrv-config command is used to change the Linux/UNIX driver shim configuration. When executed, it prompts you to select a configuration function such as setting passwords, configuring SSL, enabling remote client publishing, extending the schema, or configuring PAM or LAM."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the Remote Loader and Driver object passwords for the Linux/UNIX driver using nxdrv-config?",
+      "input": "",
+      "output": "1. Run the command `/usr/sbin/nxdrv-config`.\n2. Choose option `1) Set the Remote Loader and Driver object passwords`.\n3. When prompted, enter and confirm the Remote Loader password.\n4. Enter and confirm the Driver object password.\n5. The entered passwords are stored on the connected system and must match the passwords stored in the Identity Vault.\n6. Optionally, after changing passwords in iManager, navigate to the Driver Overview, click the driver icon, specify the new passwords under the Authentication heading, click Apply, and restart the driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the Linux/UNIX driver for SSL using nxdrv-config?",
+      "input": "",
+      "output": "1. Execute `/usr/sbin/nxdrv-config`.\n2. Select option `2) Configure the driver for Secure Sockets Layer (SSL)`.\n3. Enter the LDAP server host address (default is `localhost`).\n4. Enter the LDAP server port (default SSL port is `636`).\n5. Review the displayed Certificate Authority information.\n6. Respond with `Y` to accept the Certificate Authority.\n7. The driver shim saves the accepted certificate to the local file system.\n8. If the LDAP server is not configured for SSL, follow the manual process described in the \"Driver Certificate Setup Failure\" documentation."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default SSL port and the LDAP server details you must provide when configuring SSL for the Linux/UNIX driver?",
+      "input": "",
+      "output": "When configuring SSL for the Linux/UNIX driver, you must provide:\n- LDAP Server Host Address (e.g., `sr.digitalairlines.com`).\n- LDAP Server Port, with the default SSL port being **636**.\nThe LDAP server must be configured for SSL and listening on the specified port."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the Remote Loader password and the Driver object password match the passwords stored in the Identity Vault for the Linux/UNIX driver?",
+      "input": "",
+      "output": "The Remote Loader password is used by the Metadirectory engine to authenticate to the driver shim, while the Driver object password is used by the driver shim to authenticate to the Metadirectory engine. Matching the passwords stored on the connected system with those in the Identity Vault ensures successful mutual authentication between the engine and the driver shim."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure remote client publishing for the Linux/UNIX driver using nxdrv-config?",
+      "input": "",
+      "output": "1. Run `/usr/sbin/nxdrv-config`.\n2. Choose option `3) Configure the driver to allow for remote client publishing`.\n3. The command generates a new 2048‑bit, Base64‑encoded RSA certificate authority key pair.\n4. The public certificate is written to `/usr/local/nxdrv/keys/soap-ca-cert.pem` and the private key to `/usr/local/nxdrv/keys/soap-ca-key.pem`.\n5. These keys are used to issue and sign certificates for remote publishing clients such as NIS or NIS+.\n6. To adjust the certificate authority duration (default 10 years) or other parameters, edit the configuration file `/usr/local/nxdrv/conf/remote-publisher.conf`."
+    },
+    {
+      "category": "config",
+      "instruction": "Where are the certificate authority files stored after configuring remote client publishing for the Linux/UNIX driver?",
+      "input": "",
+      "output": "The generated certificate authority files are stored at:\n- Public certificate: `/usr/local/nxdrv/keys/soap-ca-cert.pem`\n- Private key: `/usr/local/nxdrv/keys/soap-ca-key.pem`"
+    },
+    {
+      "category": "howto",
+      "instruction": "How does nxdrv-config set up PAM for the Linux/UNIX driver on a remote client?",
+      "input": "",
+      "output": "1. Run `/usr/sbin/nxdrv-config`.\n2. Select option `5) Configure PAM for publishing password changes`.\n3. Answer `Y` when prompted \"Are you configuring PAM from a remote NIS client?\" if configuring on a remote client.\n4. Provide the host name or IP address and port of the Linux/UNIX system.\n5. Enter the Remote Loader password when prompted to mint a security certificate for the remote client.\n6. The command backs up the existing PAM configuration file (e.g., `/etc/pam.conf`) to a timestamped file.\n7. It then inserts the line `[/usr/lib/security/pam_nxdrv.so.1 mechanism=api]` into the PAM configuration file."
+    },
+    {
+      "category": "config",
+      "instruction": "What backup file is created when nxdrv-config configures PAM for the Linux/UNIX driver?",
+      "input": "",
+      "output": "When configuring PAM, nxdrv-config creates a backup of the original PAM configuration file at a path similar to `/etc/pam.conf.nxdrv.<timestamp>` (e.g., `/etc/pam.conf.nxdrv.04152006151641`)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure LAM for the Linux/UNIX driver using nxdrv-config?",
+      "input": "",
+      "output": "1. Execute `/usr/sbin/nxdrv-config`.\n2. Choose option `6) Configure LAM for publishing password changes`.\n3. The command creates a backup of the `/usr/lib/security/methods.cfg` file, naming it something like `/usr/lib/security/methods.cfg.nxdrv.<timestamp>` (e.g., `/usr/lib/security/methods.cfg.nxdrv.04152006154047`).\n4. It then appends the stanza for the Linux/UNIX driver to the original `methods.cfg` file."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the LDAP server is not configured for SSL when configuring the Linux/UNIX driver for SSL?",
+      "input": "",
+      "output": "If the LDAP server is not configured for SSL, you should follow the manual process described in the \"Driver Certificate Setup Failure\" documentation. This manual process provides steps to configure the driver for SSL without an SSL‑enabled LDAP server."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main functions of the nxdrv-config command for the Linux/UNIX driver.",
+      "input": "",
+      "output": "The nxdrv-config command for the Linux/UNIX driver allows administrators to: (1) set the Remote Loader and Driver object passwords, (2) configure SSL by specifying an LDAP server and accepting its certificate, (3) enable remote client publishing by generating a certificate authority, (4) configure PAM on remote or local systems, (5) configure LAM, and (6) extend the Identity Manager schema (run on a Metadirectory server). Each function interacts with the driver shim to update passwords, certificates, configuration files, and backup original settings."
+    }
+  ]
+}

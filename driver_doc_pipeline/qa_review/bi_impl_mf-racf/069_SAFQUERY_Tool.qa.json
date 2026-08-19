@@ -1,0 +1,77 @@
+{
+  "driver": "Bi Impl MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the SAFQUERY tool in the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "In the Bi Impl MF RACF driver, the SAFQUERY tool is the driver query processor that uses the System Authorization Facility (SAF) to retrieve information from the RACF database. The retrieved information is used by the Metadirectory engine for matching and merging operations."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you perform a read operation with SAFQUERY in the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "To perform a read operation with SAFQUERY in the Bi Impl MF RACF driver, use the following command syntax:\n```\nSAFQUERY SCOPE(entry) CLASS(class) ASSOCIATION(association) [READATTRS(attrs...)|ALLREADATTRS] [PRINT]\n```\nReplace `class` with `User` or `Group`, and `association` with `USER\\userid` or `GROUP\\groupname`. Optionally add `READATTRS` with a comma‑separated list of attributes or use `ALLREADATTRS` to return every attribute, and include `PRINT` if you want the results displayed."
+    },
+    {
+      "category": "config",
+      "instruction": "Which operands are required for a SAFQUERY read operation in the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "A SAFQUERY read operation in the Bi Impl MF RACF driver requires the following operands:\n- **SCOPE(entry)** – indicates that information about a specific profile is being requested.\n- **CLASS(class)** – specifies the profile type, either `User` or `Group`.\n- **ASSOCIATION(association)** – defines the object to read; format must be `USER\\userid` or `GROUP\\groupname`.\nOptional operands are `READATTRS(attrs…)` or `ALLREADATTRS` and `PRINT`."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you specify which attributes to return in a SAFQUERY read command for the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "In a SAFQUERY read command for the Bi Impl MF RACF driver, you specify attributes to return using the `READATTRS` operand followed by a parenthesised, comma‑separated list of attribute names, e.g., `READATTRS(DirXML-RACF-special)`. To return all attributes, replace `READATTRS` with `ALLREADATTRS`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you include the PRINT option in a SAFQUERY read command for the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "Add the `PRINT` keyword at the end of the SAFQUERY command line. For example:\n```\nSAFQUERY SCOPE(ENTRY) CLASS(User) ASSOCIATION(USER\\IBMUSER) READATTRS(DirXML-RACF-special) PRINT\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the output of a SAFQUERY command look like and how is it used by the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "The SAFQUERY command outputs a series of lines, each containing a `name=value` pair. The driver shim reads these pairs and creates an appropriate XDS document for the Metadirectory engine. Example output:\n```\nCOMMAND=instance\nCLASS_NAME=USER\nEVENT_ID=?\nASSOCIATION=USER\\IBMUSER\nATTR_DirXML-RACF-special=true\nCOMMAND=status\nSTATUS_LEVEL=success\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you perform a search operation with SAFQUERY in the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "To perform a search operation, use the following SAFQUERY syntax:\n```\nSAFQUERY SCOPE(subtree) SEARCHCLASSES(classes..) SEARCHATTRS('attr=value' ...) [READATTRS(attrs...)|ALLREADATTRS] [PRINT]\n```\n- `SCOPE(subtree)` indicates a subtree search.\n- `SEARCHCLASSES` lists one or more classes (e.g., `User`).\n- `SEARCHATTRS` provides attribute/value criteria in single quotes.\n- Optionally add `READATTRS` or `ALLREADATTRS` and `PRINT`.\nExample:\n```\nSAFQUERY SCOPE(subtree) SEARCHCLASSES(User) SEARCHATTRS('DirXML-RACF-revoke=true') PRINT\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What operands are required for a SAFQUERY search operation in the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "A SAFQUERY search operation in the Bi Impl MF RACF driver requires:\n- **SCOPE(subtree)** – indicates a subtree search.\n- **SEARCHCLASSES(classes..)** – one or more class names to search, such as `User`.\n- **SEARCHATTRS('attr=value' ...)** – a list of attribute/value criteria, each enclosed in single quotes.\nOptional operands are `READATTRS(attrs…)` or `ALLREADATTRS` and `PRINT`."
+    },
+    {
+      "category": "config",
+      "instruction": "What format should the SEARCHATTRS operand follow in a SAFQUERY search command for the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "The `SEARCHATTRS` operand must contain attribute/value pairs enclosed in single quotes, separated by spaces. Example: `SEARCHATTRS('DirXML-RACF-revoke=true' 'AnotherAttr=example')`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Bi Impl MF RACF driver handle multiple results from a SAFQUERY search operation?",
+      "input": "",
+      "output": "When a SAFQUERY search operation returns multiple matching profiles, the Bi Impl MF RACF driver shim processes each `COMMAND=instance` block in the output sequentially, creating separate XDS documents for each result. The engine can then handle zero, one, or many responses as part of the Metadirectory processing."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points for using SAFQUERY with the Bi Impl MF RACF driver.",
+      "input": "",
+      "output": "The Bi Impl MF RACF driver uses the SAFQUERY TSO command to read or search RACF data. For reads, specify `SCOPE(entry)`, `CLASS`, and `ASSOCIATION`, optionally `READATTRS` or `ALLREADATTRS`, and `PRINT` to display results. Output is a series of `name=value` lines interpreted into XDS documents. For searches, use `SCOPE(subtree)`, `SEARCHCLASSES`, and `SEARCHATTRS` with optional attribute selection and `PRINT`. Multiple results are handled as separate instance blocks."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a SAFQUERY command that reads the attribute DirXML-RACF-status for the group profile GROUP\\ADMINGROUP and prints the result, as used by the Bi Impl MF RACF driver.",
+      "input": "",
+      "output": "```\nSAFQUERY SCOPE(ENTRY) CLASS(Group) ASSOCIATION(GROUP\\ADMINGROUP) READATTRS(DirXML-RACF-status) PRINT\n```"
+    }
+  ]
+}

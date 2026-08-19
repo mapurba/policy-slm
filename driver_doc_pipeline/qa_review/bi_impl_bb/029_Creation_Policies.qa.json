@@ -1,0 +1,47 @@
+{
+  "driver": "Blackboard driver",
+  "qa_pairs": [
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points of the creation policies described for the Blackboard driver.",
+      "input": "",
+      "output": "The Blackboard driver defines the NTIQBBRT-sub-cp-SubscriberCreation policy to verify that required attributes are present when creating users, groups (courses), and organizations. If an attribute is missing, the policy can automatically populate it based on Global Configuration Variables (GCVs). Tables A‑2, A‑3, and A‑4 list the required attributes for users, groups, and organizations respectively and specify the actions to take—such as using the source name, concatenating the CN with a default email domain, or applying default role values—when the corresponding GCV flags (e.g., auto_set_ids, auto_set_email, auto_set_roles, auto_set_title) are true."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the NTIQBBRT-sub-cp-SubscriberCreation policy in the Blackboard driver?",
+      "input": "",
+      "output": "The purpose of the NTIQBBRT-sub-cp-SubscriberCreation policy in the Blackboard driver is to check that all required attributes for a Blackboard object (user, course, or organization) are set before the object is created. If any required attribute is missing, the policy can automatically assign a default value based on Global Configuration Variables (GCVs), ensuring that the creation request complies with Blackboard's mandatory data requirements."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Global Configuration Variables (GCVs) control automatic setting of required user attributes in the Blackboard driver, and what values do they affect?",
+      "input": "",
+      "output": "In the Blackboard driver, the following GCVs control automatic population of required user attributes:\n- **auto_set_ids** (boolean): When true, sets DirXML‑BB‑p‑id to the Source Name if it is not already set.\n- **auto_set_email** (boolean): When true, sets the Internet Email Address to `<CN>@<default_email_domain>` if it is not already set.\n- **auto_set_roles** (boolean): When true, sets DirXML‑BB‑p‑sys‑role to the value of **default_user_role** and DirXML‑BB‑p‑portal‑role to the value of **default_portal_role** if they are not already set.\n- **default_email_domain** (string): The domain appended to the CN to form the automatic email address.\n- **default_user_role** (string): The role assigned to DirXML‑BB‑p‑sys‑role when auto_set_roles is true.\n- **default_portal_role** (string): The role assigned to DirXML‑BB‑p‑portal‑role when auto_set_roles is true.\n- **auto_set_title** (boolean): Not used for user attributes but referenced for groups and organizations.\nThese GCVs must be set to true (or to appropriate string values for defaults) for the automatic actions described in Table A‑2 to occur."
+    },
+    {
+      "category": "config",
+      "instruction": "List the required group attributes for a Blackboard course object and the actions the Blackboard driver takes when they are missing.",
+      "input": "",
+      "output": "For a Blackboard course object (BBObjectType operation property = DirXML‑BB‑Course), the Blackboard driver requires the following attributes (Table A‑3):\n| Required Group Attribute | Action when missing |\n|--------------------------|----------------------|\n| DirXML‑BB‑c‑course‑title | If not set and GCV **auto_set_title** is true, set to the Source Name. |\n| DirXML‑BB‑c‑id           | If not set and GCV **auto_set_ids** is true, set to the Source Name. |\n| DirXML‑BB‑c‑ext‑key      | Set to the Source Name with underscores replacing spaces (always applied). |\nThese actions ensure that every created Blackboard course has a title, identifier, and external key."
+    },
+    {
+      "category": "config",
+      "instruction": "What required attributes does the Blackboard driver enforce for an organization object, and how are they populated if missing?",
+      "input": "",
+      "output": "For an organization object (BBObjectType operation property = DirXML‑BB‑Organization), the Blackboard driver enforces the following attributes (Table A‑4):\n| Required Organization Attribute | Action when missing |\n|--------------------------------|----------------------|\n| DirXML‑BB‑o‑title              | If not set and GCV **auto_set_title** is true, set to the Source Name. |\n| DirXML‑BB‑o‑id                  | If not set and GCV **auto_set_ids** is true, set to the Source Name. |\n| DirXML‑BB‑o‑ext‑key             | Set to the Source Name with underscores replacing spaces (always applied). |\nThus, titles and IDs can be auto‑generated from the source name when the corresponding GCV flags are enabled, while the external key is always derived from the source name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Blackboard driver so that missing Internet Email Address attributes are automatically set for new users?",
+      "input": "",
+      "output": "To configure the Blackboard driver to automatically set a missing Internet Email Address for new users, follow these steps:\n1. Open the Global Configuration Variables (GCV) editor for the Blackboard driver.\n2. Locate the GCV named **auto_set_email** and set its value to **true**.\n3. Define the domain part of the email address by setting the GCV **default_email_domain** to the desired domain string (e.g., `example.com`).\n4. Save the GCV changes and ensure the policy NTIQBBRT-sub-cp-SubscriberCreation is active.\nWhen a user creation request lacks an Internet Email Address, the Blackboard driver will then concatenate the user's CN with \"@\" and the value of **default_email_domain**, producing an email address automatically."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If a new Blackboard user is created without a DirXML‑BB‑p‑id value, but the ID is not being set automatically, what could be the reason based on the driver documentation?",
+      "input": "",
+      "output": "In the Blackboard driver, the automatic setting of DirXML‑BB‑p‑id occurs only when two conditions are met: (1) the attribute is not already set, and (2) the Global Configuration Variable **auto_set_ids** is true. If the ID is not being set automatically, the most likely reasons are:\n- **auto_set_ids** GCV is missing, set to false, or incorrectly named, so the driver does not trigger the auto‑set logic.\n- The attribute DirXML‑BB‑p‑id is already present (perhaps empty or null) in the creation request, causing the driver to skip the auto‑set step.\nVerify that **auto_set_ids** is defined and set to **true** in the GCV configuration, and ensure the creation request truly omits DirXML‑BB‑p‑id."
+    }
+  ]
+}

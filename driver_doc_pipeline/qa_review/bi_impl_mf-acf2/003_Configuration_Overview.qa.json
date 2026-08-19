@@ -1,0 +1,71 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Remote Loader global configuration variable in the ACF2 driver?",
+      "input": "",
+      "output": "In the ACF2 driver, the Remote Loader global configuration variable is a boolean (true/false) that indicates whether the driver should use the Remote Loader service. For the ACF2 driver this value must always be set to true to enable communication with the ACF2 system."
+    },
+    {
+      "category": "config",
+      "instruction": "List all Global Configuration Variables provided by the ACF2 Base package and briefly describe each for the ACF2 driver.",
+      "input": "",
+      "output": "The ACF2 Base package for the ACF2 driver defines the following Global Configuration Variables (GCVs):\n\n* **Remote Loader** – Boolean true/false indicating whether to use the Remote Loader service; must be true for this driver.\n* **Host Name** – The physical DNS hostname or IP address of the ACF2 system to connect to.\n* **Port** – TCP/IP port on which the remote loader runs on the ACF2 system (default 8090).\n* **KMO** – The SSL KMO object used for secure communication with ACF2.\n* **Remote Password** – Password for the remote loader service.\n* **Driver Password** – Password for the driver object itself."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What do the NOVLACF2BASE-ot-AppendACF2CMD and NOVLACF2BASE-it-ChangeLog policies do in the ACF2 driver?",
+      "input": "",
+      "output": "In the ACF2 driver, the **NOVLACF2BASE-ot-AppendACF2CMD** output transform converts XDS documents received from the Subscriber channel into ACF2 command strings that the driver shim will execute on the ACF2 system. The **NOVLACF2BASE-it-ChangeLog** input transform converts ACF2 ChangeLog events into XDS documents that can be processed by the rest of the Publisher channel."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Global Configuration Variables are introduced by the ACF2 Default Configuration package for the ACF2 driver and what are their functions?",
+      "input": "",
+      "output": "The ACF2 Default Configuration package adds the following Global Configuration Variables for the ACF2 driver:\n\n* **User Base Container** – A distinguished name (DN) that specifies the container in the Identity Vault where Subscriber events are limited and under which new or matched User objects are created on the Publisher channel.\n* **Subscriber Passphrase Synchronization** – Boolean true/false indicating whether Vault passwords should be synchronized to ACF2 passphrases.\n* **Publisher Passphrase Synchronization** – Boolean true/false indicating whether ACF2 passphrases should be synchronized back to Vault passwords."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Describe how the ACF2 Default Configuration package maps eDirectory attributes to ACF2 fields for the ACF2 driver.",
+      "input": "",
+      "output": "The ACF2 Default Configuration package defines a schema mapping that translates eDirectory attributes to corresponding ACF2 fields. The mapping includes:\n\n| eDirectory Class | eDirectory Attribute          | ACF2 Record | ACF2 Field |\n|------------------|------------------------------|-------------|------------|\n| User             | CN                           | Logonid     | LID        |\n| User             | Login Disabled               | Logonid     | SUSPEND    |\n| User             | nspmDistributionPassword     | Logonid     | PASSWORD   |\n| User             | Full Name                    | Logonid     | NAME       |\n| User             | Telephone Number             | Logonid     | PHONE      |\n\nAll other ACF2 fields are automatically mapped to attributes in the ACF2 Auxiliary Schema, which are set to ignore by default on both channels."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the User Base Container global configuration variable for the ACF2 driver?",
+      "input": "",
+      "output": "To configure the **User Base Container** GCV for the ACF2 driver:\n1. Open the Identity Manager Designer and locate the **ACF2 Default Configuration** package.\n2. Edit the package’s Global Configuration Variables.\n3. Find the entry named **User Base Container**.\n4. Enter the distinguished name (DN) of the container in the Identity Vault where you want Subscriber events to be restricted and where new User objects will be created on the Publisher channel.\n5. Save the changes and redeploy the package."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the role of the NOVLACF2ENT-pub-et-DisallowDeletes policy in the ACF2 driver?",
+      "input": "",
+      "output": "In the ACF2 driver, the **NOVLACF2ENT-pub-et-DisallowDeletes** Publisher Event Transformation detects when a user is deleted from ACF2. When such a deletion is observed, the policy removes the corresponding Vault association for that user and vetoes the delete event, preventing the deletion from propagating back to the Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "Enumerate the Global Configuration Variables available in the ACF2 Password Synchronization package for the ACF2 driver.",
+      "input": "",
+      "output": "The ACF2 Password Synchronization package provides the following Global Configuration Variables for the ACF2 driver:\n\n* **Connected System or Driver Name** – Name of the connected system, application, or Identity Manager driver; used in e‑mail notification templates.\n* **Application accepts passwords from Identity Manager** – Option to allow passwords to flow from the Identity Vault to the connected system.\n* **Identity Manager accepts passwords from application** – Option to allow passwords to flow from the connected system to the Identity Vault.\n* **Publish passwords to NDS password** – Use the password from the connected system to set the non‑reversible NDS password in eDirectory.\n* **Publish passwords to Distribution Password** – Use the password from the connected system to set the NMAS Distribution Password for password synchronization.\n* **Require password policy validation before publishing passwords** – Apply NMAS password policies during publishing; the password is not written if it fails validation.\n* **Reset user’s external system password to the Identity Manager password on failure** – On a publish Distribution Password failure, attempt to reset the external system password using the Distribution Password from the Identity Vault.\n* **Notify the user of password synchronization failure via e‑mail** – Send an e‑mail to the user when password synchronization fails."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable account tracking for the ACF2 driver using its Global Configuration Variables?",
+      "input": "",
+      "output": "To enable account tracking for the ACF2 driver:\n1. Open the **ACF2 Account Tracking** package in Identity Manager Designer.\n2. Edit the package’s Global Configuration Variables.\n3. Locate the **Enable account tracking** variable and set its value to **true**.\n4. Configure additional required variables such as **Realm**, **Object class**, **Identifiers**, **Status attribute**, **Status active value**, **Status inactive value**, **Subscription default status**, and **Publication default status** as appropriate for your environment.\n5. Save the configuration and redeploy the package so that the account tracking policies become active."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What information does the ACF2 Managed System Information package provide for reporting purposes in the ACF2 driver?",
+      "input": "",
+      "output": "The ACF2 Managed System Information package supplies metadata that the Identity Reporting Module uses to generate reports. It includes General Information such as **Name**, **Description**, **Location**, **Vendor** (Computer Associates), and **Version** of the ACF2 system, as well as System Ownership fields (**Business Owner**, **Application Owner**) and System Classification fields (**Classification**, **Environment**). These values are displayed in generated reports."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main configuration components and policies of the ACF2 driver as described in the documentation.",
+      "input": "",
+      "output": "The ACF2 driver consists of several configuration packages:\n- **ACF2 Base** defines essential GCVs (Remote Loader, Host Name, Port, KMO, Remote Password, Driver Password) and provides output/input transforms for command conversion and ChangeLog handling.\n- **ACF2 Default Configuration** adds GCVs for user container and password synchronization, publisher/subscriber policies for user creation, matching, placement, and a schema mapping table linking eDirectory attributes to ACF2 fields.\n- **ACF2 Entitlements** supplies policies that manage entitlement‑driven creation, deletion, and matching of Logonid records.\n- **ACF2 Password Synchronization** offers policies for publishing/subscribing password payloads, default passwords, and email notifications, together with GCVs controlling password flow and validation.\n- **ACF2 Account Tracking** includes policies and GCVs to enable tracking of accounts, define realm, object class, identifiers, and status handling.\n- **ACF2 Managed System Information** provides metadata (name, description, location, vendor, version, ownership, classification) for reporting.\nThese packages collectively enable synchronization, entitlement handling, password management, account tracking, and reporting for ACF2 within Identity Manager."
+    }
+  ]
+}

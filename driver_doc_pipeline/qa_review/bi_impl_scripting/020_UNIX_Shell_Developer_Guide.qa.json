@@ -1,0 +1,83 @@
+{
+  "driver": "UNIX Shell driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the EXEC function in the UNIX Shell driver?",
+      "input": "",
+      "output": "In the UNIX Shell driver, the EXEC function is used to run an external program or command line tool, log the executed command to the system log, and generate a status document that indicates the level of success or failure of the command."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the UNIX Shell driver provide event data to Shell scripts?",
+      "input": "",
+      "output": "The UNIX Shell driver provides event data to Shell scripts as name/value pairs. The driver shim places the data in IPC Shared Memory in a binary format, and the IDMGETVAR shell function invokes the ussmh helper tool to read those name/value pairs and assign them to Shell variables."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the STATUS subroutines available in the UNIX Shell driver and what does each do?",
+      "input": "",
+      "output": "The UNIX Shell driver defines the following STATUS subroutines:\n- STATUS_SUCCESS: Marks the event as successful and allows the next event to be processed.\n- STATUS_WARNING: Indicates the event succeeded with a warning; the warning message is logged and processing continues.\n- STATUS_RETRY: Tells Identity Manager to retry the event later because a temporary condition prevented processing.\n- STATUS_ERROR: Marks the event as failed; the error message is logged and the event is not retried.\n- STATUS_FATAL: Stops the driver; the message is logged and the driver must be restarted before further events are processed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which driver parameters control the polling and heartbeat behavior of the UNIX Shell driver?",
+      "input": "",
+      "output": "In the UNIX Shell driver, the parameters that control polling and heartbeat are:\n- pub-polling-interval (Publisher channel): The interval in seconds between polls for application events.\n- pub-heartbeat-interval (Publisher channel): The amount of idle time in seconds before a heartbeat event is issued.\n- pub-disabled (Publisher channel): A true/false flag that disables the Publisher channel (polling) when set to true."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve the Publisher polling interval inside a script for the UNIX Shell driver?",
+      "input": "",
+      "output": "Use the IDMGETPUBVAR function with the parameter name \"pub-polling-interval\":\n```\nPollingInterval=`IDMGETPUBVAR \"pub-polling-interval\"`\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you add an association to an identity in a Shell script using the UNIX Shell driver?",
+      "input": "",
+      "output": "Follow these steps in a Shell script:\n1. Retrieve the necessary event variables (e.g., EVENT_ID, SRC_DN, SRC_ENTRY_ID) using IDMGETVAR.\n2. Construct the new association value.\n3. Use IDMSETVAR to set the required name/value pairs:\n```\nIDMSETVAR \"COMMAND\" \"ADD_ASSOCIATION\"\nIDMSETVAR \"ASSOCIATION\" \"$MyAssociation\"\nIDMSETVAR \"EVENT_ID\" \"$EVENT_ID\"\nIDMSETVAR \"DEST_DN\" \"$SRC_DN\"\nIDMSETVAR \"DEST_ENTRY_ID\" \"$SRC_ENTRY_ID\"\n```\n4. Call a STATUS subroutine, such as STATUS_SUCCESS, to report success."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to create a poll.sh script that submits a modify-password event using the usclh tool in the UNIX Shell driver?",
+      "input": "",
+      "output": "To create a poll.sh that detects password changes and submits a modify‑password event:\n1. Use an application‑specific command to list password changes, e.g., `Results=`appchg --passwd-changes``.\n2. Loop over each result and split the string into association and password (e.g., using `awk -F:`).\n3. For each entry, call the change‑log tool usclh with the modify‑password type and association, feeding the new password on standard input:\n```\nfor Result in $Results; do\n  Association=`echo $Result | awk -F: '{print $1}'`\n  Password=`echo $Result | awk -F: '{print $2}'`\n  usclh -t modify-password -a $Association <<EOF\n$Password\nEOF\n done\n```\n4. Ensure the script is executable and located in the driver’s `scripts/` directory."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you deploy a custom driver based on the UNIX Shell driver?",
+      "input": "",
+      "output": "Deploying a custom driver for the UNIX Shell driver involves:\n1. Run the default Scripting driver installation program provided on the installation media (see \"Installing the Linux and UNIX Scripting Driver Shim\"). This installs core files under `/opt/novell/usdrv`.\n2. Copy your custom script files, custom driver XML configuration, and any additional binaries into the appropriate directories under the installation path (e.g., `scripts/`, `rules/`, `conf/`).\n3. If needed, modify `usdrv.conf` and `Scripting.xml` to reflect custom parameters or policies.\n4. (Optional) Retrieve an SSL certificate for encrypted communication by running `usdrv -s` and following the prompts; the certificate is stored in the `keys/` directory.\n5. Set the Driver Object Password and Remote Loader Password by running `usdrv -sp`.\n6. Start the driver with the `usdrv` command; the driver will begin processing events based on your custom scripts and policies."
+    },
+    {
+      "category": "config",
+      "instruction": "List all the item names that can be retrieved with IDMGETVAR in the UNIX Shell driver and give a brief description of each.",
+      "input": "",
+      "output": "The following item names are available via IDMGETVAR in the UNIX Shell driver:\n| Name | Description |\n|---|---|\n| COMMAND | Event command type (add, modify, delete, rename, modify‑password, check‑object‑password). |\n| ASSOCIATION | Identifier that links an identity across systems. |\n| CLASS_NAME | Identity class, such as User or Group. |\n| SRC_DN | Source distinguished name (slash format). |\n| EVENT_ID | Internal identifier for the event. |\n| SRC_ENTRY_ID | Source entry identifier. |\n| DEST_DN | Destination distinguished name (slash format). |\n| DEST_ENTRY_ID | Destination entry identifier. |\n| ADD_attr_name | Value to be added for attribute *attr_name*. |\n| REMOVE_attr_name | Value to be removed for attribute *attr_name*. |\n| ADD_REF_attr_name | Association value to be added for attribute *attr_name*. |\n| REMOVE_REF_attr_name | Association value to be removed for attribute *attr_name*. |\n| REMOVE_ALL_attr_name | Indicates all values of *attr_name* should be removed. |\n| OLD_PASSWORD | Previous password (used in modify‑password events). |\n| PASSWORD | New password (used in add and modify‑password events). |\n| OLD_SRC_DN | Old distinguished name for move or rename events. |\n| REMOVE_OLD_NAME | Flag indicating whether the old relative DN should be deleted (rename events). |\n| STATUS_LEVEL | Status of the event: success, warning, retry, error, or fatal. |\n| STATUS_MESSAGE | Message accompanying the status. |\n| STATUS_TYPE | Type of status, such as heartbeat."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible values for the driver parameter \"auto-loopback-detection\" in the UNIX Shell driver?",
+      "input": "",
+      "output": "The driver parameter \"auto-loopback-detection\" in the UNIX Shell driver accepts the boolean values `true` or `false`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If a Shell script for the UNIX Shell driver always returns STATUS_ERROR, how can you use tracing to identify the cause?",
+      "input": "",
+      "output": "To troubleshoot a script that always returns STATUS_ERROR in the UNIX Shell driver, enable a higher trace level in the driver configuration (e.g., set `-trace 5` or higher in `usdrv.conf`). Then:\n1. Run the driver and reproduce the error.\n2. Examine the trace file located at `logs/trace.log` (or the path defined in the driver parameters).\n3. Look for entries that show the execution of the script, the value returned by `EXEC`, and any messages logged with `IDMTRACE`.\n4. If the script uses external commands, verify their return codes (`$?`) and any error output captured.\n5. Adjust the script or command line based on the information found, then retest."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key components and workflow of the UNIX Shell driver as described in the developer guide.",
+      "input": "",
+      "output": "The UNIX Shell driver enables Identity Manager to interact with external systems using Shell scripts. It provides functions such as EXEC, IDMGETVAR, IDMSETVAR, and STATUS subroutines to run external commands, retrieve event data, set return values, and report status. Events are delivered to subscriber scripts (add.sh, modify.sh, etc.) after being converted to name/value pairs, while the driver polls the external system using a poll.sh script and submits events via the usclh change‑log tool. Driver parameters control installation path, polling intervals, heartbeat intervals, and loopback detection. Additional utilities like IDMTRACE, IDMQUERY, and tracing facilities aid debugging. Deployment involves installing the driver shim, adding custom scripts and configuration, and optionally configuring SSL and passwords."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a Shell script named modify.sh for the UNIX Shell driver that updates a user's telephone number using an external tool called appmod. The script should retrieve the association, the new telephone value (ADD_Telephone), call the external tool, and return STATUS_SUCCESS on success or STATUS_ERROR on failure.",
+      "input": "",
+      "output": "#!/bin/sh\n# modify.sh – updates a user's telephone number using appmod\n\n# Retrieve required event data\nASSOCIATION=`IDMGETVAR \"ASSOCIATION\"`\nNEW_TEL=`IDMGETVAR \"ADD_Telephone\"`\nEVENT_ID=`IDMGETVAR \"EVENT_ID\"`\nSRC_DN=`IDMGETVAR \"SRC_DN\"`\nSRC_ENTRY_ID=`IDMGETVAR \"SRC_ENTRY_ID\"`\n\n# Verify that we have the needed values\nif [ -z \"$ASSOCIATION\" ] || [ -z \"$NEW_TEL\" ]; then\n  STATUS_ERROR \"modify event: missing ASSOCIATION or ADD_Telephone\"\n  exit 0\nfi\n\n# Build and execute the external command\nCMD=\"appmod -a $ASSOCIATION -t $NEW_TEL\"\nEXEC $CMD\nRC=$?\n\nif [ $RC -eq 0 ]; then\n  # No association change is required for a modify, just report success\n  STATUS_SUCCESS \"Telephone updated for $ASSOCIATION\"\nelse\n  STATUS_ERROR \"Failed to update telephone for $ASSOCIATION, exit code $RC\"\nfi"
+    }
+  ]
+}

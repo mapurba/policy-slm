@@ -1,0 +1,53 @@
+{
+  "driver": "Bi Impl MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the connected system schema file in the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "The connected system schema file in the Bi Impl MF RACF driver defines the classes and attributes that are available on the external RACF system. It is read by the driver shim when the Metadirectory engine requests it (typically at driver startup) and is also used by the Policy Editor to map the Identity Vault schema to the external application's schema. Changing this file updates the data model the driver works with."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you specify a hierarchical schema in the Bi Impl MF RACF driver schema file?",
+      "input": "",
+      "output": "To specify a hierarchical schema, include the optional HIERARCHICAL keyword on the SCHEMA definition line. For example:\n```\nSCHEMA HIERARCHICAL\n```The presence of HIERARCHICAL tells the Bi Impl MF RACF driver that the target application is organized by hierarchical components rather than a flat set of users and groups."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attribute types are allowed in the Bi Impl MF RACF driver schema file and what is the default type if none is specified?",
+      "input": "",
+      "output": "The allowed attribute types in the Bi Impl MF RACF driver schema file are STRING, INTEGER, STATE, and DN. If no type is specified for an ATTRIBUTE, the driver assumes the default type STRING."
+    },
+    {
+      "category": "config",
+      "instruction": "What attribute properties can be assigned in the Bi Impl MF RACF driver schema file?",
+      "input": "",
+      "output": "The Bi Impl MF RACF driver schema file supports the following attribute properties: REQUIRED, NAMING, MULTIVALUED, CASESENSITIVE, and READONLY. These properties are added after the attribute type (if any) in the ATTRIBUTE line."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps must be taken after modifying the schema file for the Bi Impl MF RACF driver?",
+      "input": "",
+      "output": "After modifying the schema file for the Bi Impl MF RACF driver, you must:\n1. Save the changes to the sequential file or partitioned data set member referenced by the SCHEMDEF DD statement.\n2. Restart the driver shim task.\n3. Restart the Bi Impl MF RACF driver itself.\nThese restarts cause the driver shim to reread the updated schema file."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might changes to the schema file not take effect in the Bi Impl MF RACF driver, and how can this be resolved?",
+      "input": "",
+      "output": "If changes to the schema file do not take effect, it is usually because the driver shim and the driver have not been restarted after the edit. The Bi Impl MF RACF driver reads the schema file only at startup. To resolve the issue, stop the driver shim, stop the Bi Impl MF RACF driver, then start them again so the updated schema is loaded."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key elements and syntax rules of the Bi Impl MF RACF driver schema file.",
+      "input": "",
+      "output": "The Bi Impl MF RACF driver schema file is a sequential or partitioned data set file that defines the external system's data model. Each line starts with SCHEMA, CLASS, or ATTRIBUTE. The first non‑comment line must be a SCHEMA definition (optionally with HIERARCHICAL). CLASS lines declare a class name, optionally with CONTAINER, and must be closed by another CLASS line or the end of file. ATTRIBUTE lines follow a CLASS and define an attribute name, optional type (STRING, INTEGER, STATE, DN; default STRING), and optional properties (REQUIRED, NAMING, MULTIVALUED, CASESENSITIVE, READONLY). Comments begin with '#'. The file is read at driver startup and after any restart of the shim and driver."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a valid CLASS definition line for a container class named \"Department\" in the Bi Impl MF RACF driver schema file.",
+      "input": "",
+      "output": "```\nCLASS \"Department\" CONTAINER\n```"
+    }
+  ]
+}

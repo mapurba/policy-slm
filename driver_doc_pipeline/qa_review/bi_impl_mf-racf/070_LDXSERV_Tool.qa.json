@@ -1,0 +1,59 @@
+{
+  "driver": "Novell IDM RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the LDXSERV tool and why is it used with the Novell IDM RACF driver?",
+      "input": "",
+      "output": "LDXSERV is a TSO command tool that, for the Novell IDM RACF driver, can set a loopback token to suppress logging of exit activity, verify that the driver exits are correctly installed, query information from the change‑log queue, and optionally modify that queue."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you run LDXSERV to display the status of the Novell IDM RACF driver?",
+      "input": "",
+      "output": "Enter the command `ldxserv status` on a TSO session. The tool returns an XML document that includes the driver version, build date, the state of each Exit, the number of events queued, and details about the log file."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you retrieve the first event from the change‑log queue using LDXSERV for the Novell IDM RACF driver?",
+      "input": "",
+      "output": "Execute the command `ldxserv getnext`. LDXSERV outputs an XML document that contains the first queued event, showing the event type, date, time, event‑id, the associated user, and any relevant data such as the password."
+    },
+    {
+      "category": "howto",
+      "instruction": "After using GETNEXT, how do you remove (mark done) that event from the queue with LDXSERV for the Novell IDM RACF driver?",
+      "input": "",
+      "output": "Run `ldxserv markdone event(<event-id>)`, replacing `<event-id>` with the ID obtained from the GETNEXT output (e.g., `ldxserv markdone event(7006)`). LDXSERV returns an XML document indicating whether the removal succeeded."
+    },
+    {
+      "category": "config",
+      "instruction": "What XML elements and attributes are presented in the STATUS output of LDXSERV for the Novell IDM RACF driver?",
+      "input": "",
+      "output": "The STATUS XML contains:\n- `<ldx>` root element.\n- `<source>` with a `<product>` element having attributes `build`, `instance`, and `version`, and text specifying the driver version.\n- `<contact>` element.\n- `<output>` which includes a `<status>` element with attribute `level`.\n- Inside `<status>`:\n  - One or more `<exit>` elements with attributes `name`, `state`, `version`, `build-date`, `times-called`, `events-queued`, and `info`.\n  - A `<queue>` element with attributes `version`, `state`, `created-by`, and `entries`.\n  - A `<logger>` element with attributes `version`, `state`, `taskid`, and `logfilename`.\n  - A `<logfile>` element with attributes `name` and `state`."
+    },
+    {
+      "category": "config",
+      "instruction": "In the STATUS XML from LDXSERV, what information does each <exit> element provide for the Novell IDM RACF driver?",
+      "input": "",
+      "output": "Each `<exit>` element reports:\n- `name`: the exit identifier (e.g., LDXRIX02).\n- `state`: whether the exit is `enabled` or `disabled`.\n- `version`: the driver version associated with the exit.\n- `build-date`: the build date of the exit component.\n- `times-called`: how many times the exit has been invoked.\n- `events-queued`: the number of events currently queued for that exit.\n- `info`: a status message, typically `ok`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If LDXSERV reports `<status level=\"success\">` but the `<queue>` element shows `entries=\"0\"`, what does this indicate for the Novell IDM RACF driver?",
+      "input": "",
+      "output": "A `<status level=\"success\">` with `entries=\"0\"` means LDXSERV successfully queried the change‑log queue, and the queue is currently empty—there are no pending events for the Novell IDM RACF driver to process."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main functions and usage syntax of LDXSERV for the Novell IDM RACF driver.",
+      "input": "",
+      "output": "LDXSERV is a TSO command used with the Novell IDM RACF driver to control driver exits and the change‑log queue. Its syntax is `LDXSERV < STATUS | GETNEXT | [MARKDONE <EVENT(event-id)>] >`. `STATUS` returns an XML summary of driver components, exits, and queue state. `GETNEXT` fetches the first queued event as XML. `MARKDONE` removes a specific event identified by its event‑id, confirming the action with an XML response."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML example of a successful MARKDONE response for the Novell IDM RACF driver.",
+      "input": "",
+      "output": "<ldx>\n  <source>\n    <product build=\"20210103\" instance=\"ldxserv\" version=\"4.83\">\n      Novell IDM RACF Driver Version 4.8.3.0\n    </product>\n    <contact>NetIQ Corporation</contact>\n  </source>\n  <output>\n    <status level=\"success\">\n      <description>ok</description>\n    </status>\n  </output>\n</ldx>"
+    }
+  ]
+}

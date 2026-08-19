@@ -1,0 +1,71 @@
+{
+  "driver": "Bi Impl Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a Driver Shim Installation Failure in the Bi Impl Nx driver and why does it happen?",
+      "input": "",
+      "output": "A Driver Shim Installation Failure in the Bi Impl Nx driver occurs when the installation program cannot complete successfully. This typically happens because the wrong installation script is used for the operating system, the operating system is not supported, the installer is not run as root, or required package management software such as RPM is missing or out‑of‑date."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually install the certificate for the Bi Impl Nx driver?",
+      "input": "",
+      "output": "To manually install the certificate for the Bi Impl Nx driver:\n1. In iManager, browse to the Security container and locate the tree’s Certificate Authority (usually named *treeName* CA).\n2. Click the Certificate Authority object and select **Modify Object**.\n3. Open the **Certificates** tab.\n4. Click **Public Key Certificate** and then **Export**.\n5. Choose **No** to export without the private key and click **Next**.\n6. Select **Base64** format and click **Next**.\n7. Click **Save** and specify a local filename.\n8. Transfer the exported file to the connected system (e.g., via FTP) and place it at **/usr/local/nxdrv/keys/ca.pem**.\n9. Restart the Bi Impl Nx driver if necessary."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default Remote Loader port for the Bi Impl Nx driver and where can it be changed?",
+      "input": "",
+      "output": "The Bi Impl Nx driver uses port **8090** as the default Remote Loader port. This value can be changed by editing the **/etc/nxdrv.conf** file on the connected system."
+    },
+    {
+      "category": "config",
+      "instruction": "Which encrypted files store the driver object password and the Remote Loader password for the Bi Impl Nx driver, and where are they located?",
+      "input": "",
+      "output": "The driver object password is stored in the encrypted file **dpwdlf40** and the Remote Loader password is stored in **lpwdlf40**. Both files reside under the directory **/usr/local/nxdrv/keys** on the connected system."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take to resolve a Driver Shim Startup or Communication Failure for the Bi Impl Nx driver?",
+      "input": "",
+      "output": "To resolve a Driver Shim Startup or Communication Failure for the Bi Impl Nx driver:\n1. Examine the trace file referenced in the error message.\n2. Verify that the connected system’s operating system version is supported; consult the Identity Manager 4.8 Drivers Documentation for supported platforms.\n3. Apply all available operating‑system patches.\n4. Confirm that the Remote Loader and Driver object passwords configured on the Metadirectory server match the encrypted passwords stored on the shim (dpwdlf40 and lpwdlf40). Use **nxdrv-config** on the connected system to update them if needed.\n5. Update the passwords on the Metadirectory server via iManager’s driver configuration page.\n6. Ensure the correct host name and port number of the connected system are specified in the Remote Loader connection parameters; the default port is 8090 and can be changed in **/etc/nxdrv.conf**.\n7. After making changes, restart the Bi Impl Nx driver shim."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "When users or groups are not provisioned to the connected system with the Bi Impl Nx driver, what should you check?",
+      "input": "",
+      "output": "If users or groups are not provisioned to the connected system by the Bi Impl Nx driver, you should:\n1. Examine the status log, DSTRACE output, trace file, and script output file for errors.\n2. Verify that the identities reside in the appropriate base container; you can view and modify the base containers on the Global Configuration Values page of the Driver Edit Properties window in iManager.\n3. Ensure the driver’s **Data Flow** property is set to **Bidirectional** or **Identity Vault to Application**.\n4. If POSIX Management Mode is **Manage from Identity Vault**, confirm that the identities contain RFC 2307 attributes (the driver sets the **Require POSIX Attributes When Subscribing** GCV).\n5. Confirm that the security‑equivalent user for the driver has read rights on the base container (see Table 2‑2, Base Container Rights Required by the Driver Security‑Equivalent User)."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Global Configuration Values control password provisioning from the Identity Vault to the connected system in the Bi Impl Nx driver?",
+      "input": "",
+      "output": "The Bi Impl Nx driver provides several password‑management properties on the Global Configuration Values page. To allow provisioning of Identity Vault passwords to the connected system, ensure that:\n- The connected system accepts passwords from the Identity Vault (set the appropriate option in the password management properties).\n- The user’s container has an assigned Universal Password policy.\n- The **Synchronize Distribution Password When Setting Universal Password** option is enabled for that policy."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the PAM or LAM module for the Bi Impl Nx driver?",
+      "input": "",
+      "output": "To configure the PAM or LAM module for the Bi Impl Nx driver:\n1. Install the driver PAM or LAM module on the connected system (see the \"Installing the PAM or LAM Module\" documentation).\n2. Use the **nxdrv-config** command on the connected system to configure the module parameters as needed.\n3. Ensure that remote NIS or NIS+ clients also have the driver PAM module installed, possess a source of entropy, and can reach the driver shim over the network.\n4. On Red Hat AS 2.1 or 3.0, verify that the **pam_pwdb.so** PAM module is being used.\n5. Restart the Bi Impl Nx driver after configuration."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the Bi Impl Nx driver be specified as a Remote Loader driver even when the Identity Vault and connected system are on the same computer?",
+      "input": "",
+      "output": "The Bi Impl Nx driver must be defined as a Remote Loader driver regardless of whether the Identity Vault and the connected system share the same host because the driver shim communicates with the Metadirectory server via Remote Loader protocols. Declaring it as a Remote Loader driver ensures the correct communication channels, security handling, and activation timing are applied."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key troubleshooting steps for common problems with the Bi Impl Nx driver.",
+      "input": "",
+      "output": "Key troubleshooting steps for the Bi Impl Nx driver include:\n- Verify correct installation scripts, run as root, and ensure required package managers are up‑to‑date for shim installation failures.\n- Check **/var/nds/schema.log** and network connectivity for schema update failures.\n- Ensure eDirectory LDAP over SSL (port 636) is running and use **/usr/local/nxdrv/bin/nxdrv -s** or manual certificate export for certificate setup issues.\n- Review status logs, DSTRACE, and ensure the driver is set as a Remote Loader and activated within 90 days for driver start problems.\n- Examine trace files, OS support, patches, password consistency, host/port settings for shim startup/communication failures.\n- Confirm base containers, Data Flow settings, POSIX attributes, and adequate rights for provisioning issues in both directions.\n- Validate password management GCVs, Universal Password policies, and PAM/LAM module installation for password provisioning failures.\n- For modify/delete/rename issues, check logs, Data Flow authority, and identity associations; note that renaming is unsupported on AIX."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you verify when connected system user passwords are not being provisioned to the Identity Vault with the Bi Impl Nx driver?",
+      "input": "",
+      "output": "When connected system user passwords are not provisioned to the Identity Vault by the Bi Impl Nx driver, verify the following:\n1. Review status log, DSTRACE, and trace file for error messages.\n2. Ensure at least one of these password‑accept options is enabled in the driver’s Global Configuration Values:\n   - **Identity Vault Accepts Passwords from the Linux or UNIX Connected System**\n   - **Identity Vault Accepts Administrative Password Resets from the Linux or UNIX Connected System**\n3. Use the standard **passwd** command to change passwords (avoid **yppasswd** or **passwd -r**).\n4. Do not specify passwords with **useradd**, as this bypasses the authentication module.\n5. If the **Require Password Policy Validation before Publishing Passwords** GCV is set, confirm the user’s password complies with the assigned password policy.\n6. Ensure the PAM or LAM driver module is installed and enabled; configure it with **nxdrv-config** if needed.\n7. Verify remote NIS/NIS+ clients have the driver PAM module, sufficient entropy, and network connectivity to the driver shim.\n8. On Red Hat AS 2.1 or 3.0, confirm the use of the **pam_pwdb.so** PAM module."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "driver": "BI Implementation MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "In the BI Implementation MF RACF driver, the optional include/exclude file on the connected system is used to control which identities are synchronized from the Identity Vault to the connected system. It allows you to filter out unwanted identities or to limit the set of identities that are processed by the driver shim."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the requirements for the include/exclude file used by the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "The include/exclude file for the BI Implementation MF RACF driver must be a sequential file or a member of a partitioned data set. It is identified by the INCEXC DD statement in the driver shim's started task JCL. The file should contain no more than 50 entries total for optimal performance, and it is read when the driver shim starts (requiring a shim restart after any changes)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add a comment line in the include/exclude file for the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "To add a comment in the include/exclude file for the BI Implementation MF RACF driver, start the line with an octothorpe (#). For example:\n```\n# This is a comment.\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you exclude the RACF root user using the include/exclude file in the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "Create an exclude section that lists the association ROOT, like this:\n```\nEXCLUDE\n  ROOT\nENDEXCLUDE\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the matching priority order for include and exclude rules in the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "In the BI Implementation MF RACF driver, identities are matched first against exclude rules, then against include rules. Within each priority level, rules are evaluated in the order they appear in the file, and the first matching rule determines inclusion or exclusion."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why should you avoid using more than 50 include/exclude rules in the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "Using more than 50 include/exclude rules in the BI Implementation MF RACF driver is discouraged because each rule adds processing complexity. The driver shim must evaluate every rule for each event, which can degrade performance and increase resource consumption."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you define a class matching rule that excludes users with a RACF userid starting with TEMP in the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "Add an exclude section with a CLASS block that uses a limited regular expression, like this:\n```\nEXCLUDE\n    CLASS USER\n        DirXML-RACF-userid=TEMP.*\n    ENDCLASS\nENDEXCLUDE\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What syntax is used for a single-line include rule that matches a specific association in the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "A single-line rule uses the form:\n```\nINCLUDE [className] objectSelection\n```\nwhere `objectSelection` can be an association match (e.g., a RACF userid) or an attribute expression. For example, to include the user ADMIN:\n```\nINCLUDE ADMIN\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the effect of attribute matching rules being logically ANDed within a class rule for the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "In the BI Implementation MF RACF driver, when multiple attribute matching rules are placed inside a single CLASS block, all conditions must be true for the rule to match because the attributes are logically ANDed. To achieve an OR relationship, you must create separate CLASS blocks for each attribute condition."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an include/exclude file snippet for the BI Implementation MF RACF driver that excludes users with RACF userid USERA or USERB and includes all remaining users.",
+      "input": "",
+      "output": "```\n# Exclude USERA and USERB\nEXCLUDE\n    CLASS USER\n        DirXML-RACF-userid=USERA\n    ENDCLASS\n    CLASS USER\n        DirXML-RACF-userid=USERB\n    ENDCLASS\nENDEXCLUDE\n\n# Include all other users (implicit include)\nINCLUDE\n    CLASS USER\n    ENDCLASS\nENDINCLUDE\n```"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Third-Party JDBC Driver Class Name parameter in the JDBC driver and why is it required?",
+      "input": "",
+      "output": "In the JDBC driver, the Third-Party JDBC Driver Class Name parameter specifies the fully‑qualified Java class name of the external JDBC driver that the Identity Manager will use. This tells the JDBC driver which vendor‑specific driver to load (e.g., oracle.jdbc.driver.OracleDriver). The parameter is required because without it the JDBC driver cannot establish a connection to the target database."
+    },
+    {
+      "category": "config",
+      "instruction": "List the properties of the Time Syntax parameter for the JDBC driver, including tag name, default value, and legal values.",
+      "input": "",
+      "output": "Properties of the Time Syntax parameter in the JDBC driver:\n- Tag Name: time-syntax\n- Required?: no\n- Default Value: 1 (integer)\n- Legal Values: 1 (integer), 2 (canonical string), 3 (java string)\n- Schema-Dependent?: True"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the JDBC driver to store its state files in a custom directory on Windows?",
+      "input": "",
+      "output": "To configure the JDBC driver to use a custom state directory on Windows:\n1. Open the driver configuration in Identity Manager.\n2. Locate the parameter **State Directory** (tag name **state-dir**).\n3. Enter the full path of the desired folder, for example `c:\\novell\\nds\\DIBFiles`.\n4. Save the driver configuration.\n5. Restart the driver instance so that it creates or moves state files to the new location.\nIf the parameter is left empty or set to a period (.), the driver uses the current directory."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does moving a JDBC driver cause a full triggerless publisher resynchronization and how can you prevent it?",
+      "input": "",
+      "output": "When a JDBC driver is moved, the triggerless publisher builds new state files and performs a full resynchronization because the state files are tied to the driver’s GUID. To prevent this, copy the `jdbc_<GUID>` state file together with the other state files and ensure that **Triggerless Publication Legal Values 2 (process future changes only)** is set in the driver properties. Additionally, move the driver and its state files as a unit; otherwise the new GUID will cause a resync."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the main categories of parameters available for the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver parameters are grouped into four sub‑categories: (1) Uncategorized Parameters (e.g., Third‑Party JDBC Driver Class Name, Time Syntax, State Directory); (2) Database Scoping Parameters (e.g., Synchronization Filter, Schema Name, Include/Exclude Filter Expressions, Table/View Names); (3) Connectivity Parameters (e.g., Use Minimal Number of Connections, Connection Initialization Statements, Connection Properties); and (4) Compatibility Parameters (e.g., JDBC Driver Descriptor Filename, Transaction Isolation Level, Reuse Statements, Enable Statement‑Level Locking, Lock Statement Generator Class, etc.)."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a sample Connection Properties string for the JDBC driver that includes placeholders for username and password and enables Oracle NChar support.",
+      "input": "",
+      "output": "user={$username}; password={$password}; oracle.jdbc.defaultNChar=true"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the legal values and default for the Preserve white space in SQL statements? parameter in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, the **Preserve white space in SQL statements?** parameter (tag name **preserve-sql-whitespace**) has the following settings:\n- Legal Values: yes, no\n- Default Value: no\n- Required: yes"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable manual transactions for a MySQL database using the JDBC driver?",
+      "input": "",
+      "output": "To enable manual transactions for a MySQL database in the JDBC driver:\n1. Open the driver configuration.\n2. Find the **Use Manual Transactions?** parameter (tag name **use-manual-transactions**).\n3. Set its value to **1** (or **yes** / **true**).\n4. Save the configuration and restart the driver.\nThe driver will then execute statements within manually managed transactions, which is required for MySQL MyISAM tables that lack native transaction support."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the difference between schema‑aware and schema‑unaware modes in the JDBC driver.",
+      "input": "",
+      "output": "In the JDBC driver, **schema‑aware mode** is used when the Synchronization Filter parameter is absent or contains a non‑empty value. The driver retrieves table/view metadata at startup, requires either a Schema Name or Table/View Names value, and enables metadata‑dependent features (e.g., locking, referential attribute support). **Schema‑unaware mode** occurs when the Synchronization Filter is present and set to an empty value, causing the driver to skip metadata retrieval, ignore Schema Name and Table/View Names, and act as a passthrough for embedded SQL. In this mode, standard XDS events are ignored and publication (triggered or triggerless) does not work."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default transaction isolation level for the JDBC driver and what are the possible legal values?",
+      "input": "",
+      "output": "For the JDBC driver, the **Transaction Isolation Level** parameter (tag name **transaction-isolation-level**) defaults to **read committed** (derived dynamically, otherwise read committed). Legal values are: unsupported, none, read uncommitted, read committed, repeatable read, serializable."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the left outer join operator to (+) in the JDBC driver configuration?",
+      "input": "",
+      "output": "To set the left outer join operator to (+) in the JDBC driver:\n1. Open the driver’s configuration page.\n2. Locate the **Left Outer Join Operator** parameter (tag name **left-outer-join-operator**).\n3. Enter the value **(+)**.\n4. Save the configuration and restart the driver.\nThe driver will then use the (+) syntax for left outer joins in triggerless publication queries."
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the sample value and description for the Lock Statement Generator Class parameter in the JDBC driver.",
+      "input": "",
+      "output": "In the JDBC driver, the **Lock Statement Generator Class** parameter (tag name **lock-generator-class**) has the following sample value: `com.novell.nds.dirxml.driver.jdbc.db.lock.OraLockGenerator`. This class implements the DBLockStatementGenerator interface and generates the SQL statements needed to explicitly lock database resources before executing pending SQL statements."
+    }
+  ]
+}

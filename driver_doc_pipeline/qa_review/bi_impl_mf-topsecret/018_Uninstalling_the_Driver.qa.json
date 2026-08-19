@@ -1,0 +1,47 @@
+{
+  "driver": "Bi Impl Mf Topsecret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Bi Impl Mf Topsecret driver provide two different exit uninstallation procedures?",
+      "input": "",
+      "output": "The Bi Impl Mf Topsecret driver provides two separate exit uninstallation procedures because the actions required differ depending on whether the TSSINSTX installation exit was already in use before the driver was installed. If the TSSINSTX exit was not being used, Procedure 1 (simple de‑activation) is sufficient. If the TSSINSTX exit was in use, Procedure 2 must first replace the exit module, refresh the link list, and then toggle the exit off and on to ensure the previous configuration is correctly restored."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall the Security System Exit using Exit Uninstallation Procedure 1 for the Bi Impl Mf Topsecret driver?",
+      "input": "",
+      "output": "To uninstall the Security System Exit with Procedure 1 in the Bi Impl Mf Topsecret driver, follow these steps:\n1. Deactivate the exit by issuing the operator command:\n   ```\n   F TSS,EXIT(OFF)\n   ```\n2. Edit your Top Secret control options parameter file and replace the line that reads `EXIT(ON)` with `EXIT(OFF)`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall the Security System Exit using Exit Uninstallation Procedure 2 for the Bi Impl Mf Topsecret driver?",
+      "input": "",
+      "output": "To uninstall the Security System Exit with Procedure 2 in the Bi Impl Mf Topsecret driver, perform the following steps:\n1. Replace member `TXXINSTX` in your TSS load library with the backup copy you saved before installing the driver.\n2. If the TSS load library is listed in the z/OS linklist, refresh the linklist using the operator command:\n   ```\n   F LLA,REFRESH\n   ```\n3. Deactivate the exit with the operator command:\n   ```\n   F TSS,EXIT(OFF)\n   ```\n4. Reactivate the exit with the operator command:\n   ```\n   F TSS,EXIT(ON)\n   ```"
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to uninstall the Driver Shim for the Bi Impl Mf Topsecret driver?",
+      "input": "",
+      "output": "To uninstall the Driver Shim in the Bi Impl Mf Topsecret driver, follow these nine steps:\n1. Remove the change‑log started task and the driver shim started task from your system startup and shutdown procedures.\n2. Stop both the change‑log started task and the driver shim started task (see the \"Starting and Stopping the Change Log Started Task\" and \"Starting and Stopping the Driver Shim Started Task\" documentation for details).\n3. Delete members `LDXLOGR` and `TSDRV` from your started‑task procedure library.\n4. Delete the user IDs that were created for the started tasks (refer to the \"Preparing User IDs for the Started Tasks\" section).\n5. Remove the driver load library from the APF list by reversing the action described in Step 4 of the installation guide.\n6. Remove the `LDXSERV` and `SAFQUERY` commands from the `IKJTSOxx` member by reversing the actions from the \"Authorizing the Driver TSO Commands\" section.\n7. Delete the driver files from the HFS that were created in Step 6 of the installation guide:\n   ```\n   rm -Rf /opt/novell\n   rmdir -p /opt/novell/\n   ```\n8. Delete the driver samples library, the driver load library, and the REXX exec library that were created in Step 3 of the installation guide.\n9. Delete the change‑log data set that was created in the \"Allocating and Initializing the Change Log Data Set\" step."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you uninstall the Driver Object from eDirectory using the Bi Impl Mf Topsecret driver?",
+      "input": "",
+      "output": "To uninstall the Driver Object from eDirectory for the Bi Impl Mf Topsecret driver, execute the following steps in iManager:\n1. In iManager, select **Identity Manager Overview** from the Identity Manager task list on the left side of the window.\n2. Locate your driver set by searching the tree or by entering its name.\n3. Click **Delete Driver** on the Identity Manager Overview page.\n4. In the confirmation dialog, select the Driver object you wish to delete and click **OK**."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main tasks required to uninstall the Bi Impl Mf Topsecret driver.",
+      "input": "",
+      "output": "Uninstalling the Bi Impl Mf Topsecret driver involves three main tasks:\n1. **Security System Exit** – Use either Procedure 1 (deactivate the exit and set `EXIT(OFF)` in the control options file) or Procedure 2 (replace `TXXINSTX`, refresh the link list, then deactivate and reactivate the exit) depending on whether the TSSINSTX exit was previously used.\n2. **Driver Shim** – Remove the related started tasks from startup/shutdown procedures, stop the tasks, delete associated library members and user IDs, remove the driver load library from the APF list, delete TSO command entries, clean up driver files on the HFS, and delete the samples, load, and REXX exec libraries as well as the change‑log data set.\n3. **Driver Object in eDirectory** – In iManager, navigate to Identity Manager Overview, locate the driver set, click **Delete Driver**, and confirm the deletion of the driver object."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact command sequence needed to deactivate and then reactivate the exit using Exit Uninstallation Procedure 2 for the Bi Impl Mf Topsecret driver.",
+      "input": "",
+      "output": "The command sequence for Exit Uninstallation Procedure 2 in the Bi Impl Mf Topsecret driver is:\n```\nF LLA,REFRESH   # Refresh the linklist if the TSS load library is in the z/OS linklist\nF TSS,EXIT(OFF)  # Deactivate the exit\nF TSS,EXIT(ON)   # Reactivate the exit\n```"
+    }
+  ]
+}

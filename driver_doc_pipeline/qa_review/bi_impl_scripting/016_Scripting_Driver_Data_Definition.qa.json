@@ -1,0 +1,59 @@
+{
+  "driver": "Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the schema.def file in the Scripting driver?",
+      "input": "",
+      "output": "In the Scripting driver, the schema.def file defines the external application's identity classes and attributes. It lists each class (e.g., User) and its attributes, indicating which attribute is the naming attribute, whether an attribute is required, and any other special properties. This schema is used by the driver to understand the structure of the data it will synchronize, and the file format is consistent across operating systems and scripting languages."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the syntax for defining a class and its attributes in the Scripting driver’s schema.def file?",
+      "input": "",
+      "output": "In the Scripting driver’s schema.def file, classes and attributes are defined using the following syntax:\n```\nSCHEMA\n   CLASS <ClassName>\n     ATTRIBUTE <AttributeName> [NAMING] [REQUIRED]\n     ATTRIBUTE <AttributeName>\n     ATTRIBUTE <AttributeName>\n         (etc.)\n```\nFor example:\n```\nSCHEMA\n   CLASS User\n     ATTRIBUTE loginName NAMING REQUIRED\n     ATTRIBUTE firstName\n     ATTRIBUTE lastName\n```\nThe `NAMING` keyword marks the naming attribute, and `REQUIRED` indicates the attribute must be present."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a driver filter for the Scripting driver using the default XML configuration file?",
+      "input": "",
+      "output": "To create a driver filter for the Scripting driver using the default XML configuration file, follow these steps:\n1. In NetIQ iManager, create a new driver and select the default configuration file `Scripting.xml` that ships with the Scripting driver.\n2. Open the newly created driver and choose **Edit Driver Filter**.\n3. In the Driver Filter dialog, select the Identity Vault classes and attributes that are relevant to your synchronization scenario and set their **Synchronize** flag to **Yes**.\n4. Save the driver filter configuration.\n5. Export the driver configuration to an XML file for backup or later use.\nThe exported XML now contains the driver filter that tells the Metadirectory engine which classes and attributes the Scripting driver should monitor."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Scripting driver use the include-exclude.conf file to exclude identities from synchronization?",
+      "input": "",
+      "output": "In the Scripting driver, the `include-exclude.conf` file specifies identities that must not be synchronized. The driver reads this file and skips any identity whose name matches an entry under the `EXCLUDE` section, or any identity belonging to a class listed after the `CLASS` keyword. This allows administrators to prevent synchronization of sensitive or administrative accounts, ensuring they are not inadvertently replicated to the external application."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the format of entries in the include-exclude.conf file for the Scripting driver?",
+      "input": "",
+      "output": "The `include-exclude.conf` file for the Scripting driver uses a simple text format:\n```\nEXCLUDE\n   <identityName>\n   CLASS <className>\n```\nFor example:\n```\nEXCLUDE\n   adminUser\n   CLASS secureUser\n```\nEach line after `EXCLUDE` either lists a specific identity name to exclude or uses the `CLASS` keyword to exclude all identities of that class. The file format is the same on all operating systems and scripting languages."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you define an association rule for identities in the Scripting driver?",
+      "input": "",
+      "output": "To define an association rule for identities in the Scripting driver, follow these steps:\n1. Identify an attribute (or combination of attributes) that is unique in both the Identity Vault and the external application.\n2. If a single naming attribute is globally unique, use that attribute value as the association.\n3. If the naming attribute is only unique within its class, concatenate the attribute value with the class name (e.g., `BobUser`).\n4. For hierarchical systems, you may use the full hierarchical path (e.g., `Bob.Users.ACME`).\n5. If the system provides a serial number, use the serial number as the association.\n6. Document the chosen rule and ensure the driver scripts reference this rule when creating or locating identities during synchronization."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which event types should be considered when configuring the Scripting driver for identity synchronization?",
+      "input": "",
+      "output": "When configuring the Scripting driver for identity synchronization, you should consider the following event types:\n- **Add** – creation of a new identity, requiring all required attributes and security parameters.\n- **Modify** – change of one or more attributes of an existing identity.\n- **Modify-password** – a password change, treated as a distinct event because it often needs special handling.\n- **Delete** – removal of an identity, which may be permanent or a status change allowing undelete.\n- **Rename** – change of the naming attribute of an identity.\n- **Move** – change of the logical location of an identity, relevant in hierarchical systems.\n- **Query** – a request for information rather than a change, used by eDirectory to request data from the external application.\nEach event type may map to a different action in the external application, and you should define how each is handled in the Scripting driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you map relevant events between eDirectory and an external application using the Scripting driver?",
+      "input": "",
+      "output": "To map relevant events between eDirectory and an external application using the Scripting driver, follow these steps:\n1. List all event types supported by eDirectory (Add, Modify, Modify‑password, Delete, Rename, Move, Query).\n2. For each event type, decide what the corresponding action should be in the external application (e.g., an eDirectory Add may trigger an Add in the external system, or a Modify may trigger an Add if the identity does not yet exist).\n3. Document the mapping in a design document, noting any transformations needed for attribute values.\n4. Implement the mapping logic in the Scripting driver scripts, using the association rule to locate the target identity.\n5. Test each event mapping by generating events in eDirectory and verifying the correct operation in the external application.\n6. Adjust the driver filter and include‑exclude.conf as needed to ensure only relevant events are processed."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps for configuring the Scripting driver to synchronize identity data.",
+      "input": "",
+      "output": "To configure the Scripting driver for identity synchronization, follow these key steps:\n1. **Define Data Classes and Attributes** – Analyze the external application’s identity data and create a list of classes, attributes, data types, and special properties; record this in the driver’s `schema.def` file.\n2. **Associate Vault and Application Classes** – Use the driver filter (via the default `Scripting.xml` file) to select the Identity Vault classes and attributes that correspond to the external application and set them to **Synchronize**.\n3. **Create an Association Rule** – Choose a unique attribute or combination of attributes (e.g., naming attribute, class‑concatenated value, hierarchical path, or serial number) to uniquely identify each identity across both systems.\n4. **Define Excluded Identities** – Populate the `include-exclude.conf` file with specific identities or classes to prevent from being synchronized.\n5. **Identify Relevant Events** – Determine which event types (Add, Modify, Modify‑password, Delete, Rename, Move, Query) are applicable and define how each should be handled in the external application.\n6. **Implement Event Mapping** – Write or modify the driver scripts to translate eDirectory events into the appropriate external‑application actions, using the association rule and handling any attribute transformations.\n7. **Test and Refine** – Validate the configuration by generating test events and confirming correct synchronization; adjust the driver filter, schema, or scripts as needed.\nBy completing these steps, the Scripting driver will be fully configured to synchronize identities between the Identity Vault and the external application."
+    }
+  ]
+}

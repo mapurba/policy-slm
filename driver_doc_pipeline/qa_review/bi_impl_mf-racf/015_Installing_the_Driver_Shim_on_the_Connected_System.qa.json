@@ -1,0 +1,77 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver shim in the RACF driver and why does it not require Java on the connected system?",
+      "input": "",
+      "output": "The driver shim in the RACF driver provides the executable programs, REXX execs, and sample JCL needed to run the driver on a z/OS system. It includes an embedded Remote Loader, so a separate Java installation on the connected system is not required."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upload and extract the RACF driver shim libraries to the target z/OS system?",
+      "input": "",
+      "output": "1. Use FTP from the workstation where the .xmt files reside:\n   ftp Your-z/OS-Host\n   User: Your-User-ID\n   Password:\n   ftp> quote site lrecl=80 recfm=fb\n   ftp> binary\n   ftp> put samplib.xmt\n   ftp> put racfexec.xmt\n   ftp> quote site pri=30 sec=5 cyl\n   ftp> put idmload.xmt\n   ftp> quit\n2. Log on to z/OS with the same user ID used for FTP.\n3. Issue the TSO RECEIVE command for each .xmt file, supplying the desired data set names and volumes when prompted. Example for samplib.xmt:\n   RECEIVE INDATASET(samplib.xmt)\n   ...\n   DSNAME('SYS3.IDM.SAMPLIB') VOLUME(work0a)\n   ...\n   RECEIVE INDATASET(idmload.xmt) … DSNAME('SYS3.IDM.LOAD') …\n   RECEIVE INDATASET(racfexec.xmt) … DSNAME('SYS3.RACF.RACFEXEC') …\n4. Add the driver load library (e.g., SYS3.IDM.LOAD) to the APF list via the appropriate IEAAPFxx or PROGxx member and activate with SET PROG if using dynamic APF, otherwise IPL.\n5. Restrict access to the driver load library and do not place it in the linklist unless program protection is applied."
+    },
+    {
+      "category": "config",
+      "instruction": "Which PARMLIB member must be edited to authorize the LDXSERV and SAFQUERY commands for the RACF driver, and what is the exact syntax to add them?",
+      "input": "",
+      "output": "Edit member IKJTSOxx of SYS1.PARMLIB (or the equivalent PARMLIB member) and add the commands to the AUTHCMD statement as follows:\n\nAUTHCMD NAMES(\n  ... other commands ...\n  LDXSERV SAFQUERY)\n\nAfter editing, activate the changes with the PARMLIB CHECK and UPDATE commands."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you secure the RACF driver shim with SSL using the provided REXX exec?",
+      "input": "",
+      "output": "1. Run the REXX exec named SETCERT from the driver REXX exec library.\n2. When prompted, enter the MetaDirectory server host name or IP address and the secure LDAP port (default 636).\n3. When the certificate authority information is displayed, respond with Y to accept the CA.\nThe exec stores the trusted root certificate for subsequent secure LDAP connections."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the remote loader and driver object passwords for the RACF driver?",
+      "input": "",
+      "output": "Run the REXX exec named SETPWDS located in the driver REXX exec library. Respond to the prompts by entering the same passwords that were used when setting up the driver on the MetaDirectory server (refer to Step 11 of the installation guide)."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the requirements for the change log data set used by the RACF driver?",
+      "input": "",
+      "output": "The change log data set must be a standard z/OS direct‑access data set, allocated on a shared device if more than one z/OS system will use the security system database. It must be initialized with the LDXUTIL utility before the driver shim started task is started for the first time. The data set should be protected appropriately because it contains sensitive information.\n\nWarning: Initializing a change log data set that already contains data will erase the existing data."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set up the Change Log started task for the RACF driver?",
+      "input": "",
+      "output": "1. Copy member LDXLOGR from the samples library to your system's started‑task procedure library (e.g., SYS1.PROCLIB).\n2. Edit the copied JCL to specify:\n   • The name of the RACF driver load library.\n   • The name of the change log data set.\n3. Add the change log started task to your system startup and shutdown procedures so that it starts before user processing begins and stops after all user processing ends.\n4. Verify that the Workload Manager assigns the task to an appropriate Service Class."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set up the Driver Shim started task for the RACF driver?",
+      "input": "",
+      "output": "1. Copy member RACFDRV from the samples library to your started‑task procedure library (SYS1.PROCLIB).\n2. Edit the JCL to specify:\n   • The RACF driver load library name.\n   • The driver shim configuration file (use DRVCONF as a model).\n   • The connected system schema file (use SCHEMDEF as a model).\n   • The include/exclude file (use INCEXC as a model).\n   • The change log data set name.\n   • The driver REXX exec library name.\n3. Add the driver shim started task to your system startup and shutdown procedures.\n4. Assign a restricted user ID (e.g., RACFDRV) with OMVS and TSO segments, granting read/write access to /opt/novell/racfdrv and its subdirectories.\n5. Ensure the Workload Manager assigns the task to an appropriate Service Class."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What warning does the RACF driver documentation give about initializing a change log data set that already contains data?",
+      "input": "",
+      "output": "The documentation warns that initializing a change log data set that already contains data will cause the existing data to be lost."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you test the RACF driver installation before installing the security system exit using the LDXSERV command?",
+      "input": "",
+      "output": "1. Ensure the change log started task is running.\n2. From a TSO session that has the RACF driver load library in its STEPLIB, issue:\n   LDXSERV STATUS\n3. Review the output; it should display information about the memory queue, the change log started task, and confirm that the change log data set is valid and empty."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the RACF driver security system exits LDXEVX01 and ICHRIX02 on a z/OS system?",
+      "input": "",
+      "output": "1. Install LDXEVX01 (Common Command exit) via the Dynamic Exit Facility:\n   a. Edit the SAMPLIB members PROGAD and PROGDL, replacing <LDX load library> with your load library name.\n   b. Copy the edited members to SYS1.PARMLIB (or equivalent). If PROGAD or PROGDL already exist, rename the LDX members to unused PROGxx names.\n   c. Activate the exit with the console command SET PROG=AD.\n   d. To remove, issue SET PROG=DL.\n   e. For permanent installation, add the EXIT ADD statement to a production PROGxx member or automate SET PROG=AD during IPL.\n2. Install ICHRIX02 (RACROUTE REQUEST=VERIFY(X) post‑processing exit):\n   a. If no existing ICHRIX02, run the job in member RIX0A to linkedit LDXRIX02 into SYS1.LPALIB.\n   b. If an ICHRIX02 already exists, update member RIX0B as needed; RIX0B installs a router that calls the driver post‑processing exit and the existing exit.\n   c. To uninstall, use SMP/E RESTORE and IPL with the CLPA option.\n3. After both exits are installed, IPL the z/OS system with the CLPA option."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to install the driver shim for the RACF driver on a connected z/OS system.",
+      "input": "",
+      "output": "To install the driver shim for the RACF driver on a connected z/OS system: upload the samplib.xmt, idmload.xmt, and racfexec.xmt files via FTP; extract them with TSO RECEIVE and place the data sets on a shared volume; add the driver load library to the APF list and restrict its access; authorize the LDXSERV and SAFQUERY commands in the AUTHCMD statement; secure the shim with SSL by running the SETCERT REXX exec; configure passwords with the SETPWDS exec; allocate and initialize a shared change log data set using the LOGINIT job; set up the change log and driver shim started tasks by copying LDXLOGR and RACFDRV members and updating JCL with the appropriate library, data set, and configuration file names; assign a restricted user ID to the driver shim task; test the installation with LDXSERV STATUS before installing exits; install the LDXEVX01 and ICHRIX02 exits via the Dynamic Exit Facility or SMP/E; finally, IPL the system with the CLPA option and verify operation with another LDXSERV STATUS call."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "driver": "Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the exec function in the Scripting driver and what does it do?",
+      "input": "",
+      "output": "In the Scripting driver, the exec function is provided by the idmlib library. It executes an external program or command line, logs the command to the system log, and returns a status document indicating the level of success (e.g., a return code). This function is used to invoke application‑provided tools from within driver scripts."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How is event data formatted when it is passed to scripts in the Scripting driver?",
+      "input": "",
+      "output": "Event data for the Scripting driver is supplied in a name/value pair format. Each line contains a name, an equal sign (=), and a value, for example:\n```\nASSOCIATION=BobUser\nADD_TELEPHONE=818-555-2100\nADD_TELEPHONE=818-555-9842\n```\nNames are unique within a line, but the same name may appear multiple times with different values. The driver library provides functions such as idmgetvar to retrieve these values."
+    },
+    {
+      "category": "config",
+      "instruction": "What driver parameters are defined for the default Scripting driver and what are their possible values?",
+      "input": "",
+      "output": "The default Scripting driver defines the following parameters (Table 5‑17):\n| Parameter Name | Driver/Channel | Description | Values |\n|----------------|----------------|-------------|--------|\n| INSTALL_PATH | Driver | The installation path of the Driver | string value |\n| auto-loopback-detection | Driver | Whether to enable automatic loopback detection | true/false |\n| subscriber-script | Subscriber | The root script file for Subscriber events, relative to the driver installation path | string value |\n| pub-polling-interval | Publisher | The interval in seconds between Publisher polls for application events | number |\n| pub-heartbeat-interval | Publisher | The amount of idle time in seconds before a heartbeat event is issued | number |\n| pub-disabled | Publisher | Whether the Publisher Channel (such as for polling) is disabled | true/false |\nThese values can be retrieved in scripts with idmgetdrvvar, idmgetsubvar, or idmgetpubvar."
+    },
+    {
+      "category": "config",
+      "instruction": "Which item names can be retrieved with idmgetvar in a Scripting driver script?",
+      "input": "",
+      "output": "The Scripting driver defines many item names that can be obtained with idmgetvar (Table 5‑13). Some of the key names include:\n- COMMAND (event type such as add, modify, delete, rename, modify-password, check-object-password)\n- ASSOCIATION (identifier that distinguishes an identity on both systems)\n- CLASS_NAME (identity class, e.g., User or Group)\n- SRC_DN, DEST_DN (distinguished names in slash format)\n- EVENT_ID (internal event identifier)\n- SRC_ENTRY_ID, DEST_ENTRY_ID (identifiers in source or destination namespace)\n- ADD_attr_name / REMOVE_attr_name (values to add or remove for a given attribute)\n- ADD_REF_attr_name / REMOVE_REF_attr_name (association references to add or remove)\n- OLD_PASSWORD, PASSWORD (password values for modify‑password or add events)\n- OLD_SRC_DN, REMOVE_OLD_NAME (used for move or rename events)\n- STATUS_LEVEL, STATUS_MESSAGE, STATUS_TYPE (status information for the event)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve the command type of an event in a Scripting driver script?",
+      "input": "",
+      "output": "To retrieve the command type (event type) in a Scripting driver script:\n1. Import the idmlib library: `from idmlib import *`.\n2. Call the idmgetvar function with the name \"COMMAND\": `command = idmgetvar(\"COMMAND\")`.\n3. The variable `command` now contains a string such as \"add\", \"modify\", \"delete\", etc., which you can use in conditional logic to decide which action to take."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you add an association for an identity in an add.py script for the Scripting driver?",
+      "input": "",
+      "output": "To add an association in an add.py script for the Scripting driver:\n1. Retrieve required event values (e.g., CLASS_NAME, CN, EVENT_ID, SRC_DN, SRC_ENTRY_ID) using idmgetvar.\n2. Build the association value (for example, concatenate CN and CLASS_NAME).\n3. After successfully creating the identity in the external application, call idmsetvar for each required name/value pair:\n   ```python\n   idmsetvar(\"COMMAND\", \"ADD_ASSOCIATION\")\n   idmsetvar(\"ASSOCIATION\", association_value)\n   idmsetvar(\"EVENT_ID\", EventId)\n   idmsetvar(\"DEST_DN\", SrcDn)\n   idmsetvar(\"DEST_ENTRY_ID\", SrcEntryId)\n   ```\n4. Finally, report success with `status_success(\"Add event succeeded\")`. If the external command fails, use `status_error` instead."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you write a poll.py script that detects password changes and submits a modify‑password event using the usclh tool in the Scripting driver?",
+      "input": "",
+      "output": "To create a poll.py script for the Scripting driver that detects password changes:\n1. Import required modules: `import os` and `from idmlib import *`.\n2. Run the external application tool that reports password changes, e.g., `results = os.popen(\"appchg --passwd-changes\", 'r').readlines()`.\n3. Loop through each line of results, split the line on the colon to obtain the association and the new password:\n   ```python\n   for result in results:\n       fields = result.split(\":\")\n       Association = fields[0]\n       Password = fields[1]\n   ```\n4. For each change, open a pipe to the usclh changelog tool with the appropriate parameters:\n   ```python\n   usclh = os.popen(\"usclh -t modify-password -a \" + Association, 'w')\n   usclh.write(Password)\n   usclh.close()\n   ```\n5. The usclh invocation creates a modify‑password event that will be processed by the Publisher channel of the Scripting driver.\n6. Save the script as `poll.py` in the driver’s `scripts/` directory and ensure it is executable."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the exec function returns a non‑zero return code in a Scripting driver script, how should the script report the failure to Identity Manager?",
+      "input": "",
+      "output": "When exec returns a non‑zero code, the script should call the `status_error()` subroutine to report the failure. For example:\n```python\nrc = exec(command)\nif rc != 0:\n    status_error(\"Command failed with return code \" + str(rc))\n```\n`status_error` logs the error message and tells Identity Manager not to retry the event."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can a script retrieve the Publisher polling interval parameter from the Scripting driver?",
+      "input": "",
+      "output": "A script can obtain the Publisher polling interval using the `idmgetpubvar` function. Example:\n```python\nPollingInterval = idmgetpubvar(\"pub-polling-interval\")\n```\nThe variable `PollingInterval` will contain the number of seconds defined for the `pub-polling-interval` driver parameter."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What status subroutines are provided by the Scripting driver and what does each one indicate?",
+      "input": "",
+      "output": "The Scripting driver provides the following status subroutines (Table 5‑14):\n- `status_success()` – Marks the event as successful; Identity Manager proceeds to the next event.\n- `status_warning()` – Event processed with a warning; the warning message is logged and the next event is processed.\n- `status_retry()` – Event cannot be processed now; Identity Manager will retry later (use cautiously to avoid backlogs).\n- `status_error()` – Event cannot be processed and should not be retried; the error message is logged and processing moves to the next event.\n- `status_fatal()` – A fatal condition; the driver is stopped. The event remains in the queue and will be retried when the driver restarts."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main steps required to develop, configure, and deploy a custom driver using the Scripting driver.",
+      "input": "",
+      "output": "To develop, configure, and deploy a custom driver with the Scripting driver you should:\n1. **Evaluate application tools** – Identify command‑line utilities or APIs for modifying data and for detecting changes (polling or event notifications).\n2. **Define synchronization data** – Decide which attributes and identities will be synchronized and how events will be represented.\n3. **Write subscriber scripts** – Implement add.py, modify.py, delete.py, etc., using idmgetvar to read event data, exec to call external tools, idmsetvar to set return values (e.g., ADD_ASSOCIATION), and status_* subroutines to report outcome.\n4. **Write publisher scripts** – Implement poll.py (and optionally heartbeat.py) to detect changes in the external system and submit them via the usclh changelog tool.\n5. **Configure driver parameters** – Edit the driver’s XML configuration or use the default values for parameters such as INSTALL_PATH, pub‑polling‑interval, subscriber‑script, etc.; retrieve them in scripts with idmgetdrvvar, idmgetsubvar, or idmgetpubvar.\n6. **Test the scripts** – Use NetIQ Designer or iManager to simulate policies, and employ trace() and the driver trace log for debugging.\n7. **Package the driver** – Place custom scripts, configuration XML, and any additional files in the appropriate directories under the driver installation path (bin/, scripts/, conf/, rules/, etc.).\n8. **Deploy** – Run the Scripting driver installer, then copy the custom files into the installation directory (default /opt/novell/usdrv). Set any required passwords with `usdrv -sp` and retrieve SSL certificates with `usdrv -s` if needed.\n9. **Start the driver** – Launch the driver shim (usdrv) and monitor the trace and status logs to verify correct operation."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a complete example of an add.py subscriber script for the Scripting driver that creates an association from the identity’s CN and class name, executes a hypothetical appadd tool, and reports success or error.",
+      "input": "",
+      "output": "```python\n#!/usr/bin/python\n\nfrom idmlib import *\n\n# Retrieve required event information\nClassName = idmgetvar(\"CLASS_NAME\")\nCN = idmgetvar(\"CN\")\nPhoneNumber = idmgetvar(\"Telephone\")\nEventId = idmgetvar(\"EVENT_ID\")\nSrcDn = idmgetvar(\"SRC_DN\")\nSrcEntryId = idmgetvar(\"SRC_ENTRY_ID\")\n\n# Validate mandatory fields\nif ClassName == \"\" or CN == \"\":\n    status_error(\"Add event: missing CLASS_NAME and/or CN\")\nelse:\n    # Build the command line for the external application\n    Command = \"appadd -n \" + CN + \" -t \" + PhoneNumber\n    rc = exec(Command)\n    if rc == 0:\n        # Build the association value (CN + class name)\n        AssociationValue = CN + ClassName\n        # Set the variables that tell Identity Manager to create the association\n        idmsetvar(\"COMMAND\", \"ADD_ASSOCIATION\")\n        idmsetvar(\"ASSOCIATION\", AssociationValue)\n        idmsetvar(\"EVENT_ID\", EventId)\n        idmsetvar(\"DEST_DN\", SrcDn)\n        idmsetvar(\"DEST_ENTRY_ID\", SrcEntryId)\n        status_success(\"Add event succeeded for \" + AssociationValue)\n    else:\n        status_error(\"Add event failed with return code \" + str(rc))\n```\nThis script follows the pattern described in the Scripting driver documentation: it extracts event data with `idmgetvar`, calls the external `appadd` tool via `exec`, uses `idmsetvar` to set the required association fields, and finishes with either `status_success` or `status_error`."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "config",
+      "instruction": "In the JDBC driver, where are the default locations for SQL scripts on Windows and UNIX/Linux?",
+      "input": "",
+      "output": "For the JDBC driver, the default location for SQL scripts on Windows is `c:\\Novell\\IdentityManager\\NDS\\DirXMLUtilities\\jdbc\\sql\\`. On UNIX/Linux the default location is `/opt/novell/eDirectory/lib/dirxml/rules/jdbc/sql/`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver limit database identifier length to 18 characters?",
+      "input": "",
+      "output": "The JDBC driver limits identifier length to 18 characters because that is the maximum identifier size supported by DB2, which serves as the least common denominator across all supported databases. This restriction ensures that the same SQL scripts work on every database platform."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What abbreviation does the JDBC driver use for a stored procedure or function, and what is the alternative abbreviation that is avoided?",
+      "input": "",
+      "output": "The JDBC driver uses the abbreviation `proc_` for a stored procedure or function. An alternative abbreviation `sp_` is reserved for system‑stored procedures on Microsoft SQL Server and is deliberately avoided in the JDBC driver to prevent forced lookup in the master database and to maximize procedure lookup efficiency."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the JDBC driver name index objects, and can you give an example?",
+      "input": "",
+      "output": "In the JDBC driver, index names follow the convention `idx_<unqualified-table-name>_<sequence-number>`. For example, an index on the table `indirectlog` might be named `idx_indirectlog_1`."
+    },
+    {
+      "category": "config",
+      "instruction": "What naming pattern does the JDBC driver use for triggers, and provide an example of a trigger name for an insert operation on the `usr` table.",
+      "input": "",
+      "output": "The JDBC driver names triggers using the pattern `tgr_<unqualified-table-name>_<triggering-statement-type>_<sequence-number>`. For an INSERT trigger on the `usr` table, an example name would be `tgr_usr_i_1`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What case convention does the JDBC driver enforce for all database identifiers?",
+      "input": "",
+      "output": "The JDBC driver enforces that all database identifiers are lowercase."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the default length for string fields in the JDBC driver and why might you adjust it?",
+      "input": "",
+      "output": "String fields are defined with a length of 64 characters in the JDBC driver, which is sufficient for most eDirectory attribute values. You might refine (reduce) the field length to improve storage efficiency if you know the data will never exceed a smaller size."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which numeric data type does the JDBC driver prefer for primary key columns, and why?",
+      "input": "",
+      "output": "The JDBC driver prefers native scalar numeric types such as `BIGINT` for primary key columns because they offer better performance compared to generic types like `NUMERIC`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the `record_id` column in event log tables for the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, the `record_id` column in event log tables uses the maximum numeric range permitted by each database to avoid overflow as the log grows."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why do identity columns and sequence objects in the JDBC driver not cache values?",
+      "input": "",
+      "output": "Identity columns and sequence objects in the JDBC driver are configured not to cache values because some databases discard cached values on a rollback, which can cause large gaps in the sequence. Disabling caching avoids this issue."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key SQL script conventions used by the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver stores its SQL scripts in platform‑specific default folders (`c:\\Novell\\IdentityManager\\NDS\\DirXMLUtilities\\jdbc\\sql\\` on Windows and `/opt/novell/eDirectory/lib/dirxml/rules/jdbc/sql/` on UNIX/Linux). All identifiers are limited to 18 characters, lowercase, and follow abbreviated prefixes (e.g., `proc_` for procedures, `idx_` for indexes, `tgr_` for triggers). Naming conventions define exact patterns for objects such as `proc_<name>`, `idx_<table>_#`, `tgr_<table>_<type>_#`, `pk_<table>_<column>`, `fk_<table>_<column>`, and `chk_<table>_<column>`. String fields default to 64 characters, primary keys use native types like BIGINT, `record_id` uses the maximum numeric range, and identity/sequence objects do not cache values to prevent gaps after rollbacks."
+    }
+  ]
+}

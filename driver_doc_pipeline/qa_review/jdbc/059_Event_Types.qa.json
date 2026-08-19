@@ -1,0 +1,65 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the JDBC driver, what does event type 3 represent and when is it used?",
+      "input": "",
+      "output": "Event type 3 in the JDBC driver represents an \"update field (remove all values)\" operation. It is used when a field is being updated and the existing values are cleared before adding the new value."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which event categories include event type 7 in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, event type 7 belongs to the following categories: Per‑field (attribute), Query‑back, Per‑field, query‑back."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why do query‑back event types take precedence over non‑query‑back event types in the JDBC driver?",
+      "input": "",
+      "output": "Query‑back event types take precedence because they reflect the current state of the database object at processing time, ensuring that the most up‑to‑date data is published. Non‑query‑back events are ignored if a corresponding query‑back event exists for the same field or object, preventing stale data from being sent."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you generate the XDS <add> XML for an insert‑field event in the JDBC driver?",
+      "input": "",
+      "output": "To generate the XDS `<add>` XML for an insert‑field event in the JDBC driver:\n1. Identify the event log rows with `event_type` = 1 for the target table (e.g., `usr`).\n2. For each column entry, retrieve the `new_value` (Base64‑encoded for binary data).\n3. Create an `<add>` element with `class-name` set to the table name.\n4. Add an `<association>` child containing the primary‑key and schema (e.g., `idu=1,table=usr,schema=indirect`).\n5. For each column, add an `<add-attr>` element with `attr-name` set to the column name and a nested `<value>` element:\n   * Use `type=\"string\"` for text values.\n   * Use `type=\"octet\"` for binary values, providing the Base64‑encoded string.\nThe resulting XML matches the example shown for event type 1 in the JDBC driver documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you handle a situation where a query‑back event is logged for a row that has been deleted in the JDBC driver?",
+      "input": "",
+      "output": "When a query‑back event (types 5‑8) is logged for a row that no longer exists, the JDBC driver Publisher ignores the event. To handle this:\n1. Ensure that the Publisher checks for the existence of the database object before processing query‑back events.\n2. If the object is missing, skip generating any XDS XML for that event.\n3. Optionally, log a warning indicating that a query‑back event was ignored because the target row was deleted."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If both event type 2 and event type 8 are logged for the same field, what will the JDBC driver Publisher do?",
+      "input": "",
+      "output": "The JDBC driver Publisher will ignore the non‑query‑back event type 2 (update‑field) because a query‑back event type 8 (update‑field, query‑back) exists for the same field. The query‑back event takes precedence and only its changes are published."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What happens if a query‑back row event (type 6) and a query‑back field event (type 8) are logged for the same object in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, the query‑back row event type 6 takes precedence over the query‑back field event type 8 for the same object. Consequently, the field‑level event (type 8) is ignored, and only the row‑level changes are published."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about event types, categories, and their XDS output in the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver defines eight event types (1‑8) that indicate insert, update, or delete actions on fields or rows, with “query‑back” variants (5‑8) that retrieve current data at processing time. Event types are grouped into categories such as per‑field, per‑row, query‑back, and non‑query‑back. Query‑back events override non‑query‑back events, and row‑level events override field‑level events. The Publisher converts these events to XDS XML: `<add>` for inserts, `<modify>` for updates, and `<delete>` for deletions, using appropriate attribute elements and value types."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write the XDS <modify> XML that the JDBC driver Publisher would generate for an update‑field (remove‑all‑values) event where the column \"email\" changes from \"old@example.com\" to \"new@example.com\".",
+      "input": "",
+      "output": "<modify class-name=\"usr\">\n    <association>idu=1,table=usr,schema=indirect</association>\n    <modify-attr attr-name=\"email\">\n        <remove-all-values/>\n        <add-value>\n            <value type=\"string\">new@example.com</value>\n        </add-value>\n    </modify-attr>\n</modify>"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What XDS element does event type 4 correspond to in the JDBC driver?",
+      "input": "",
+      "output": "Event type 4 (delete row) corresponds to the `<delete>` element in the XDS output generated by the JDBC driver Publisher."
+    }
+  ]
+}

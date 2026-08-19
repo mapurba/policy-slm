@@ -1,0 +1,107 @@
+{
+  "driver": "Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you edit properties on the Driver Configuration page of the Scripting driver using iManager?",
+      "input": "",
+      "output": "To edit properties on the Driver Configuration page of the Scripting driver using iManager, follow these steps:\n1. In iManager, select **Identity Manager Overview** from the task list on the left.\n2. Navigate to your driver set by searching the tree or by entering its name.\n3. Click the driver to open its overview.\n4. Click the driver icon.\n5. Select **Driver Configuration** (or **Global Config Values** as appropriate).\n6. Edit the property values as desired, then click **OK**.\nRemember that any changes require a restart of the Scripting driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "What is the procedure for changing import‑only parameters in the Scripting driver?",
+      "input": "",
+      "output": "Import‑only parameters for the Scripting driver can only be changed by re‑importing the driver configuration file. The procedure is:\n1. Modify the desired parameters in the **Scripting.xml** file.\n2. Re‑import the **Scripting.xml** file over the existing driver using the driver import function in iManager.\n3. After the import completes, restart the Scripting driver for the changes to take effect."
+    },
+    {
+      "category": "config",
+      "instruction": "What import‑only parameters can be set for the Scripting driver and what values are allowed?",
+      "input": "",
+      "output": "The Scripting driver has three import‑only parameters (Table 4‑1):\n\n| Property Name | Values or Format |\n|---------------|------------------|\n| **Data Flow** | Bidirectional, Application to Identity Vault, Identity Vault to Application |\n| **Enable Entitlements** | Yes, No |\n| **Use SSL** | No |\n\nThese values must be defined in the **Scripting.xml** file before the driver is imported."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the \"Bidirectional\" Data Flow option mean for the Scripting driver?",
+      "input": "",
+      "output": "In the Scripting driver, selecting the **Bidirectional** Data Flow means that identities are synchronized in both directions: from the Identity Vault to the connected application and from the application back to the Identity Vault. After all pending events are processed, both systems contain identical identity data."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When should you enable Entitlements for the Scripting driver?",
+      "input": "",
+      "output": "Enable **Entitlements** for the Scripting driver only if you plan to use the User Application or Role‑Based Entitlements with the driver. Enabling this option allows the driver to work with either Approval Flow or Role‑Based Entitlements provided by the Entitlements Service driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is it recommended to use SSL with the Scripting driver?",
+      "input": "",
+      "output": "The **Use SSL** property determines whether the Scripting driver encrypts the connection between the Identity Vault and the connected system. Using SSL is strongly recommended because, without SSL, identity data—including passwords—is transmitted across the network in clear text, exposing it to interception."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the Remote Loader Connection parameters for the Scripting driver and how should they be formatted?",
+      "input": "",
+      "output": "The Remote Loader Connection parameters for the Scripting driver are defined as a space‑separated string (Table 4‑3):\n\n| Parameter | Description |\n|-----------|-------------|\n| **host=hostName** | Connected system host name or IP address. |\n| **port=portNumber** | Connected system TCP port number (default 8090). |\n| **kmo=objectRDN** | RDN of the object that holds the server certificate signed by the tree’s certificate authority. Enclose in double quotes if the name contains spaces. |\n\nExample string from the documentation:\n```\nhostname=192.168.17.41 port=8090 kmo=\"SSL CertificateDNS\"\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the Driver Object Password property in the Scripting driver?",
+      "input": "",
+      "output": "The **Driver Object Password** is used by the driver shim (embedded Remote Loader) to authenticate itself to the Metadirectory engine. The password must match the Driver Object Password configured on the connected system's driver shim."
+    },
+    {
+      "category": "config",
+      "instruction": "What values can be selected for the Startup Option property of the Scripting driver?",
+      "input": "",
+      "output": "The **Startup Option** property for the Scripting driver can be set to either **Auto start** or **Manual**."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Automatic Loopback Detection setting control in the Scripting driver?",
+      "input": "",
+      "output": "The **Automatic Loopback Detection** setting specifies whether the driver shim discards events that would cause loopback conditions. This feature complements the loopback detection already provided by the Metadirectory engine, helping to prevent duplicate processing of the same event."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default and minimum values for the Polling Interval property in the Scripting driver?",
+      "input": "",
+      "output": "The **Polling Interval** defines how many seconds the Publisher shim waits after running the polling script before sending events to the Metadirectory engine. The default interval is **60 seconds**, and the minimum allowed interval is **1 second**."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you disable the heartbeat mechanism in the Scripting driver?",
+      "input": "",
+      "output": "To disable the heartbeat mechanism in the Scripting driver, set the **Heartbeat Interval** property to **0**. Any non‑zero value defines the number of seconds between heartbeat checks."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the effect of setting the Application Supports Query property to No in the Scripting driver?",
+      "input": "",
+      "output": "When **Application Supports Query** is set to **No**, the Scripting driver will not attempt to query data from the connected application. Consequently, objects cannot be matched or merged based on query results, limiting the driver to event‑notification scenarios only."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the difference between the SourceName and GUID options for Auto Associate Subscriber Value in the Scripting driver.",
+      "input": "",
+      "output": "For **Auto Associate Subscriber Value**, choosing **SourceName** uses the object's naming attribute as the association value, which is easier to read in scripts. Choosing **GUID** uses the object's Global Unique Identifier, guaranteeing uniqueness even if the object is renamed or moved."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Strip Old Values property control in the Scripting driver?",
+      "input": "",
+      "output": "The **Strip Old Values** property determines how the engine treats older attribute values during event processing on the subscriber channel. Selecting **Strip** removes attribute values whose timestamps are older than the current state. Selecting **Keep** retains those older values, which can be useful if the target application requires processing of every event."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration areas and important properties for the Scripting driver.",
+      "input": "",
+      "output": "The Scripting driver’s configuration is divided into three main areas: import‑only parameters (Data Flow, Enable Entitlements, Use SSL), the Driver Configuration page (properties such as Driver Module, Remote Loader Connection, Script files, intervals, and loopback detection), and Global Configuration Values (association settings, password flow options, base containers, and notification settings). Changing any property requires a driver restart, and import‑only parameters can only be altered by re‑importing the **Scripting.xml** file."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the example Remote Loader connection parameter string shown in the Scripting driver documentation.",
+      "input": "",
+      "output": "```\nhostname=192.168.17.41 port=8090 kmo=\"SSL CertificateDNS\"\n```"
+    }
+  ]
+}

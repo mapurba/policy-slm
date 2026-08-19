@@ -1,0 +1,41 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What SQL statements does the JDBC driver generate for an <add> XDS event during indirect synchronization?",
+      "input": "",
+      "output": "For an <add> event, the JDBC driver generates:\n* Zero or more SELECT statements, depending on the matching policy.\n* One parent‑table INSERT statement for each single‑value <add-attr> element.\n* Zero or one stored procedure/function calls to retrieve primary‑key values before or after the parent‑table INSERT.\n* One child‑table INSERT statement for each multivalue <add-attr> element.\nAll of these statements are produced by the JDBC driver as part of indirect synchronization."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the JDBC driver handle a <modify> XDS event when mapping to DML statements?",
+      "input": "",
+      "output": "When processing a <modify> event, the JDBC driver creates:\n* One parent‑table UPDATE statement for each single‑value <add-value> or <remove-value> element.\n* One child‑table INSERT statement for each multivalue <add-value> element.\n* One child‑table DELETE statement for each <remove-value> element.\nThese statements reflect the changes described by the <modify> event."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which SQL actions are performed by the JDBC driver for a <delete> XDS event?",
+      "input": "",
+      "output": "For a <delete> event, the JDBC driver issues:\n* One parent‑table DELETE statement.\n* One DELETE statement for each child table associated with the object being deleted.\nThis ensures both the main record and its related child records are removed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What SQL statements are produced by the JDBC driver for a <query> XDS event?",
+      "input": "",
+      "output": "The JDBC driver maps a <query> event to:\n* One SELECT statement on the parent table.\n* One SELECT statement for each child table.\nThese SELECTs retrieve the requested data from the database."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver generate zero statements for <move>, <rename>, <modify-password>, and <check-object-password> XDS events?",
+      "input": "",
+      "output": "The mapping table shows that the JDBC driver generates *0 statements* for those events because they are only acted upon if they are bound to embedded SQL statements. Without such bindings, the JDBC driver does not produce any SQL for <move>, <rename>, <modify-password>, or <check-object-password> events."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the JDBC driver maps XDS events to SQL statements for indirect synchronization.",
+      "input": "",
+      "output": "In the JDBC driver, indirect synchronization maps XDS events as follows: <add> triggers selects, a parent INSERT, optional key‑retrieval procedures, and child INSERTs; <modify> results in parent UPDATEs, child INSERTs for added multivalues, and child DELETEs for removed values; <delete> issues a parent DELETE and child DELETEs; <query> creates a parent SELECT and a SELECT per child table; and <move>, <rename>, <modify-password>, and <check-object-password> produce no statements unless explicitly bound to embedded SQL."
+    }
+  ]
+}

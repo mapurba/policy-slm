@@ -1,0 +1,95 @@
+{
+  "driver": "IBM i driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the IBM i driver?",
+      "input": "",
+      "output": "The include/exclude file in the IBM i driver allows you to control which identities are synchronized between the Identity Vault and the IBM i system. Identities that match exclude rules are omitted from synchronization, while identities that match include rules are processed normally."
+    },
+    {
+      "category": "config",
+      "instruction": "Where is the include/exclude file located for the IBM i driver?",
+      "input": "",
+      "output": "The include/exclude file for the IBM i driver is located in the driver IFS path at **conf/include-exclude.conf**. If the driver was installed with the default IFS path, the full path is **/usr/local/i5osdrv/conf/include-exclude.conf**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply changes made to the include/exclude file in the IBM i driver?",
+      "input": "",
+      "output": "After editing the include/exclude file for the IBM i driver, you must restart the driver shim. The file is read only when the driver shim starts, so a restart is required for changes to take effect."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the IBM i driver determine priority when matching identities in the include/exclude file?",
+      "input": "",
+      "output": "The IBM i driver matches identities in the following priority order:\n1. Channel‑specific (Publisher or Subscriber) exclude rules\n2. Channel‑specific include rules\n3. General exclude rules\n4. General include rules\nWithin each priority level, rules are evaluated in the order they appear in the file, and the first matching rule determines inclusion or exclusion."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the recommended maximum number of entries in an IBM i driver include/exclude file?",
+      "input": "",
+      "output": "For optimal performance, an IBM i driver include/exclude file should contain no more than **50 entries total**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you write a comment line in the IBM i driver include/exclude file?",
+      "input": "",
+      "output": "In the IBM i driver include/exclude file, any line that begins with an octothorpe (**#**) is treated as a comment. Example:\n```\n# This is a comment.\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you define a subscriber section in the IBM i driver include/exclude file?",
+      "input": "",
+      "output": "A subscriber section starts with the line **SUBSCRIBER** and ends with **ENDSUBSCRIBER**. Any include or exclude sections placed between these lines apply only to the subscriber channel. Example:\n```\nSUBSCRIBER\n  ...\nENDSUBSCRIBER\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you define an include section within the IBM i driver include/exclude file?",
+      "input": "",
+      "output": "An include section begins with the line **INCLUDE** and ends with **ENDINCLUDE**. Rules placed inside affect objects that should be included. Example:\n```\nINCLUDE\n  ...\nENDINCLUDE\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you write a class matching rule for the UserProfile class in the IBM i driver include/exclude file?",
+      "input": "",
+      "output": "A class matching rule starts with **CLASS className** and ends with **ENDCLASS**. For the UserProfile class, the syntax is:\n```\nCLASS UserProfile\n  ...\nENDCLASS\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you write attribute matching rules using limited regular expressions in the IBM i driver include/exclude file?",
+      "input": "",
+      "output": "Within a class matching rule, an attribute matching rule is written as **attributeName=expression**. The expression can be an exact value or a limited regular expression such as `TEMP.*` to match any name starting with TEMP. Example:\n```\nCLASS UserProfile\n  USRPRF=TEMP.*\nENDCLASS\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a single‑line exclude rule for the ADMIN user in the IBM i driver include/exclude file?",
+      "input": "",
+      "output": "A single‑line rule can be written as follows to exclude the ADMIN user from subscriber events:\n```\n# Do not subscribe to events for the ADMIN user.\nSUBSCRIBER EXCLUDE adminUserProfile\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are limited regular expressions and how are they used in the IBM i driver include/exclude file?",
+      "input": "",
+      "output": "Limited regular expressions are patterns used to match strings in attribute or association expressions. They support:\n- Literal characters (case sensitive)\n- Period (`.`) for any single character\n- Bracket expressions (`[0-9]`) for a set or range of characters\n- Asterisk (`*`) for zero or more repetitions of the preceding item\n- Plus (`+`) for one or more repetitions\n- Question mark (`?`) for zero or one repetition\n- Parentheses for grouping (nesting not supported)\nThese patterns are used in attribute matching rules, such as `USRPRF=TEMP.*`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What must you do after editing the include/exclude file to ensure the IBM i driver applies the changes?",
+      "input": "",
+      "output": "After editing the include/exclude file, you must restart the driver shim for the IBM i driver. The driver reads the file only at shim start‑up, so a restart is required for the new rules to be recognized."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points of configuring the include/exclude file for the IBM i driver.",
+      "input": "",
+      "output": "The IBM i driver uses an optional **include-exclude.conf** file (default location **/usr/local/i5osdrv/conf/include-exclude.conf**) to control which identities are synchronized. The file is read at shim start, so changes require a shim restart. It can contain up to 50 rules, organized into subscriber/publisher sections, include/exclude sections, class and attribute matching rules, and single‑line rules. Matching follows a defined priority (channel‑specific exclude, channel‑specific include, general exclude, general include) and respects the order of rules. Comments start with `#`. Limited regular expressions are used for pattern matching."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example include/exclude file for the IBM i driver that excludes all users whose names start with TEMP and includes only users whose names start with IDM for both subscriber and publisher channels.",
+      "input": "",
+      "output": "```\n# Exclude users whose names start with TEMP\nEXCLUDE\n    CLASS UserProfile\n        USRPRF=TEMP.*\n    ENDCLASS\nENDEXCLUDE\n\n# Include only users whose names start with IDM for both channels\nSUBSCRIBER INCLUDE UserProfile USRPRF=IDM.*\nPUBLISHER INCLUDE UserProfile USRPRF=IDM.*\n```"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the pg_hba.conf file and why must it be updated when configuring the JDBC driver?",
+      "input": "",
+      "output": "The pg_hba.conf file in PostgreSQL 8 defines client authentication rules. For the JDBC driver you must update it so that the driver’s database user (idm) is allowed to connect to the idm database, otherwise the driver will be rejected during login."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the correct syntax for adding an entry to pg_hba.conf for the JDBC driver, and which fields must be provided?",
+      "input": "",
+      "output": "Add a line in pg_hba.conf with the following fields:\n```\n# TYPE DATABASE USER IP-ADDRESS IP-MASK METHOD\nhost    idm     idm <ip-address> <net-mask> password\n```\nReplace `<ip-address>` and `<net-mask>` with the appropriate values for the client host. This entry allows the JDBC driver user \"idm\" to connect to the \"idm\" database using password authentication."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create the idm database for the JDBC driver on a UNIX/Linux system?",
+      "input": "",
+      "output": "Open a UNIX command line and run the following command:\n```\n./createdb idm\n```\nThis creates the database named \"idm\" which the JDBC driver will use."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you log in to the idm database as the postgres user using the PostgreSQL client for the JDBC driver?",
+      "input": "",
+      "output": "From a UNIX command line, execute:\n```\n./psql -d idm postgres\n```\nBy default the postgres user has no password, so you can connect directly."
+    },
+    {
+      "category": "howto",
+      "instruction": "After logging into psql, how do you run the installation script for the JDBC driver?",
+      "input": "",
+      "output": "Inside the psql prompt, issue the command:\n```\n\\i 1_install_8.sql\n```\nThis runs the script that sets up the schema needed by the JDBC driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "Where are the PostgreSQL installation script files for the JDBC driver located on Windows and UNIX/Linux platforms?",
+      "input": "",
+      "output": "On Windows the scripts are in:\n```\ninstall-dir\\DirXMLUtilities\\jdbc\\sql\\postgres\\install\n```\nOn UNIX/Linux the scripts are in:\n```\ninstall-dir/lib/dirxml/rules/jdbc/sql/postgres/install\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What directory does the JDBC driver expect to find PostgreSQL command binaries like createdb and psql?",
+      "input": "",
+      "output": "The JDBC driver expects the PostgreSQL command binaries to be located in the directory:\n```\npostgres-install-dir/pgsql/bin\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If changes to pg_hba.conf do not take effect for the JDBC driver, what step should you verify?",
+      "input": "",
+      "output": "Ensure you have restarted the PostgreSQL server after editing pg_hba.conf. If you used pgAdminIII, also make sure you saved the file by clicking the disk icon in the editor toolbar and confirming the prompt."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to install PostgreSQL 8 for use with the JDBC driver.",
+      "input": "",
+      "output": "1. Locate the JDBC driver’s PostgreSQL scripts (install-dir\\DirXMLUtilities\\jdbc\\sql\\postgres\\install on Windows or install-dir/lib/dirxml/rules/jdbc/sql/postgres/install on UNIX/Linux).\\n2. Create the `idm` database with `./createdb idm`.\\n3. Connect to the database as the `postgres` user using `./psql -d idm postgres`.\\n4. Inside psql, run the script `\\i 1_install_8.sql`.\\n5. Edit `pg_hba.conf` (via pgAdminIII or directly) to add a `host` entry for the JDBC driver user `idm`, specifying IP address, net mask, and `password` method.\\n6. Save the file (disk icon in pgAdminIII) and restart the PostgreSQL server."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "In pgAdminIII’s pg_hba.conf editor, why are the IP-ADDRESS and IP-MASK columns combined into a single IP-Address field for the JDBC driver configuration?",
+      "input": "",
+      "output": "pgAdminIII presents the pg_hba.conf entries in a simplified grid where the separate `IP-ADDRESS` and `IP-MASK` columns are merged into one column named `IP-Address`. The JDBC driver’s configuration therefore requires you to place the two values in that single field, separated by a single whitespace character."
+    }
+  ]
+}

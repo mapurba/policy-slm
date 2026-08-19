@@ -1,0 +1,53 @@
+{
+  "driver": "BI Implementation MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver shim configuration file in the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "In the BI Implementation MF RACF driver, the driver shim configuration file controls the operation of the driver shim. It contains one configuration statement per line that defines options such as connection strings, HTTP ports, trace settings, and password values, allowing the shim to be customized without modifying the driver code."
+    },
+    {
+      "category": "config",
+      "instruction": "Which option in the BI Implementation MF RACF driver shim configuration file specifies the HTTP services port, and what is its default value?",
+      "input": "",
+      "output": "The option `-hp <httpPort>` or its long form `-httpport <httpPort>` specifies the HTTP services port number. The default HTTP services port number is **8091**."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you set the limit for the trace file size in the BI Implementation MF RACF driver shim configuration file, and what is the minimum allowed size?",
+      "input": "",
+      "output": "Use the option `-tfm size` or its long form `-tracefilemax size` to specify the limit for the trace file size. The size can be expressed with K, M, or G suffixes (e.g., `1000K`, `100M`, `10G`). The minimum allowed value is **100K**."
+    },
+    {
+      "category": "config",
+      "instruction": "What configuration option disables writing to the dirxml.log file in the BI Implementation MF RACF driver shim?",
+      "input": "",
+      "output": "The option `-ndl` or its long form `-nodirxmllog` disables writing to the driver status log file and specifically disables writing to `dirxml.log`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a driver shim configuration file that sets a trace level of 3, uses a CA certificate located at /opt/novell/racfdrv/keys/ca.pem, and stores the trace log at /opt/novell/racfdrv/logs/trace.log for the BI Implementation MF RACF driver?",
+      "input": "",
+      "output": "Create a plain text file (or a member of a partitioned data set) and add the following lines, one per option:\n```\n-tracefile /opt/novell/racfdrv/logs/trace.log\n-trace 3\n-connection \"ca=/opt/novell/racfdrv/keys/ca.pem\"\n```\nSave the file and reference it with the DRVCONF DD statement in the driver shim's JCL."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you disable the HTTP service in the BI Implementation MF RACF driver shim using the configuration file?",
+      "input": "",
+      "output": "Add the option `-nohttpport` as a separate line in the driver shim configuration file. This disables the HTTP service entirely."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the trace file for the BI Implementation MF RACF driver continues to grow beyond the size specified with -tracefilemax, what is the expected behavior and how can you verify that roll‑over is occurring?",
+      "input": "",
+      "output": "When `-tracefilemax` is set, the driver shim creates up to nine roll‑over files named with the base trace filename plus `_n` (where n is 1 through 9). Each roll‑over file is 1/10th of the total size specified. If the trace file exceeds the maximum at startup, it will remain larger until the roll‑over process completes through all ten files. Verify roll‑over by checking the directory for the main trace file and the additional files (`trace.log_1`, `trace.log_2`, … `trace.log_9`)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration options available for the BI Implementation MF RACF driver shim.",
+      "input": "",
+      "output": "The BI Implementation MF RACF driver shim supports the following key configuration options: \n- `-conn`/`-connection` to set connection strings (including port and CA file). \n- `-hp`/`-httpport` to define the HTTP service port (default 8091). \n- `-path` to set the driver file directory (default `/opt/novell/racfdrv`). \n- `-sp`/`-setpassword` to provide Remote Loader and Driver object passwords. \n- `-t`/`-trace` to set debug trace level (0‑10). \n- `-tfm`/`-tracefilemax` to limit trace file size with a minimum of 100K and automatic roll‑over to nine additional files. \n- `-ndl`/`-nodirxmllog` to disable status logging. \n- `-nohttpport` to disable HTTP services. \n- `-disablerexx` to disable REXX scripts. \n- `-pollinginterval` and `-heartbeatinterval` to override driver‑level intervals in seconds."
+    }
+  ]
+}

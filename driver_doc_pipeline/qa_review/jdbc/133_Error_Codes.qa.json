@@ -1,0 +1,53 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is error 226 in the JDBC driver and why does it occur?",
+      "input": "",
+      "output": "Error 226 in the JDBC driver is \"SET CHAINED command not allowed within multi‑statement transaction\". The driver throws a com.sybase.jdbc2.jdbc.SybSQLException with error code 226 and an SQL state of ZZZZZ. This exception is usually caused by a defect in older versions of jConnect. The recommended solution is to download and upgrade to the latest jConnect version from the jConnect for JDBC web page."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the \"Use Manual Transactions?\" parameter control in the JDBC driver and what values can it take?",
+      "input": "",
+      "output": "The \"Use Manual Transactions?\" parameter in the JDBC driver determines whether the driver operates in manual (chained) or automatic (unchained) transaction mode. It is a Boolean parameter:\n- **True** – the driver runs in manual (chained) transaction mode; stored procedures that require chained mode will execute correctly.\n- **False** – the driver runs in automatic (unchained) transaction mode; each transaction consists of a maximum of one statement. Changing this setting affects how stored procedures that are created in either mode can be called."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you resolve error 226 in the JDBC driver?",
+      "input": "",
+      "output": "To resolve error 226 in the JDBC driver:\n1. Visit the jConnect for JDBC web page (http://www.sybase.com/products/informationmanagement/softwaredeveloperkit/jconnect).\n2. Download the latest version of jConnect.\n3. Install or upgrade the existing jConnect libraries used by the JDBC driver to the newly downloaded version.\n4. Restart any applications that use the driver to ensure the new version is loaded."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "When encountering error 7112 in the JDBC driver, what steps should be taken to fix it?",
+      "input": "",
+      "output": "Error 7112 indicates that a stored procedure may be run only in chained transaction mode. To fix it:\n1. Verify whether the driver’s \"Use Manual Transactions?\" parameter is set to **False** (automatic/unchained mode). If so, change it to **True** to enable manual (chained) mode, or adjust the policy transaction type to manual.\n2. Alternatively, change the stored procedure’s mode to unchained or anymode by executing the system stored procedure **sp_procxmode** with the appropriate mode parameter (preferred).\n3. After making the change, retest the stored procedure execution."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you change a stored procedure’s mode to unchained using the JDBC driver?",
+      "input": "",
+      "output": "To change a stored procedure’s mode to unchained with the JDBC driver:\n1. Connect to the database using the JDBC driver.\n2. Execute the system stored procedure **sp_procxmode**, passing the name of the target stored procedure and the mode **unchained** (or **anymode** for flexibility). For example:\n   ```sql\n   EXEC sp_procxmode 'myProcedure', 'unchained'\n   ```\n3. Verify that the procedure now runs without error 7112.\n4. If the driver is set to automatic mode, ensure the \"Use Manual Transactions?\" parameter remains **False**."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How do you address error 7113 in the JDBC driver?",
+      "input": "",
+      "output": "Error 7113 indicates that a stored procedure may be run only in unchained transaction mode. To address it:\n1. Check the driver’s \"Use Manual Transactions?\" parameter. If it is set to **True** (manual/chained mode), change it to **False** to enable automatic (unchained) mode, or modify the policy transaction type to **auto**.\n2. Alternatively, change the stored procedure’s mode to **chained** or **anymode** by executing the system stored procedure **sp_procxmode** with the desired mode (preferred).\n3. After applying the change, re‑run the stored procedure to confirm the error is resolved."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the effect of setting \"Use Manual Transactions?\" to False in the JDBC driver?",
+      "input": "",
+      "output": "Setting \"Use Manual Transactions?\" to **False** in the JDBC driver puts the driver into automatic (unchained) transaction mode. In this mode, all transactions consist of a maximum of one statement, and stored procedures that require chained transaction mode will raise errors such as 7112."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points of the error codes page for the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver error codes page documents three specific errors:\n- **Error 226** occurs when the SET CHAINED command is used inside a multi‑statement transaction; it is caused by old jConnect versions and is resolved by upgrading jConnect.\n- **Error 7112** indicates a stored procedure requires chained transaction mode but the driver is in unchained mode; fix it by setting the driver’s \"Use Manual Transactions?\" parameter to True or by altering the procedure’s mode with **sp_procxmode**.\n- **Error 7113** is the opposite: a stored procedure requires unchained mode while the driver runs in chained mode; resolve it by setting \"Use Manual Transactions?\" to False or changing the procedure’s mode to chained via **sp_procxmode**.\nThe page also explains that setting \"Use Manual Transactions?\" to False limits each transaction to a single statement."
+    }
+  ]
+}

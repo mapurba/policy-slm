@@ -1,0 +1,53 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the <actions> element in the JDBC driver descriptor and which child elements can it contain?",
+      "input": "",
+      "output": "In the JDBC driver descriptor, the <actions> element defines a sequence of actions that the driver may perform in response to error conditions. It can contain zero or more of the following child elements: <exec-sql>, <check-for-closed-connection>, <fetch-metadata>, and <rollback>."
+    },
+    {
+      "category": "config",
+      "instruction": "Which child elements are allowed inside the <options> element of the JDBC driver descriptor?",
+      "input": "",
+      "output": "In the JDBC driver descriptor, the <options> element may contain any combination (including none) of the following child elements:\n- <lock-generator-class>\n- <supports-schemas-in-metadata-retrieval>\n- <time-translator-class>\n- <column-position-comparator>\n- <use-manual-transactions>\n- <minimal-metadata>\n- <transaction-isolation-level>\n- <use-single-connection>\n- <exclude-table-filter>\n- <include-table-filter>\n- <left-outer-join-operator>\n- <current-timestamp-stmt>\n- <add-default-values-on-view-insert>\n- <reuse-statements>\n- <function-return-method>\n- <handle-stmt-results>"
+    },
+    {
+      "category": "config",
+      "instruction": "What optional attribute can be defined on the <error-code> element in the JDBC driver descriptor and what is its data type?",
+      "input": "",
+      "output": "In the JDBC driver descriptor, the <error-code> element may have an optional attribute named \"description\". The attribute type is CDATA and it is #IMPLIED, meaning it can be omitted."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the structure and optional sub‑elements of the <identity> element in the JDBC driver descriptor.",
+      "input": "",
+      "output": "In the JDBC driver descriptor, the <identity> element identifies the JDBC driver and can contain up to four optional child elements, each appearing zero or one time:\n- <name>: the driver name.\n- <target-database>: the database system the driver targets.\n- <jdbc-type>: the JDBC type string.\n- <jdbc-class>: the fully qualified Java class name of the driver.\nAll four are optional, so <identity> may be empty or include any combination of these sub‑elements."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you map a source SQL type to a target SQL type using the <sql-type-map> element in the JDBC driver descriptor?",
+      "input": "",
+      "output": "In the JDBC driver descriptor, you use the <sql-type-map> element to define type mappings. Inside <sql-type-map> you place one or more <type> elements. Each <type> element contains two child elements: <from> (the source SQL type) and <to> (the target SQL type). This pair tells the driver to translate the source type to the target type during metadata processing."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the steps to declare a property with a key and value inside the <connection-properties> element of the JDBC driver descriptor.",
+      "input": "",
+      "output": "To declare a property in the JDBC driver descriptor:\n1. Ensure you have a <connection-properties> element within the <jdbc-driver> definition.\n2. Inside <connection-properties>, add a <property> element for each property you want to define.\n3. Within each <property>, add a <key> element containing the property name.\n4. Follow the <key> with a <value> element containing the property value.\nThe resulting structure looks like:\n```xml\n<connection-properties>\n  <property>\n    <key>property-name</key>\n    <value>property-value</value>\n  </property>\n</connection-properties>\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the main elements defined in the third‑party JDBC driver descriptor DTD.",
+      "input": "",
+      "output": "The third‑party JDBC driver descriptor DTD defines the XML structure used to describe a JDBC driver for NetIQ Identity Manager. Key elements include:\n- <jdbc-driver>: the root element that may contain imports, an <identity>, and optional sections such as <metadata-override>, <connection-properties>, <sql-type-map>, <options>, and <errors>.\n- <identity>: optional sub‑elements (<name>, <target-database>, <jdbc-type>, <jdbc-class>) that uniquely identify the driver.\n- <connection-properties>: a list of <property> elements, each with a <key> and <value>, for driver configuration.\n- <sql-type-map>: zero or more <type> mappings, each with <from> and <to> values.\n- <options>: a collection of optional behavior flags and class names (e.g., <lock-generator-class>, <use-single-connection>, <transaction-isolation-level>, etc.).\n- <errors>: categories (<connectivity>, <authentication>, <retry>, <fatal>) that describe how the driver should handle various error conditions, using elements such as <regular-expression>, <sql-state>, <error-code>, and <actions>."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a minimal valid XML descriptor for a third‑party JDBC driver that includes an <identity> with name 'SampleDriver', a single connection property 'url' with value 'jdbc:sample', and a <retry> block that rolls back on SQL state '40001'.",
+      "input": "",
+      "output": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<jdbc-driver>\n  <identity>\n    <name>SampleDriver</name>\n  </identity>\n  <connection-properties>\n    <property>\n      <key>url</key>\n      <value>jdbc:sample</value>\n    </property>\n  </connection-properties>\n  <errors>\n    <retry>\n      <sql-state description=\"Deadlock\">\n        <value>40001</value>\n      </sql-state>\n      <actions>\n        <rollback/>\n      </actions>\n    </retry>\n  </errors>\n</jdbc-driver>"
+    }
+  ]
+}

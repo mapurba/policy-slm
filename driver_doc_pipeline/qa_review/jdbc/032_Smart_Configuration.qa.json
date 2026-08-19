@@ -1,0 +1,59 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of Smart Configuration in the JDBC driver?",
+      "input": "",
+      "output": "Smart Configuration in the JDBC driver automatically detects supported third‑party JDBC drivers and databases and dynamically sets most compatibility parameters, so administrators do not need to manually configure those parameters."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver restrict imports across major descriptor types?",
+      "input": "",
+      "output": "Import descriptor files in the JDBC driver are limited to the same major type (driver or database) to prevent dependencies between reserved and custom files, ensuring that reserved descriptor imports cannot be used by custom descriptors and that extensions remain safe across driver versions."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you force the JDBC driver to use a custom descriptor file for a database or third‑party driver?",
+      "input": "",
+      "output": "1. Create a custom descriptor file for the database or third‑party JDBC driver.\n2. Ensure the custom file's name does not begin with an underscore and the containing JAR file name begins with the prefix \"jdbc\" (case‑insensitive).\n3. Place the custom descriptor file in the appropriate directory inside the JAR (see the descriptor location table).\n4. Set the driver parameter named \"jdbc-driver-descriptor\" to the pathname of the custom descriptor file.\n5. Restart the Identity Manager services if required for the change to take effect."
+    },
+    {
+      "category": "config",
+      "instruction": "Where should each type of descriptor file be placed inside a descriptor JAR for the JDBC driver?",
+      "input": "",
+      "output": "The required directory paths are:\n\nThird‑party JDBC driver → com/novell/nds/dirxml/driver/jdbc/db/descriptor/driver\n\nThird‑party JDBC driver import → com/novell/nds/dirxml/driver/jdbc/db/descriptor/driver/import\n\nDatabase → com/novell/nds/dirxml/driver/jdbc/db/descriptor/db\n\nDatabase import → com/novell/nds/dirxml/driver/jdbc/db/descriptor/db/import"
+    },
+    {
+      "category": "config",
+      "instruction": "What naming rules must be followed for custom descriptor files in the JDBC driver?",
+      "input": "",
+      "output": "Custom descriptor filenames must not start with an underscore (\"_\"). The JAR file that contains them must have a name that starts with the prefix \"jdbc\" (case‑insensitive). Reserved descriptor files, which ship with the driver, always begin with an underscore; this prevents naming conflicts with custom files."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the JDBC driver determine precedence when multiple descriptor sources define the same parameter?",
+      "input": "",
+      "output": "Precedence order is:\n1. Parameters set explicitly through the management console (e.g., Identity Console) always win.\n2. Within descriptor files, non‑importable descriptor files take precedence over import files.\n3. If a parameter appears multiple times in the same file, the first occurrence wins.\n4. Among import files, the order in the import list matters—earlier imports override later ones."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error occurs if a custom third‑party JDBC driver descriptor tries to import a reserved descriptor, and how can it be avoided?",
+      "input": "",
+      "output": "The JDBC driver issues an error because custom non‑import descriptors are not allowed to import reserved descriptor imports (filenames that begin with an underscore). To avoid the error, ensure that custom descriptor files only import other custom (non‑reserved) import files, and never reference filenames that start with an underscore."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key guidelines for creating and using descriptor files with the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver uses XML descriptor files to describe third‑party drivers and databases. Custom descriptors must be placed in a JAR whose name starts with \"jdbc\", stored in specific package paths, and must not begin with an underscore. Reserved descriptors (prefixed with \"_\") are shipped in JDBCConfig.jar and cannot be overridden or imported by custom files. Import files allow content sharing but cannot cross major types or import reserved files. Parameter precedence gives management console settings highest priority, followed by non‑import descriptors, then import files in declared order."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example of a valid custom descriptor filename for a database that follows the JDBC driver best‑practice rules.",
+      "input": "",
+      "output": "jdbcMyCustomDatabase.xml"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "driver": "BI Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of using an alternate scripting language in the BI Impl Scripting driver?",
+      "input": "",
+      "output": "The BI Impl Scripting driver allows you to write Subscriber, Polling, and Heartbeat scripts in an alternative language by porting the globals, IDMLib, and other scripts. This enables integration with environments where the provided languages (Bourne Shell, Perl, Microsoft VBScript, PowerShell) are not suitable, as long as the new language can execute programs and read/write standard input and output."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you change the program the BI Impl Scripting driver executes when running a script?",
+      "input": "",
+      "output": "Modify the **Script Command** driver parameter. Set its value to the full command line of the program you want the BI Impl Scripting driver to run. After the program name you may include any needed command‑line arguments. The driver will then append a space and the name of the Subscriber, Polling, or Heartbeat script, followed by the appropriate additional parameters."
+    },
+    {
+      "category": "config",
+      "instruction": "What additional parameters does the BI Impl Scripting driver append to the Script Command string for a Subscriber script?",
+      "input": "",
+      "output": "For a Subscriber script, the BI Impl Scripting driver appends:\n1. The full path to the event file (XML format).\n2. The full path to the Driver Parameter file.\nThese are passed as the next two parameters after the script name."
+    },
+    {
+      "category": "config",
+      "instruction": "What additional parameter does the BI Impl Scripting driver append to the Script Command string for Polling or Heartbeat scripts?",
+      "input": "",
+      "output": "For Polling and Heartbeat scripts, the BI Impl Scripting driver appends only the full path to the Driver Parameter file as the next parameter after the script name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you process an event file on Windows using the BI Impl Scripting driver?",
+      "input": "",
+      "output": "On Windows, use the **EventReader.exe** program that ships with the BI Impl Scripting driver:\n1. Run `EventReader.exe` with the **nvpairs** option to retrieve the event document as name/value pairs (default behavior).\n2. Run `EventReader.exe` with the **xds** option to retrieve the event in its original XDS/XML format.\nThe program reads the XML event file supplied by the driver and outputs the chosen representation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you process an event file on Linux or UNIX using the BI Impl Scripting driver?",
+      "input": "",
+      "output": "On Linux/UNIX, events are delivered to scripts via shared memory. Use the **ussmh** (Shared Memory Helper) utility:\n1. Run `ussmh` with the **-xml** option to retrieve the original XDS/XML event document.\n2. The utility reads the shared‑memory segment created by the BI Impl Scripting driver and outputs the XML."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is contained in the Driver Parameter file used by the BI Impl Scripting driver?",
+      "input": "",
+      "output": "The Driver Parameter file holds name/value pairs for the driver parameters. These pairs configure the behavior of the BI Impl Scripting driver and are read by scripts to obtain settings such as script names, connection details, or other driver‑specific options."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you submit events to the BI Impl Scripting driver on the Publisher channel?",
+      "input": "",
+      "output": "Use the Change Log tool appropriate for your platform:\n- On Windows, run **idmevent.exe**.\n- On Linux/UNIX, run **usclh**.\nThese tools write events into the driver’s event queue, where they are then delivered to the appropriate scripts."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you alter the names of the Subscriber, Polling, and Heartbeat scripts used by the BI Impl Scripting driver?",
+      "input": "",
+      "output": "The script names are configurable through driver parameters. Set the corresponding driver parameters (e.g., `SubscriberScript`, `PollingScript`, `HeartbeatScript`) to the desired script file names. The BI Impl Scripting driver will then use these names when constructing the command line."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps and requirements for using an alternate scripting language with the BI Impl Scripting driver.",
+      "input": "",
+      "output": "To use an alternate scripting language with the BI Impl Scripting driver, you must port globals, IDMLib, and existing scripts to the new language, ensuring it can execute programs and handle standard I/O. Change the program invoked by editing the **Script Command** driver parameter, which the driver augments with script names and required file paths. On Windows, use EventReader.exe (nvpairs or xds) to read events; on Linux/UNIX, use ussmh with the -xml option. Provide driver configurations via the Driver Parameter file and submit events on the Publisher channel with idmevent.exe (Windows) or usclh (Linux/UNIX). Script names for Subscriber, Polling, and Heartbeat can be overridden via driver parameters."
+    }
+  ]
+}

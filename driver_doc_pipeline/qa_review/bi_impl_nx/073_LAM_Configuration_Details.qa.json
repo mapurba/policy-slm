@@ -1,0 +1,53 @@
+{
+  "driver": "Linux/UNIX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the LAM module and why does the Linux/UNIX driver use it on older AIX versions?",
+      "input": "",
+      "output": "The LAM (Loadable Authentication Module) module provides password publishing for the Linux/UNIX driver in AIX environments that pre‑date AIX 5.3, which introduced PAM support. On those older versions the Linux/UNIX driver implements its authentication integration via LAM instead of PAM."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the LAM module for the Linux/UNIX driver on an AIX system?",
+      "input": "",
+      "output": "Run the driver installation program and select the option to install the PAM or LAM module. The installation script will copy the LAM module file named NXDRV into the /usr/lib/security directory of the connected AIX system. If you answer “yes” to the prompt to configure the LAM module, the script also adds an NXDRV stanza to /usr/lib/security/methods.cfg."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the LAM module after it has been installed for the Linux/UNIX driver?",
+      "input": "",
+      "output": "After installation, invoke the nxdrv-config command on the AIX system. The nxdrv-config command adds an NXDRV stanza to /usr/lib/security/methods.cfg (or updates it) and allows you to set configuration options such as the database to use. For detailed usage, refer to the \"Using the nxdrv-config Command\" documentation."
+    },
+    {
+      "category": "config",
+      "instruction": "What stanza must be added to /usr/lib/security/methods.cfg for the Linux/UNIX driver LAM module, and what are its fields?",
+      "input": "",
+      "output": "The required stanza is:\n```\nNXDRV:\n   program = /usr/lib/security/NXDRV\n   options = db=BUILTIN\n```\nThe \"program\" field points to the LAM module executable, and the \"options\" field specifies configuration options; in this example the database option is set to BUILTIN."
+    },
+    {
+      "category": "config",
+      "instruction": "Where does the Linux/UNIX driver install the LAM module file on an AIX system?",
+      "input": "",
+      "output": "The installation script places the LAM module file named NXDRV in the /usr/lib/security directory of the connected AIX system."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the LAM module for the Linux/UNIX driver not supported for NIS or NIS+ on AIX?",
+      "input": "",
+      "output": "The documentation states that the LAM module is not supported for NIS or NIS+ on AIX, indicating that the LAM authentication mechanism does not integrate with those network information services in the Linux/UNIX driver context."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you change the global stanza in /etc/security/user to use the LAM module by default for the Linux/UNIX driver?",
+      "input": "",
+      "output": "Edit the /etc/security/user file and modify the global user stanza to reference the NXDRV module instead of the default. This makes the LAM module the default authentication method for all users, and you should also adjust the AIX files‑mode scripts so they no longer assign NXDRV SYSTEM and registry attributes to files‑mode users."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps for installing and configuring the Linux/UNIX driver LAM module on AIX.",
+      "input": "",
+      "output": "1) Run the driver installation program and choose to install the PAM or LAM module; the script copies NXDRV to /usr/lib/security and can add an NXDRV stanza to /usr/lib/security/methods.cfg. 2) After installation, run nxdrv-config to add or update the NXDRV stanza with desired options (e.g., db=BUILTIN). 3) Verify that /usr/lib/security/methods.cfg contains the stanza:\n```\nNXDRV:\n   program = /usr/lib/security/NXDRV\n   options = db=BUILTIN\n```\n4) Optionally edit /etc/security/user to set the global stanza to use NXDRV by default and modify AIX scripts to avoid assigning NXDRV SYSTEM and registry attributes for files‑mode users."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What happens to existing state files when the JDBC driver is upgraded to a version that uses a different MapDB persistence API?",
+      "input": "",
+      "output": "When the JDBC driver is upgraded to a version that includes a different state file persistence API (MapDB or ZoomDB), the driver running in triggerless mode can no longer use the state files created by the older driver. The state files are tied to the specific persistence API version, so a mismatch prevents the new JDBC driver from reading them."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Persistence API version and JDBC driver version correspond to Identity Manager 4.7 for the JDBC driver?",
+      "input": "",
+      "output": "For Identity Manager 4.7, the Persistence API version is **mapdb 3.0.5** and the JDBC driver version is **4.1.0.1**."
+    },
+    {
+      "category": "config",
+      "instruction": "What state file names are associated with Identity Manager 4.6.3 when using the JDBC driver?",
+      "input": "",
+      "output": "The state files for Identity Manager 4.6.3 with the JDBC driver are:\n- jdbc_e53fdaf6-b825-4074-8cf5-f6da3fe525b8\n- jdbc_e53fdaf6-b825-4074-8cf5-f6da3fe525b8.p\n- jdbc_e53fdaf6-b825-4074-8cf5-f6da3fe525b8.t"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you determine whether existing state files will continue to work after upgrading the JDBC driver?",
+      "input": "",
+      "output": "To determine if existing state files will work after upgrading the JDBC driver, compare the Persistence API version used by the current Identity Manager version (as listed in the upgrade considerations table) with the Persistence API version bundled with the new JDBC driver. If the versions match, the state files are compatible; if they differ, the new JDBC driver cannot use the old state files."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken when moving from Identity Manager 4.5.6 to 4.6 regarding the JDBC driver version?",
+      "input": "",
+      "output": "When moving from Identity Manager 4.5.6 to 4.6, you must upgrade the JDBC driver to version **4.0.4.1** (the version shipped with IM 4.5.6) before applying the IM 4.6 driver version (4.0.3.0). This ensures the state file persistence API (mapdb 1.0.9) remains consistent and avoids incompatibility with existing state files."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key considerations for upgrading the JDBC driver with different Identity Manager and MapDB versions.",
+      "input": "",
+      "output": "The JDBC driver upgrade guide highlights that a change in the MapDB/ZooDB persistence API version makes old state files unreadable by the new driver. The table links Identity Manager versions to specific MapDB versions, JDBC driver versions, and state file names. Before upgrading, verify the persistence API version matches; otherwise, migrate or recreate state files. Also note the special case when moving from IM 4.5.6 to 4.6—upgrade the driver to 4.0.4.1 first. Prior to IM 4.x, state file extensions were `<tao number>.db` or `.lg`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why did the extension of driver state files change prior to Identity Manager 4.x for the JDBC driver?",
+      "input": "",
+      "output": "Before Identity Manager 4.x, the JDBC driver stored its state files with extensions `<tao number>.db` or `.lg`. The documentation notes this change to indicate that newer versions use a different naming convention (e.g., files prefixed with `jdbc_` and extensions such as `.p` and `.t`), reflecting the shift to the MapDB persistence mechanism."
+    },
+    {
+      "category": "config",
+      "instruction": "What were the file extensions used for JDBC driver state files before Identity Manager 4.x?",
+      "input": "",
+      "output": "Prior to Identity Manager 4.x, the JDBC driver state files used the extensions **`.db`** or **`.lg`**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you identify the correct JDBC driver version to use with Identity Manager 4.5?",
+      "input": "",
+      "output": "To identify the correct JDBC driver version for Identity Manager 4.5, consult the upgrade considerations table: Identity Manager 4.5 uses **mapdb 1.0.4** and the compatible JDBC driver version is **4.0.0.2**."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If after upgrading the JDBC driver you cannot read existing state files, what is the most likely cause based on the documentation?",
+      "input": "",
+      "output": "The most likely cause is a mismatch between the Persistence API version bundled with the new JDBC driver and the version used to create the existing state files. When the versions differ (e.g., moving from mapdb 1.0.9 to mapdb 3.0.5), the upgraded JDBC driver cannot read the old state files."
+    }
+  ]
+}

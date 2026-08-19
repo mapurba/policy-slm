@@ -1,0 +1,77 @@
+{
+  "driver": "Bi Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the include/exclude file in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "The include/exclude file in the Bi Impl Scripting driver allows administrators to control which identities are synchronized between the Identity Vault and the connected system. By defining include and exclude rules, you can limit or expand the set of users and groups that the driver processes, which is useful for phasing in deployments or improving performance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create and place the include/exclude file for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "1. Create a plain‑text file named **include-exclude.conf**.\n2. Save the file in the **conf** directory that resides under the Bi Impl Scripting driver installation directory.\n3. Ensure the file follows the syntax described in the driver documentation (sections, rules, etc.).\n4. Start the driver shim; the file will be read automatically at shim start."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps are required after modifying the include/exclude file for the Bi Impl Scripting driver to take effect?",
+      "input": "",
+      "output": "After editing **include-exclude.conf** you must restart the driver shim. Stopping and then starting the Bi Impl Scripting driver shim forces the driver to reread the file and apply the new include/exclude rules."
+    },
+    {
+      "category": "config",
+      "instruction": "How are case sensitivity rules applied to entries in the include/exclude file of the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "In the include/exclude file of the Bi Impl Scripting driver, class names, attribute names, and the values to match are case **insensitive**. All other characters (e.g., the syntax keywords INCLUDE, EXCLUDE, CLASS, etc.) follow the same rule. However, limited regular expression patterns used in attribute or association expressions are **case sensitive**."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the matching priority order for identities in the include/exclude file of the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "Identities are evaluated against the include/exclude file in the following priority order:\n1. Channel‑specific (Publisher or Subscriber) **exclude** rules\n2. Channel‑specific **include** rules\n3. General **exclude** rules\n4. General **include** rules\nWithin each priority level, rules are processed in the order they appear in the file; the first matching rule determines inclusion or exclusion."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you define a Subscriber section in the include/exclude file for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "A Subscriber section begins with the line **SUBSCRIBER** and ends with **ENDSUBSCRIBER**. Example:\n```\nSUBSCRIBER\n    ... include or exclude sections ...\nENDSUBSCRIBER\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you define an Include section in the include/exclude file for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "An Include section starts with **INCLUDE** and ends with **ENDINCLUDE**. Example:\n```\nINCLUDE\n    ... class, attribute, or association rules ...\nENDINCLUDE\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you write a class matching rule with an attribute match in the include/exclude file of the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "A class matching rule is declared with **CLASS className** and closed with **ENDCLASS**. Inside, you place attribute matching lines as **attributeName=expression**. Example:\n```\nCLASS User\n    loginName=user01\nENDCLASS\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How can you write a single‑line rule to exclude a specific user in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "Use the single‑line syntax **[SUBSCRIBER|PUBLISHER] EXCLUDE className attributeName=expression** (or association). For example, to exclude the ADMIN user from subscription events:\n```\nSUBSCRIBER EXCLUDE adminUser\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If changes to the include/exclude file are not reflected in identity synchronization, what should you verify for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "Verify that you have restarted the driver shim after editing **include-exclude.conf**. The Bi Impl Scripting driver reads the file only at shim start; without a restart, the old rules remain in effect."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key considerations for using an include/exclude file with the Bi Impl Scripting driver.",
+      "input": "",
+      "output": "The Bi Impl Scripting driver supports an optional **include-exclude.conf** file (max 50 entries) placed in the driver’s **conf** directory. The file is read at shim start, so restart the shim after changes. Rules can be general or channel‑specific (Subscriber/Publisher) and are processed in a defined priority (channel‑specific exclude, channel‑specific include, general exclude, general include). Syntax includes sections (SUBSCRIBER, PUBLISHER, INCLUDE, EXCLUDE, CLASS), attribute matching (attributeName=expression), association matching, and single‑line rules. Case is insensitive except for limited regular expression patterns."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example include/exclude file for the Bi Impl Scripting driver that excludes users whose loginName starts with \"temp\" and includes only users whose loginName starts with \"idm\" for both Subscriber and Publisher channels.",
+      "input": "",
+      "output": "```\n# Exclude users whose names start with temp\nEXCLUDE\n    CLASS User\n        loginName=temp.*\n    ENDCLASS\nENDEXCLUDE\n\n# Include only users whose names start with idm for both channels\nSUBSCRIBER INCLUDE User loginName=idm.*\nPUBLISHER INCLUDE User loginName=idm.*\n```"
+    }
+  ]
+}

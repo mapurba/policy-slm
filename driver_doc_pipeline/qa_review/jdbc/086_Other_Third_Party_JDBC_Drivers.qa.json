@@ -1,0 +1,59 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the IBM Toolbox for Java/JTOpen driver and what are its main characteristics as listed for the JDBC driver?",
+      "input": "",
+      "output": "The IBM Toolbox for Java/JTOpen driver (also known as iSeries Toolbox for Java or AS/400 Toolbox for Java) is an unsupported third‑party JDBC driver that can be used with the JDBC driver. Its key characteristics are:\n- **Class Name**: com.ibm.as400.access.AS400JDBCDriver\n- **Type**: 4\n- **URL Syntax**: jdbc:as400://ip-address/database-name\n- **Filenames**: jt400.jar\n- **Download Instructions**: Available from the JTOpen website (http://jt400.sourceforge.net) and IBM's Toolbox download page (http://www-03.ibm.com/servers/eserver/iseries/toolbox/downloads.html)\n- **Documentation URLs**: http://www-03.ibm.com/servers/eserver/iseries/toolbox/\nWhen using this driver, the JDBC driver does not automatically populate the JDBC Driver Class Name and Authentication Context parameters; these must be entered manually."
+    },
+    {
+      "category": "config",
+      "instruction": "What configuration values should be entered for the IBM Toolbox for Java/JTOpen driver in the JDBC driver?",
+      "input": "",
+      "output": "For the IBM Toolbox for Java/JTOpen driver, configure the following values in the JDBC driver:\n- **JDBC Driver Class Name**: com.ibm.as400.access.AS400JDBCDriver\n- **Type**: 4\n- **URL Syntax**: jdbc:as400://ip-address/database-name\n- **Filename to load**: jt400.jar\nThese settings are taken from Table 14‑33 of the documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually set the JDBC Driver Class Name and Authentication Context parameters when using the IBM Toolbox for Java/JTOpen driver with the JDBC driver?",
+      "input": "",
+      "output": "To manually configure the required parameters for the IBM Toolbox for Java/JTOpen driver in the JDBC driver, follow these steps:\n1. Open the Identity Manager console and navigate to **Drivers > JDBC Drivers**.\n2. Select the entry for the IBM Toolbox for Java/JTOpen driver or create a new JDBC driver entry.\n3. In the **JDBC Driver Class Name** field, enter **com.ibm.as400.access.AS400JDBCDriver** (the class name listed in the documentation).\n4. Locate the **Authentication Context** parameter field and enter the appropriate authentication context value for your environment (e.g., a user ID or security domain).\n5. Save the configuration and restart the JDBC service if prompted.\nRefer to the sections **Third-Party JDBC Driver Class Name** and **Authentication Context** in the product documentation for additional details."
+    },
+    {
+      "category": "config",
+      "instruction": "What minimum requirements must an unsupported third‑party JDBC driver satisfy to be used with the JDBC driver?",
+      "input": "",
+      "output": "An unsupported third‑party JDBC driver must meet two minimum requirements to be usable with the JDBC driver:\n1. **Support required metadata methods** – the driver must implement the java.sql.DatabaseMetaData methods identified as required in *Section F.0, java.sql.DatabaseMetaData Methods*.\n2. **Support other required JDBC methods** – the driver must implement the JDBC interface methods listed as required in *Section G.0, JDBC Interface Methods*.\nThese requirements ensure that the JDBC driver can interact correctly with the third‑party driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why can bugs in third‑party JDBC driver implementations cause the JDBC driver to malfunction?",
+      "input": "",
+      "output": "The JDBC driver is directly dependent on the implementation of the third‑party JDBC driver it loads. If the third‑party driver contains bugs—such as incorrect handling of metadata, improper transaction management, or faulty error reporting—those defects propagate into the JDBC driver’s operation, potentially leading to crashes, incorrect data retrieval, or other malfunctions in the Identity Manager product."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Which tracing levels does the JDBC driver provide to help debug third‑party JDBC drivers?",
+      "input": "",
+      "output": "The JDBC driver includes two tracing levels that aid in debugging third‑party JDBC drivers:\n- **Level 6 – JDBC API level tracing**\n- **Level 7 – Third‑party JDBC driver tracing**\nEnabling these levels allows you to capture detailed logs of API calls and the behavior of the underlying third‑party driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is a custom driver descriptor file and why might you need to create one when using a third‑party JDBC driver with the JDBC driver?",
+      "input": "",
+      "output": "A custom driver descriptor file is a configuration artifact that defines how the JDBC driver should interpret error codes and SQL state values returned by a specific third‑party JDBC driver. Because each driver may use its own set of error codes and SQL state conventions, creating a descriptor file allows the JDBC driver to categorize these responses correctly, enabling proper error handling and logging within Identity Manager."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you categorize error codes and SQL states for a third‑party JDBC driver in the custom driver descriptor file required by the JDBC driver?",
+      "input": "",
+      "output": "To categorize error codes and SQL states for a third‑party JDBC driver in a custom driver descriptor file for the JDBC driver, follow these steps:\n1. **Identify the driver’s error codes and SQL state values** – consult the third‑party driver’s documentation or run tests that force known errors.\n2. **Create a descriptor file** (e.g., a properties or XML file) named for the driver.\n3. **Map each error code** to a generic category used by the JDBC driver (such as *connection error*, *syntax error*, *timeout*).\n4. **Map each SQL state pattern** (e.g., `08S01` for communication errors) to the same generic categories.\n5. **Save the file** in the directory where the JDBC driver looks for driver descriptors (refer to the product’s driver‑descriptor configuration guide).\n6. **Restart the JDBC service** so the new mappings take effect.\nBy completing these steps, the JDBC driver can correctly interpret and handle errors returned by the third‑party driver."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the considerations and requirements for using other third‑party JDBC drivers with the JDBC driver.",
+      "input": "",
+      "output": "When using unsupported third‑party JDBC drivers with the JDBC driver, you must manually configure the driver class name and authentication context, ensure the driver meets required metadata and JDBC method support, be aware that bugs in the third‑party implementation can affect product stability, enable tracing levels 6 and 7 for debugging, anticipate potential stored‑procedure issues, and create a custom driver descriptor file to map the driver’s error codes and SQL states to the JDBC driver’s error‑handling framework."
+    }
+  ]
+}

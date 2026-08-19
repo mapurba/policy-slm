@@ -1,0 +1,65 @@
+{
+  "driver": "Bi Implementation MF ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the driver shim configuration file and why is it needed in the Bi Implementation MF ACF2 driver?",
+      "input": "",
+      "output": "The driver shim configuration file controls operation of the driver shim for the Bi Implementation MF ACF2 driver. It allows you to specify individual configuration options—one per line—that affect how the shim connects, logs, and interacts with the driver. The same options can also be provided on the command line."
+    },
+    {
+      "category": "config",
+      "instruction": "Which option sets the HTTP services port for the Bi Implementation MF ACF2 driver shim and what is its default value?",
+      "input": "",
+      "output": "Use the **-hp <httpPort>** or **-httpport <httpPort>** option to specify the HTTP services port number. The default HTTP services port number is **8091**."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you define a connection string that includes a Certificate Authority file in the Bi Implementation MF ACF2 driver shim configuration?",
+      "input": "",
+      "output": "Add the **-conn <connString>** or **-connection <connString>** option, enclosing the string in double quotes. Example: `-connection \"ca=/opt/novell/acf2drv/keys/ca.pem\"`."
+    },
+    {
+      "category": "config",
+      "instruction": "What option controls the maximum size of the trace file for the Bi Implementation MF ACF2 driver shim and what units are accepted?",
+      "input": "",
+      "output": "Use **-tfm size** or **-tracefilemax size** to set the limit. The size can be expressed in kilobytes (K), megabytes (M), or gigabytes (G). The minimum value is **100K**. Examples: `-tracefilemax 1000K`, `-tracefilemax 100M`, `-tracefilemax 10G`."
+    },
+    {
+      "category": "config",
+      "instruction": "Which option disables the HTTP service in the Bi Implementation MF ACF2 driver shim?",
+      "input": "",
+      "output": "Include the **-nohttpport** option in the configuration file (or on the command line) to disable the HTTP service."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a driver shim configuration file for the Bi Implementation MF ACF2 driver that sets a custom trace file location, disables tracing, defines a CA connection, and sets the driver path?",
+      "input": "",
+      "output": "Create a plain‑text file (or a member of a partitioned data set) and add one option per line. For example:\n```\n-tracefile /opt/novell/acf2drv/logs/trace.log\n-trace 0\n-connection \"ca=/opt/novell/acf2drv/keys/ca.pem\"\n-path /opt/novell/acf2drv/\n```\nSave the file and reference it with the DRVCONF DD statement in the driver shim JCL."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you supply driver shim options on the command line instead of a configuration file for the Bi Implementation MF ACF2 driver?",
+      "input": "",
+      "output": "When starting the driver shim task, append the desired options directly to the command line in the same syntax used in the configuration file. For example: `driverShim -trace 3 -httpport 9090 -path /opt/novell/acf2drv`.\nRefer to the \"Driver Shim Command Line Options\" documentation for the complete list of supported options."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the trace file data is already larger than the maximum size specified when the Bi Implementation MF ACF2 driver shim starts, what will happen?",
+      "input": "",
+      "output": "The trace file data will remain larger than the specified maximum until roll‑over is completed through all 10 files. The shim creates up to nine roll‑over files, each representing one‑tenth of the total size, but it does not truncate the existing oversized file on startup."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration options available for the Bi Implementation MF ACF2 driver shim.",
+      "input": "",
+      "output": "The Bi Implementation MF ACF2 driver shim configuration file supports options to set the connection string (**-conn / -connection**), HTTP port (**-hp / -httpport**, default 8091), driver file path (**-path**, default `/opt/novell/acf2drv`), Remote Loader and Driver object passwords (**-sp / -setpassword**), trace level (**-t / -trace**, 0‑10), trace‑file maximum size (**-tfm / -tracefilemax**, with K/M/G suffixes, minimum 100K), disable status logging (**-ndl / -nodirxmllog**), disable HTTP services (**-nohttpport**), and polling/heartbeat intervals (**-pollinginterval**, **-heartbeatinterval**). Options can be placed one per line in a sequential file or supplied on the command line."
+    },
+    {
+      "category": "config",
+      "instruction": "What syntax is used to set the Remote Loader and Driver object passwords in the Bi Implementation MF ACF2 driver shim configuration?",
+      "input": "",
+      "output": "Use the **-sp <RLpassword>,<DOpassword>** or **-setpassword <RLpassword>,<DOpassword>** option. List the Remote Loader password first, followed by a comma, then the Driver object password."
+    }
+  ]
+}

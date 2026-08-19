@@ -1,0 +1,65 @@
+{
+  "driver": "Bi Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the IDMGETDRVVAR function do in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, the IDMGETDRVVAR function returns the string value of a driver parameter specified by the parameter name passed as the argument. It allows scripts to read configuration values that were defined for the driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you customize the handling of an add event in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "To customize handling of an add event in the Bi Impl Scripting driver, edit the script file named **add.sh** located in the driver’s *scripts* directory (e.g., /opt/novell/usdrv/scripts). Add or modify the shell commands needed to create the external account, and use the STATUS_* functions (e.g., STATUS_SUCCESS) to return the appropriate status to the Identity Manager engine."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you change the polling interval for the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "The polling interval for the Bi Impl Scripting driver is controlled by the driver parameter **Polling Interval** (default 60 seconds). To change it, modify the driver configuration in the Identity Manager console to set a new value for the Polling Interval parameter. The poll.sh script will automatically use the new interval when the Publisher calls it."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the XML format of a status document returned by the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "The Bi Impl Scripting driver returns a status document as an XML element with a *status* tag. The element includes a *level* attribute (e.g., \"success\", \"warning\", \"error\", \"fatal\", \"retry\") and the message as the element’s content. Example:\n```\n<status level=\"success\">This is a message</status>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you send a success status from a script in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "Call the built‑in function **STATUS_SUCCESS** followed by the message you want to return. For example, within any of the event scripts (add.sh, modify.sh, etc.):\n```\nSTATUS_SUCCESS \"User account created successfully\"\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What heartbeat functions are provided by the Bi Impl Scripting driver and what XML do they produce?",
+      "input": "",
+      "output": "The Bi Impl Scripting driver provides three heartbeat functions:\n* **HEARTBEAT_SUCCESS Message** – Sends a heartbeat status with level=\"success\".\n* **HEARTBEAT_ERROR Message** – Sends a heartbeat status with level=\"error\".\n* **HEARTBEAT_WARNING Message** – Sends a heartbeat status with level=\"warning\".\nEach function outputs an XML document in the form:\n```\n<status level=\"<level>\" type=\"heartbeat\">This is a heartbeat message</status>\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the built‑in functions available in the Bi Impl Scripting driver.",
+      "input": "",
+      "output": "The Bi Impl Scripting driver defines several built‑in functions grouped by purpose:\n* General functions: IDMGETDRVVAR, TRACE, EXEC, STATUS, STATUS_SUCCESS, STATUS_WARNING, STATUS_RETRY, STATUS_ERROR, STATUS_FATAL.\n* Subscriber functions: IDMGETSUBVAR, IDMGETVAR, IDMSETVAR.\n* Publisher function: IDMGETPUBVAR.\n* Query functions: IDMQUERY, IDMGETQVAR.\n* Heartbeat functions: HEARTBEAT_SUCCESS, HEARTBEAT_ERROR, HEARTBEAT_WARNING.\nThese functions enable scripts to read driver, subscriber, publisher, and query parameters; execute external commands; log trace messages; return status to the engine; and report heartbeat health."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a short heartbeat.sh script snippet for the Bi Impl Scripting driver that reports a successful heartbeat.",
+      "input": "",
+      "output": "```sh\n#!/bin/sh\n# heartbeat.sh for Bi Impl Scripting driver\n\n# Perform any health checks here (e.g., ping external system)\n# If the check succeeds, send a success heartbeat\nHEARTBEAT_SUCCESS \"External system is responding correctly\"\n\n# If the check fails, you could use HEARTBEAT_ERROR or HEARTBEAT_WARNING instead\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the IDMQUERY function operate in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, the IDMQUERY function sends a query request to the Identity Manager engine. It requires three arguments: **ClassName** (the object class to query), **Association** (the association name, if any), and **ReadAttrs** (a list of attributes to retrieve). The engine returns the query result, which can then be accessed with IDMGETQVAR."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve a value from a query result in a Bi Impl Scripting driver script?",
+      "input": "",
+      "output": "After calling IDMQUERY, use the IDMGETQVAR function with the parameter name of the desired result item. For example:\n```\nIDMQUERY \"User\" \"\" \"uid,mail\"\nIDMGETQVAR \"uid\"\n```\nIDMGETQVAR will output the value of the \"uid\" attribute (or an empty string if none)."
+    }
+  ]
+}

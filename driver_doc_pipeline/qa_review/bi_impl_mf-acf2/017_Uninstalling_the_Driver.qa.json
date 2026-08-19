@@ -1,0 +1,65 @@
+{
+  "driver": "Bi Impl Mf ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of uninstalling the security system exits in the Bi Impl Mf ACF2 driver?",
+      "input": "",
+      "output": "Uninstalling the security system exits in the Bi Impl Mf ACF2 driver removes the ACF2 security integration that was added by the driver, restoring the system to its original state and ensuring that no residual exit modules or GSO EXITS records interfere with normal operation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall the security system exits for the Bi Impl Mf ACF2 driver when you originally linked the LDXNPXIT exit with your own custom exits?",
+      "input": "",
+      "output": "To uninstall the security system exits for the Bi Impl Mf ACF2 driver after linking LDXNPXIT with custom exits, follow these steps:\n1. Reinstall your original exits, then IPL with CLPA to load the relinked exits in the active LPA.\n2. If you changed the exit names during relinking, update the GSO EXITS record with the new exit names.\n3. Delete the exit modules from the LPA library that contain them, then IPL with CLPA at a convenient time."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to uninstall the security system exits for the Bi Impl Mf ACF2 driver when using LDXNPXIT, LDXNPHXT, or LDXPOST alone?",
+      "input": "",
+      "output": "When using LDXNPXIT, LDXNPHXT, or LDXPOST alone with the Bi Impl Mf ACF2 driver, uninstall the security system exits as follows:\n1. Update the GSO EXITS record to remove the exit names:\n   a. Enter the following TSO commands:\n      \n      READY\n      acf\n        ACF\n      set control(gso) sysid(system)\n        CONTROL\n      insert sysid(system) exits lidpost() newpxit() npwpexit()\n   b. Install the new values by entering on a z/OS console:\n      MODIFY ACF2,REFRESH\n2. Delete the exit modules from the LPA library that contain them, then IPL with CLPA at a convenient time."
+    },
+    {
+      "category": "config",
+      "instruction": "Which TSO commands are required to update the GSO EXITS record when uninstalling the Bi Impl Mf ACF2 driver security exits?",
+      "input": "",
+      "output": "The TSO commands required to update the GSO EXITS record for the Bi Impl Mf ACF2 driver are:\n```\nREADY\nacf\n  ACF\nset control(gso) sysid(system)\n  CONTROL\ninsert sysid(system) exits lidpost() newpxit() npwpexit()\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you uninstall the driver shim for the Bi Impl Mf ACF2 driver?",
+      "input": "",
+      "output": "To uninstall the driver shim for the Bi Impl Mf ACF2 driver, perform the following steps:\n1. Remove the change log started task (LDXLOGR) and driver shim (ACF2DRV) started task from your system startup and shutdown procedures.\n2. Stop both started tasks (LDXLOGR and ACF2DRV).\n3. Remove members LDXLOGR and ACF2DRV from your started task procedure library.\n4. Remove the driver load library from the APF list by modifying the appropriate PARMLIB IEAAPFxx or PROGxx member.\n5. Remove the LDXSERV and ACFQUERY TSO commands from IKJTSOxx.\n6. Delete the driver files from the HFS using `oshell rm -rf /opt/novell`.\n7. Delete the SAMPLIB, LOAD and EXEC driver data sets.\n8. Delete the change log data set that was created during driver installation."
+    },
+    {
+      "category": "config",
+      "instruction": "What PARMLIB member should be modified to remove the driver load library from the APF list for the Bi Impl Mf ACF2 driver, and how can the change be activated without an IPL?",
+      "input": "",
+      "output": "To remove the driver load library from the APF list for the Bi Impl Mf ACF2 driver, modify the appropriate PARMLIB IEAAPFxx or PROGxx member. If you use the dynamic APF facility, you can activate the change immediately with the `SET PROG` command; otherwise, an IPL is required for the change to take effect."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the driver shim removal for the Bi Impl Mf ACF2 driver does not take effect after modifying the APF list?",
+      "input": "",
+      "output": "If the driver shim removal for the Bi Impl Mf ACF2 driver does not take effect after modifying the APF list, perform an IPL of the system, because the change to the APF list requires a reboot unless you are using the dynamic APF facility with the `SET PROG` command."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you delete the Bi Impl Mf ACF2 driver object from the Identity Vault using iManager?",
+      "input": "",
+      "output": "To delete the Bi Impl Mf ACF2 driver object from the Identity Vault via iManager, follow these steps:\n1. In iManager, select **Identity Manager Administration** from the top menu icons.\n2. Under **Administration tasks**, choose **Identity Manager Overview**.\n3. Click **Driver Sets** and navigate to your driver set by clicking its name.\n4. Click **Drivers**, then click **Delete Driver** on the Driver Set Overview page.\n5. Select the driver object to be deleted and click **OK**."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the entire uninstall process for the Bi Impl Mf ACF2 driver.",
+      "input": "",
+      "output": "Uninstalling the Bi Impl Mf ACF2 driver involves three main parts: (1) removing security system exits—either by reinstalling original exits and updating GSO EXITS if custom exits were linked, or by clearing exit names and refreshing ACF2 if only default exits were used; (2) uninstalling the driver shim—removing and stopping the LDXLOGR and ACF2DRV started tasks, deleting related members, clearing the APF list entry, removing TSO commands, and deleting driver files and data sets; and (3) deleting the driver object from the Identity Vault via iManager by navigating to the driver set and confirming deletion."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write the exact TSO command block needed to update the GSO EXITS record when uninstalling the Bi Impl Mf ACF2 driver security exits.",
+      "input": "",
+      "output": "```\nREADY\nacf\n  ACF\nset control(gso) sysid(system)\n  CONTROL\ninsert sysid(system) exits lidpost() newpxit() npwpexit()\n```"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you edit the properties of the RACF driver using iManager?",
+      "input": "",
+      "output": "To edit the properties of the RACF driver using iManager, follow these steps:\n1. In iManager, select **Identity Manager Overview** from the Identity Manager task list on the left side.\n2. Navigate to your driver set by searching the tree or entering the driver name.\n3. Click the driver to open its overview.\n4. Click the driver icon.\n5. Choose **Driver Configuration** or **Global Config Values** as needed.\n6. Edit the property values you want to change and click **OK**.\nRemember that any change requires a restart of the RACF driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the import‑only parameters for the RACF driver and the values they accept?",
+      "input": "",
+      "output": "The RACF driver import‑only parameters and their allowed values are:\n| Property Name | Values or Format |\n|---|---|\n| Data Flow | Bidirectional, Application to Identity Vault, Identity Vault to Application |\n| Set Preconfigured TSO Data | Yes, No |\n| Set Preconfigured OMVS Data | Yes, No |\n| Enable Entitlements | Yes, No |\n| Use SSL | Yes, No |\nThese parameters can only be set during driver import."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the Use SSL import‑only property important for the RACF driver?",
+      "input": "",
+      "output": "The **Use SSL** property determines whether the RACF driver encrypts the connection between the Identity Vault and the connected system. NetIQ strongly recommends enabling SSL because, without it, identity data—including passwords—travel across the network in clear text, exposing them to interception."
+    },
+    {
+      "category": "config",
+      "instruction": "Which values can be selected for the Data Flow property during RACF driver import and what does each option mean?",
+      "input": "",
+      "output": "During RACF driver import, the **Data Flow** property can be set to:\n- **Bidirectional** – Identities are synchronized both from the Identity Vault to the connected system and from the connected system to the Identity Vault, keeping them mirrored after all pending events are processed.\n- **Application to Identity Vault** – Identities flow only from the connected system (application) to the Identity Vault; changes made in the Identity Vault are not pushed back to the connected system.\n- **Identity Vault to Application** – Identities flow only from the Identity Vault to the connected system; identities created in the Identity Vault are not created on the connected system unless explicitly migrated."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the Remote Loader Connection Parameters for the RACF driver and how should they be formatted?",
+      "input": "",
+      "output": "The Remote Loader Connection Parameters for the RACF driver are a string that includes three key/value pairs:\n| Parameter | Description |\n|---|---|\n| host=hostName | Connected system host name or IP address. |\n| port=portNumber | Connected system TCP port number (default is 8090). |\n| kmo=objectRDN | RDN of the object with the server certificate signed by the tree’s certificate authority. Enclose the RDN in double quotes if it contains spaces. |\nExample string:\n```\nhostname=192.168.17.41 port=8090 kmo=\"SSL CertificateDNS\"\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the recommended value for the Driver Cache Limit property on the RACF driver Configuration page?",
+      "input": "",
+      "output": "The **Driver Cache Limit** property on the RACF driver Configuration page recommends a value of **0 (zero)**."
+    },
+    {
+      "category": "config",
+      "instruction": "Which startup options are available for the RACF driver and how do they differ?",
+      "input": "",
+      "output": "The **Startup Option** property for the RACF driver can be set to:\n- **Auto start** – The driver starts automatically when the Identity Manager service starts.\n- **Manual** – The driver must be started manually by an administrator."
+    },
+    {
+      "category": "config",
+      "instruction": "What setting is recommended for Automatic Loopback Detection in the RACF driver and why?",
+      "input": "",
+      "output": "For the RACF driver, **Automatic Loopback Detection** should be set to **No** because the RACF driver provides its own loopback detection mechanism, making the additional shim‑based detection unnecessary."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the Publisher Disabled property affect the RACF driver behavior?",
+      "input": "",
+      "output": "The **Publisher Disabled** property determines whether the Publisher shim is active. Setting it to **Yes** disables the Publisher, which is useful when using a one‑way Identity Vault‑to‑Application data flow, thereby saving processing time."
+    },
+    {
+      "category": "config",
+      "instruction": "What options are available for the UID Assignment global configuration value in the RACF driver?",
+      "input": "",
+      "output": "The **UID Assignment** global configuration value for the RACF driver can be set to either **Assign by RACF** or **Assign by Identity Vault**. This determines whether UID and GID numbers are sourced from RACF or generated by the Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "How should the Default Home Directory be specified in the RACF driver Global Configuration Values?",
+      "input": "",
+      "output": "In the RACF driver Global Configuration Values, **Default Home Directory** should be entered as a path ending with a slash (/). The user’s ID will be appended to this path. Example:\n```\n/home/\n```\nIf the user ID is **IBMUSER**, the resulting home directory will be **/home/IBMUSER**."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Enable Entitlements import‑only property control in the RACF driver?",
+      "input": "",
+      "output": "The **Enable Entitlements** import‑only property specifies whether the RACF driver uses Approval Flow or Roles‑Based Entitlements with the Entitlements Service driver. Enable it only if you intend to use the User Application or Roles‑Based Entitlements with the RACF driver."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration sections and most important properties of the RACF driver.",
+      "input": "",
+      "output": "The RACF driver configuration is organized into three main sections:\n1. **Driver Import‑Only Parameters** – Set during driver import and include Data Flow, Set Preconfigured TSO Data, Set Preconfigured OMVS Data, Enable Entitlements, and Use SSL.\n2. **Driver Configuration Page** – Editable after import; key properties include Driver Module (must be *Connect to Remote Loader*), Driver Object Password, Remote Loader Connection Parameters (host, port, kmo), Driver Cache Limit (recommended 0), Startup Option (Auto start/Manual), Automatic Loopback Detection (set to No), Polling Interval, Heartbeat Interval, Publisher Disabled, and others.\n3. **Global Configuration Values Page** – Global settings such as Connected System or Driver Name, User Default Group/Owner, Default CONNECT Attributes, TSO defaults, UID Assignment, Default Home Directory, Default Program, password flow flags, and containers for users and groups. Many of these properties control password synchronization, entitlement publishing, and placement of objects in the Identity Vault."
+    }
+  ]
+}

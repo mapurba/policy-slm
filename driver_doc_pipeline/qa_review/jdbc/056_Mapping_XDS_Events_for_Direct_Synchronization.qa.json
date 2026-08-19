@@ -1,0 +1,47 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of mapping XDS events to SQL statements in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, mapping XDS events to SQL statements enables direct synchronization between the Identity Manager repository and external data stores. Each XDS event (<add>, <modify>, <delete>, etc.) is translated into one or more DML SQL statements so that changes made in Identity Manager are reflected in the target database in real time."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the JDBC driver maps XDS events to SQL statements for direct synchronization.",
+      "input": "",
+      "output": "The JDBC driver maps XDS events as follows: \n- **<add>**: zero or more SELECTs (matching policy), one view INSERT for each single‑value <add-attr>, optional stored procedure/function call for primary key retrieval, and one view INSERT for each multivalue <add-attr>. \n- **<modify>**: one view UPDATE for each single‑value <add-value> or <remove-value>, one view INSERT for each multivalue <add-value>, and one view DELETE for each <remove-value>. \n- **<delete>**: one view DELETE statement. \n- **<query>**: one view SELECT statement. \n- **<move>, <rename>, <modify-password>, <check-object-password>**: no statements unless they are bound to embedded SQL."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the JDBC driver handle an <add> XDS event during direct synchronization?",
+      "input": "",
+      "output": "When the JDBC driver processes an <add> event, it performs the following steps:\n1. Executes zero or more SELECT statements as required by the matching policy.\n2. Issues one view INSERT statement for each single‑value <add-attr> element.\n3. Calls an optional stored procedure or function (0 or 1) to retrieve primary‑key values before or after the view INSERT.\n4. Issues one view INSERT statement for each multivalue <add-attr> element.\nThese SQL statements together create the new record(s) that correspond to the added object."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the JDBC driver process a <modify> XDS event for direct synchronization?",
+      "input": "",
+      "output": "For a <modify> event, the JDBC driver executes the following SQL actions:\n1. Issues one view UPDATE statement for each single‑value <add-value> or <remove-value> element.\n2. Issues one view INSERT statement for each multivalue <add-value> element.\n3. Issues one view DELETE statement for each <remove-value> element.\nThese statements update, add, or remove attribute values in the target database to reflect the modification."
+    },
+    {
+      "category": "howto",
+      "instruction": "What SQL statement does the JDBC driver generate for a <delete> XDS event in direct synchronization?",
+      "input": "",
+      "output": "When the JDBC driver receives a <delete> event, it generates a single view DELETE statement to remove the corresponding record from the target database."
+    },
+    {
+      "category": "howto",
+      "instruction": "How is a <query> XDS event translated by the JDBC driver for direct synchronization?",
+      "input": "",
+      "output": "The JDBC driver translates a <query> event into a single view SELECT statement that retrieves the requested data from the target database."
+    },
+    {
+      "category": "howto",
+      "instruction": "What does the JDBC driver do when it encounters <move>, <rename>, <modify-password>, or <check-object-password> XDS events?",
+      "input": "",
+      "output": "For the <move>, <rename>, <modify-password>, and <check-object-password> events, the JDBC driver issues zero SQL statements unless those events are explicitly bound to embedded SQL statements in the configuration."
+    }
+  ]
+}

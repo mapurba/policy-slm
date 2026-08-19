@@ -1,0 +1,59 @@
+{
+  "driver": "Bi Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the Bi Impl Scripting driver, what does the function idm_getdriverparam($paramname) do and when would you use it?",
+      "input": "",
+      "output": "The function idm_getdriverparam($paramname) returns the string value for the driver parameter whose name is passed in as $paramname. It is used within PowerShell scripts of the Bi Impl Scripting driver to read configuration values that were defined for the driver instance, such as custom settings or the Polling Interval."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Bi Impl Scripting driver provide several idm_status* functions like idm_statussuccess and idm_statuserror?",
+      "input": "",
+      "output": "The Bi Impl Scripting driver includes a set of idm_status* helper functions (idm_statussuccess, idm_statuswarning, idm_statusretry, idm_statuserror, idm_statusfatal) to allow a script to return a specific status level and message to the Identity Manager engine when the script finishes. Using the appropriate function lets the engine understand whether the operation succeeded, should be retried, generated a warning, or failed fatally."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve a subscriber parameter named \"UserDomain\" in a Bi Impl Scripting driver subscriber script?",
+      "input": "",
+      "output": "In a Bi Impl Scripting driver subscriber script, call the function idm_getsubscriberparam with the parameter name:\n\n```powershell\n$domain = idm_getsubscriberparam \"UserDomain\"\n``` \nThe variable $domain will contain the string value of the subscriber parameter \"UserDomain\" (or $null if it is not defined)."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the steps to set a command and return a single attribute value from a Bi Impl Scripting driver subscriber script.",
+      "input": "",
+      "output": "To set a command and return a value in a Bi Impl Scripting driver subscriber script:\n1. Call idm_setcommand with the command string you want the Identity Manager engine to receive, for example:\n   ```powershell\n   idm_setcommand \"CreateUser\"\n   ```\n2. Use idm_writevalue to set the attribute name and its value:\n   ```powershell\n   idm_writevalue \"uid\" $newUserId\n   ```\n3. After these calls, the script ends, and the engine receives the command \"CreateUser\" together with the attribute \"uid\" and its value."
+    },
+    {
+      "category": "howto",
+      "instruction": "What is the procedure for publishing multiple attribute values to the Identity Vault using the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "To publish multiple values in a Bi Impl Scripting driver publisher script:\n1. Initialize the publish command with idm_publishinit, e.g.: \n   ```powershell\n   idm_publishinit \"UpdateUser\"\n   ```\n2. Provide the attribute values using idmpublishvalues, passing an array of strings:\n   ```powershell\n   $groups = @(\"GroupA\", \"GroupB\", \"GroupC\")\n   idmpublishvalues \"memberOf\" $groups\n   ```\n3. Optionally set single‑value attributes with idm_publishvalue.\n4. Finally, call idm_publish to submit the command and the values to the driver engine:\n   ```powershell\n   idm_publish\n   ```\nThe Identity Manager engine then writes the supplied data to the identity vault."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you perform a query for a single user object using the Bi Impl Scripting driver query functions?",
+      "input": "",
+      "output": "To query a single object in a Bi Impl Scripting driver script:\n1. Call idm_queryinit to start a new query.\n2. Specify the object association (or DN) with idm_querysetassociation or idm_querysetsearchroot, for example:\n   ```powershell\n   idm_querysetassociation \"User\"\n   ```\n3. Add a search condition that uniquely identifies the object, e.g.:\n   ```powershell\n   idm_queryaddsearchattr \"uid\" \"bob\"\n   ```\n4. (Optional) Indicate which attributes you want returned using idm_queryaddreadattr, e.g.:\n   ```powershell\n   idm_queryaddreadattr \"mail\"\n   idm_queryaddreadattr \"displayName\"\n   ```\n5. Execute the query with idm_doquery. The function returns $True if an instance is found.\n6. Retrieve data from the returned instance, for example:\n   ```powershell\n   if (idm_doquery) {\n       $email = idm_getqueryinstanceattrvalue \"mail\"\n       $name  = idm_getqueryinstanceattrvalue \"displayName\"\n   }\n   ```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter controls how often the Bi Impl Scripting driver polls the external system, and what is its default value?",
+      "input": "",
+      "output": "The parameter that controls the poll frequency for the Bi Impl Scripting driver is the **Polling Interval** driver parameter. Its default value is **60 seconds**."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main categories of built‑in functions provided by IDMLib.ps1 for the Bi Impl Scripting driver.",
+      "input": "",
+      "output": "IDMLib.ps1 for the Bi Impl Scripting driver groups its built‑in PowerShell functions into five categories:\n1. **General Functions** – utilities such as idm_getdriverparam, idm_trace, and the family of idm_status* functions for returning status messages.\n2. **Subscriber Functions** – helpers for handling inbound events, e.g., idm_getsubscriberparam, idm_setcommand, idm_geteventvalue(s), idm_writevalue(s), and idm_subgetnamedpassword.\n3. **Publisher Functions** – functions used to send data back to Identity Manager, including idm_getpublisherparam, idm_publishinit, idmpublishvalues, idm_publishvalue, and idm_publish.\n4. **Query Functions** – a set of calls for constructing and executing queries against the identity vault, such as idm_queryinit, idm_querysetassociation, idm_queryaddsearchattr, idm_doquery, and various idm_getqueryinstance* retrieval functions.\n5. **Heartbeat Functions** – specialized functions (idmheartbeatsuccess, idmheartbeaterror, idmheartbeatwarning) for reporting the health status of the external system."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a PowerShell code snippet for the Bi Impl Scripting driver that reads the event attribute \"email\" using idm_geteventvalue and returns it as \"mail\" via idm_writevalue, ensuring the proper command is set.",
+      "input": "",
+      "output": "```powershell\n# Bi Impl Scripting driver – map incoming \"email\" event attribute to \"mail\" attribute\n\n# 1. Set the command that will be returned to Identity Manager\nidm_setcommand \"UpdateMail\"\n\n# 2. Retrieve the incoming email value from the event\n$email = idm_geteventvalue \"email\"\n\n# 3. Return the value as the attribute \"mail\"\nif ($email -ne $null) {\n    idm_writevalue \"mail\" $email\n}\n```\nThe snippet first defines the command \"UpdateMail\", obtains the incoming event attribute \"email\", and then writes it back as the \"mail\" attribute using idm_writevalue."
+    }
+  ]
+}

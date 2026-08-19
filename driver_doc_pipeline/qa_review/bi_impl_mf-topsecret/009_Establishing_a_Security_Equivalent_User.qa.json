@@ -1,0 +1,47 @@
+{
+  "driver": "Bi Impl Mf Topsecret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a security‑equivalent user in the Bi Impl Mf Topsecret driver and why should it be used?",
+      "input": "",
+      "output": "In the Bi Impl Mf Topsecret driver, the driver object runs with the rights of a \"security‑equivalent\" user. This user must have sufficient privileges to perform the driver’s synchronization tasks, but you can also define a minimal‑rights user to improve security. Using a dedicated security‑equivalent user isolates driver operations from regular admin accounts and limits exposure to only the rights the driver actually needs."
+    },
+    {
+      "category": "config",
+      "instruction": "What Entry Rights and All Attribute Rights are required for the Bi Impl Mf Topsecret driver security‑equivalent user to create objects in the Identity Vault without group synchronization?",
+      "input": "",
+      "output": "For creating objects in the Identity Vault without group synchronization, the Bi Impl Mf Topsecret driver security‑equivalent user must have:\n- Entry Rights: **Browse and Create**\n- All Attribute Rights: **Compare and Read**"
+    },
+    {
+      "category": "config",
+      "instruction": "What rights must the Bi Impl Mf Topsecret driver security‑equivalent user have to retrieve passwords from the Identity Vault?",
+      "input": "",
+      "output": "To retrieve passwords, the Bi Impl Mf Topsecret driver security‑equivalent user requires:\n- Entry Rights: **Browse and Supervisor**\n- All Attribute Rights: **Compare and Read**"
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the complete table of base container rights required by the Bi Impl Mf Topsecret driver security‑equivalent user.",
+      "input": "",
+      "output": "| Operation | Entry Rights | All Attribute Rights |\n|---|---|---|\n| Subscriber notification of account changes (recommended minimum) | Browse | Compare and Read |\n| Creating objects in the Identity Vault without group synchronization | Browse and Create | Compare and Read |\n| Creating objects in the Identity Vault with group synchronization | Browse and Create | Compare, Read, and Write |\n| Modifying objects in the Identity Vault | Browse | Compare, Read, and Write |\n| Renaming objects in the Identity Vault | Browse and Rename | Compare and Read |\n| Deleting objects from the Identity Vault | Browse and Erase | Compare, Read, and Write |\n| Retrieving passwords from the Identity Vault | Browse and Supervisor | Compare and Read |\n| Updating passwords in the Identity Vault | Browse and Supervisor | Compare, Read, and Write |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Bi Impl Mf Topsecret driver to avoid password‑related error messages when you do not want the driver to set passwords?",
+      "input": "",
+      "output": "1. Do **not** assign the **Supervisor** right under Entry Rights for the driver’s security‑equivalent user, because without Supervisor the driver cannot set passwords.\n2. Open the policy filter for the User class.\n3. Locate the attribute **nspmDistributionPassword**.\n4. Set the **Subscribe** setting for that attribute to **Ignore**.\n5. Save the filter changes. This prevents the driver from attempting to set passwords and eliminates superfluous error messages."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the Bi Impl Mf Topsecret driver fail to set passwords and what is the documented resolution?",
+      "input": "",
+      "output": "The Bi Impl Mf Topsecret driver cannot set passwords if the security‑equivalent user does not have the **Supervisor** right in the Entry Rights. To resolve the issue, either grant the **Supervisor** right to the driver’s security‑equivalent user or, if password setting is not required, set the **Subscribe** setting for the User class attribute **nspmDistributionPassword** to **Ignore** in the filter."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about establishing a security‑equivalent user for the Bi Impl Mf Topsecret driver.",
+      "input": "",
+      "output": "The Bi Impl Mf Topsecret driver must run as a security‑equivalent user with rights defined in Table 2‑2. The user must be a trustee of the containers holding synchronized objects, with inheritance set for Entry Rights and All Attribute Rights. Specific rights vary by operation (e.g., Browse + Create for object creation, Supervisor for password operations). If Supervisor is omitted, the driver cannot set passwords; to avoid errors when passwords are not needed, set the Subscribe option for the nspmDistributionPassword attribute to Ignore. Detailed rights information is available in the NetIQ eDirectory Administration Guide."
+    }
+  ]
+}

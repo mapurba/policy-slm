@@ -67,7 +67,7 @@ def _approve(driver_slug: str, md_name: str, review_path: str, content_hash: str
 
 
 def _process_file(driver_slug: str, md_name: str, driver_display: str, state: Dict,
-                  auto_approve_cache_hits: bool) -> str:
+                  auto_approve_cache_hits: bool, no_review: bool = False) -> str:
     """Handle one markdown file interactively. Returns 'continue' or 'quit'."""
     md_path = os.path.join(utils.markdown_folder_for(driver_slug), md_name)
     with open(md_path, "r", encoding="utf-8") as f:
@@ -105,9 +105,10 @@ def _process_file(driver_slug: str, md_name: str, driver_display: str, state: Di
     ))
     _summarize_payload(payload, source)
 
-    if source == "cache-hit" and auto_approve_cache_hits:
+    if no_review or (source == "cache-hit" and auto_approve_cache_hits):
         n = _approve(driver_slug, md_name, review_path, chash, driver_display, state)
-        console.print(f"[green]Auto-approved cache hit: {n} record(s) appended.[/green]")
+        label = "no-review" if no_review else "cache hit"
+        console.print(f"[green]Auto-approved ({label}): {n} record(s) appended.[/green]")
         return "continue"
 
     while True:
@@ -142,7 +143,7 @@ def _process_file(driver_slug: str, md_name: str, driver_display: str, state: Di
 
 
 def run(drivers: Optional[List[str]] = None, auto_approve_cache_hits: bool = False,
-        skip_boilerplate: bool = True) -> None:
+        skip_boilerplate: bool = True, no_review: bool = False) -> None:
     """Walk drivers/files in order, resuming from the first pending file."""
     utils.configure_logging()
     cache.init_db()
@@ -169,7 +170,7 @@ def run(drivers: Optional[List[str]] = None, auto_approve_cache_hits: bool = Fal
                 console.print(f"[dim]{slug}/{md_name}: boilerplate, auto-skipped.[/dim]")
                 continue
 
-            result = _process_file(slug, md_name, display, state, auto_approve_cache_hits)
+            result = _process_file(slug, md_name, display, state, auto_approve_cache_hits, no_review)
             if result == "quit":
                 return
 

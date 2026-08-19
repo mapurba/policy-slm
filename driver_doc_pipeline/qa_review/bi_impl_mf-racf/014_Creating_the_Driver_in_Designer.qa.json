@@ -1,0 +1,77 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why must you import the current driver packages before installing the RACF driver?",
+      "input": "",
+      "output": "Importing the current driver packages ensures that the Package Catalog contains the latest versions of the RACF driver packages; without the latest packages the RACF driver may not install correctly or may miss recent updates."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the current driver packages for the RACF driver in Designer?",
+      "input": "",
+      "output": "1. Open Designer.\n2. Click **Help > Check for Package Updates** in the toolbar.\n3. Click **OK** if there are no updates, or click **OK** to import updates.\n4. In the Outline view, right‑click **Package Catalog** and choose **Import Package**.\n5. Select the RACF Packages (or click **Select All** to import all displayed packages).\n6. If only base packages are shown, deselect **Show Base Packages Only** to see all packages.\n7. Click **OK** to import the selected packages, then confirm the successful import message.\n8. Proceed to the next step, installing the driver packages."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the step‑by‑step actions to install the driver packages and create a new RACF driver in Designer?",
+      "input": "",
+      "output": "1. In Designer, open your project.\n2. In the Modeler, right‑click the driver set where the driver will reside and choose **New > Driver**.\n3. Select **RACF Base** from the list of base packages and click **Next**.\n4. Choose the optional feature packages you want (Default Configuration, Entitlements, Password Synchronization, Data Collection, Account Tracking) and click **Next**.\n5. If any selected packages have dependencies, click **OK** to install the listed dependencies; repeat for additional dependency groups if prompted.\n6. If the **Common Settings** package was installed, fill in **User Container** (default for all drivers) and optionally **Group Container** (ignored for RACF) on the **Install Common Settings** page, then click **Next**.\n7. If required, fill in the **Common Settings Advanced Edition** fields (User Application Provisioning Services URL and Administrator DN) and click **Next**.\n8. On the **Install RACF** page, enter a unique **Driver Name**.\n9. On the **Install RACF Base** page, set **Connect to Remote Loader** to **Yes**, specify **Host Name**, **Port** (default 8090), **Remote Password**, and **Driver Password**, then click **Next**.\n10. Provide the driver parameters (Polling Interval, Heartbeat Interval, Publisher Disabled, Synchronize RACF Password Phrases) and click **Next**.\n11. Continue through any conditional pages (OMVS, TSO, Default Configuration, Entitlements mappings, General Information, Managed System Information, System Ownership, Account Tracking) filling in required fields, clicking **Next** after each.\n12. Review the summary and click **Finish** to create the RACF driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which optional packages can be selected when installing the RACF driver and what does each package provide?",
+      "input": "",
+      "output": "The optional packages for the RACF driver are:\n- **Default Configuration** – supplies the default configuration information for the RACF driver; always selected.\n- **Entitlements** – adds configuration for synchronizing RACF accounts and policies that enable account creation and auditing.\n- **Password Synchronization** – adds policies that allow the RACF driver to synchronize passwords.\n- **Data Collection** – adds policies that enable the driver to collect data for reporting (used with the Identity Reporting Module).\n- **Account Tracking** – adds policies that enable tracking of accounts for reports (also used with the Identity Reporting Module)."
+    },
+    {
+      "category": "config",
+      "instruction": "What Remote Loader connection parameters must be entered on the Install RACF Base page for the RACF driver?",
+      "input": "",
+      "output": "On the **Install RACF Base** page you must provide:\n- **Connect to Remote Loader** – set to **Yes** (default is to connect via Remote Loader).\n- **Host Name** – the hostname or IP address of the mainframe where the RACF Driver Shim runs.\n- **Port** – the port number where the Remote Loader is installed; the default is **8090**.\n- **Remote Password** – the password defined on the Remote Loader, used by the Metadirectory server (or Remote Loader shim) to authenticate to the Remote Loader.\n- **Driver Password** – the driver object password defined in the Remote Loader service, required for the Remote Loader to authenticate to the Metadirectory server."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameters control the polling and heartbeat behavior of the RACF driver shim?",
+      "input": "",
+      "output": "The driver parameters on the **Install RACF Base** page that control shim behavior are:\n- **Polling Interval** – the interval, in seconds, that specifies how often the driver shim checks for publisher events.\n- **Heartbeat Interval** – the interval, in seconds, that specifies how often the publisher sends Heartbeat status messages from the driver shim.\n- **Publisher Disabled** – indicates whether the publisher channel should be disabled.\n- **Synchronize RACF Password Phrases** – indicates whether Identity Vault passwords should be synchronized with RACF password phrases."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Entitlements Name to CSV File Mappings page during RACF driver installation?",
+      "input": "",
+      "output": "The **Entitlements Name to CSV File Mappings** page (displayed only if the Entitlements package is installed) lets you map RACF entitlements to a CSV file. Identity Manager uses this CSV file to translate RACF entitlement data into resources in the Identity Manager catalog, enabling the creation of permission entries based on the defined entitlements."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you deploy the RACF driver to the Identity Vault from Designer?",
+      "input": "",
+      "output": "1. In Designer, open your project.\n2. In the Modeler, right‑click the RACF driver icon (or driver line) and choose **Live > Deploy**.\n3. If you are not already authenticated to the Identity Vault, enter:\n   - **Host** – IP address or DNS name of the server hosting the Identity Vault.\n   - **Username** – DN of the user object used for authentication.\n   - **Password** – the user’s password.\n4. Click **OK**.\n5. Review the deployment summary and click **Deploy**.\n6. After the successful deployment message appears, click **OK**.\n7. Click **Define Security Equivalence**, then **Add** to select the object with the appropriate rights, and click **OK** twice.\n8. Click **Exclude Administrative Roles**, **Add** each administrative user object to exclude (e.g., Admin, DriversUser), and click **OK** for each addition; then click **OK** to finish."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to start the RACF driver after it has been deployed?",
+      "input": "",
+      "output": "1. In Designer, open your project.\n2. In the Modeler, right‑click the RACF driver icon (or driver line) and select **Live > Start Driver**.\n3. The driver will start; it will remain idle until an event occurs in the event‑driven Identity Manager system."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the RACF driver installation stops because of missing package dependencies, how should you resolve the issue?",
+      "input": "",
+      "output": "When the installer detects missing package dependencies, a dialog lists the required packages. Click **OK** to install the listed dependencies. If additional dependency groups appear, repeat the process by clicking **OK** for each group until all dependencies are installed. Then continue with the installation steps."
+    },
+    {
+      "category": "config",
+      "instruction": "What fields must be completed on the General Information page when the Managed System package is installed for the RACF driver?",
+      "input": "",
+      "output": "On the **General Information** page you must provide:\n- **Name** – a descriptive name for the RACF system (displayed in reports).\n- **Description** – a brief description of the RACF system (displayed in reports).\n- **Location** – the physical location of the RACF system (displayed in reports).\n- **Vendor** – leave as **IBM** (displayed in reports).\n- **Version** – the version number of the RACF system (displayed in reports)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete process for creating, configuring, deploying, and starting the RACF driver in Designer.",
+      "input": "",
+      "output": "To create a RACF driver, first import the latest RACF packages into the Package Catalog. Then install the driver packages by selecting the RACF Base package and any optional packages (such as Entitlements or Password Synchronization), handling any package dependencies, and providing required settings on pages like Common Settings, Install RACF Base (Remote Loader connection and driver parameters), and optional configuration pages (OMVS, TSO, Entitlements mappings, Managed System information). After reviewing the summary, finish the wizard to create the driver. Configure the driver by opening its Properties page and adjusting driver parameters and global configuration values as needed. Deploy the driver to the Identity Vault via Live > Deploy, supplying authentication details if needed, and assign security equivalence while excluding administrative roles. Finally, start the driver with Live > Start Driver; the driver will then process events as they occur."
+    }
+  ]
+}

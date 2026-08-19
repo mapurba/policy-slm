@@ -1,0 +1,47 @@
+{
+  "driver": "Bi Implementation MF ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of a security‑equivalent user in the Bi Implementation MF ACF2 driver and why should you consider using a minimal‑rights account?",
+      "input": "",
+      "output": "In the Bi Implementation MF ACF2 driver the driver object must run with security equivalence to a user that has sufficient rights to perform the required operations. Setting the driver equivalent to Admin or a similar privileged user is the simplest approach, but for stronger security you can define a user that has only the minimal rights necessary for the specific operations the driver needs to perform. This limits the potential impact of a compromised driver account."
+    },
+    {
+      "category": "config",
+      "instruction": "List the Entry Rights and All Attribute Rights required for each operation by the security‑equivalent user of the Bi Implementation MF ACF2 driver as shown in Table 2‑2.",
+      "input": "",
+      "output": "Base Container Rights Required by the Driver Security‑Equivalent User (Bi Implementation MF ACF2 driver):\n\n| Operation | Entry Rights | All Attribute Rights |\n|---|---|---|\n| Subscriber notification of account changes (recommended minimum) | Browse | Compare and Read |\n| Creating objects in the Identity Vault without group synchronization | Browse and Create | Compare and Read |\n| Creating objects in the Identity Vault with group synchronization | Browse and Create | Compare, Read, and Write |\n| Modifying objects in the Identity Vault | Browse | Compare, Read, and Write |\n| Renaming objects in the Identity Vault | Browse and Rename | Compare and Read |\n| Deleting objects from the Identity Vault | Browse and Erase | Compare, Read, and Write |\n| Retrieving passwords from the Identity Vault | Browse and Supervisor | Compare and Read |\n| Updating passwords in the Identity Vault | Browse and Supervisor | Compare, Read, and Write |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Bi Implementation MF ACF2 driver to avoid password‑related error messages when the driver does not need to set passwords?",
+      "input": "",
+      "output": "1. Open the filter used by the Bi Implementation MF ACF2 driver.\n2. Locate the User class attribute **nspmDistributionPassword**.\n3. Set the **Subscribe** setting for this attribute to **Ignore**.\n4. Save the filter.\nBy ignoring the nspmDistributionPassword attribute, the driver will not attempt to set passwords and will not generate superfluous error messages."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the Bi Implementation MF ACF2 driver be unable to set passwords and how can this be resolved?",
+      "input": "",
+      "output": "The driver cannot set passwords if the security‑equivalent user does not have the **Supervisor** right in the Entry Rights column. To resolve the issue, edit the driver’s security‑equivalent user and grant the **Supervisor** right (e.g., \"Browse and Supervisor\") for the container entries where passwords need to be set."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the essential steps for establishing a security‑equivalent user for the Bi Implementation MF ACF2 driver.",
+      "input": "",
+      "output": "To establish a security‑equivalent user for the Bi Implementation MF ACF2 driver:\n1. Choose a user account—either Admin/similar or a minimal‑rights account.\n2. Ensure the user is a trustee of the containers that hold synchronized users.\n3. Set inheritance for both **Entry Rights** and **All Attribute Rights** on those containers.\n4. Grant the rights listed in Table 2‑2 for each required operation, including **Supervisor** when password operations are needed.\n5. If passwords are not required, configure the driver filter to ignore the **nspmDistributionPassword** attribute to prevent unnecessary errors."
+    },
+    {
+      "category": "config",
+      "instruction": "What container trustee and inheritance settings are required for the security‑equivalent user of the Bi Implementation MF ACF2 driver?",
+      "input": "",
+      "output": "The security‑equivalent user must be a **trustee** of the containers where synchronized users reside, and **inheritance must be enabled** for both **[Entry Rights]** and **[All Attribute Rights]** on those containers."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is it recommended to set the driver equivalent to Admin or a similar user for the Bi Implementation MF ACF2 driver, and what is a more secure alternative?",
+      "input": "",
+      "output": "Setting the driver equivalent to **Admin** (or a similar highly‑privileged user) is recommended because it guarantees the driver has all rights needed for any operation, simplifying initial configuration. A more secure alternative is to create a dedicated user that is granted only the minimal rights outlined in Table 2‑2 for the specific operations the driver will perform. This principle of least privilege reduces security risk if the driver account is compromised."
+    }
+  ]
+}

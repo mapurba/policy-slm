@@ -1,0 +1,53 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What information does the STATUS operand of LDXSERV provide for the ACF2 driver?",
+      "input": "",
+      "output": "For the ACF2 driver, the STATUS operand returns an XML document that describes the installed Event Subsystem. It includes the build date and version of each component, the state of each Exit (e.g., enabled or disabled), the number of times each Exit has been called, the number of events queued through each Exit, and details about the log file such as its name, state, and usage percentage. The XML also contains a <queue> element indicating the queue version, state, creator, and entry count, as well as a <logger> element with its version, state, task ID, and log file name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you run the STATUS command with LDXSERV for the ACF2 driver?",
+      "input": "",
+      "output": "To run the STATUS command for the ACF2 driver, issue the following TSO command:\n```\nldxserv status\n```\nThe command returns an XML document similar to the example shown in the documentation, containing <status>, <exit>, <queue>, <logger>, and <logfile> elements that report the current state of the ACF2 driver’s Event Subsystem."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the ACF2 driver use a loopback token with LDXSERV?",
+      "input": "",
+      "output": "The ACF2 driver uses a loopback token set in the task’s address space memory to prevent the Exit routines from writing their activity to the change log. This allows LDXSERV to operate without generating additional log entries, which is useful when the tool is used as a verification utility to check that the Exits are installed correctly."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you retrieve the first event from the change log queue using LDXSERV in the ACF2 driver?",
+      "input": "",
+      "output": "To retrieve the first event from the change log queue for the ACF2 driver, run the following command:\n```\nldxserv getnext\n```\nLDXSERV will respond with an XML document that includes an event element (e.g., <modify-password>) containing attributes such as date, time, and event-id, as well as child elements like <association> and <password> that describe the event details."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What elements are included in the XML output of the GETNEXT operand for the ACF2 driver?",
+      "input": "",
+      "output": "The XML output of the GETNEXT operand for the ACF2 driver includes:\n- A <modify-password> (or other event‑type) element with attributes `date`, `time`, and `event-id`.\n- Child elements inside the event, such as `<association>` (the user) and `<password>` (the new password, masked).\n- A <status> element with attribute `level=\"success\"` and a nested `<description>` element indicating the result of the command."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you remove an event from the ACF2 driver change log queue after retrieving it with LDXSERV?",
+      "input": "",
+      "output": "After obtaining the event-id from the GETNEXT command, use the MARKDONE operand to delete that event from the queue. Replace `EVENTID` with the actual ID, for example:\n```\nldxserv markdone event(7006)\n```\nLDXSERV will return an XML document with a <status level=\"success\"> element confirming that the event has been removed."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the exact syntax for using the MARKDONE operand with LDXSERV for the ACF2 driver?",
+      "input": "",
+      "output": "The MARKDONE operand syntax for the ACF2 driver is:\n```\nLDXSERV MARKDONE <EVENT(event-id)>\n```\nYou must supply the event‑id that matches the value returned by the GETNEXT command, enclosed in parentheses after the word `event`. For example: `ldxserv markdone event(7006)`."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the capabilities of the LDXSERV tool for the ACF2 driver.",
+      "input": "",
+      "output": "The LDXSERV tool for the ACF2 driver is a TSO command utility that can (1) report the status of the driver’s Event Subsystem via the STATUS operand, (2) retrieve the first pending event from the change‑log queue with GETNEXT, and (3) remove a processed event from the queue using MARKDONE. It uses a loopback token to suppress logging of its own activity, making it useful for verification and troubleshooting of the ACF2 driver’s exit mechanisms."
+    }
+  ]
+}

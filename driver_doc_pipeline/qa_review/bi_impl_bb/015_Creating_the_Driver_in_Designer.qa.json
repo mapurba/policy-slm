@@ -1,0 +1,71 @@
+{
+  "driver": "Blackboard REST driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Blackboard REST driver and why is it needed in Identity Manager?",
+      "input": "",
+      "output": "The Blackboard REST driver is a NetIQ Identity Manager driver that synchronizes identities, groups, and enrollments between the Identity Vault (eDirectory) and a Blackboard Learn instance using Blackboard's REST API. It enables automatic account creation, role mapping, and enrollment management for users, courses, and organizations in Blackboard."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the current Blackboard REST driver packages into Designer?",
+      "input": "",
+      "output": "To import the current Blackboard REST driver packages:\n1. Open Designer.\n2. Choose **Help > Check for Package Updates** in the toolbar and click **OK** to update or confirm the packages are up‑to‑date.\n3. In the Outline view, right‑click **Package Catalog** and select **Import Package**.\n4. In the import dialog, select any BlackboardREST driver packages or click **Select All** to import every displayed package. (If only base packages are shown, deselect **Show Base Packages Only** to see all packages.)\n5. Click **OK**, then click **OK** again in the success message.\n6. After importing, proceed to install the driver packages."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to install the Blackboard REST driver packages and what optional features can be selected?",
+      "input": "",
+      "output": "Installation steps:\n1. In Designer, open your project.\n2. In the Modeler, right‑click the driver set where the driver will be created and choose **New > Driver**.\n3. Select **BlackboardREST Base** and click **Next**.\n4. On the optional‑features page, the following packages are shown (all selected by default):\n   * **BlackboardREST Default Configuration** – contains the default driver configuration; always keep selected.\n   * **BlackboardREST Group Based Enrollments** – provides policies for using Group attributes to define Blackboard enrollment roles.\n   * **BlackboardREST User Entitlements** – adds policies and entitlements for account creation and management with entitlements.\n5. Click **Next** and continue through the driver‑information, Remote Loader, Blackboard server, and any conditional pages, completing required fields.\n6. Review the summary and click **Finish**.\n7. After installation, configure the driver as described in the next section."
+    },
+    {
+      "category": "config",
+      "instruction": "Which fields must be filled on the Remote Loader page when installing the Blackboard REST driver?",
+      "input": "",
+      "output": "On the Remote Loader page you must provide:\n- **Host Name** – the host name or IP address where the `bbdrv` service is installed and running.\n- **Port** – the port number for the `bbdrv` service (default is 8090).\n- **Remote Password** – password that controls access to the Remote Loader instance; must match the password used in the `bbdrv` configuration.\n- **Driver Password** – the Driver Object Password used by `bbdrv` to authenticate to the Identity Manager server; must match the password set on the Identity Manager Remote Loader.\n- **Key Material Object (KMO)** – the Key Material Object to be used for the SSL connection to the `bbdrv` service."
+    },
+    {
+      "category": "config",
+      "instruction": "List the Blackboard server configuration fields required after the Remote Loader page for the Blackboard REST driver.",
+      "input": "",
+      "output": "The Blackboard server configuration fields are:\n- **Blackboard Server Hostname** – e.g., `bb.myschool.edu`.\n- **Blackboard Server Port** – the SSL‑encrypted port, typically `443`.\n- **Blackboard Server Url** – the base URL for the REST API, e.g., `/learn/api/public/v1/`.\n- **Blackboard Server API Key** – the API key obtained from the Blackboard Learn instance.\n- **Blackboard Server API Secret** – the API secret obtained from the Blackboard Learn instance."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you configure role mappings for group‑based enrollments in the Blackboard REST driver?",
+      "input": "",
+      "output": "If you installed the **BlackboardREST Group Based Enrollments** package, you will see a page titled **Choose the roles that should be used for users who are added to the following group attributes**. On this page you enter mappings in the format `<attribute>:<bb role>`. The default mappings are:\n- `Member:Student`\n- `Owner:Instructor`\nYou can add additional mappings by extending the schema and adding entries such as `Faculty:Instructor`. Note that the values are case‑sensitive and eDirectory attributes typically start with a capital letter. After adding new attributes, remember to add them to the driver filter."
+    },
+    {
+      "category": "config",
+      "instruction": "What options are available on the Default Configuration page for the Blackboard REST driver to set default roles and container limits?",
+      "input": "",
+      "output": "On the Default Configuration page you can set:\n- **Limit the driver to a base container in the Identity Vault for synchronization** – restricts events to a specific base container.\n- **Specify the base container in the Identity Vault for User synchronization** – e.g., `users.myorg`.\n- **Specify the base container in the Identity Vault for Group synchronization** – e.g., `groups.myorg`.\n- **What action should be taken on an enrollment when a Person is removed from a Group** – choose **Delete** (removes the person from the course/organization) or **Disable** (disables the enrollment).\n- **Automatically set the required ID attribute for new Person, Course, and Organization objects to the source name of the object** – when true, sets `DirXML-BB-p-id`, `DirXML-BB-c-id`, and `DirXML-BB-o-id` to the source name if not already set.\n- **Automatically set the required title attribute for new Course and Organization objects to the source name of the Group** – sets `DirXML-bb-c-course-title` and `DirXML-bb-o-title`.\n- **Automatically set the required user roles attributes for Person objects** – when true, assigns default roles defined below.\n- **Default System Role for new users** – the system role to assign (see Blackboard documentation).\n- **Default Institutional Role for new users** – e.g., Student, Staff, Alumni, Guest, Faculty, Observer, or any custom role.\n- **Group objects in this subtree will be synchronized as Courses in Blackboard** – enables course synchronization for groups in the specified subtree.\n- **Group objects in this subtree will be synchronized as Organizations in Blackboard** – enables organization synchronization.\n- **Automatically set required Person attribute DirXML-BB-p-email if it is not set** – when true, creates an email address for the Blackboard user.\n- **Domain name to use for default email address** – domain used to construct the default email address when none exists in eDirectory."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you deploy the Blackboard REST driver from Designer to the Identity Vault?",
+      "input": "",
+      "output": "To deploy the Blackboard REST driver:\n1. Open your project in Designer.\n2. In the Modeler, right‑click the driver icon or driver line and choose **Live > Deploy**.\n3. If not already authenticated to the Identity Vault, provide:\n   - **Host** – IP address or DNS name of the Identity Vault server.\n   - **Username** – DN of the user object used for authentication.\n   - **Password** – that user's password.\n4. Click **OK**.\n5. Review the deployment summary and click **Deploy**.\n6. After the success message, click **OK**.\n7. Click **Define Security Equivalence** to assign rights to the driver (typically the Admin or a dedicated DriversUser object).\n8. Click **Exclude Administrative Roles** to exclude admin users (e.g., Admin, DriversUser) from synchronization, adding each user to the exclusion list.\n9. Confirm all dialogs by clicking **OK**."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver shim configuration file for the Blackboard REST driver and where is it located?",
+      "input": "",
+      "output": "The driver shim configuration file controls the operation of the driver shim, which acts as the interface between the Blackboard REST driver and its service (`bbdrv`). The file is located at `/etc/bbdrv.conf` on the Linux server that hosts the driver shim. It contains options such as connection strings, HTTP port, trace settings, and file paths, each specified on a separate line."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample driver shim configuration file for the Blackboard REST driver that sets a trace file, disables tracing, limits trace file size to 100 MB, connects to a CA file on port 8090, uses HTTP port 8091, and sets the driver path to /opt/novell/bbdrv.",
+      "input": "",
+      "output": "```\n-tracefile /opt/novell/bbdrv/logs/trace.log\n-trace 0\n-tracefilemax 100M\n-connection \"ca=/opt/novell/bbdrv/keys/ca.pem port=8090\"\n-httpport 8091\n-path /opt/novell/bbdrv/\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete process for creating, configuring, deploying, and starting the Blackboard REST driver in Identity Manager.",
+      "input": "",
+      "output": "To create the Blackboard REST driver, first import the latest BlackboardREST packages into Designer, then install the driver by selecting BlackboardREST Base and optional packages (Default Configuration, Group Based Enrollments, User Entitlements). Provide required information on the Driver Information, Remote Loader (host, port, passwords, KMO), and Blackboard Server pages (hostname, SSL port, URL, API key/secret). Configure optional settings such as role mappings, default system/institutional roles, container limits, and attribute defaults. After installation, configure Global Configuration Values, driver filters, and policies as needed. Deploy the driver by right‑clicking it in Designer, supplying Identity Vault credentials, defining security equivalence, and excluding administrative accounts. Finally, start the driver by ensuring the Remote Loader service (`bbdrvd`) is running and selecting **Live > Start Driver** in Designer."
+    }
+  ]
+}

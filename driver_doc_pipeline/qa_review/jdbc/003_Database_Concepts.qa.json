@@ -1,0 +1,83 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is Structured Query Language (SQL) and why is it important for the JDBC driver?",
+      "input": "",
+      "output": "Structured Query Language (SQL) is the language used to query and manipulate data in relational databases. In the JDBC driver, SQL is the foundation for executing data operations because the driver translates Identity Manager events into SQL statements that interact with the underlying database."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver rely on Data Manipulation Language (DML) statements?",
+      "input": "",
+      "output": "The JDBC driver is DML‑based because Data Manipulation Language (DML) statements are highly standardized across databases and are used to insert, update, delete, and query data. By mapping Identity Manager events expressed as XDS XML to DML statements, the JDBC driver can consistently manipulate database data regardless of the specific relational database in use."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How do Data Definition Language (DDL) statements differ from DML statements in the context of the JDBC driver?",
+      "input": "",
+      "output": "Data Definition Language (DDL) statements manipulate database objects such as tables, indexes, and users, and they are often proprietary and differ between databases. Although the JDBC driver is primarily DML‑based, it allows DDL statements to be embedded in XDS events, enabling creation or alteration of database structures alongside data manipulation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is a view and how is it used by the JDBC driver?",
+      "input": "",
+      "output": "A view is a logical table defined by a SELECT query. When the view is queried, the underlying SQL query is executed to generate the result set. In the JDBC driver, views provide an abstraction mechanism that can represent multiple underlying tables as a single logical entity, simplifying data access for Identity Manager."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the difference between an identity column and a sequence object for the JDBC driver.",
+      "input": "",
+      "output": "An identity column is a self‑incrementing column that automatically generates a unique value for each new row in a specific table. A sequence object is a separate counter that can generate unique values and is not bound to a single table; it can be used by multiple tables or for other purposes. Both mechanisms can be used by the JDBC driver to generate primary key values."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are manual (user‑defined) and automatic transactions in the JDBC driver?",
+      "input": "",
+      "output": "Manual (user‑defined) transactions consist of one or more statements that must be explicitly committed with a COMMIT statement; they are typically used for multi‑statement operations and cannot mix DDL with DML. Automatic transactions consist of a single statement that is implicitly committed after execution, often referred to as auto‑committed statements."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a manual transaction that inserts a row and then updates another row using the JDBC driver?",
+      "input": "",
+      "output": "To create a manual transaction with the JDBC driver, follow these steps:\n1. Disable auto‑commit with `SET AUTOCOMMIT OFF`.\n2. Execute the first DML statement, e.g., `INSERT INTO usr(lname) VALUES('Doe');`.\n3. Execute the second DML statement, e.g., `UPDATE usr SET fname = 'John' WHERE idu = 1;`.\n4. Commit the transaction explicitly with `COMMIT;`.\nThe complete example is:\n```\nSET AUTOCOMMIT OFF\nINSERT INTO usr(lname) VALUES('Doe');\nUPDATE usr SET fname = 'John' WHERE idu = 1;\nCOMMIT; -- explicit commit\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable an automatic (auto‑committed) transaction for an INSERT statement in the JDBC driver?",
+      "input": "",
+      "output": "To use an automatic transaction with the JDBC driver, enable auto‑commit and then execute the statement. Example steps:\n1. Turn on auto‑commit with `SET AUTOCOMMIT ON`.\n2. Execute the INSERT statement, e.g., `INSERT INTO emp(lname) VALUES('Doe');`.\nBecause auto‑commit is on, the statement is implicitly committed.\n```\nSET AUTOCOMMIT ON\nINSERT INTO emp(lname) VALUES('Doe');\n-- implicit commit\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What does the `SET AUTOCOMMIT OFF` command configure in the JDBC driver?",
+      "input": "",
+      "output": "`SET AUTOCOMMIT OFF` configures the JDBC driver to disable automatic committing of each individual statement. With auto‑commit off, statements are grouped into a manual transaction that must be explicitly committed with a `COMMIT` command, allowing multiple statements to be treated atomically."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a view named `view_usr` that selects `idu`, `fname`, and `lname` from the `usr` table using the JDBC driver?",
+      "input": "",
+      "output": "Use a `CREATE VIEW` statement as follows:\n```\nCREATE VIEW view_usr\n(\n    pk_idu,\n    fname,\n    lname\n)\nAS\nSELECT idu, fname, lname FROM usr;\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you define an after‑insert trigger on the `usr` table that updates the `fname` column using the JDBC driver?",
+      "input": "",
+      "output": "First, ensure the `usr` table exists, then create the trigger with the following statements:\n```\nCREATE TABLE usr\n(\n    idu   INTEGER,\n    fname VARCHAR2(64),\n    lname VARCHAR2(64)\n);\n```\n```\n-- t = trigger; i = insert\nCREATE TRIGGER t_usr_i\n    AFTER INSERT ON usr\n    FOR EACH ROW\nBEGIN\n    UPDATE usr SET fname = 'John';\nEND;\n```"
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a complete stored procedure definition that returns the next value of a sequence named `seq_idu` for the JDBC driver.",
+      "input": "",
+      "output": "```\nCREATE SEQUENCE seq_idu\n    START WITH 1\n    INCREMENT BY 1\n    NOMINVALUE\n    NOMAXVALUE\n    ORDER;\n```\n```\nCREATE\nPROCEDURE sp_idu(    io_idu IN OUT INTEGER)\nIS\nBEGIN\n    IF (io_idu IS NULL) THEN\n      SELECT seq_idu.nextval INTO io_idu FROM DUAL;\n    END IF;\nEND sp_idu;\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main database concepts covered for the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver documentation covers core database concepts: SQL as the query language; DML for data manipulation (SELECT, INSERT, UPDATE); DDL for defining objects (CREATE TABLE, CREATE USER) with the ability to embed DDL in XDS events; views as logical tables; identity columns and sequences for generating unique keys; transaction types (manual with explicit COMMIT and automatic auto‑commit); stored procedures/functions for encapsulating logic; triggers for reacting to table changes; and instead‑of‑triggers for making views writable. Examples are provided for each concept, primarily using Oracle syntax."
+    }
+  ]
+}

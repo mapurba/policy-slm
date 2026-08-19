@@ -1,0 +1,35 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JDBC driver recommend using a single stored procedure instead of multiple embedded SQL statements for performance?",
+      "input": "",
+      "output": "In the JDBC driver, calling a single stored procedure or function that contains multiple SQL statements is more efficient because it reduces the number of round‑trips between Identity Manager and the database. Each embedded <jdbc:statement> requires a separate database call, which adds overhead. By consolidating the work into one stored procedure, the JDBC driver can execute all needed statements in a single database interaction, improving overall performance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you invoke a stored procedure with two parameters using the JDBC driver in an XDS document?",
+      "input": "",
+      "output": "To invoke a stored procedure with two parameters in the JDBC driver, include a <jdbc:statement> element inside the <input> document and place the CALL statement in a <jdbc:sql> child. For example:\n\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\">\n        <add-attr name=\"fname\">\n            <value>John</value>\n        </add-attr>\n        <add-attr name=\"lname\">\n            <value>Doe</value>\n        </add-attr>\n    </add>\n    <jdbc:statement>\n        <jdbc:sql>CALL PROCEDURE set_name('John', 'Doe')</jdbc:sql>\n    </jdbc:statement>\n</input>\n```\n\nThis XDS snippet calls the stored procedure `set_name` with the values 'John' and 'Doe' using the JDBC driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you embed multiple UPDATE statements in an XDS document when using the JDBC driver?",
+      "input": "",
+      "output": "To embed multiple UPDATE statements in an XDS document with the JDBC driver, add a separate <jdbc:statement> element for each SQL command. Example:\n\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\">\n        <add-attr name=\"lname\">\n            <value>Doe</value>\n        </add-attr>\n    </add>\n    <jdbc:statement>\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE idu = {$idu}</jdbc:sql>\n    </jdbc:statement>\n    <jdbc:statement>\n        <jdbc:sql>UPDATE indirect.usr SET lname = 'Doe' WHERE idu = {$idu}</jdbc:sql>\n    </jdbc:statement>\n</input>\n```\n\nEach <jdbc:statement> is processed as an individual database call, which is less performant than a single stored procedure."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the best practice recommendations for using the JDBC driver with stored procedures and embedded statements.",
+      "input": "",
+      "output": "The JDBC driver best practice is to prefer a single stored procedure or function that groups multiple SQL statements, because it minimizes database round‑trips and improves performance. While the driver supports embedding multiple <jdbc:statement> elements, each results in a separate call and is therefore slower. The exact CALL syntax depends on the database, so refer to the database‑specific syntax guide for details."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XDS example that calls a stored function named `calculate_salary` with three parameters using the JDBC driver.",
+      "input": "",
+      "output": "```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"emp\">\n        <add-attr name=\"emp_id\">\n            <value>12345</value>\n        </add-attr>\n    </add>\n    <jdbc:statement>\n        <jdbc:sql>CALL FUNCTION calculate_salary(12345, '2023-01-01', '2023-12-31')</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    }
+  ]
+}

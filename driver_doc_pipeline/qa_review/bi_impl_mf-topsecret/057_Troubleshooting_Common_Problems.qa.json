@@ -1,0 +1,65 @@
+{
+  "driver": "Top Secret driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Top Secret driver require binary mode when FTP'ing the driver samples library, load library, and REXX exec library XMT files?",
+      "input": "",
+      "output": "The Top Secret driver requires binary mode for FTP because the driver samples library, load library, and REXX exec library XMT files contain binary data that would be corrupted if transferred in ASCII mode. Using binary mode preserves the exact byte sequence needed for the driver shim to load correctly, preventing installation failures."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually configure the certificate for the Top Secret driver when SSL over LDAP cannot be used?",
+      "input": "",
+      "output": "To manually configure the certificate for the Top Secret driver:\n1. In iManager, browse to the Security container and locate your tree’s certificate authority (usually named *treeName* CA).\n2. Click the certificate authority object.\n3. Click **Modify Object**.\n4. Select the **Certificates** tab.\n5. Click **Public Key Certificate**.\n6. Click **Export**.\n7. Choose **No** to export without the private key and click **Next**.\n8. Select **Base64** format and click **Next**.\n9. Click **Save**, choose a location, and save the exported certificate file.\n10. Transfer the saved file to the connected system (e.g., via FTP) and place it at `/opt/novell/tsdrv/keys/ca.pem`.\n11. Optionally, run the driver REXX exec library member `SETCERT` to configure the certificate at any time."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Global Configuration Values (GCVs) must be set for the Top Secret driver to provision Identity Vault user passwords to the connected system?",
+      "input": "",
+      "output": "For the Top Secret driver to provision Identity Vault user passwords to the connected system, ensure the following Global Configuration Values (GCVs) are set on the driver’s **Driver Edit Properties** page:\n- **Synchronize Distribution Password When Setting Universal Password** must be enabled for the Universal Password policy assigned to the user’s container.\n- The driver’s **Data Flow** property must be set to **Bidirectional** or **Identity Vault to Application**.\n- Verify that the password management properties on the Global Configuration Values page reflect that the connected system accepts passwords from the Identity Vault (see the driver documentation for exact option names)."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default port number for the Remote Loader connection in the Top Secret driver, and how can it be changed?",
+      "input": "",
+      "output": "The default port number for the Remote Loader connection in the Top Secret driver is **8090**. To change this value, edit the driver shim configuration file located in the driver’s installation directory and modify the port setting to the desired number."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you resolve a Driver Shim Startup or Communication Failure caused by mismatched Remote Loader and Driver object passwords in the Top Secret driver?",
+      "input": "",
+      "output": "To resolve a Driver Shim Startup or Communication Failure due to mismatched passwords in the Top Secret driver:\n1. Verify that the Remote Loader and Driver object passwords entered during driver setup on the Metadirectory server match the encrypted password files on the connected system.\n2. On the connected system, run the REXX exec **SETPWDS** to update the passwords stored under `/opt/novell/tsdrv/keys` (`dpwdlf40` for the Driver object password and `lpwdlf40` for the Remote Loader password).\n3. On the Metadirectory server, open iManager, navigate to the driver configuration, and update the passwords to the same values used in step 2.\n4. Restart the driver shim started task to apply the new credentials.\n5. Confirm that the driver shim can now communicate with the Metadirectory server by checking the trace file."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken to fix a Driver Start Failure caused by the driver load library not being APF‑authorized for the Top Secret driver?",
+      "input": "",
+      "output": "To fix a Driver Start Failure due to the driver load library not being APF‑authorized for the Top Secret driver:\n1. Use the operator command `DISPLAY PROG,APF` to list all APF‑authorized libraries on the system.\n2. Verify whether the Top Secret driver load library appears in the list.\n3. If it is missing, add the driver load library to the APF list using your system’s security procedures (e.g., `ADDPROG` with the APF attribute).\n4. After authorizing the library, ensure that the `LDXSERV` and `SAFQUERY` commands are authorized TSO commands (check with `DISPLAY IKJTSO,AUTHCMD`).\n5. Restart the Top Secret driver and confirm that it starts without errors by reviewing the status log and DSTRACE output."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How do you troubleshoot Users or Groups not being provisioned to the Identity Vault by the Top Secret driver?",
+      "input": "",
+      "output": "To troubleshoot Users or Groups not being provisioned to the Identity Vault by the Top Secret driver:\n1. Examine the **status log**, **DSTRACE**, and **trace file** for error messages.\n2. Verify the **User Base Container** and **Group Base Container** GCV values on the Global Configuration Values page; they must point to containers that the driver monitors.\n3. Ensure the driver’s **Data Flow** property is set to **Bidirectional** or **Application to Identity Vault**; if not, re‑import the driver rules file with the correct setting.\n4. Confirm that the security‑equivalent user for the driver has the required rights to **update** the base containers (see Table 2‑2 in the documentation).\n5. Check that the driver security system exit (IDMTSSIX) is installed, LLA has been refreshed, and the exit is activated.\n6. After correcting any issues, restart the driver and verify provisioning in the Identity Vault."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should be done if the Change Log started task is not running for the Top Secret driver?",
+      "input": "",
+      "output": "If the Change Log started task is not running for the Top Secret driver:\n1. Verify that the task is defined on all systems that share the security system database.\n2. Ensure the user ID assigned to the Change Log started task is properly set up (see the \"Preparing User IDs for the Started Tasks\" guidance).\n3. Confirm that the change log data set was initialized during installation (refer to the \"Allocating and Initializing the Change Log Data Set\" procedure).\n4. Use the TSO command `LDXSERV STATUS` to display information about the change log data set; make sure the driver load library is included in the STEPLIB concatenation.\n5. Restart the Change Log started task and monitor the change log started task messages for successful execution."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact operator command to display APF‑authorized libraries for troubleshooting the Top Secret driver.",
+      "input": "",
+      "output": "DISPLAY PROG,APF"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key troubleshooting actions for common problems with the Top Secret driver.",
+      "input": "",
+      "output": "For the Top Secret driver, common troubleshooting actions include:\n- Use binary mode FTP for installing driver libraries.\n- Verify iManager version compatibility when installing driver rules.\n- Check `/var/nds/schema.log` and ensure correct host, Admin FDN, and password for schema updates.\n- Ensure eDirectory LDAP/SSL is running and the connected system can reach the Metadirectory server for certificate setup; use the SETCERT REXX exec or manually export the CA certificate to `/opt/novell/tsdrv/keys/ca.pem`.\n- Examine status logs, DSTRACE, and trace files for driver start failures; set the driver as a Remote Loader driver, activate within 90 days, and ensure APF‑authorization and authorized TSO commands.\n- For shim startup/communication failures, confirm OS/security version support, match Remote Loader and Driver object passwords (update with SETPWDS), verify host and port (default 8090), and ensure the correct user ID is used.\n- Verify base containers, Data Flow settings, and security‑equivalent user rights for provisioning issues in both directions.\n- Ensure password management GCVs are correctly set and required policies are applied for password provisioning.\n- Confirm the Change Log started task is running on all systems, its user ID is set up, and the change log data set is initialized (use `LDXSERV STATUS`)."
+    }
+  ]
+}

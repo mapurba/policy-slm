@@ -1,0 +1,71 @@
+{
+  "driver": "Windows Script driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver shim in the Windows Script driver and why does it require passwords?",
+      "input": "",
+      "output": "In the Windows Script driver, the driver shim is a Windows service that acts as a bridge between the Identity Manager engine and the driver component. It enables secure communication by using SSL (if enabled) and verifies the identity of the driver shim using the Remote Loader and Driver passwords. These passwords ensure that only an authorized driver shim can talk to the engine."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Windows Script driver shim on a Windows system?",
+      "input": "",
+      "output": "1. Obtain the installer from your media:\n   * win_x86_64_scriptdriver_install.exe (64‑bit) or\n   * win_x86_scriptdriver_install.exe (32‑bit).\n2. Run the installer.\n3. Click **Next** to continue.\n4. Accept the default installation folder or specify a custom folder, then click **Next**.\n5. Review the settings and click **Next**.\n6. When prompted, retrieve an SSL certificate (optional but recommended):\n   a. Click **Yes**.\n   b. Enter the DNS name or IP address of the eDirectory server.\n   c. Enter the LDAP secure port (default 636).\n   d. Enter **Y** to accept the certificate.\n7. When prompted for Driver and Remote Loader passwords, click **Yes** and then:\n   a. Enter and confirm the Remote Loader password.\n   b. Enter and confirm the Driver password.\n8. Finish the installation; you may choose to start the NetIQ IDM Windows Script Driver service immediately.\n9. Proceed to the next section to start the driver engine component in iManager."
+    },
+    {
+      "category": "config",
+      "instruction": "What configuration keywords can be used in scriptservice.conf for the Windows Script driver and what is their syntax?",
+      "input": "",
+      "output": "| Keyword     | Description                                                            | Syntax                                   |\n|-------------|------------------------------------------------------------------------|------------------------------------------|\n| -address    | Change the default address and port for Script Service. Default: localhost:8081 | -address <DNS name or IP address>[:port] |\n| -nosecurity | Do not enforce security. Required if the \"Use Windows EFS driver\" parameter is disabled. | -nosecurity |\n| -command    | Execute a script command on startup. May be specified multiple times. | -command <command> |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Script Service of the Windows Script driver to listen on a custom address and port?",
+      "input": "",
+      "output": "1. Create a file named **scriptservice.conf** in the *WSDriver\\conf* directory (if it does not already exist).\n2. Open the file in a text editor.\n3. Add a line using the **-address** keyword with the desired address and optional port, for example:\n   `-address 10.0.0.5:9090`\n4. Save the file.\n5. Restart the **NetIQ IDM Windows Script Driver - Script Service** service for the changes to take effect."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is retrieving an SSL certificate during Windows Script driver installation optional but recommended?",
+      "input": "",
+      "output": "Retrieving an SSL certificate enables encrypted communication between the Identity Manager engine and the driver shim, protecting credentials and data in transit. Although the driver can operate without SSL, enabling it improves security by preventing eavesdropping and man‑in‑the‑middle attacks, which is why it is recommended."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you run the Windows Script driver using PowerShell directly instead of the Script Service?",
+      "input": "",
+      "output": "1. Open the Driver Configuration in iManager.\n2. In the Driver Parameters, change **Script Command** to `powershell.exe`.\n3. Stop or disable the Script Service (via the Services application).\n4. Restart the driver so it uses PowerShell directly."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add a second instance of the Windows Script driver on a Windows machine?",
+      "input": "",
+      "output": "1. Stop the original driver service.\n2. Create a new directory (e.g., *C:\\Program Files\\Novell\\WSDriver2*) and copy the entire original driver folder (*C:\\Program Files\\Novell\\WSDriver*) into it, preserving the directory structure.\n3. Edit the new instance's *conf\\wsdrv.conf*:\n   a. Replace all file paths with the new directory path.\n   b. Change the connection and HTTP ports to unused values (e.g., from default 8090/8091 to 9090/9091).\n4. Open a Command Prompt and run the following command from the new instance directory:\n   `wsdriver -installService -instance 2 -path \"C:\\Program Files\\Novell\\WSDriver2\"`\n   This creates a Windows service named **Novell IDM Windows Script Driver - 2**.\n5. Using iManager or Designer, create a new Driver Object that points to the new instance, or export the original driver configuration and import it as a new driver.\n6. In the new driver’s configuration, update the Remote Loader Connection Parameters to use the new connection port (e.g., 9090).\n7. Start both the original and the new driver services and the corresponding driver objects in iManager or Designer."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you remove a Windows Script driver instance from a Windows system?",
+      "input": "",
+      "output": "1. Stop the service for the instance you want to remove.\n2. From a Command Prompt, run:\n   `wsdriver -removeService -instance {number}`\n   Replace **{number}** with the instance number (e.g., 2).\n3. Delete the directory that contains the instance’s files and all its sub‑directories.\n*Note: To remove the original instance, use the uninstall feature provided with the driver installer.*"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the Script Service cannot communicate with the Script Client because of firewall restrictions?",
+      "input": "",
+      "output": "Open TCP port **8081** (the default port used by the Script Service) in the firewall to allow traffic between the Script Client and the Script Service. If you have changed the port in *scriptservice.conf*, open the custom port you specified instead."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps for installing and configuring the Windows Script driver on a Windows platform.",
+      "input": "",
+      "output": "1. Run the appropriate *win_x86_64_scriptdriver_install.exe* or *win_x86_scriptdriver_install.exe* installer and follow the wizard.\n2. Optionally retrieve an SSL certificate to secure communication with eDirectory.\n3. Set the Driver and Remote Loader passwords when prompted.\n4. Start the **NetIQ IDM Windows Script Driver** service via the Windows Services app.\n5. Install required components for the Script Service (.NET 3.5, WSE 3.0) and open TCP port 8081.\n6. Configure *scriptservice.conf* with desired keywords such as **-address**, **-nosecurity**, and **-command**.\n7. Set the Script Service to start automatically.\n8. If preferred, switch to direct PowerShell execution by changing the Script Command to `powershell.exe` and disabling the Script Service.\n9. To run multiple driver instances, copy the driver files, adjust *wsdrv.conf* paths and ports, install a new service with the **-instance** option, and create a corresponding driver object in iManager."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a sample scriptservice.conf file for the Windows Script driver that sets the address to myserver.example.com:9090, disables security, and runs the PowerShell command \"Import-Module ActiveDirectory\" on startup.",
+      "input": "",
+      "output": "-address myserver.example.com:9090\n-nosecurity\n-command Import-Module ActiveDirectory"
+    }
+  ]
+}

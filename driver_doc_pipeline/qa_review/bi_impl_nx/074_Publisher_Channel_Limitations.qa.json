@@ -1,0 +1,41 @@
+{
+  "driver": "Bi Impl Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the role of the Publisher channel in the Bi Impl Nx driver?",
+      "input": "",
+      "output": "In the Bi Impl Nx driver, the Publisher channel generates events based on modifications that are discovered by polling. It interprets changes after they have occurred and creates corresponding publish events for downstream processing."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why can the Publisher channel in the Bi Impl Nx driver produce unexpected results?",
+      "input": "",
+      "output": "Because the Publisher channel interprets events only after they have happened, it must make assumptions about the nature of the change. Those assumptions may be incorrect in certain situations, leading to unexpected results such as treating a rename as a delete followed by an add."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you modify the polling script of the Bi Impl Nx driver to better detect whether a user was renamed or deleted and re‑added?",
+      "input": "",
+      "output": "To improve detection in the Bi Impl Nx driver, edit the polling script to examine additional contextual clues such as the password hash or a component of the gecos field. Use these values to decide whether the change represents a simple rename (identity preserved) or a delete followed by an add (identity changed)."
+    },
+    {
+      "category": "config",
+      "instruction": "Which additional user attributes can be checked by the Bi Impl Nx driver’s polling script to distinguish a rename from a delete‑add scenario?",
+      "input": "",
+      "output": "The Bi Impl Nx driver’s polling script can be enhanced to look at the password hash and a component of the gecos field when determining whether a user rename or a delete‑add event has occurred."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What problem occurs when a user is renamed and its UID is also changed on a Linux system using the Bi Impl Nx driver, and how can it be addressed?",
+      "input": "",
+      "output": "When a user is renamed and the UID changes, the Bi Impl Nx driver’s polling script assumes the operation is a delete followed by an add, which may break identity continuity. To address this, modify the polling script to also compare the password hash or gecos field so it can recognize the operation as a rename and preserve the user’s identity."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main limitations of the Publisher channel in the Bi Impl Nx driver.",
+      "input": "",
+      "output": "The Publisher channel in the Bi Impl Nx driver relies on post‑event polling, requiring it to make assumptions about the nature of changes. This can lead to misinterpretation of events—for example, treating a user rename with a UID change as a delete‑add. The default behavior may not preserve user identity unless the polling script is customized to use additional clues like password hashes or gecos fields."
+    }
+  ]
+}

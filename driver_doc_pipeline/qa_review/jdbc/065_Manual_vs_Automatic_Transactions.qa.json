@@ -1,0 +1,47 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the jdbc:transaction-type attribute in the JDBC driver and what values can it take?",
+      "input": "",
+      "output": "In the JDBC driver, the **jdbc:transaction-type** attribute controls whether a group of XDS and embedded SQL events runs in a manual or automatic transaction. It supports two values:\n\n* **manual** – XDS events are grouped into a single transaction that can contain one or more SQL statements. This is the default for most XDS events such as <add>, <modify>, and <delete>.\n* **auto** – Each embedded SQL statement is executed in its own implicit transaction. This is the default for embedded SQL events because statements like DDL cannot usually be part of a manual transaction."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When does the JDBC driver consider the jdbc:transaction-id attribute and what is its purpose?",
+      "input": "",
+      "output": "The **jdbc:transaction-id** attribute is only evaluated by the Subscriber channel when the element’s **jdbc:transaction-type** is set to **manual** (either explicitly or by default). Its purpose is to tag multiple XDS and SQL elements with the same identifier so the JDBC driver knows they belong to the same manual transaction and should be committed together."
+    },
+    {
+      "category": "config",
+      "instruction": "List the default transaction types for XDS events and embedded SQL statements in the JDBC driver.",
+      "input": "",
+      "output": "In the JDBC driver:\n\n* **XDS events** (<add>, <modify>, <delete>) default to **manual** transaction type.\n* **Embedded SQL statements** default to **auto** transaction type."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a manual transaction that includes an <add> XDS event and a subsequent embedded SQL update using the JDBC driver?",
+      "input": "",
+      "output": "To create a manual transaction in the JDBC driver:\n\n1. Add the **jdbc:transaction-id** attribute (e.g., \"0\") to the XDS element you want to include in the transaction.\n2. Add a **jdbc:statement** element for the embedded SQL and set both **jdbc:transaction-type=\"manual\"** and **jdbc:transaction-id** to the same value used on the XDS element.\n3. Submit the XML. The driver will turn off AUTOCOMMIT, execute the XDS event and the SQL statement, and then issue a COMMIT.\n\nExample XML:\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\" jdbc:transaction-id=\"0\">\n        <add-attr name=\"lname\"><value>Doe</value></add-attr>\n    </add>\n    <jdbc:statement jdbc:transaction-type=\"manual\" jdbc:transaction-id=\"0\">\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE idu = {$idu}</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you force an embedded SQL statement to run in automatic mode using the JDBC driver?",
+      "input": "",
+      "output": "To run an embedded SQL statement in automatic mode with the JDBC driver, either omit the **jdbc:transaction-type** attribute (the default is **auto**) or set it explicitly to **auto** on the **jdbc:statement** element. Example:\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\" jdbc:transaction-type=\"auto\">\n        <add-attr name=\"lname\"><value>Doe</value></add-attr>\n    </add>\n    <jdbc:statement>\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE idu = {$idu}</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key differences between manual and automatic transactions in the JDBC driver.",
+      "input": "",
+      "output": "In the JDBC driver, **manual transactions** (jdbc:transaction-type=\"manual\") group XDS events and embedded SQL statements into a single transaction identified by a common jdbc:transaction-id; AUTOCOMMIT is turned off and an explicit COMMIT is issued after all statements run. **Automatic transactions** (jdbc:transaction-type=\"auto\") execute each embedded SQL statement in its own implicit transaction with AUTOCOMMIT on; XDS events default to manual because they can be safely grouped, while DDL and other statements default to auto because they cannot be part of a manual transaction."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML example for the JDBC driver that inserts a new user with lname \"Smith\" and then updates the same record's fname to \"Anna\" using a manual transaction with transaction-id 5.",
+      "input": "",
+      "output": "```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\" jdbc:transaction-id=\"5\">\n        <add-attr name=\"lname\"><value>Smith</value></add-attr>\n    </add>\n    <jdbc:statement jdbc:transaction-type=\"manual\" jdbc:transaction-id=\"5\">\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'Anna' WHERE idu = {$idu}</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    }
+  ]
+}

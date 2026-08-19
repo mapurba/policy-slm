@@ -1,0 +1,41 @@
+{
+  "driver": "Bi Impl MF RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the security system exits associated with the Bi Impl MF RACF driver and how are they removed?",
+      "input": "",
+      "output": "The Bi Impl MF RACF driver installs two security system exits: LDXEVX01 (the Common Command exit) and LDXRIX02. To uninstall LDXEVX01, issue the command `SET PROG=DL` from the console. To uninstall LDXRIX02, use the SMP/E RESTORE function and then IPL with the CLPA option."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you uninstall the Bi Impl MF RACF driver shim from a mainframe system?",
+      "input": "",
+      "output": "To uninstall the Bi Impl MF RACF driver shim, follow these steps:\n1. Remove the change log started task and driver shim started task from your system startup and shutdown procedures.\n2. Stop the change log started task and driver shim started task (see the documentation for starting and stopping these tasks).\n3. Remove members `LDXLOGR` and `RACFDRV` from your started task procedure library.\n4. Remove the driver load library from your APF list (reverse the action performed during installation).\n5. Remove the `LDXSERV` and `SAFQUERY` commands from `IKJTSOxx` (reverse the authorizations made during installation).\n6. Delete the driver files from the HFS with the command:\n   ```\n   rm -rf /opt/novell\n   ```\n7. Delete the driver samples library, load library, and REXX exec library that were created during installation.\n8. Delete the change log data set that was allocated and initialized during installation."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to uninstall the Bi Impl MF RACF driver object from eDirectory using iManager?",
+      "input": "",
+      "output": "To uninstall the Bi Impl MF RACF driver object from eDirectory via iManager:\n1. In iManager, select **Identity Manager Overview** from the Identity Manager task list on the left.\n2. Locate your driver set by searching the tree or by entering its name.\n3. Click **Delete Driver** on the Identity Manager Overview page.\n4. In the dialog that appears, select the driver object to be deleted and click **OK**."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration entry must be removed from the APF list when uninstalling the Bi Impl MF RACF driver shim?",
+      "input": "",
+      "output": "When uninstalling the Bi Impl MF RACF driver shim, you must remove the driver load library from the APF list. This reverses the action performed during the driver installation."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Which command should be executed to delete the Bi Impl MF RACF driver files from the HFS during uninstallation?",
+      "input": "",
+      "output": "Execute the following command to delete the Bi Impl MF RACF driver files from the HFS:\n```\nrm -rf /opt/novell\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete uninstallation process for the Bi Impl MF RACF driver.",
+      "input": "",
+      "output": "Uninstalling the Bi Impl MF RACF driver involves three main tasks: (1) Remove the security system exits — use `SET PROG=DL` for LDXEVX01 and SMP/E RESTORE + IPL CLPA for LDXRIX02; (2) Uninstall the driver shim — delete started tasks, remove `LDXLOGR` and `RACFDRV` members, clear the driver load library from the APF list, delete `LDXSERV` and `SAFQUERY` from `IKJTSOxx`, remove driver files with `rm -rf /opt/novell`, and delete sample, load, and REXX libraries plus the change‑log data set; (3) Delete the driver object from eDirectory via iManager by selecting Identity Manager Overview, locating the driver, clicking Delete Driver, and confirming the deletion."
+    }
+  ]
+}

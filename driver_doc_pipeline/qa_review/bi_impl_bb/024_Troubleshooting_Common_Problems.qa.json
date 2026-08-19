@@ -1,0 +1,65 @@
+{
+  "driver": "Blackboard Learn driver",
+  "qa_pairs": [
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you verify if the Blackboard Learn driver shim installation fails?",
+      "input": "",
+      "output": "For a Blackboard Learn driver shim installation failure, verify that you used the correct installation program for your operating system, that you are running the installation as root or an equivalent privileged user, and that your package management software (such as RPM) is installed and up‑to‑date."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Which logs are recommended to examine when the Blackboard Learn driver fails to start?",
+      "input": "",
+      "output": "When a Blackboard Learn driver start fails, examine the status log and the DSTRACE output for error details."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the Blackboard Learn driver be specified as a Remote Loader driver even if the Identity Vault and connected system reside on the same computer?",
+      "input": "",
+      "output": "The Blackboard Learn driver must be specified as a Remote Loader driver regardless of co‑location because the driver architecture requires the Remote Loader component to handle communication and provisioning logic; this setting ensures proper interaction between the Identity Vault and the driver, as documented in the start‑failure troubleshooting steps."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually install the SSL certificate for the Blackboard Learn driver when you cannot configure SSL using LDAP?",
+      "input": "",
+      "output": "To manually install the SSL certificate for the Blackboard Learn driver:\n1. In iManager, browse to the Security container and locate your tree’s Certificate Authority (typically named *treeName* CA).\n2. Click the Certificate Authority object.\n3. Click **Modify Object**.\n4. Select the **Certificates** tab.\n5. Click **Public Key Certificate**.\n6. Click **Export**.\n7. Choose **No** to export the certificate without the private key, then click **Next**.\n8. Select **Base64** format, then click **Next**.\n9. Click **Save**, specify a location, and save the exported certificate to a file.\n10. Transfer the file to the connected system (using FTP, SSH, etc.) and place it as **ca.pem** in the **keys** directory under the Blackboard Learn driver installation directory."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you update the Remote Loader and Driver Object passwords for the Blackboard Learn driver on the connected system?",
+      "input": "",
+      "output": "To update the passwords on the connected system for the Blackboard Learn driver, run the command **/opt/novell/bbdrv/bin/bbdrv -sp**. The updated passwords are stored in encrypted files within the driver installation directory: **dpwdl1f40** holds the Driver object password and **lpwd1f40** holds the Remote Loader password."
+    },
+    {
+      "category": "config",
+      "instruction": "What command can be used at any time to configure the SSL certificate for the Blackboard Learn driver?",
+      "input": "",
+      "output": "You can configure the SSL certificate for the Blackboard Learn driver at any time by executing the command **/opt/novell/bbdrv/bin/bbdrv -s**."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Global Configuration Values setting must be set to provision identities from the Identity Vault to Blackboard Learn?",
+      "input": "",
+      "output": "In the Blackboard Learn driver’s Global Configuration Values page, the **Data Flow** property must be set to **Identity Vault to Application** to provision identities from the Identity Vault to Blackboard Learn."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What are common reasons why users or groups are not provisioned to Blackboard Learn, and how can you resolve them?",
+      "input": "",
+      "output": "If users or groups are not provisioned to Blackboard Learn, check the following:\n- Ensure the identities reside in the appropriate base container; adjust the base containers in iManager on the Global Configuration Values page of the Blackboard Learn driver.\n- Verify the driver Data Flow property is set to **Identity Vault to Application**; re‑import the driver rules file if needed.\n- Confirm that the driver’s security equivalent user has read rights on the base container (see Table 3‑1 for required rights).\nAddressing these items typically resolves provisioning failures."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What must be ensured regarding passwords when experiencing a Blackboard Learn driver shim startup or communication failure?",
+      "input": "",
+      "output": "For a Blackboard Learn driver shim startup or communication failure, ensure that the Remote Loader and Driver Object passwords configured on the Metadirectory server match those stored with the driver shim. Update mismatched passwords on the connected system using **/opt/novell/bbdrv/bin/bbdrv -sp**, and update them on the Metadirectory server via iManager’s driver configuration settings."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key troubleshooting steps for common problems with the Blackboard Learn driver.",
+      "input": "",
+      "output": "Key troubleshooting steps for the Blackboard Learn driver include:\n- Verify installation prerequisites (correct installer, root privileges, up‑to‑date package manager) for shim installation failures.\n- Ensure iManager or Designer versions support your Identity Manager version for driver rules installation.\n- Confirm eDirectory LDAP SSL is enabled and network connectivity exists; use **bbdrv -s** or manually export the CA certificate to **ca.pem** for certificate setup failures.\n- Examine status logs and DSTRACE output for driver start failures; set the driver as a Remote Loader driver and activate both Identity Manager and the driver within 90 days.\n- Check trace files, OS support, and password synchronization for shim startup/communication failures; update passwords with **bbdrv -sp** and verify encrypted files.\n- Ensure identities are in the correct base container, Data Flow is set to **Identity Vault to Application**, and the driver’s security equivalent user has appropriate read rights for provisioning issues.\n- Verify password management properties and that the user’s container has a Universal Password policy with the **Synchronize Distribution Password When Setting Universal Password** GCV enabled for password provisioning.\n- Review driver Data Flow and object associations to resolve issues where metadirectory objects are not modified, deleted, renamed, or moved."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What codepage does the ACF2 driver assume by default and how is it described?",
+      "input": "",
+      "output": "The ACF2 driver assumes the ACF2 system is using the EBCDIC Latin 1 (Open Systems) codepage, identified as IBM-1047. This codepage is the default for translating data to and from the Identity Manager Metadirectory engine."
+    },
+    {
+      "category": "config",
+      "instruction": "Which environment variable sets the codepage for the ACF2 driver and what is its default value?",
+      "input": "",
+      "output": "The environment variable is set with the ENVAR statement in the SAMPLIB(CEEOPT) member:\n\n```\nENVAR(\"LC_CTYPE=IBM-1047\")\n```\n\nThis line configures the default codepage IBM-1047 for the ACF2 driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you change the codepage for the ACF2 driver when the ACF2 system uses a different codepage?",
+      "input": "",
+      "output": "To change the codepage for the ACF2 driver:\n1. Open the SAMPLIB(CEEOPT) member that contains the ENVAR line.\n2. Modify the ENVAR statement to use the desired IBM-CCSID value, for example:\n   `ENVAR(\"LC_CTYPE=IBM-1140\")`\n3. The format is `IBM-CCSID`, where CCSID is a decimal coded character set identifier that matches your ACF2 system’s codepage.\n4. Save the changes and restart the ACF2 driver shim using the updated JCL."
+    },
+    {
+      "category": "config",
+      "instruction": "What are some sample codepage identifiers and their descriptions that can be used with the ACF2 driver?",
+      "input": "",
+      "output": "The following table lists a subset of valid codepage identifiers for the ACF2 driver:\n\n| Codepage | Description |\n|----------|-------------|\n| IBM-858  | IBM-PC |\n| IBM-1047 | Latin 1 (Open Systems) |\n| IBM-1140 | US/Canada |\n| IBM-1141 | Austria/Germany |\n| IBM-1142 | Denmark/Norway |\n| IBM-1143 | Finland/Sweden |\n| IBM-1144 | Italy |\n| IBM-1145 | Spain/Spanish Latin America |\n| IBM-1146 | UK |\n| IBM-1147 | France |\n| IBM-1148 | International |\n| IBM-1149 | Iceland |\n\nFor a complete list, refer to the IBM CCSID reference table."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the JCL be changed for the ACF2 driver if the ACF2 system uses a codepage other than IBM-1047?",
+      "input": "",
+      "output": "The JCL must be changed because the ACF2 driver relies on the environment variable `LC_CTYPE` to translate characters between the ACF2 system and the Identity Manager engine. If the ACF2 system uses a different codepage, the default IBM-1047 setting would cause incorrect character translation, leading to data corruption or processing errors. Updating the JCL ensures the driver uses the correct codepage."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the international considerations for configuring the ACF2 driver.",
+      "input": "",
+      "output": "The ACF2 driver assumes the ACF2 system uses the IBM-1047 (Latin 1 Open Systems) codepage, set via `ENVAR(\"LC_CTYPE=IBM-1047\")` in the SAMPLIB(CEEOPT) member. If the ACF2 system uses a different codepage, you must edit this ENVAR line to the appropriate IBM-CCSID value (e.g., IBM-1140) and restart the driver shim. A subset of valid codepages is listed in the documentation, and a full list is available from the IBM CCSID reference table."
+    }
+  ]
+}

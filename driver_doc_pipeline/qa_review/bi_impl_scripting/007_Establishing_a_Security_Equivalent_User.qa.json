@@ -1,0 +1,59 @@
+{
+  "driver": "Bi Impl Scripting driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a security‑equivalent user in the Bi Impl Scripting driver and why is it needed?",
+      "input": "",
+      "output": "In the Bi Impl Scripting driver, a security‑equivalent user is the user account under which the driver runs and that must have rights equivalent to a user with sufficient privileges. This user provides the necessary permissions for the driver to perform operations such as creating, modifying, or deleting identities in the Identity Vault, and it allows the driver to act with the appropriate security context while limiting exposure by using a minimally‑privileged account instead of an ADMIN account."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Entry Rights and All Attribute Rights are required for the Bi Impl Scripting driver to create objects in the Identity Vault without group synchronization?",
+      "input": "",
+      "output": "For creating objects in the Identity Vault without group synchronization, the Bi Impl Scripting driver requires:\n\n- Entry Rights: **Browse and Create**\n- All Attribute Rights: **Compare and Read**"
+    },
+    {
+      "category": "config",
+      "instruction": "What Entry Rights must be set for the Bi Impl Scripting driver to retrieve passwords from the Identity Vault?",
+      "input": "",
+      "output": "To retrieve passwords, the Bi Impl Scripting driver must have the Entry Rights **Browse and Supervisor**."
+    },
+    {
+      "category": "config",
+      "instruction": "What rights are required for the Bi Impl Scripting driver to modify objects in the Identity Vault?",
+      "input": "",
+      "output": "Modifying objects in the Identity Vault requires the following rights for the Bi Impl Scripting driver:\n\n- Entry Rights: **Browse**\n- All Attribute Rights: **Compare, Read, and Write**"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What problem occurs if Supervisor is not set for Entry Rights in the Bi Impl Scripting driver, and how can it be avoided?",
+      "input": "",
+      "output": "If Supervisor is not set for Entry Rights, the Bi Impl Scripting driver cannot set passwords, leading to errors when password operations are attempted. To avoid these errors when password setting is not required, set the Subscribe setting for the User class **nspmDistributionPassword** attribute to **Ignore** in the driver’s filter."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Bi Impl Scripting driver to run under a minimally privileged security‑equivalent user instead of ADMIN?",
+      "input": "",
+      "output": "To configure the Bi Impl Scripting driver with a minimally privileged security‑equivalent user:\n1. Create a user account in eDirectory that will serve as the driver user.\n2. Make this user a trustee of the base containers where synchronized identities reside.\n3. Assign the rights listed in Table 2‑1 for each required operation (e.g., Browse, Create, Compare, Read, Write, Rename, Erase, Supervisor) and set inheritance for both **[Entry Rights]** and **[All Attribute Rights]**.\n4. Ensure the user has only the rights necessary for the operations the driver will perform.\n5. In the driver configuration, specify this user as the security‑equivalent user (instead of using ADMIN).\n6. Save the configuration and restart the driver if required."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you set the Subscribe setting for the User class nspmDistributionPassword attribute to Ignore in the Bi Impl Scripting driver filter?",
+      "input": "",
+      "output": "To set the Subscribe setting for the User class **nspmDistributionPassword** attribute to **Ignore** in the Bi Impl Scripting driver:\n1. Open the Identity Manager console and navigate to the Policies section.\n2. Locate the filter used by the Bi Impl Scripting driver (refer to the documentation on policies for details).\n3. Edit the filter and find the entry for the **User** class attribute **nspmDistributionPassword**.\n4. Change the Subscribe setting for this attribute from its default value to **Ignore**.\n5. Save the filter changes and apply them to the driver configuration.\n6. Verify that the driver no longer attempts to set passwords, eliminating related error messages."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must inheritance be set for both Entry Rights and All Attribute Rights in the Bi Impl Scripting driver?",
+      "input": "",
+      "output": "Inheritance must be set for both **[Entry Rights]** and **[All Attribute Rights]** in the Bi Impl Scripting driver so that the rights granted to the security‑equivalent user automatically propagate to all objects within the base containers. This ensures the driver can perform required operations on any synchronized identity without needing to assign rights individually to each object."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key security configuration requirements for the Bi Impl Scripting driver.",
+      "input": "",
+      "output": "The Bi Impl Scripting driver must run as a security‑equivalent user with rights matching the operations it performs. The user should be a trustee of the base containers and have inheritance enabled for Entry Rights and All Attribute Rights. Table 2‑1 defines the exact rights needed for each operation, such as Browse and Supervisor for password retrieval and Browse, Compare, Read, Write for modifications. If the Supervisor right is omitted, password setting fails; to suppress related errors, set the nspmDistributionPassword Subscribe setting to Ignore. Using a minimally privileged user instead of ADMIN improves security."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of transaction isolation levels in the JDBC driver?",
+      "input": "",
+      "output": "In the JDBC driver, the transaction isolation level determines how database locks are set during a transaction, controlling the visibility of changes made by concurrent transactions and thus preserving data integrity."
+    },
+    {
+      "category": "config",
+      "instruction": "Which values are valid for the jdbc:isolation-level attribute in the JDBC driver?",
+      "input": "",
+      "output": "The valid values for the jdbc:isolation-level attribute in the JDBC driver are:\n* none\n* read uncommitted\n* read committed\n* repeatable read\n* serializable"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default transaction isolation level used by the JDBC driver if no descriptor overrides it?",
+      "input": "",
+      "output": "The JDBC driver’s default transaction isolation level is **read committed** unless it is overridden by a descriptor file."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set a serializable transaction isolation level for a manual transaction using the JDBC driver?",
+      "input": "",
+      "output": "To set a serializable transaction isolation level for a manual transaction in the JDBC driver, place the attribute **jdbc:isolation-level=\"serializable\"** on the first element of the transaction (e.g., the first <add> element). The attribute is ignored on subsequent elements. Example:\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\" jdbc:transaction-id=\"0\" jdbc:isolation-level=\"serializable\">\n        <add-attr name=\"lname\">\n            <value>Doe</value>\n        </add-attr>\n    </add>\n    <jdbc:statement jdbc:transaction-type=\"manual\" jdbc:transaction-id=\"0\">\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE idu = {$idu}</jdbc:sql>\n    </jdbc:statement>\n</input>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the jdbc:isolation-level attribute appear to have no effect in a manual transaction with the JDBC driver, and how can this be resolved?",
+      "input": "",
+      "output": "The jdbc:isolation-level attribute is only evaluated on the first element of a manual transaction. If it is placed on a later element, the driver ignores it, so the isolation level appears unchanged. To resolve the issue, ensure the jdbc:isolation-level attribute is set on the very first element (such as the initial <add> element) of the transaction."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about transaction isolation level configuration in the JDBC driver.",
+      "input": "",
+      "output": "The JDBC driver supports five transaction isolation levels (none, read uncommitted, read committed, repeatable read, serializable) via the jdbc:isolation-level attribute. The default is read committed unless a descriptor overrides it. For manual transactions, the attribute must be placed on the first transaction element; it is ignored on later elements."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML snippet that uses the JDBC driver to start a manual transaction with a repeatable read isolation level, inserts a record, and then updates another record before committing.",
+      "input": "",
+      "output": "```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n    <add class-name=\"usr\" jdbc:transaction-id=\"0\" jdbc:isolation-level=\"repeatable read\">\n        <add-attr name=\"lname\">\n            <value>Smith</value>\n        </add-attr>\n    </add>\n    <jdbc:statement jdbc:transaction-type=\"manual\" jdbc:transaction-id=\"0\">\n        <jdbc:sql>UPDATE indirect.usr SET fname = 'Alice' WHERE idu = {$idu}</jdbc:sql>\n    </jdbc:statement>\n</input>\n```\nThis XML resolves to:\n```\nSET AUTOCOMMIT OFF\nSET TRANSACTION ISOLATION LEVEL REPEATABLE READ\nINSERT INTO indirect.usr(lname) VALUES('Smith');\nUPDATE indirect.usr SET fname = 'Alice' WHERE idu = 1;\nCOMMIT; -- explicit commit\n```"
+    }
+  ]
+}

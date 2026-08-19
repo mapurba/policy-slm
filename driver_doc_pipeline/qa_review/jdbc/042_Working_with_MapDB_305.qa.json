@@ -1,0 +1,53 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Which versions of the Identity Manager engine are compatible with the JDBC driver shipped with Identity Manager 4.7?",
+      "input": "",
+      "output": "The JDBC driver shipped with Identity Manager 4.7 is compatible only with the Identity Manager 4.7 Engine or Remote Loader. Drivers shipped before Identity Manager 4.7 are not compatible with the 4.7 engine, and the 4.7 JDBC driver is not backward compatible with Identity Manager 4.6.x or 4.5.x Engine or Remote Loader."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the required steps to upgrade the JDBC driver for use with the Identity Manager 4.7 engine?",
+      "input": "",
+      "output": "To upgrade the JDBC driver for Identity Manager 4.7, perform the following actions in order:\n1. Upgrade the Identity Manager Engine to version 4.7.\n2. If a Remote Loader is used, upgrade it conditionally to the 4.7 version.\n3. Upgrade the JDBC driver itself.\n4. Manually remove the MapDB state cache files from the Identity Vault’s DIB directory after the driver upgrade."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the naming pattern for the MapDB state cache files used by the JDBC driver?",
+      "input": "",
+      "output": "MapDB state cache files for the JDBC driver follow the pattern:\n```\njdbc_<driver instance guid>_*\n```\nwhere \"*\" is the specific name of the state cache file. Examples include `jdbc_<driver instance guid>_0` or `jdbc_<driver instance guid>_1.t`."
+    },
+    {
+      "category": "config",
+      "instruction": "Where are the MapDB state cache files for the JDBC driver stored on Linux and Windows systems?",
+      "input": "",
+      "output": "The MapDB state cache files for the JDBC driver are stored in the Identity Vault’s DIB directory:\n- On Linux: `/var/opt/novell/eDirectory/data/dib`\n- On Windows: `C:\\Novell\\NDS\\DIBFiles`"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually remove the MapDB state cache files for the JDBC driver after an upgrade?",
+      "input": "",
+      "output": "To manually delete the MapDB state cache files for the JDBC driver:\n1. Navigate to the DIB directory (`/var/opt/novell/eDirectory/data/dib` on Linux or `C:\\Novell\\NDS\\DIBFiles` on Windows).\n2. Locate all files whose names match the pattern `jdbc_<driver instance guid>_*`.\n3. Delete those files.\n4. Verify that no `dx*` cache files remain for the JDBC driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must you manually delete the MapDB state cache files for the JDBC driver after upgrading to Identity Manager 4.7?",
+      "input": "",
+      "output": "Although the Identity Manager engine upgrade process removes the generic MapDB driver work cache files (dx*), it does not automatically delete the JDBC driver’s specific MapDB state cache files. Manually removing these files ensures that stale cache data does not interfere with the upgraded JDBC driver, allowing it to operate correctly with the Identity Manager 4.7 engine."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the JDBC driver does not function correctly after upgrading to Identity Manager 4.7, what step should you verify?",
+      "input": "",
+      "output": "Verify that you have manually removed all MapDB state cache files matching the pattern `jdbc_<driver instance guid>_*` from the Identity Vault’s DIB directory. Failure to delete these files is a common cause of JDBC driver malfunctions after an upgrade."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the actions required to prepare the JDBC driver for use with Identity Manager 4.7.",
+      "input": "",
+      "output": "To prepare the JDBC driver for Identity Manager 4.7, upgrade the Identity Manager Engine (and Remote Loader if applicable), upgrade the JDBC driver itself, and then manually delete all JDBC‑specific MapDB state cache files (`jdbc_<driver instance guid>_*`) from the DIB directory on the server."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "driver": "RACF driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the default codepage assumed by the RACF driver for character translation?",
+      "input": "",
+      "output": "The RACF driver assumes the RACF system uses the EBCDIC Latin 1 (Open Systems) codepage, identified as IBM-1047."
+    },
+    {
+      "category": "config",
+      "instruction": "Which JCL line configures the default codepage for the RACF driver?",
+      "input": "",
+      "output": "The line in the SAMPLIB(RACFDRV) member that sets the environment variable is:\n```\n//  SET ENV='ENVAR(\"LC_CTYPE=IBM-1047\")'\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you change the codepage setting for the RACF driver to match a different RACF system codepage?",
+      "input": "",
+      "output": "1. Open the SAMPLIB member RACFDRV that contains the JCL for starting the RACF driver shim.\n2. Locate the line:\n   `//  SET ENV='ENVAR(\"LC_CTYPE=IBM-1047\")'`\n3. Replace **IBM-1047** with the appropriate IBM-CCSID value for your RACF system (e.g., IBM-1140 for US/Canada).\n4. Save the member and restart the RACF driver so the new environment setting takes effect.\n5. Verify character translation by testing a provisioning operation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the JCL be modified if the RACF system uses a codepage other than IBM-1047?",
+      "input": "",
+      "output": "Because the RACF driver uses the LC_CTYPE environment variable to translate data between the RACF system and the Identity Manager Metadirectory engine. If the codepage does not match the RACF system's actual codepage, character translation will be incorrect, leading to garbled or mis‑interpreted data."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the required format for specifying a custom codepage in the RACF driver JCL?",
+      "input": "",
+      "output": "The format is **IBM-CCSID**, where *CCSID* is the decimal coded character set identifier. Example: `IBM-1140`."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the international considerations for configuring codepages in the RACF driver.",
+      "input": "",
+      "output": "The RACF driver defaults to IBM-1047 (EBCDIC Latin 1) for character translation. If the RACF environment uses a different codepage, you must edit the SAMPLIB(RACFDRV) JCL line that sets LC_CTYPE, replacing IBM-1047 with the appropriate IBM-CCSID value. Valid CCSIDs are listed in the IBM CCSID reference table, and a subset of common values is provided in the documentation."
+    },
+    {
+      "category": "config",
+      "instruction": "Provide a table of sample codepage identifiers and their descriptions that can be used with the RACF driver.",
+      "input": "",
+      "output": "| Codepage | Description |\n|----------|-------------|\n| IBM-858  | IBM‑PC |\n| IBM-1047 | Latin 1 (Open Systems) |\n| IBM-1140 | US/Canada |\n| IBM-1141 | Austria/Germany |\n| IBM-1142 | Denmark/Norway |\n| IBM-1143 | Finland/Sweden |\n| IBM-1144 | Italy |\n| IBM-1145 | Spain/Spanish Latin America |\n| IBM-1146 | UK |\n| IBM-1147 | France |\n| IBM-1148 | International |\n| IBM-1149 | Iceland |"
+    },
+    {
+      "category": "howto",
+      "instruction": "Where can you find a complete list of valid codepage identifiers for use with the RACF driver?",
+      "input": "",
+      "output": "A full list of valid codepage identifiers is available in the IBM CCSID reference table at the URL: http://www-01.ibm.com/software/globalization/ccsid/ccsid_registered.jsp"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If characters appear garbled after provisioning with the RACF driver, what is a likely cause and how should you resolve it?",
+      "input": "",
+      "output": "A common cause is a mismatch between the RACF system's actual codepage and the codepage configured in the RACF driver JCL (LC_CTYPE). Resolve it by editing the SAMPLIB(RACFDRV) member to set `LC_CTYPE` to the correct IBM-CCSID value for your RACF system, then restart the RACF driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the LC_CTYPE environment variable control in the RACF driver shim?",
+      "input": "",
+      "output": "LC_CTYPE specifies the character set (codepage) that the RACF driver uses for translating data between the RACF system and the Identity Manager metadirectory engine."
+    }
+  ]
+}

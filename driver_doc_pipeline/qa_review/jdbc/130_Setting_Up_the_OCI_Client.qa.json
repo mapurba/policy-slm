@@ -1,0 +1,77 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of setting up the Oracle Instant Client for the JDBC driver?",
+      "input": "",
+      "output": "The purpose of setting up the Oracle Instant Client for the JDBC driver is to provide the native OCI libraries required by the JDBC driver on the machine where the driver runs. This enables the JDBC driver to communicate with Oracle databases using OCI, without needing the full Oracle server installation on that machine."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create the required directory structure for the OCI client on Linux for the JDBC driver?",
+      "input": "",
+      "output": "Log in to Linux as root and create the following directories for the JDBC driver:\n\n```\n/oracle\n/oracle/client\n/oracle/client/bin\n/oracle/client/lib\n/oracle/client/network/admin\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the basic and SQL*Plus Instant Client packages for the JDBC driver?",
+      "input": "",
+      "output": "For the JDBC driver, unzip the packages as follows:\n\n1. Unzip **instantclient-basic-linux32-11.1.0.7.zip** into **/oracle/client/lib**.\n2. Unzip **instantclient-sqlplus-linux32-11.1.0.7.zip** into **/oracle/client/bin**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you copy the required libsqlplus files after unzipping the Instant Client for the JDBC driver?",
+      "input": "",
+      "output": "For the JDBC driver, copy the shared libraries from the bin directory to the lib directory:\n\n```\ncp /oracle/client/bin/libsqlplus.so /oracle/client/lib\ncp /oracle/client/bin/libsqlplusic.so /oracle/client/lib\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you ensure the sqlplus executable has the correct permissions for the JDBC driver?",
+      "input": "",
+      "output": "For the JDBC driver, use **chmod** to make the sqlplus program executable:\n\n```\nchmod +x /oracle/client/bin/sqlplus\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you place and name the tnsnames.ora file for the JDBC driver?",
+      "input": "",
+      "output": "Copy a valid **tnsnames.ora** file into **/oracle/client/network/admin** for the JDBC driver. Ensure the filename is in lowercase. If you do not have a tnsnames.ora file, create one with the Oracle configuration tool before copying."
+    },
+    {
+      "category": "config",
+      "instruction": "Which environment variables must be exported in profile.local for the JDBC driver, and what values should they contain?",
+      "input": "",
+      "output": "The JDBC driver requires three export statements in **/etc/profile.local**:\n\n```\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/oracle/client/lib\nexport TNS_ADMIN=/oracle/client/network/admin\nexport PATH=$PATH:/oracle/client/lib\n```\nThese lines extend **LD_LIBRARY_PATH**, set **TNS_ADMIN**, and extend **PATH**. The file may contain only these three lines if it does not already exist."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you copy the required JAR files for the JDBC driver into the Identity Manager classes directory?",
+      "input": "",
+      "output": "For the JDBC driver, copy the appropriate JAR files supplied with the Instant Client into the Identity Manager classes directory—the same directory where the JDBC driver is located."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you start SQL*Plus to test the OCI setup for the JDBC driver?",
+      "input": "",
+      "output": "Assuming the Oracle client bin directory is **/oracle/client/bin**, start SQL*Plus with the following command for the JDBC driver:\n\n```\n./sqlplus username/password@sid\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you verify if the JDBC driver fails to locate the OCI libraries after setting up the Instant Client?",
+      "input": "",
+      "output": "If the JDBC driver cannot locate the OCI libraries, verify that the export lines in **/etc/profile.local** are present and correct:\n\n* **LD_LIBRARY_PATH** must include **/oracle/client/lib**.\n* **TNS_ADMIN** must point to **/oracle/client/network/admin**.\n* **PATH** must include **/oracle/client/lib**.\nAlso ensure the **profile.local** file is being read at boot (it is processed when the server starts) and that the file permissions allow the exports to be applied."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete procedure for setting up the Oracle Instant Client for the JDBC driver.",
+      "input": "",
+      "output": "To set up the Oracle Instant Client for the JDBC driver, follow these steps:\n1. Log in as root and create the directory tree **/oracle/client/{bin,lib,network/admin}**.\n2. Unzip the basic Instant Client zip into **/oracle/client/lib** and the SQL*Plus zip into **/oracle/client/bin**.\n3. Copy **libsqlplus.so** and **libsqlplusic.so** from **bin** to **lib**.\n4. Make **sqlplus** executable with **chmod +x**.\n5. Place a lowercase **tnsnames.ora** in **/oracle/client/network/admin** (create one if needed).\n6. Add three export lines for **LD_LIBRARY_PATH**, **TNS_ADMIN**, and **PATH** to **/etc/profile.local** (create the file if it does not exist).\n7. Ensure the exports are valid and will be read at boot.\n8. Copy the Instant Client‑supplied JAR files to the Identity Manager classes directory where the JDBC driver resides.\n9. Test the setup by running **./sqlplus username/password@sid** from **/oracle/client/bin**."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact export statements that must be added to profile.local for the JDBC driver.",
+      "input": "",
+      "output": "```\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/oracle/client/lib\nexport TNS_ADMIN=/oracle/client/network/admin\nexport PATH=$PATH:/oracle/client/lib\n```"
+    }
+  ]
+}

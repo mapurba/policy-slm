@@ -1,0 +1,47 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a virtual trigger in the JDBC driver and why would you use it?",
+      "input": "",
+      "output": "In the JDBC driver, a virtual trigger is an XML construct that lets you embed SQL statements that are executed automatically before or after an XDS (eXtensible Directory Services) event such as a modify operation. It mimics database triggers, allowing you to perform additional database updates (e.g., setting values, logging) in sync with the directory change, without having to write separate procedural code."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a virtual before trigger in the JDBC driver that updates a column before the XDS modify takes place?",
+      "input": "",
+      "output": "To create a virtual before trigger in the JDBC driver:\n1. Open the transformation XML for the XDS event you want to augment.\n2. Add an `<input>` element with the JDBC namespace declaration: `<input xmlns:jdbc=\"urn:dirxml:jdbc\">`.\n3. Inside the `<input>`, place a `<jdbc:statement>` element.\n4. Within `<jdbc:statement>`, define the `<association>` that identifies the target row (e.g., `idu=1,table=usr,schema=indirect`).\n5. Add a `<jdbc:sql>` element containing the SQL you want to run before the modify, using placeholders such as `{$idu}`.\n6. After the `<jdbc:statement>`, include the normal `<modify>` element that performs the XDS attribute change.\n7. Close the `<input>` element.\nThe resulting XML will be resolved to SQL that runs first (with AUTOCOMMIT OFF and an explicit COMMIT), followed by the directory modify.\nExample snippet:\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n  <jdbc:statement>\n    <association>idu=1,table=usr,schema=indirect</association>\n    <jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE idu = {$idu}</jdbc:sql>\n  </jdbc:statement>\n  <modify class-name=\"usr\">\n    ...\n  </modify>\n</input>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a virtual after trigger in the JDBC driver that runs SQL after the XDS modify is applied?",
+      "input": "",
+      "output": "To create a virtual after trigger in the JDBC driver:\n1. Begin the transformation XML with the JDBC namespace: `<input xmlns:jdbc=\"urn:dirxml:jdbc\">`.\n2. First place the `<modify>` block that performs the XDS attribute change.\n3. After the `<modify>` block, add a `<jdbc:statement>` element.\n4. Inside `<jdbc:statement>`, provide the `<association>` identifying the row to update.\n5. Add a `<jdbc:sql>` element containing the SQL to execute after the modify, using any needed placeholders.\n6. Close the `<jdbc:statement>` and the `<input>` element.\nThe generated SQL will be executed after the directory modify, each statement wrapped with `SET AUTOCOMMIT OFF`, the statement, and an explicit `COMMIT`.\nExample snippet:\n```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n  <modify class-name=\"usr\">\n    ...\n  </modify>\n  <jdbc:statement>\n    <association>idu=1,table=usr,schema=indirect</association>\n    <jdbc:sql>UPDATE indirect.usr SET fname = 'John' WHERE idu = {$idu}</jdbc:sql>\n  </jdbc:statement>\n</input>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "In the JDBC driver, what is the purpose of the xmlns:jdbc attribute in the XML for virtual triggers?",
+      "input": "",
+      "output": "The `xmlns:jdbc` attribute declares the XML namespace for JDBC‑specific elements used in a virtual trigger. By setting `xmlns:jdbc=\"urn:dirxml:jdbc\"`, the transformation tells the JDBC driver that elements prefixed with `jdbc:` (such as `<jdbc:statement>` and `<jdbc:sql>`) belong to the JDBC namespace, enabling the driver to recognize and process those elements as embedded SQL statements."
+    },
+    {
+      "category": "config",
+      "instruction": "How should the association element be formatted in a JDBC driver virtual trigger?",
+      "input": "",
+      "output": "In a JDBC driver virtual trigger, the `<association>` element identifies the database row that the embedded SQL will affect. It is formatted as a comma‑separated list of key/value pairs that specify the primary key and table details, for example:\n```\n<association>idu=1,table=usr,schema=indirect</association>\n```\nThe keys typically include the identifier column (`idu`), the table name (`table`), and the database schema (`schema`)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about virtual triggers in the JDBC driver.",
+      "input": "",
+      "output": "Virtual triggers in the JDBC driver let you embed SQL statements that run automatically before or after an XDS event. You define them in transformation XML using the `xmlns:jdbc=\"urn:dirxml:jdbc\"` namespace. A `<jdbc:statement>` containing an `<association>` (identifying the target row) and a `<jdbc:sql>` element holds the SQL to execute. For a *before* trigger, place the `<jdbc:statement>` before the `<modify>` block; for an *after* trigger, place it after. The driver resolves the XML to a sequence of SQL commands wrapped with `SET AUTOCOMMIT OFF` and explicit `COMMIT` statements."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example XML for a virtual before trigger in the JDBC driver that sets the column \"title\" to \"Manager\" for the row with emp_id = {$empId}, and then modifies the directory attribute \"status\" to \"Active\".",
+      "input": "",
+      "output": "```xml\n<input xmlns:jdbc=\"urn:dirxml:jdbc\">\n  <jdbc:statement>\n    <association>emp_id=1,table=employee,schema=corp</association>\n    <jdbc:sql>UPDATE corp.employee SET title = 'Manager' WHERE emp_id = {$empId}</jdbc:sql>\n  </jdbc:statement>\n  <modify class-name=\"employee\">\n    <association>emp_id=1,table=employee,schema=corp</association>\n    <modify-attr name=\"status\">\n      <remove-all-values/>\n      <add-value>\n        <value>Active</value>\n      </add-value>\n    </modify-attr>\n  </modify>\n</input>\n```\nThis XML defines a virtual before trigger for the JDBC driver: the SQL updates the `title` column, then the directory modify sets the `status` attribute to \"Active\"."
+    }
+  ]
+}

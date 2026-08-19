@@ -1,0 +1,71 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the JDBC driver, what is the purpose of the record_id column and what requirements does it have?",
+      "input": "",
+      "output": "The record_id column in the JDBC driver event log table uniquely identifies each row and is used to order publication events. It must contain sequential, ascending, positive, unique integer values. Gaps between record_id values no longer prematurely end a polling cycle."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the permitted character values for the status column in the JDBC driver event log and what does each value represent?",
+      "input": "",
+      "output": "The status column in the JDBC driver event log accepts the following case‑sensitive character values:\n\n| Character Value | Interpretation |\n|-----------------|----------------|\n| N               | new            |\n| S               | success        |\n| W               | warning        |\n| E               | error          |\n| F               | fatal          |\n\nOnly rows with a status of **N** are processed; the other values are used by the Publisher channel for processed rows."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How is the table_key column formatted in the JDBC driver event log?",
+      "input": "",
+      "output": "In the JDBC driver, the table_key column contains a concatenation of primary‑key column name/value pairs separated by a plus sign (+). Each pair follows the pattern `<primary-key-column-name>=<value>`. For composite primary keys, multiple pairs are joined with '+'. If any value contains special characters {, ; ' + \" = \\ < >}, the entire value must be enclosed in double quotes, and double quotes and backslashes inside the quotes must be escaped as \\\" and \\\\ respectively."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the Backus‑Naur Form (BNF) definition of the table_key parameter for the JDBC driver?",
+      "input": "",
+      "output": "The BNF definition for the table_key parameter in the JDBC driver is:\n```\n<table-key> ::= <unique-row-identifier> {\"+\"\n                <unique-row-identifier>}\n\n<unique-row-identifier> ::= <primary-key-column-name> \"=\" <value>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "Using the JDBC driver, how do you construct a table_key value for a row whose primary key is pk_empno=1 and contains special characters in the value?",
+      "input": "",
+      "output": "1. Identify the primary‑key column name and its value (e.g., pk_empno=1).\n2. Determine if the value contains any of the special characters {, ; ' + \" = \\ < >}. If it does, enclose the entire value in double quotes.\n3. Escape any double‑quote characters inside the value as \\\" and escape any backslash as \\\\.\n4. Assemble the final string as `<column-name>=\"<escaped‑value>\"`.\n\nExample: if the primary‑key value is `\", ; ' + \" = \\ < >` then the table_key becomes `pk_empno=\"\\\", ; ' + \\\" = \\\\ < >\"`."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What numeric range is allowed for the event_type column in the JDBC driver and why?",
+      "input": "",
+      "output": "The event_type column in the JDBC driver must contain an integer between 1 and 8 inclusive. Values outside this range are reserved for future use. Each number maps to a specific type of event (insert, update, delete, etc.)."
+    },
+    {
+      "category": "config",
+      "instruction": "List the event type numbers and their interpretations for the JDBC driver event log.",
+      "input": "",
+      "output": "The event type numbers for the JDBC driver are:\n\n| Event Type | Interpretation |\n|------------|----------------|\n| 1          | insert field |\n| 2          | update field |\n| 3          | update field (remove all values) |\n| 4          | delete row |\n| 5          | insert row (query-back) |\n| 6          | update row (query-back) |\n| 7          | insert field (query-back) |\n| 8          | update field (query-back) |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you make the JDBC driver use the event_time column as the ordering column for publications?",
+      "input": "",
+      "output": "To have the JDBC driver use event_time as the ordering column, set the **Enable Future Event Processing** parameter to Boolean **True**. This tells the Publisher channel to order events by the non‑NULL event_time value instead of record_id."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain how the perpetrator column influences publishing in the JDBC driver, including the effect of the Allow Loopback Publisher parameter.",
+      "input": "",
+      "output": "The perpetrator column records the database user who triggered the event. A NULL value is treated as a user other than the driver user, so such rows are published. Rows where perpetrator is NULL or differs from the driver’s database username are always published. If the perpetrator value equals the driver’s database username, the row is **not** published unless the **Allow Loopback Publisher** parameter is set to Boolean **True**."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the essential information about columns in the JDBC driver event log table.",
+      "input": "",
+      "output": "The JDBC driver event log table contains columns that identify and describe each change event: \n- **record_id**: unique, sequential integer for ordering. \n- **table_key**: formatted primary‑key identifier, with special‑character quoting rules. \n- **status**: single‑character state (N, S, W, E, F); only N rows are processed. \n- **event_type**: integer 1‑8 indicating the kind of change (insert, update, delete, query‑back variants). \n- **event_time**: non‑NULL timestamp used for ordering when Enable Future Event Processing is true. \n- **perpetrator**: database user that caused the event; publishing can be suppressed for the driver user unless Allow Loopback Publisher is true. \n- **table_name**, **column_name**, **old_value**, **new_value**: provide context for the change; column_name, old_value, and new_value are required for per‑field events and must be present for the Publisher channel to start."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a correctly escaped table_key string for a JDBC driver row whose composite primary key consists of `id=42` and `type=admin, user` (the comma is a special character).",
+      "input": "",
+      "output": "The special character \",\" is not listed among the required escape set, but to be safe we treat it as needing quoting. The escaped table_key is:\n```\nid=42+type=\"admin, user\"\n```"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "driver": "ACF2 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver shim in the ACF2 driver and where are its files installed?",
+      "input": "",
+      "output": "The driver shim in the ACF2 driver provides the core runtime components that enable communication between the connected ACF2 system and NetIQ Identity Manager. Its files are installed into z/OS data sets that you specify and into files created by the installation process in the HFS (Hierarchical File System). The shim includes a load library, sample library, and REXX exec library, and it uses an embedded Remote Loader so Java does not need to be installed on the connected system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upload the ACF2 driver shim files to a target z/OS system using FTP?",
+      "input": "",
+      "output": "To upload the ACF2 driver shim files using FTP, follow these steps:\n1. Open an FTP session to the z/OS host.\n2. Issue the command `quote site lrecl=80 recfm=fb`.\n3. Set binary mode with `binary`.\n4. Upload the sample library with `put samplib.xmt`.\n5. Upload the REXX exec library with `put acf2exec.xmt`.\n6. Set allocation attributes using `quote site pri=30 sec=5 cyl`.\n7. Upload the load library with `put idmload.xmt`.\n8. End the session with `quit`.\nThe commands look like:\n```\n  c:\\> ftp Your-z/OS-Host\n  User: Your-User-ID\n  Password:\n  ftp> quote site lrecl=80 recfm=fb\n  ftp> binary\n  ftp> put samplib.xmt\n  ftp> put acf2exec.xmt\n  ftp> quote site pri=30 sec=5 cyl\n  ftp> put idmload.xmt\n  ftp> quit\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you extract the uploaded ACF2 driver shim data sets on the target system using the TSO RECEIVE command?",
+      "input": "",
+      "output": "After uploading, log on to z/OS with the same user ID and use the TSO RECEIVE command for each .XMT file:\n1. `receive indataset(samplib.xmt)` and when prompted, provide the target data set name (e.g., `dsname('sys3.idm.samplib')`) and the volume (e.g., `volume(work0a)`).\n2. Repeat for `idmload.xmt` with a target like `dsname('sys3.idm.load')`.\n3. Repeat for `acf2exec.xmt` with a target like `dsname('sys3.acf2.acf2exec')`.\nTSO will display IEBCOPY messages and finish with `INMR001I Restore successful to dataset 'SYS3.IDM.SAMPLIB'` (or corresponding dataset name) for each file."
+    },
+    {
+      "category": "config",
+      "instruction": "What steps are required to add the ACF2 driver load library to the APF list and protect it from unauthorized use?",
+      "input": "",
+      "output": "To add the ACF2 driver load library to the APF list:\n1. Edit the appropriate PARMLIB member (IEAAPFxx or PROGxx) and include the load library name.\n2. If using the dynamic APF facility, issue the `SET PROG` command to activate the change; otherwise, an IPL is required for the change to take effect.\n3. After adding it, restrict access to the load library. Do **not** place the driver load library in the linklist unless you use program protection to secure its contents. Failing to protect the load library can expose the system to security risks."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you secure the ACF2 driver shim with SSL using the EXEC(SETCERT) REXX member?",
+      "input": "",
+      "output": "To secure the ACF2 driver shim with SSL:\n1. Customize the REXX exec member `EXEC(SETCERT)` to specify the driver load library and DRVCONF locations for your installation.\n2. Run the member `EXEC(SETCERT)`.\n3. When prompted, enter the eDirectory LDAP server host name or IP address and the secure LDAP port (default 636).\n4. When prompted to accept the certificate authority, enter `Y`.\n5. Verify that the file `/opt/novell/acf2drv/keys/ca.pem` was created.\nIf the LDAP server cannot be contacted, refer to the \"Driver Certificate Setup Failure\" guidance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Remote Loader and driver object passwords for the ACF2 driver using the EXEC(SETPWDS) REXX member?",
+      "input": "",
+      "output": "To configure passwords for the Remote Loader and driver objects in the ACF2 driver:\n1. Customize the REXX exec member `EXEC(SETPWDS)` to specify the driver load library and DRVCONF location.\n2. Run the member `EXEC(SETPWDS)` and respond to the prompts for the desired passwords.\n3. After successful execution, verify that the following password files exist:\n   - `/opt/novell/acf2drv/keys/lpwd1f40`\n   - `/opt/novell/acf2drv/keys/dpwdlf40`"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the requirements for the change log data set in the ACF2 driver and how is it allocated and initialized?",
+      "input": "",
+      "output": "The ACF2 driver requires a standard z/OS direct‑access data set to serve as the change log. The data set must reside on a shared device if more than one z/OS system accesses the same security system database. To allocate and initialize it:\n1. Customize the sample library member `LOGINIT` JCL, specifying:\n   - the name of the driver load library,\n   - a name for the change log data set,\n   - the shared disk volume (and a different unit name if needed).\n2. Run the `LOGINIT` job. An IEC031I D37 message is normal and can be ignored.\n3. Protect the change log data set appropriately because it contains sensitive information. **Warning:** Initializing a data set that already contains data will erase that data."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set up the change log started task for the ACF2 driver?",
+      "input": "",
+      "output": "To set up the change log started task for the ACF2 driver:\n1. Copy member `LDXLOGR` from the samples library to your started‑task procedure library (e.g., `SYS1.PROCLIB`). You may rename the member if desired.\n2. Edit the JCL to include the driver load library name and the change log data set name.\n3. Add the started task to your system startup and shutdown procedures, ensuring it starts during system startup before user processing begins and stops after user processing ends.\n4. Verify that your Workload Manager definitions assign the started task to an appropriate Service Class."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install and configure the driver shim started task for the ACF2 driver?",
+      "input": "",
+      "output": "To install the driver shim started task for the ACF2 driver:\n1. Copy member `ACF2DRV` from the samples library to your started‑task procedure library (e.g., `SYS1.PROCLIB`). Rename if needed.\n2. Edit the JCL to specify:\n   - the driver load library name,\n   - the driver shim configuration file (use `DRVCONF` as a model),\n   - the connected system schema file (use `SCHEMDEF` as a model),\n   - the include/exclude file (use `INCEXC` as a model),\n   - the change log data set name,\n   - the driver REXX exec library name.\n3. Add the started task to your system startup and shutdown procedures so that it starts before user processing and stops after user processing.\n4. Ensure Workload Manager assigns the task to an appropriate Service Class.\n5. Authorize a restricted user ID for the started task (example commands shown in the documentation) and grant it read/write permissions to `/opt/novell/acf2drv/` and subdirectories."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you authorize the ACF2 driver TSO commands LDXSERV and ACFQUERY on the ACF2 system?",
+      "input": "",
+      "output": "To APF‑authorize the ACF2 driver TSO commands:\n1. Edit member `IKJTSOxx` in `SYS1.PARMLIB` (or equivalent) and add `LDXSERV` and `ACFQUERY` to the `AUTHCMD NAMES(...)` statement, for example:\n```\n  AUTHCMD NAMES( +\n    ... other commands ... +\n    LDXSERV ACFQUERY)\n```\n2. Activate the change by running the PARMLIB TSO commands:\n```\n  PARMLIB CHECK(00)\n  PARMLIB UPDATE(00)\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you check if the ACF2 driver cannot retrieve the SSL certificate from the LDAP server during the SETCERT step?",
+      "input": "",
+      "output": "If the ACF2 driver cannot retrieve the SSL certificate during the `EXEC(SETCERT)` step, verify the following:\n1. The LDAP server host name or IP address entered is correct.\n2. The secure LDAP port (default 636) is reachable from the z/OS system.\n3. Network connectivity and any firewalls allow traffic to the LDAP server on that port.\n4. If connectivity is verified but the step still fails, consult the \"Driver Certificate Setup Failure\" documentation for additional troubleshooting guidance."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the main steps required to install and verify the ACF2 driver on a connected z/OS system.",
+      "input": "",
+      "output": "To install the ACF2 driver on a connected z/OS system, you must: (1) upload the driver shim PDS files via FTP and extract them with TSO RECEIVE; (2) add the driver load library to the APF list and protect it; (3) run the `SAMPLIB(HFSINST)` job to create the HFS directory structure; (4) secure the shim with SSL using `EXEC(SETCERT)`; (5) configure Remote Loader passwords with `EXEC(SETPWDS)`; (6) allocate and initialize a shared change log data set using the `LOGINIT` job; (7) set up the change log started task and the driver shim started task, updating JCL with required library and data set names; (8) authorize the TSO commands `LDXSERV` and `ACFQUERY`; (9) test the installation with `LDXSERV STATUS` before and after installing the ACF2 exits; and (10) install any required ACF2 exits (LDXPOST, LDXNPXIT, LDXNPHXT) as needed."
+    }
+  ]
+}

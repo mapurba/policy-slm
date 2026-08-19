@@ -1,0 +1,53 @@
+{
+  "driver": "JDBC driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What role does the perpetrator field play in the JDBC driver’s processing of rows in the Event Log Table, and how does the Allow Loopback parameter affect this?",
+      "input": "",
+      "output": "In the JDBC driver, the Publisher channel uses the perpetrator field to detect loopback events. If the Allow Loopback parameter is set to Boolean False (the default), the Publisher channel ignores any Event Log Table rows whose perpetrator field value matches the driver’s database username. Therefore, a row will be processed only when its perpetrator field is set to a value other than the driver’s database username."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameter defines the driver’s database username for the JDBC driver, and what is its purpose?",
+      "input": "",
+      "output": "The Authentication ID parameter defines the driver’s database username for the JDBC driver. It is used by the Publisher channel to compare against the perpetrator field; if the perpetrator equals the Authentication ID value and Allow Loopback is False, the row is ignored."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default setting for the Allow Loopback parameter in the JDBC driver, and what impact does this default have on Event Log Table row processing?",
+      "input": "",
+      "output": "The default setting for the Allow Loopback parameter in the JDBC driver is Boolean False. With this default, the Publisher channel will skip any rows where the perpetrator field equals the driver’s database username, preventing loopback events from being processed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you troubleshoot a situation where the JDBC driver is not processing rows in the Event Log Table?",
+      "input": "",
+      "output": "To troubleshoot the JDBC driver not processing rows in the Event Log Table, follow these steps:\n1. Verify the perpetrator field of the affected rows and ensure it is set to a value other than the driver’s database username (the username defined by the Authentication ID parameter).\n2. Confirm that the Allow Loopback parameter is set to Boolean False (default) or adjust it if loopback processing is desired.\n3. Check that each record’s status field is set to \"N\" (new); records with any other status are ignored.\n4. Ensure that any changes made to the rows are explicitly committed, as uncommitted changes remain tentative and will not be processed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you verify that a specific record in the Event Log Table will be processed by the JDBC driver?",
+      "input": "",
+      "output": "To verify that a specific Event Log Table record will be processed by the JDBC driver, perform the following checks:\n1. Open the record and inspect the perpetrator field; it must contain a value different from the driver’s database username (set via the Authentication ID parameter).\n2. Ensure the status field of the record is \"N\" (new).\n3. Confirm that the record has been explicitly committed in the database; otherwise, the driver will treat the changes as tentative.\nIf all three conditions are met, the JDBC driver will process the record."
+    },
+    {
+      "category": "config",
+      "instruction": "What status field value indicates that a row in the Event Log Table is new and eligible for processing by the JDBC driver?",
+      "input": "",
+      "output": "The status field value \"N\" (new) indicates that a row in the Event Log Table is eligible for processing by the JDBC driver. Any other status value will cause the driver to skip the row."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you ensure that changes to Event Log Table rows are recognized by the JDBC driver?",
+      "input": "",
+      "output": "After modifying Event Log Table rows, you must explicitly commit the transaction in the database. This commits the changes, making them permanent and visible to the JDBC driver. Without an explicit commit, the changes remain tentative and the driver will not process the rows."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to make sure the JDBC driver processes rows in the Event Log Table.",
+      "input": "",
+      "output": "To ensure the JDBC driver processes rows in the Event Log Table: (1) Set the perpetrator field to a value different from the driver’s database username (Authentication ID). (2) Keep the Allow Loopback parameter set to Boolean False (default) unless loopback processing is needed. (3) Ensure the record’s status field is \"N\" (new). (4) Explicitly commit any changes to the table so they become permanent."
+    }
+  ]
+}
