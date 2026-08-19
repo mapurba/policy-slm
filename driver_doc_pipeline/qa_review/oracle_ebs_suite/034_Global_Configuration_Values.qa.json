@@ -1,0 +1,77 @@
+{
+  "driver": "Oracle EBS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are Global Configuration Values (GCVs) in the Oracle EBS driver and how are they scoped?",
+      "input": "",
+      "output": "In the Oracle EBS driver, Global Configuration Values (GCVs) are configuration parameters that control driver functionality. GCVs can be defined either on the driver set, making them available to all drivers in the set, or on an individual driver, where they are usable only by that specific driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you access the Oracle EBS driver’s Global Configuration Values using the Identity Console?",
+      "input": "",
+      "output": "To access the Oracle EBS driver’s Global Configuration Values in Identity Console:\n1. Click the IDM Administration tile.\n2. On the Driver Dashboard, locate the Oracle EBS driver and click its icon to open the driver’s properties page.\n3. Select the Configuration tab.\n4. Expand the Global Config Values section."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you add a new Global Configuration Value to the Oracle EBS driver set in Identity Console?",
+      "input": "",
+      "output": "To add a new GCV to the Oracle EBS driver set:\n1. On the Driver Dashboard, click the upper‑right corner of the driver set to open the Action menu.\n2. Choose **Driver Set Properties**.\n3. On the Driver Set Configuration tab, expand the **Global Config Values** section.\n4. Add the desired GCV entries and click **Save**."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the steps to edit Password Synchronization GCVs for the Oracle EBS driver in Designer.",
+      "input": "",
+      "output": "In Designer, to edit Password Synchronization GCVs for the Oracle EBS driver:\n1. Open a project in the Modeler.\n2. Right‑click the Oracle EBS driver icon or line and select **Properties > Global Configuration Values**.\n3. Locate the desired Password Synchronization GCV.\n4. Click the edit icon (shown as ![](../graphics/designer_edit_pass_sync_n.png)) next to the GCV.\n5. Modify the value in the Password Synchronization Options dialog and apply the changes."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the 'Oracle EBS User's Default password' GCV in the Oracle EBS driver and what are its validation rules?",
+      "input": "",
+      "output": "The **Oracle EBS User's Default password** GCV specifies the default password to assign to Oracle EBS users when their password is empty or shorter than five characters. The password must be longer than 5 characters; otherwise, the default password is applied."
+    },
+    {
+      "category": "config",
+      "instruction": "List the Boolean GCVs that control password flow direction in the Oracle EBS driver and explain what each one does.",
+      "input": "",
+      "output": "The Oracle EBS driver includes the following Boolean GCVs for password flow:\n- **Application accepts passwords from Identity Manager** – If set to **True**, passwords can flow from the Identity Manager data store to the Oracle EBS system.\n- **Identity Manager accepts passwords from application** – If **True**, passwords can flow from the Oracle EBS system back to the Identity Manager.\n- **Publish passwords to NDS password** – When **True**, the Oracle EBS password is used to set the non‑reversible NDS password in the Identity Vault.\n- **Publish passwords to Distribution Password** – If **True**, the Oracle EBS password sets the NMAS Distribution Password for password synchronization.\n- **Require password policy validation before publishing passwords** – If **True**, NMAS password policies are applied before publishing; non‑compliant passwords are not written to the data store.\n- **Reset user’s external system password to the Identity Manager password on failure** – If **True**, a failed Distribution Password publish triggers a reset of the Oracle EBS password using the Identity Manager password.\n- **Notify the user of password synchronization failure via e‑mail** – If **True**, the user receives an e‑mail notification when password synchronization fails."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the 'Set Oracle EBS HR As Authoritative Data Source' GCV control in the Oracle EBS driver?",
+      "input": "",
+      "output": "The **Set Oracle EBS HR As Authoritative Data Source** GCV determines whether add and delete operations on the Subscriber channel are synchronized. When set to **True**, add and delete operations are not synchronized; only modify operations are synchronized. The default value is **False**."
+    },
+    {
+      "category": "config",
+      "instruction": "Explain the 'Action on Employee while Entitlement Revoke?' GCV for the HR driver component of the Oracle EBS driver.",
+      "input": "",
+      "output": "The **Action on Employee while Entitlement Revoke?** GCV specifies the action taken when an employee entitlement is revoked. Options are **Delete User** or **Do Nothing**, with **Delete User** being the default selection."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible values for the 'Classification' field in the Managed System Information tab of the Oracle EBS driver?",
+      "input": "",
+      "output": "The **Classification** field can be set to one of the following:\n- Mission‑Critical\n- Vital\n- Not‑Critical\n- Other (requires a custom classification to be specified)"
+    },
+    {
+      "category": "config",
+      "instruction": "Detail the GCVs required to enable account tracking for the Oracle EBS driver and any mandatory values.",
+      "input": "",
+      "output": "To enable account tracking for the Oracle EBS driver, set the following GCVs:\n- **Enable account tracking** – set to **True** to activate account tracking policies.\n- **Realm** – specify the Oracle EBS domain name; this is the namespace where account names are unique.\n- **Object Class** – provide the object class name in the application namespace to be tracked.\n- **Identifiers** – list the account identifier attribute names in the application namespace.\n- **Status attribute** – name of the attribute representing account status in the application namespace.\n- **Status active value** – value of the status attribute that indicates an active account.\n- **Status inactive value** – value that indicates an inactive account.\n- **Subscription default status** – default status assumed when an object is subscribed and the status attribute is unset.\n- **Publication default status** – default status assumed when an object is published and the status attribute is unset."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the Password Synchronization GCVs not apply to the Oracle EBS driver, and how can you verify this?",
+      "input": "",
+      "output": "Password Synchronization GCVs do not apply to the Oracle EBS driver when the driver set includes the HR driver, because the HR driver synchronizes employee information and password synchronization is not relevant. To verify, check the documentation note that states *\"The HR driver synchronizes employee information; therefore, Account Tracking and Password Synchronization GCVs do not apply to this driver.\"* If the driver you are configuring is the HR driver, those GCVs will be ignored."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration areas and GCV categories available for the Oracle EBS driver.",
+      "input": "",
+      "output": "The Oracle EBS driver provides Global Configuration Values (GCVs) organized into five main categories: Password Synchronization (controls password flow between Identity Manager and Oracle EBS), (Conditional) Default Configuration (e.g., authoritative data source flag), Entitlements (user, role, responsibility, employee entitlement options and mapping settings), Account Tracking (enables reporting of account status with realm, object class, identifiers, and status values), and Managed System Information (general system metadata, ownership, classification, and environment). Each GCV can be edited via Identity Console or Designer, and driver‑set GCVs can be shared across all drivers in the set."
+    }
+  ]
+}
