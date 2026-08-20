@@ -1,35 +1,35 @@
 {
-  "driver": "Oracle EBS Suite driver",
+  "driver": "Oracle EBS driver",
   "qa_pairs": [
     {
       "category": "explanatory",
-      "instruction": "What does it indicate when NDSTrace shows the http connection protocol on the Publisher channel in the Oracle EBS Suite driver?",
+      "instruction": "What does it indicate when NDSTrace shows an http connection protocol on the Publisher channel for the Oracle EBS driver, even though https has been configured?",
       "input": "",
-      "output": "In the Oracle EBS Suite driver, the NDSTrace log will display \"http\" for the Publisher channel even though https has been configured; this symptom indicates that the trace is reporting the wrong protocol name for the channel."
-    },
-    {
-      "category": "config",
-      "instruction": "Which environment variables control the Java heap size for the Oracle EBS Suite driver and what do they represent?",
-      "input": "",
-      "output": "The Oracle EBS Suite driver uses the following environment variables to control Java heap memory:\n- **DHOST_JVM_INITIAL_HEAP** – sets the initial heap size for the driver’s JVM.\n- **DHOST_JVM_MAX_HEAP** – defines the maximum heap size that the driver’s JVM can use."
+      "output": "In the Oracle EBS driver, NDSTrace reporting an http connection protocol on the Publisher channel means that the trace is logging the protocol as http despite the publisher being configured to use https. This discrepancy is a known issue for this driver version and does not necessarily reflect the actual network traffic, which may still be using https."
     },
     {
       "category": "howto",
-      "instruction": "How do you resolve a java.lang.OutOfMemory error in the Oracle EBS Suite driver?",
+      "instruction": "How do you address a java.lang.OutOfMemory error in the Oracle EBS driver?",
       "input": "",
-      "output": "To address a java.lang.OutOfMemory error in the Oracle EBS Suite driver, follow these steps:\n1. Set or increase the **DHOST_JVM_INITIAL_HEAP** and **DHOST_JVM_MAX_HEAP** environment variables.\n2. Restart the Oracle EBS Suite driver.\n3. Monitor the driver to confirm that the new heap settings provide sufficient memory."
+      "output": "To resolve a java.lang.OutOfMemory error in the Oracle EBS driver, follow these steps:\n1. Set or increase the environment variables DHOST_JVM_INITIAL_HEAP and DHOST_JVM_MAX_HEAP to allocate more Java heap memory.\n2. Restart the Oracle EBS driver so the new heap settings take effect.\n3. Monitor the driver to confirm that the increased heap size prevents further OutOfMemory errors.\nFor additional details, refer to the \"Configuring Java Environment Parameters\" section of the NetIQ Identity Manager Driver Administration Guide."
+    },
+    {
+      "category": "config",
+      "instruction": "Which environment variables should be set or increased to adjust the Java heap size for the Oracle EBS driver, and what are their purposes?",
+      "input": "",
+      "output": "The Oracle EBS driver uses the following environment variables to control Java heap allocation:\n- **DHOST_JVM_INITIAL_HEAP** – Specifies the initial heap size for the driver’s Java Virtual Machine.\n- **DHOST_JVM_MAX_HEAP** – Defines the maximum heap size the JVM can grow to.\nIncreasing these values provides more memory to the driver and helps prevent java.lang.OutOfMemory errors."
     },
     {
       "category": "troubleshooting",
-      "instruction": "What actions should you take after adjusting the heap variables to ensure the Oracle EBS Suite driver no longer encounters OutOfMemory errors?",
+      "instruction": "Why might the Oracle EBS driver’s NDSTrace display http instead of the expected https on the Publisher channel?",
       "input": "",
-      "output": "After changing **DHOST_JVM_INITIAL_HEAP** and **DHOST_JVM_MAX_HEAP** for the Oracle EBS Suite driver, you should restart the driver and then continuously monitor its memory usage to verify that the configured heap is adequate and the OutOfMemory error does not reappear."
+      "output": "The Oracle EBS driver has a known issue where NDSTrace logs the connection protocol as http on the Publisher channel even when https has been configured. This is a reporting discrepancy in the trace output and does not necessarily mean that the driver is communicating over an insecure channel."
     },
     {
       "category": "summarization",
-      "instruction": "Summarize the known troubleshooting issues for version 7.2 of the Oracle EBS Suite driver.",
+      "instruction": "Provide a brief summary of the troubleshooting guidance for the Oracle EBS driver version 7.2.",
       "input": "",
-      "output": "Version 7.2 of the Oracle EBS Suite driver has two documented issues: (1) NDSTrace may report the Publisher channel using the http protocol even when https is configured, and (2) the driver can shut down with a java.lang.OutOfMemory error. The recommended fix for the memory issue is to increase the **DHOST_JVM_INITIAL_HEAP** and **DHOST_JVM_MAX_HEAP** environment variables, restart the driver, and monitor its memory usage."
+      "output": "For the Oracle EBS driver version 7.2, two primary issues are documented:\n1. NDSTrace may incorrectly show an http protocol on the Publisher channel despite https being configured.\n2. An OutOfMemory error can be mitigated by setting or increasing the DHOST_JVM_INITIAL_HEAP and DHOST_JVM_MAX_HEAP environment variables, restarting the driver, and monitoring to ensure sufficient memory. Additional configuration details are available in the NetIQ Identity Manager Driver Administration Guide."
     }
   ]
 }

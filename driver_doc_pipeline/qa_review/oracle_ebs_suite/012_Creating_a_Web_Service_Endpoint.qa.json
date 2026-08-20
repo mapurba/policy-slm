@@ -1,47 +1,59 @@
 {
-  "driver": "Oracle EBS Suite driver",
+  "driver": "Oracle EBS driver",
   "qa_pairs": [
     {
-      "category": "summarization",
-      "instruction": "Summarize the steps required to create a SOAP or REST web service endpoint for the Oracle EBS Suite driver.",
+      "category": "explanatory",
+      "instruction": "What is the purpose of creating a Web Service endpoint in the Oracle EBS driver?",
       "input": "",
-      "output": "In the Oracle EBS Suite driver, you create a SOAP/REST endpoint by (1) running a shell script on the EBS server to set FND_TOP and APPL_TOP, (2) logging into Oracle EBS as sysadmin, (3) opening the Integrated SOA Gateway, (4) navigating to the Novell IDM Suite > Driver > Subscriber > IDM Subscriber view, (5) for SOAP: generate WSDL and deploy; for REST: specify a service alias, select Subscribe IDM Events, deploy, and use the base URL from the WADL, (6) generate and deploy the WSDL, (7) grant the Subscribe Identity Manager Events procedure to the sysadmin user, and (8) resolve any Perl module or WSDL file errors as described."
+      "output": "In the Oracle EBS driver, creating a Web Service endpoint provides a SOAP or REST interface that the Identity Manager Subscriber channel uses to synchronize events and poll the Oracle database for fetching those events."
     },
     {
       "category": "howto",
-      "instruction": "How do you create a new SOAP/REST endpoint for the Oracle EBS Suite driver using the provided shell script?",
+      "instruction": "How do you create a SOAP Web Service endpoint for the Oracle EBS driver?",
       "input": "",
-      "output": "To create a new SOAP/REST endpoint for the Oracle EBS Suite driver:\n1. Open a shell on the Oracle EBS server.\n2. Set the required environment variables, for example:\n   ```\n   export FND_TOP=/u01/app/VIS/apps/apps_st/appl/fnd/12.0.0\n   export APPL_TOP=/u01/app/VIS/apps/apps_st/appl\n   ```\n3. Source the instance environment file (replace *instancename* and *hostname* with your values):\n   ```\n   . $APPL_TOP/APPS_instancename_hostname-ora.env\n   ```\n4. (Optional) Run the configure script if needed: `#. /configure_EBS.sh` (available only on UNIX).\n5. After the script completes, continue with the web‑based steps to deploy the service.\nThese commands prepare the Oracle EBS environment so the Oracle EBS Suite driver can generate and deploy its SOAP or REST endpoint."
+      "output": "To create a SOAP Web Service endpoint for the Oracle EBS driver:\n1. Run the provided shell script on the Oracle EBS server, setting the environment variables:\n   ```\n   export FND_TOP=/u01/app/VIS/apps/apps_st/appl/fnd/12.0.0\n   export APPL_TOP=/u01/app/VIS/apps/apps_st/appl\n   . $APPL_TOP/APPS_instancename_hostname-ora.env\n   #. /configure_EBS.sh\n   ```\n2. Log into the Oracle EBS system using a web browser as the **sysadmin** user.\n3. From the Dashboard, click **Integrated SOA Gateway**.\n4. Choose **Integration Repository**, change the view to **By Product Family**, and expand **Novell IDM Suite > Driver > Subscriber > IDM Subscriber**.\n5. Click **SOAP Web Service**, then **Generate WSDL**, and finally **Deploy**.\n6. In the Procedures and Functions list, select **Subscribe Identity Manager Events**, click **Create Grant**, choose the user **sysadmin**, and click **Apply**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a REST Web Service endpoint for the Oracle EBS driver?",
+      "input": "",
+      "output": "To create a REST Web Service endpoint for the Oracle EBS driver:\n1. Run the shell script on the Oracle EBS server with the appropriate **FND_TOP** and **APPL_TOP** values (see the script example in the documentation).\n2. Log in to the Oracle EBS system as **sysadmin**.\n3. Open **Integrated SOA Gateway**, go to **Integration Repository**, view **By Product Family**, and expand **Novell IDM Suite > Driver > Subscriber > IDM Subscriber**.\n4. Click **REST Web Service** and perform the following steps:\n   a. Enter a name for the endpoint in the **Service Alias** field (e.g., `idmebs`).\n   b. Check the **Subscribe IDM Events** box.\n   c. Click **Deploy**.\n   d. Click **View WADL** and copy the resource base URL from the WADL file. Use the URL without quotes and without a trailing slash, for example:\n      `http://oracleebs.labs.blr.novell.com:8010/webservices/rest/idmebs`\n5. After viewing the WADL, click **Generate WSDL** and then **Deploy**.\n6. In the Procedures and Functions list, select **Subscribe Identity Manager Events**, click **Create Grant**, select **sysadmin**, and click **Apply**."
     },
     {
       "category": "config",
-      "instruction": "Which environment variables must be specified for the Oracle EBS Suite driver when running the endpoint creation script, and what do they represent?",
+      "instruction": "Which environment variables must be set when running the configuration script for the Oracle EBS driver, and what are example values?",
       "input": "",
-      "output": "When running the endpoint creation script for the Oracle EBS Suite driver you must set:\n- **FND_TOP** – the full path to the Oracle EBS Foundation layer directory (e.g., `/u01/app/VIS/apps/apps_st/appl/fnd/12.0.0`).\n- **APPL_TOP** – the full path to the Oracle EBS application tier directory (e.g., `/u01/app/VIS/apps/apps_st/appl`).\nThese variables point the script to the correct installation locations of the EBS framework and application files needed by the Oracle EBS Suite driver."
+      "output": "When running the configuration script for the Oracle EBS driver, you must set the following environment variables:\n- **FND_TOP** – Example value: `/u01/app/VIS/apps/apps_st/appl/fnd/12.0.0`\n- **APPL_TOP** – Example value: `/u01/app/VIS/apps/apps_st/appl`\nThese variables point to the Oracle EBS installation directories and are required before sourcing the instance environment file."
     },
     {
-      "category": "howto",
-      "instruction": "What are the exact steps to deploy a REST endpoint for the Oracle EBS Suite driver through the Integrated SOA Gateway UI?",
+      "category": "config",
+      "instruction": "What is the required format for the REST endpoint URL in the Oracle EBS driver after viewing the WADL?",
       "input": "",
-      "output": "To deploy a REST endpoint for the Oracle EBS Suite driver:\n1. Log in to Oracle EBS as the **sysadmin** user using a web browser.\n2. On the Dashboard, click **Integrated SOA Gateway**.\n3. Select **Integration Repository** under the Integrated SOA Gateway tab and change the view to **By Product Family**.\n4. Expand the view and click **Novell IDM Suite > Driver > Subscriber > IDM Subscriber**.\n5. Click **REST Web Service**.\n6. In the REST configuration pane:\n   a. Enter a Service Alias (e.g., `idmebs`).\n   b. Check the **Subscribe IDM Events** box.\n   c. Click **Deploy**.\n   d. Click **View WADL** and copy the resource base URL (do not include quotes or a trailing slash). Example URL: `http://oracleebs.labs.blr.novell.com:8010/webservices/rest/idmebs`.\n7. Use that URL as the REST endpoint URL for the Oracle EBS Suite driver.\nThese steps complete the REST endpoint deployment for the Oracle EBS Suite driver."
-    },
-    {
-      "category": "troubleshooting",
-      "instruction": "If executing the endpoint creation command for the Oracle EBS Suite driver returns the error \"Can't locate Class/MethodMaker.pm in @INC\", what should you do?",
-      "input": "",
-      "output": "When the Oracle EBS Suite driver shows \"Can't locate Class/MethodMaker.pm in @INC\" during endpoint creation, you need to install the missing Perl modules. Follow the installation instructions provided in the *Oracle E‑Business Suite Integrated SOA Gateway Implementation Guide* (see the Oracle documentation link in the original page). Installing the required Perl modules resolves the error."
+      "output": "The REST endpoint URL for the Oracle EBS driver must be the resource base URL taken from the WADL file, without quotes and without a trailing slash. For example:\n`http://oracleebs.labs.blr.novell.com:8010/webservices/rest/idmebs`"
     },
     {
       "category": "troubleshooting",
-      "instruction": "How can you fix a deployment failure caused by the IRepOverloadSeq attribute in the Oracle EBS Suite driver?",
+      "instruction": "What should you do if you receive the error \"Can't locate Class/MethodMaker.pm in @INC\" while executing the configuration script for the Oracle EBS driver?",
       "input": "",
-      "output": "If deployment of the Oracle EBS Suite driver fails, locate the file `/u01/app/VIS/inst/apps/VIS_sles11sp164-ora/soa/PLSQL/4723/SUBSCRIBE_EVENTS.wsdl`. Open it and remove the line that contains `IRepOverloadSeq=\"1\"` inside the `<operation>` tag. Save the file and then redeploy the SOAP service using the GUI method. This removal resolves the deployment failure."
+      "output": "If the error \"Can't locate Class/MethodMaker.pm in @INC\" appears, you need to install the missing Perl modules on the Oracle EBS server. Refer to the Oracle E‑Business Suite Integrated SOA Gateway Implementation Guide for detailed installation instructions."
     },
     {
-      "category": "explanatory",
-      "instruction": "Why does the Oracle EBS Suite driver require granting the Subscribe Identity Manager Events method to the sysadmin user?",
+      "category": "troubleshooting",
+      "instruction": "How can you resolve a SOAP service deployment failure caused by the IRepOverloadSeq attribute in the Oracle EBS driver?",
       "input": "",
-      "output": "The Oracle EBS Suite driver needs to receive event notifications from Identity Manager. Granting the **Subscribe Identity Manager Events** procedure to the **sysadmin** user authorizes that user’s account to invoke the subscription method, allowing the driver to poll the Oracle database and process IDM events. Without this grant, the driver would be unable to subscribe to or receive the necessary events."
+      "output": "To fix a SOAP service deployment failure in the Oracle EBS driver:\n1. Open the file `/u01/app/VIS/inst/apps/VIS_sles11sp164-ora/soa/PLSQL/4723/SUBSCRIBE_EVENTS.wsdl`.\n2. Locate the `<operation>` tag that contains the attribute `IRepOverloadSeq=\"1\"`.\n3. Remove the entire `IRepOverloadSeq=\"1\"` attribute from that tag.\n4. Save the file.\n5. Use the GUI method in Integrated SOA Gateway to redeploy the SOAP service."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to create and deploy a Web Service endpoint for the Oracle EBS driver.",
+      "input": "",
+      "output": "To create and deploy a Web Service endpoint for the Oracle EBS driver, you must (1) set the FND_TOP and APPL_TOP environment variables and run the provided shell script on the Oracle EBS server, (2) log in as sysadmin and navigate through Integrated SOA Gateway to the Novell IDM Suite subscriber view, (3) for SOAP, generate and deploy the WSDL; for REST, define a service alias, enable Subscribe IDM Events, deploy, view the WADL to obtain the endpoint URL, then generate and deploy the WSDL, (4) grant the Subscribe Identity Manager Events procedure to the sysadmin user, and (5) resolve any deployment issues by installing missing Perl modules or editing the SUBSCRIBE_EVENTS.wsdl file to remove the IRepOverloadSeq attribute."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the corrected `<operation>` tag XML snippet for the Oracle EBS driver after removing the IRepOverloadSeq attribute.",
+      "input": "",
+      "output": "<operation name=\"SubscribeEvents\" soapAction=\"...\">\n    <!-- other attributes and child elements remain unchanged -->\n</operation>"
     }
   ]
 }

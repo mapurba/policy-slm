@@ -1,59 +1,59 @@
 {
-  "driver": "Oracle EBS driver",
+  "driver": "Oracle EBS Suite driver",
   "qa_pairs": [
     {
       "category": "explanatory",
-      "instruction": "What is the purpose of the IDM_DRIVER_S PL/SQL package in the Oracle EBS driver?",
+      "instruction": "What is the purpose of the IDM_DRIVER_S PL/SQL package in the Oracle EBS Suite driver?",
       "input": "",
-      "output": "In the Oracle EBS driver, the IDM_DRIVER_S PL/SQL package is used on the Subscriber channel to invoke built‑in Oracle EBS APIs for creating, updating, or deleting user and employee data. It acts as the bridge that translates Identity Manager change events into calls to the appropriate Oracle EBS system APIs."
-    },
-    {
-      "category": "config",
-      "instruction": "Which Oracle EBS system APIs are used for the User Management module in the Oracle EBS driver?",
-      "input": "",
-      "output": "For the User Management module, the Oracle EBS driver uses the following APIs:\n- fnd_user_pkg.createuser\n- fnd_user_pkg.updateuser"
-    },
-    {
-      "category": "config",
-      "instruction": "According to the Oracle EBS driver documentation, which tables support query operations?",
-      "input": "",
-      "output": "The Oracle EBS driver currently supports query operations on the following tables:\n- FND_USER\n- PER_ALL_PEOPLE_F\n- HZ_PARTIES"
+      "output": "In the Oracle EBS Suite driver, the IDM_DRIVER_S PL/SQL package is used on the Subscriber channel to invoke built‑in Oracle EBS APIs for creating, updating, or deleting user and employee data. It acts as the bridge that translates Identity Manager operations into calls to Oracle EBS system APIs."
     },
     {
       "category": "explanatory",
-      "instruction": "What are the four conditions defined for handling new attributes in the Oracle EBS driver, and what actions correspond to each condition?",
+      "instruction": "Which Oracle EBS system APIs are used by the Oracle EBS Suite driver for the User Management, HR Implementation, and TCA modules?",
       "input": "",
-      "output": "The Oracle EBS driver defines four conditions for new attributes:\n1. **Condition 1** – The attribute is supported by an Oracle EBS API and belongs to one of the FND_USER, PER_ALL_PEOPLE_F, or HZ_PARTIES tables. *Action:* No change to the PL/SQL script is required; the attribute can be added directly to the driver schema and filtered for extending.\n2. **Condition 2** – The attribute is supported by an Oracle EBS API but does **not** belong to any of the three tables. *Action:* Modify the query in the IDM_DRIVER_S package to reference the correct table name in the `IF EVENT_NAME = TO_CHAR('oracle.apps.fnd.user.search') THEN` statement.\n3. **Condition 3** – The attribute is **not** supported by any Oracle EBS API but does belong to one of the three tables. *Action:* Identify the required Oracle EBS API, add it to the IDM_DRIVER_S package, and use the existing `EMPLOYEE_OPERATION` and `EXECUTE_EMPLOYEE_API` functions as examples.\n4. **Condition 4** – The attribute is neither supported by an API nor in the three tables. *Action:* Perform the changes described in Condition 2 **and** Condition 3 – add a new API and adjust the query to include the new table."
+      "output": "The Oracle EBS Suite driver uses the following APIs:\n\n*User Management*: `fnd_user_pkg.createuser`, `fnd_user_pkg.updateuser`\n*HR Implementation*: `r_employee_api.create_employee`, `hr_person_api.update_person`, `hr_person_api.delete_person`\n*TCA*: `hz_party_v2pub.create_person`, `hz_party_v2pub.update_person`, `hz_contact_point_v2pub.create_email_contact_point`"
+    },
+    {
+      "category": "config",
+      "instruction": "List the conditions defined for handling new schema attributes in the Oracle EBS Suite driver and the required action for each condition.",
+      "input": "",
+      "output": "The Oracle EBS Suite driver defines four conditions:\n\n1. **Condition 1** – The attribute is supported by an Oracle EBS API and belongs to one of the `FND_USER`, `PER_ALL_PEOPLE_F`, or `HZ_PARTIES` tables. **Action**: No change to the PL/SQL script; add the attribute directly to the driver schema and filter for extending it.\n2. **Condition 2** – The attribute is supported by an API but does **not** belong to any of the three tables. **Action**: Modify the query in the `IDM_DRIVER_S` package to specify the correct table name in the `IF EVENT_NAME = TO_CHAR('oracle.apps.fnd.user.search') THEN` statement.\n3. **Condition 3** – The attribute is **not** supported by any API but belongs to one of the three tables. **Action**: Identify the required Oracle EBS API, add it to the `IDM_DRIVER_S` package (using `EMPLOYEE_OPERATION` and `EXECUTE_EMPLOYEE_API` as examples), and then handle the attribute.\n4. **Condition 4** – The attribute is neither supported by an API nor in the three tables. **Action**: Perform the steps from Condition 2 *and* Condition 3—add a new Oracle EBS API and modify the query to include the new table."
     },
     {
       "category": "howto",
-      "instruction": "How do you modify the IDM_DRIVER_S PL/SQL script to support an attribute that is supported by an API but resides in a non‑FND_USER table in the Oracle EBS driver?",
+      "instruction": "How do you modify the IDM_DRIVER_S PL/SQL script in the Oracle EBS Suite driver when an attribute is supported by an API but resides in a table other than FND_USER, PER_ALL_PEOPLE_F, or HZ_PARTIES?",
       "input": "",
-      "output": "To modify the IDM_DRIVER_S PL/SQL script for such an attribute in the Oracle EBS driver:\n1. Open the IDM_DRIVER_S package source in your PL/SQL editor.\n2. Locate the `IF EVENT_NAME = TO_CHAR('oracle.apps.fnd.user.search') THEN` block.\n3. Within that block, find the `IF` condition that checks the table name.\n4. Change the table name reference from the default (e.g., `FND_USER`) to the appropriate table that holds the attribute (e.g., `PER_ALL_PEOPLE_F` or `HZ_PARTIES`).\n5. Save the package and re‑compile it.\n6. Restart the Oracle EBS driver so the changed script takes effect."
+      "output": "To modify the `IDM_DRIVER_S` PL/SQL script for such an attribute in the Oracle EBS Suite driver:\n1. Open the `IDM_DRIVER_S` package source.\n2. Locate the `IF EVENT_NAME = TO_CHAR('oracle.apps.fnd.user.search') THEN` block.\n3. Within that block, find the query that references the default tables.\n4. Change the table name in the `WHERE` clause to the appropriate table that contains the new attribute.\n5. Save the package and re‑compile it.\n6. Restart the Oracle EBS Suite driver so the changes take effect."
     },
     {
       "category": "howto",
-      "instruction": "What steps are required to verify that newly added attributes are correctly synchronized in the Oracle EBS driver?",
+      "instruction": "What steps should you follow to verify that changes made to the Subscriber channel of the Oracle EBS Suite driver are working correctly?",
       "input": "",
-      "output": "To verify newly added attributes in the Oracle EBS driver:\n1. Create a user in the Identity Vault and include the recently added attributes.\n2. Allow the synchronization process to run and then confirm that the attributes appear in the Oracle EBS system.\n3. Perform a query operation for those attributes (using the supported query tables) and check that the response contains the correct values.\n4. Review the synchronization logs for any errors related to the new attributes."
+      "output": "Verification steps for the Oracle EBS Suite driver:\n1. Create a user in the Identity Vault and include the newly added attributes.\n2. Confirm that those attributes are synchronized to the Oracle EBS instance.\n3. Perform a query operation for the newly added attributes against the EBS tables.\n4. Verify that the query response contains the expected values."
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the XML structure required for a subscriber change event in the Oracle EBS Suite driver, as shown in the documentation.",
+      "input": "",
+      "output": "```xml\n<EBS_EVENT>\n    <EVENT_NAME>oracle.apps.fnd.user.insert</EVENT_NAME>\n    <DRIVER_TYPE>UM</DRIVER_TYPE>\n    <OBJECT TYPE=\"USER\">\n        <x_user_name>IDM_TEST_SUB_996111</x_user_name>\n        <x_description>IDM_TEST_SUB_998</x_description>\n        <x_email_address>IDM_TEST_SUB_998@test.com</x_email_address>\n        <x_fax>19999989</x_fax>\n    </OBJECT>\n</EBS_EVENT>\n```"
     },
     {
       "category": "troubleshooting",
-      "instruction": "If an attribute added to the Oracle EBS driver schema is not being synchronized, what driver‑restart requirement must be observed?",
+      "instruction": "If a newly added attribute does not appear in Oracle EBS after updating the Oracle EBS Suite driver, what could be the cause and how should you resolve it?",
       "input": "",
-      "output": "After making any changes to the IDM_DRIVER_S PL/SQL script or the driver schema, you must **restart the Oracle EBS driver**. Restarting ensures that the updated script and configuration are loaded; without a restart, the new attribute changes will not take effect."
+      "output": "The attribute may fall under **Condition 4** – it is not supported by any existing Oracle EBS API and does not belong to the `FND_USER`, `PER_ALL_PEOPLE_F`, or `HZ_PARTIES` tables. To resolve the issue, add a suitable Oracle EBS API to the `IDM_DRIVER_S` package (as demonstrated with `EMPLOYEE_OPERATION` and `EXECUTE_EMPLOYEE_API`) and modify the query logic to reference the new table containing the attribute. After making these changes, re‑compile the package and restart the Oracle EBS Suite driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Oracle EBS Suite driver documentation state that the driver must be restarted after making changes to the IDM_DRIVER_S PL/SQL package?",
+      "input": "",
+      "output": "The Oracle EBS Suite driver loads the `IDM_DRIVER_S` PL/SQL package into memory when it starts. Any modifications to the package (such as added APIs or query changes) are not picked up until the driver process is re‑initialized. Restarting the driver forces it to reload the updated package, ensuring the new logic is applied during subsequent synchronization operations."
     },
     {
       "category": "summarization",
-      "instruction": "Summarize the process for customizing the Subscriber channel in the Oracle EBS driver.",
+      "instruction": "Summarize the key steps for customizing the Subscriber channel in the Oracle EBS Suite driver.",
       "input": "",
-      "output": "Customizing the Subscriber channel in the Oracle EBS driver involves: (1) reviewing the Oracle EBS APIs listed for each module; (2) determining which condition applies to the new attribute (supported API and table membership); (3) modifying the IDM_DRIVER_S PL/SQL script or adding new API calls as required; (4) adding the attribute to the driver schema; (5) restarting the driver; and (6) verifying synchronization by creating a test user and performing query operations."
-    },
-    {
-      "category": "grounded",
-      "instruction": "Provide an example XML payload for a user insert event that can be used to test the Oracle EBS driver subscriber changes.",
-      "input": "",
-      "output": "<EBS_EVENT>\n    <EVENT_NAME>oracle.apps.fnd.user.insert</EVENT_NAME>\n    <DRIVER_TYPE>UM</DRIVER_TYPE>\n    <OBJECT TYPE=\"USER\">\n        <x_user_name>IDM_TEST_SUB_996111</x_user_name>\n        <x_description>IDM_TEST_SUB_998</x_description>\n        <x_email_address>IDM_TEST_SUB_998@test.com</x_email_address>\n        <x_fax>19999989</x_fax>\n    </OBJECT>\n</EBS_EVENT>"
+      "output": "To customize the Subscriber channel in the Oracle EBS Suite driver:\n1. Identify the Oracle EBS API that supports the desired attribute (see Table C‑1).\n2. Determine which of the four conditions (Table C‑2) applies to the attribute.\n3. Depending on the condition, either add the attribute to the driver schema, modify the `IDM_DRIVER_S` query, or add a new API to the package.\n4. Update the PL/SQL script accordingly and re‑compile it.\n5. Restart the Oracle EBS Suite driver.\n6. Verify the changes by creating a test user with the new attributes and confirming synchronization and query results."
     }
   ]
 }

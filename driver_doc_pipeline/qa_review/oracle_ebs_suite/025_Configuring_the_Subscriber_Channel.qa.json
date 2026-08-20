@@ -3,63 +3,81 @@
   "qa_pairs": [
     {
       "category": "explanatory",
-      "instruction": "What is the purpose of the Subscriber channel in the Oracle EBS driver?",
+      "instruction": "What is the Subscriber channel in the Oracle EBS driver and what does it do?",
       "input": "",
-      "output": "In the Oracle EBS driver, the Subscriber channel is responsible for sending information from the Identity Vault to the Web service. It requires a trust store that contains a certificate issued by the authority that signed the server’s certificate to establish a secure SSL connection."
+      "output": "In the Oracle EBS driver, the Subscriber channel is the component that sends information from the Identity Vault to the Oracle EBS web service. It is the downstream direction of data flow and relies on a secure SSL connection."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Oracle EBS driver require an Oracle wallet for the Subscriber channel?",
+      "input": "",
+      "output": "The Oracle EBS driver uses an Oracle wallet to store authentication and signing credentials—including private keys, certificates, and trusted certificates—so that SSL can provide strong authentication for the Subscriber channel. The wallet’s trust store must contain a certificate from the certificate authority that signed the server’s certificate to establish a secure connection."
     },
     {
       "category": "howto",
-      "instruction": "How do you change the SSLWallet property for the Oracle EBS driver when you are not using the default wallet?",
+      "instruction": "How do you change the SSLWallet property to point to a custom wallet for the Oracle EBS driver?",
       "input": "",
-      "output": "1. Open the **ssl.conf** file used by the Oracle EBS driver.\n2. Locate the **SSLWallet** property.\n3. Change its value to the full path of your custom wallet. For example, set it to `/u01/app/VIS/inst/apps/VIS_hostname/ora/10.1.3/conf/ssl.conf` if the wallet resides in `/etc/ORACLE/WALLETS/pub`.\n4. Save the file."
+      "output": "1. Open the *ssl.conf* file used by the Oracle EBS driver.\n2. Locate the **SSLWallet** property.\n3. Replace its value with the full path to your custom wallet directory. For example:\n   ```\n   SSLWallet=/u01/app/VIS/inst/apps/VIS_hostname/ora/10.1.3/conf/ssl.conf\n   ```\n4. Save the *ssl.conf* file.\n5. Add the same wallet location to the *sqlnet.ora* file as described in the configuration step for the Oracle EBS driver."
     },
     {
       "category": "config",
-      "instruction": "What sqlnet.ora entry should be added to point the Oracle EBS driver to a custom wallet location?",
+      "instruction": "What entry must be added to the sqlnet.ora file to define the wallet location for the Oracle EBS driver?",
       "input": "",
-      "output": "Add the following stanza to the **sqlnet.ora** file (found under `<ORACLE_HOME>/network/admin/<VIS_hostname>`):\n```\nWALLET_LOCATION=\n (SOURCE=\n      (METHOD=file)\n      (METHOD_DATA=\n         (DIRECTORY=/etc/ORACLE/WALLETS/pub)))\n```"
+      "output": "Add the following stanza to the *sqlnet.ora* file (located in `<ORACLE_HOME>/network/admin/<VIS_hostname>`):\n```\nWALLET_LOCATION=\n (SOURCE=\n      (METHOD=file)\n      (METHOD_DATA=\n         (DIRECTORY=/etc/ORACLE/WALLETS/pub)))\n```\nReplace `/etc/ORACLE/WALLETS/pub` with the actual directory that contains your wallet."
     },
     {
       "category": "howto",
-      "instruction": "How do you specify the HTTPS listening port for the Subscriber channel of the Oracle EBS driver?",
+      "instruction": "How do you add a certificate request to a wallet using the Oracle Wallet Manager for the Oracle EBS driver?",
       "input": "",
-      "output": "Edit the **ssl.conf** file used by the Oracle EBS driver and set the **Listen** directive to the desired HTTPS port. For example, to use port 4443, add or modify the line:\n```\nListen 4443\n```"
+      "output": "1. Start Oracle Wallet Manager (on UNIX type `owm`; on Windows use the Start menu entry).\n2. In the Wallet Manager UI, choose **Operations > Add Certificate Request**.\n3. In the dialog, enter a **Common Name** that matches the host name of the Oracle EBS server (do not include the port). This must be the same as the *Server Name* entry in the *httpd.conf* file.\n4. Complete the wizard and accept the generated request."
     },
     {
       "category": "howto",
-      "instruction": "How can you create and import a user certificate into the wallet for the Oracle EBS driver?",
+      "instruction": "How do you export the certificate request you created for the Oracle EBS driver?",
       "input": "",
-      "output": "1. Start Oracle Wallet Manager (UNIX: run `owm`; Windows: Start → Programs → Oracle‑HOME_NAME → Network Administration → Wallet Manager).\n2. **Add a certificate request** – click **Operations > Add Certificate Request**. Enter a Common Name that matches the host name (e.g., `sles11sp164-ora.novell.com`).\n3. **Export the request** – click **Operations > Export Certificate Request** and save the file with a `.csr` extension (e.g., `subreq.csr`).\n4. (Optional) If you do not have a Certificate Authority, create one:\n```\nopenssl req -new -x509 -keyout cakey.pem -out cacert.crt -days 365\n```\n5. **Create the user certificate** using the request and CA files:\n```\nopenssl x509 -req -in subreq.csr -CA cacert.crt -CAkey cakey.pem -CAcreateserial -days 365 > server.crt\n```\n6. **Import the CA certificate** – click **Operations > Import Trusted Certificate** and select `cacert.crt`.\n7. **Import the user certificate** – click **Operations > Import User Certificate** and select `server.crt`.\n8. Save the wallet and restart the Oracle EBS system. If you are using a non‑default wallet location, copy the wallet files to that location."
+      "output": "1. In Oracle Wallet Manager, select **Operations > Export Certificate Request**.\n2. Choose a location and file name ending with the `.csr` extension (for example, `subreq.csr`).\n3. Save the file. The exported `.csr` file can later be used to create a user certificate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a user certificate with OpenSSL for the Oracle EBS driver Subscriber channel?",
+      "input": "",
+      "output": "Run the following OpenSSL commands on a system that has the exported `subreq.csr` file:\n```\n# (Optional) Create a new Certificate Authority if you do not have one\nopenssl req -new -x509 -keyout cakey.pem -out cacert.crt -days 365\n\n# Create the user certificate signed by the CA\nopenssl x509 -req -in subreq.csr -CA cacert.crt -CAkey cakey.pem -CAcreateserial -days 365 > server.crt\n```\nIf you already have a CA, skip the first command and use only the second command to generate `server.crt`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the CA and user certificates into the wallet for the Oracle EBS driver?",
+      "input": "",
+      "output": "1. In Oracle Wallet Manager, choose **Operations > Import Trusted Certificate** and select the `cacert.crt` file to import the CA certificate.\n2. Next, choose **Operations > Import User Certificate** and select the `server.crt` file to import the user certificate.\n3. After both imports complete, click **Save** in the Wallet Manager.\n4. Restart the Oracle EBS system so that the new certificates take effect."
     },
     {
       "category": "howto",
       "instruction": "How do you download the subscriber certificate from the Oracle EBS system for the Oracle EBS driver?",
       "input": "",
-      "output": "1. Open Oracle Wallet Manager and use **Export** to save the certificate file, **or**\n2. Open a web browser and navigate to the HTTPS URL of the Oracle EBS system, specifying the port you configured (e.g., `https://sles11sp164-ora.novell.com:4443`).\n3. When prompted, download the presented certificate file (commonly saved as `subscriber.cer`)."
+      "output": "You have two options:\n1. **Export via Oracle Wallet Manager** – Open the wallet on the Oracle EBS system and use **Operations > Export Certificate** to save the certificate.\n2. **Web browser download** – Open a browser and navigate to the HTTPS URL of the Oracle EBS server using the port configured for the Subscriber channel, for example:\n   `https://sles11sp164-ora.novell.com:4443`\n   The browser will prompt you to download the server’s certificate."
     },
     {
       "category": "config",
-      "instruction": "What keytool command adds the subscriber certificate to the trust store used by the Oracle EBS driver?",
+      "instruction": "What keytool command adds the subscriber certificate to the keystore for the Oracle EBS driver, and what parameters does it require?",
       "input": "",
-      "output": "```\nkeytool -import -file subscriber.cer -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell\n```\nThis command imports `subscriber.cer` into the keystore file `dirxml.keystore` with the store password `novell`."
+      "output": "Use the following command, replacing `subscriber.cer` with the path to the downloaded certificate and `dirxml.keystore` with the desired keystore name:\n```\nkeytool -import -file subscriber.cer -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell\n```\nThe options mean:\n- `-import` – import a certificate.\n- `-file subscriber.cer` – the certificate file to import.\n- `-trustcacerts` – treat the certificate as a trusted CA.\n- `-noprompt` – do not ask for confirmation.\n- `-keystore dirxml.keystore` – name of the keystore file.\n- `-storepass novell` – password for the keystore."
     },
     {
       "category": "howto",
-      "instruction": "How do you configure the Subscriber channel to use a specific keystore file in the Oracle EBS driver?",
+      "instruction": "How do you configure the Subscriber channel to use the keystore file in the Oracle EBS driver?",
       "input": "",
-      "output": "1. Log in to Identity Console and click the **IDM Administration** tile.\n2. On the Driver Dashboard, locate the **Oracle EBS driver** icon and click the upper‑right corner of the icon to open its properties page.\n3. Select the **Configuration** tab and expand the **Driver Parameters** section.\n4. Click the **Subscriber Settings** tab.\n5. In the **Truststore File** field, enter the full path to the keystore you created (e.g., `/path/to/dirxml.keystore`).\n6. Save the configuration."
+      "output": "1. Open **Identity Console** and click the **IDM Administration** tile.\n2. On the **Driver Dashboard**, locate the **Oracle EBS driver** icon and click the upper‑right corner of the icon to open the driver’s properties page.\n3. Select the **Configuration** tab, then expand the **Driver Parameters** section.\n4. Click the **Subscriber Settings** tab.\n5. In the **Truststore File** field, enter the full path to the keystore you created (e.g., `dirxml.keystore`).\n6. Click **Save** to apply the changes."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if you are not using the default wallet location for the Oracle EBS driver?",
+      "input": "",
+      "output": "After configuring the custom wallet location in *ssl.conf* and *sqlnet.ora*, save the wallet in Oracle Wallet Manager and then **copy the wallet files to the custom location** you specified. This ensures the Oracle EBS driver can locate and use the wallet at runtime."
     },
     {
       "category": "summarization",
-      "instruction": "Summarize the end‑to‑end process for configuring the Subscriber channel of the Oracle EBS driver.",
+      "instruction": "Summarize the steps required to configure the Subscriber channel for the Oracle EBS driver.",
       "input": "",
-      "output": "To configure the Subscriber channel of the Oracle EBS driver you must (1) point the driver to a custom wallet by modifying `SSLWallet` in `ssl.conf` and adding a `WALLET_LOCATION` entry to `sqlnet.ora`; (2) set the HTTPS listening port in `ssl.conf` (e.g., `Listen 4443`); (3) use Oracle Wallet Manager to create a certificate request, export it, optionally create a CA, generate a user certificate, and import both the CA and user certificates into the wallet; (4) download the resulting subscriber certificate from the Oracle EBS system; (5) import that certificate into a Java keystore with `keytool`; and (6) configure the Oracle EBS driver’s Subscriber Settings in Identity Console to reference the keystore file, then save the configuration."
-    },
-    {
-      "category": "grounded",
-      "instruction": "Provide the exact sqlnet.ora snippet required to configure a wallet located at /etc/ORACLE/WALLETS/pub for the Oracle EBS driver.",
-      "input": "",
-      "output": "```\nWALLET_LOCATION=\n (SOURCE=\n      (METHOD=file)\n      (METHOD_DATA=\n         (DIRECTORY=/etc/ORACLE/WALLETS/pub)))\n```"
+      "output": "To configure the Subscriber channel for the Oracle EBS driver you must:\n1. Point the **SSLWallet** property in *ssl.conf* to your wallet and add a matching **WALLET_LOCATION** entry in *sqlnet.ora*.\n2. Start Oracle Wallet Manager and add a certificate request (Common Name = server host name).\n3. Export the request as a `.csr` file.\n4. (Optional) Create a CA with OpenSSL, then generate a user certificate (`server.crt`).\n5. Import the CA certificate (`cacert.crt`) and the user certificate (`server.crt`) into the wallet and save.\n6. Restart the Oracle EBS system (and copy the wallet files if using a non‑default location).\n7. Download the subscriber certificate from the Oracle EBS system (via Wallet Manager or a browser).\n8. Import that certificate into a Java keystore using **keytool**.\n9. In Identity Console, open the Oracle EBS driver properties, go to **Subscriber Settings**, and set the **Truststore File** field to the keystore path.\n10. Save the configuration.\nIf mutual authentication is required, follow the additional publisher‑channel keystore instructions and add the certificate to the Subscriber channel’s mutual authentication settings."
     }
   ]
 }

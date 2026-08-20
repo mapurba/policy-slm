@@ -5,43 +5,55 @@
       "category": "explanatory",
       "instruction": "What is the purpose of the Schema Mapping policy in the Oracle EBS driver?",
       "input": "",
-      "output": "In the Oracle EBS driver, the Schema Mapping policy is referenced by the driver object and applies to both the Subscriber (Identity Vault to Oracle EBS) and Publisher (Oracle EBS to Identity Vault) channels. Its purpose is to map schema names—specifically attribute names and class names—between the Identity Vault and the Oracle User database table (idmusrmgt.idm_events) so that user information can be created, deleted, and modified bidirectionally."
+      "output": "The Schema Mapping policy in the Oracle EBS driver maps schema names—specifically attribute names and class names—between the Identity Vault and the Oracle User database table (idmusrmgt.idm_events). It is referenced by the driver object and applies to both the Subscriber (Identity Vault to Oracle EBS) and Publisher (Oracle EBS to Identity Vault) channels."
     },
     {
       "category": "explanatory",
       "instruction": "Why should existing entries in the Schema Mapping policy of the Oracle EBS driver not be modified or removed?",
       "input": "",
-      "output": "The documentation warns that any modification or removal of existing entries in the Schema Mapping policy could destroy the default configuration and the policy processing behavior of the Oracle EBS driver. Keeping the default entries intact ensures that the driver continues to synchronize user data correctly."
+      "output": "Modifying or removing existing entries in the Schema Mapping policy of the Oracle EBS driver could destroy the default configuration and the expected policy processing behavior, leading to synchronization failures or incorrect data mapping."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which channels does the Oracle EBS driver synchronize information between?",
+      "input": "",
+      "output": "The Oracle EBS driver synchronizes information between the Identity Vault and the Oracle EBS system using two channels: the Subscriber channel (Identity Vault to Oracle EBS) and the Publisher channel (Oracle EBS to Identity Vault)."
     },
     {
       "category": "config",
-      "instruction": "What are the default attribute mappings between Identity Vault attributes and Oracle User Management attributes in the Oracle EBS driver?",
+      "instruction": "In the Oracle EBS driver, which Identity Vault attribute maps to the Oracle User Management attribute USER_NAME?",
       "input": "",
-      "output": "Default mappings for Oracle User Management in the Oracle EBS driver:\n\nIdentity Vault Attribute | Oracle User Management Attribute\n--- | ---\nUser | inetOrgPerson\nCN | USER_NAME\nDescription | DESCRIPTION\nFacsimile Telephone Number | FAX\nInternet EMail Address | EMAIL_ADDRESS\nSurname | Mapped as default password if the password is not specified for the user.\nLogin Expiration Time | END_DATE\nloginActivationTime | START_DATE\nPassword Expiration Interval | PASSWORD_LIFESPAN_DAYS (see note below)\nLogin Disabled | LOGIN_DISABLED\nDirXML-ebsPersonId | EMPLOYEE_ID"
+      "output": "The Identity Vault attribute **CN** maps to the Oracle User Management attribute **USER_NAME**."
     },
     {
       "category": "config",
-      "instruction": "In the Oracle EBS driver, which Identity Vault attribute maps to the Oracle HR attribute P_EMAIL_ADDRESS?",
+      "instruction": "What Identity Vault attribute maps to the Oracle User Management attribute PASSWORD_LIFESPAN_DAYS, and what is the important note associated with it in the Oracle EBS driver?",
       "input": "",
-      "output": "In the Oracle EBS driver, the Identity Vault attribute **Internet EMail Address** maps to the Oracle HR attribute **P_EMAIL_ADDRESS**."
+      "output": "The Identity Vault attribute **PASSWORD_LIFESPAN_DAYS** maps to the Oracle User Management attribute **Password Expiration Interval**. Important note: if the Password Expiration field in Oracle EBS is set to **Accesses**, the password expiration interval is turned off, the driver cannot synchronize the change to the Identity Vault, and synchronization fails. The changes synchronize correctly only when the interval is set to a number of days."
     },
     {
       "category": "config",
-      "instruction": "Which Identity Vault attribute corresponds to the Oracle TCA attribute TCA_PERSON_FIRST_NAME in the Oracle EBS driver?",
+      "instruction": "List the default attribute mappings between Oracle HR attributes and Identity Vault attributes in the Oracle EBS driver.",
       "input": "",
-      "output": "In the Oracle EBS driver, the Identity Vault attribute **Given Name** maps to the Oracle TCA attribute **TCA_PERSON_FIRST_NAME**."
+      "output": "Default Oracle HR to Identity Vault attribute mappings:\n\n| Identity Vault Attribute | Oracle HR Attribute |\n|--------------------------|----------------------|\n| User                     | inetOrgPerson        |\n| Internet EMail Address   | P_EMAIL_ADDRESS      |\n| Surname                  | P_LAST_NAME          |\n| Given Name               | P_FIRST_NAME         |\n| mailstop                 | P_MAILSTOP           |\n| L                        | P_INTERNAL_LOCATION  |\n| Initials                 | P_MIDDLE_NAMES       |\n| DirXML-ebsGender         | P_SEX                |"
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the default attribute mappings for Oracle TCA attributes to Identity Vault attributes as defined in the Oracle EBS driver.",
+      "input": "",
+      "output": "Default Oracle TCA to Identity Vault attribute mappings:\n\n| Identity Vault Attribute      | Oracle TCA Attribute |\n|-------------------------------|----------------------|\n| User                          | inetOrgPerson        |\n| CN                            | USER_NAME            |\n| Description                   | DESCRIPTION          |\n| Facsimile Telephone Number    | FAX                  |\n| Login Expiration Time         | END_DATE             |\n| loginActivationTime           | START_DATE           |\n| Password Expiration Interval  | PASSWORD_LIFESPAN_DAYS |\n| Internet EMail Address        | TCA_EMAIL_ADDRESS    |\n| Login Disabled                | LOGIN_DISABLED       |\n| Surname                       | TCA_PERSON_LAST_NAME |\n| Given Name                    | TCA_PERSON_FIRST_NAME |\n| EMail Address                 | EMAIL_ADDRESS        |\n| Initials                      | TCA_PERSON_MIDDLE_NAME |"
     },
     {
       "category": "troubleshooting",
-      "instruction": "What problem occurs if the Password Expiration field is set to 'Accesses' in the Oracle EBS system, and how can it be resolved for the Oracle EBS driver?",
+      "instruction": "In the Oracle EBS driver, what issue arises when the Password Expiration field is set to Accesses, and how can it be avoided?",
       "input": "",
-      "output": "If the Password Expiration field in Oracle EBS is set to **Accesses**, the password expiration interval is turned off. The Oracle EBS driver then fails to synchronize password expiration changes with the Identity Vault because the Identity Vault has no corresponding attribute for Accesses. To resolve the issue, configure the Password Expiration Interval to a numeric value representing the number of days; this allows the driver to synchronize the password expiration correctly."
+      "output": "When the Password Expiration field in Oracle EBS is set to **Accesses**, the driver cannot map a corresponding attribute in the Identity Vault, causing the password expiration interval synchronization to fail. To avoid this issue, configure the Password Expiration field to a numeric number of days instead of Accesses."
     },
     {
       "category": "summarization",
-      "instruction": "Summarize the key points about schema mapping for the Oracle EBS driver.",
+      "instruction": "Summarize the key points of the 8.0 Schema Mapping page for the Oracle EBS driver.",
       "input": "",
-      "output": "The Oracle EBS driver uses a Schema Mapping policy for both Subscriber and Publisher channels to map attribute and class names between the Identity Vault and Oracle EBS tables. Default mappings are provided for User Management, HR, and TCA modules (as shown in Tables 8-1, 8-2, and 8-3). Modifying or removing existing mappings can break default behavior, while adding new mappings is optional. A special note applies to the Password Expiration Interval: setting the Oracle EBS password expiration to \"Accesses\" disables synchronization, so a numeric day count must be used for proper sync."
+      "output": "The 8.0 Schema Mapping page for the Oracle EBS driver explains that a Schema Mapping policy connects attribute and class names between the Identity Vault and Oracle EBS (idmusrmgt.idm_events) for both Subscriber and Publisher channels. Modifying default mappings can break synchronization, while adding new mappings is optional. The page lists default attribute mappings for Oracle User Management, HR, and TCA modules. A notable caveat is that setting the Oracle password expiration field to *Accesses* disables synchronization of the PASSWORD_LIFESPAN_DAYS attribute; using a numeric day value resolves this."
     }
   ]
 }
