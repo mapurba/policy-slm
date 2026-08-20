@@ -1,0 +1,59 @@
+{
+  "driver": "BI Implementation Middleware driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the BI Implementation Middleware driver not require Java to be installed on the connected IBM i system?",
+      "input": "",
+      "output": "The BI Implementation Middleware driver uses an embedded Remote Loader, so all required runtime components are included in the driver shim itself. Because the Remote Loader is built into the shim, there is no need to install a separate Java runtime on the connected IBM i system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the BI Implementation Middleware driver shim on an IBM i system?",
+      "input": "",
+      "output": "To install the BI Implementation Middleware driver shim on an IBM i system, follow these steps:\n1. Sign on as QSECOFR (or an equivalent user) on the target IBM i system.\n2. Create a temporary save file to hold the driver shim distribution package:\n   ```\n   CRTSAVF FILE(QSYS/NOVELLDIST)\n   ```\n3. From a workstation, FTP the i5osdrv.sav file to the newly created save file:\n   ```\n   >ftp server_address\n   (Authenticate to the server)\n   ftp> cd qsys\n   ftp> bin\n   ftp> put i5osdrv.sav novelldist.file\n   ftp> quit\n   ```\n4. Restore the driver shim distribution library on the IBM i system:\n   ```\n   RSTLIB SAVLIB(NOVELLDIST) DEV(*SAVF) SAVF(QSYS/NOVELLDIST)\n   ```\n5. Delete the temporary save file:\n   ```\n   DLTF FILE(QSYS/NOVELLDIST)\n   ```\n6. Run the installation program:\n   ```\n   CALL PGM(NOVELLDIST/INSTALL)\n   ```\n7. Respond to the installation prompts, providing the license agreement, driver library name (default I5OSDRV), IFS path (default /usr/local/i5osdrv), TCP port (default 8090), user profile, subsystem, job queue, autostart option, exits to install, passwords, and LDAP server information as described in the prompts.\n8. Start the driver shim by entering `GO I5OSDRV/I5OSDRV` and selecting option 1 (substituting your library name if you chose a different one)."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default library name and IFS path used by the BI Implementation Middleware driver shim during installation?",
+      "input": "",
+      "output": "During installation, the BI Implementation Middleware driver shim defaults to the library name **I5OSDRV** and the Integrated File System path **/usr/local/i5osdrv**. These defaults are presented in the prompts:\n```\nLibrary: I5OSDRV\n```\n```\nIFS Path: /user/local/i5osdrv\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which TCP port does the BI Implementation Middleware driver shim listen on by default, and how can this be changed during installation?",
+      "input": "",
+      "output": "The BI Implementation Middleware driver shim listens on TCP port **8090** by default. During the installation prompts you are asked to \"Specify the TCP port number for the driver shim to listen on,\" allowing you to enter a different port number if required."
+    },
+    {
+      "category": "config",
+      "instruction": "What special privileges must the user profile have for the BI Implementation Middleware driver, and how does the installer handle profile creation?",
+      "input": "",
+      "output": "The user profile used by the BI Implementation Middleware driver must have the **\\*SECADM** and **\\*ALLOBJ** special privileges. During installation you can choose to create a new profile (the installer will set these privileges) by responding \"Create New Profile: Y\" and providing a profile name (default **I5OSDRV**), or you can specify an existing profile that already has the required privileges."
+    },
+    {
+      "category": "config",
+      "instruction": "Which subsystem and job queue are recommended for the BI Implementation Middleware driver, and how are they specified during installation?",
+      "input": "",
+      "output": "The installation prompts for the BI Implementation Middleware driver ask you to specify a subsystem and a job queue. The default values shown in the prompts are:\n- **Subsystem:** QSYSWRK\n- **Job Queue:** QSYSNOMAX\nYou can accept these defaults or enter alternative subsystem and job queue names as needed."
+    },
+    {
+      "category": "config",
+      "instruction": "What exit installations are required for the BI Implementation Middleware driver to publish profile, distribution directory, and password changes, and how are they selected during installation?",
+      "input": "",
+      "output": "To enable the BI Implementation Middleware driver to publish changes to the Identity Vault, you must install the following exits during installation:\n- **Profile Exits:**\n  - QIBM_QSY_CHG_PROFILE\n  - QIBM_QSY_CRT_PROFILE\n  - QIBM_QSY_DLT_PROFILE\n  - QIBM_QSY_RST_PROFILE\n- **Distribution Directory Exit:**\n  - QIBM_QOK_NOTIFY\n- **Password Exit:**\n  - QIBM_QSY_VLD_PASSWRD\nThe installer presents prompts such as \"Install Profile Exits: Y\" and lists the specific exit names. Answer \"Y\" to each prompt to install the corresponding exits."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the BI Implementation Middleware driver fails to start because of insufficient user privileges, what is the likely cause and how can it be resolved?",
+      "input": "",
+      "output": "A common cause for the BI Implementation Middleware driver failing to start is that the user profile assigned to the driver does not have the required **\\*SECADM** and **\\*ALLOBJ** special privileges. To resolve the issue, ensure the specified user profile either is newly created by the installer (which automatically assigns those privileges) or, if using an existing profile, manually grant the **\\*SECADM** and **\\*ALLOBJ** privileges to that profile before starting the driver."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the key steps and default settings involved in installing the BI Implementation Middleware driver shim on an IBM i system.",
+      "input": "",
+      "output": "The BI Implementation Middleware driver shim is installed on an IBM i system by creating a temporary save file, FTP‑transferring the i5osdrv.sav package, restoring the library, deleting the temporary file, and running the INSTALL program. During installation you accept the license, accept defaults of library **I5OSDRV**, IFS path **/usr/local/i5osdrv**, TCP port **8090**, and provide a user profile with \\*SECADM and \\*ALLOBJ privileges (default profile **I5OSDRV**). You also set the subsystem (**QSYSWRK**), job queue (**QSYSNOMAX**), enable autostart, install required profile, distribution directory, and password exits, enter Remote Loader and driver object passwords, and specify the Metadirectory server’s LDAP host and SSL port. Finally you start the shim with `GO I5OSDRV/I5OSDRV` and select option 1."
+    }
+  ]
+}
