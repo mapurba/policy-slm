@@ -1,0 +1,77 @@
+{
+  "driver": "Epic driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why must you choose between provisioning EMP accounts or SER records when configuring the Epic driver?",
+      "input": "",
+      "output": "In the Epic driver, a single driver instance can maintain only one association per user, so it cannot be configured for both EMP and SER simultaneously; configuring both would require two associations for the same user, which is not allowed. The choice determines whether the \"Epic EMP Default Configuration\" package or the \"Epic SER Default Configuration\" package is applied, along with the matching entitlement package."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you decide whether to configure the Epic driver for EMP accounts or for SER records?",
+      "input": "",
+      "output": "1. Review the provisioning requirements for your environment.\n2. Determine if you need to manage employee (EMP) accounts or service (SER) records.\n3. Choose one of the two options because the Epic driver can maintain only a single association per user.\n4. Apply the \"Epic Base\" package to the driver regardless of the choice.\n5. If you selected EMP provisioning, apply the \"Epic EMP Default Configuration\" package and the corresponding entitlement package.\n6. If you selected SER provisioning, apply the \"Epic SER Default Configuration\" package and the corresponding entitlement package.\n7. Ensure that the selected configuration matches the intended use before completing the driver setup."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the common driver set parameter for specifying the user container in the Epic driver?",
+      "input": "",
+      "output": "Parameter: **User Container** – Description: DN of base container for user objects."
+    },
+    {
+      "category": "config",
+      "instruction": "Which authentication parameters must be set for the Epic driver and what do they represent?",
+      "input": "",
+      "output": "Parameter | Description\n--- | ---\n**Authentication ID** | ID of the Epic Service Account. The format is emp$<ID>.\n**Set Password** | Password of the Epic Service Account.\n**Connection Information** | URL of the Epic Interconnect Server endpoint."
+    },
+    {
+      "category": "config",
+      "instruction": "List the general driver options available for the Epic driver and briefly describe each.",
+      "input": "",
+      "output": "Parameter | Description\n--- | ---\n**Epic Version** | Version of the Epic implementation; determines the Epic schema supported by the driver.\n**Epic Environment** | Select Production or Non-Production.\n**ID Types** | List of custom ID types (Item 20700/20701) to support; when added, they appear in the Schema as IDType-<value>.\n**Trust All Certs** | Select Yes or No; configures whether the driver trusts all certificates when establishing the HTTPS connection to the Epic SOAP endpoint (setting Yes poses security risks such as potential MITM attacks).\n**Enable Data Courier Log File** | Select Yes or No.\n**Force Contact on all Updates** | Select Yes or No; if Yes, Epic creates a new contact record on every update from the driver.\n**Audit User** | External ID of the user in Epic identified as the creator of new records; usually left blank.\n**Audit User Password** | Password for the Audit User.\n**Audit User IDType** | ID type of the audit user’s ID; generally set to External.\n**SER Configuration** | Select Show or Hide; choose Show when the driver is used for SER record management.\n**Custom Attribute for SER ID in Epic** | SER record identifier INI Descriptor (e.g., PDS). Epic requires a unique identifier type for SER record IDs.\n**Custom Attribute Type for SER ID in Epic** | SER record identifier INI # for the above type (e.g., 200).\n**SER Blueprint Override** | Default value (1) allows overriding assigned Blueprints in Epic."
+    },
+    {
+      "category": "config",
+      "instruction": "What EMP‑specific driver options are referenced by Global Configuration Values in the Epic driver?",
+      "input": "",
+      "output": "Parameter | Description\n--- | ---\n**Epic Date Format** | Format pattern for dates as configured in the Epic environment (e.g., \"MM-dd-yyyy\" or \"yyyy.MM.dd\").\n**Custom Epic ID Types** | List of custom ID types to support (example: \"POS_VENDOR_ID\"); generally not needed.\n**Matching Attribute** | Identity Vault (eDirectory) attribute used when matching Epic records (e.g., “CN” or “workforceID”).\n**Matching ID Type** | Epic ID Type used when searching for Epic records (e.g., “SystemLogin”)."
+    },
+    {
+      "category": "config",
+      "instruction": "What SER‑specific driver options can be configured for the Epic driver?",
+      "input": "",
+      "output": "Parameter | Description\n--- | ---\n**SER Configuration** | Select Show or Hide; choose Show when the driver is used for SER record management.\n**Custom Attribute for SER ID in Epic** | SER record identifier INI Descriptor (e.g., PDS). Required for a unique Epic identifier to hold the SER record ID.\n**Custom Attribute Type for SER ID in Epic** | SER record identifier INI # for the above type (e.g., 200).\n**SER Blueprint Override** | Default value (1) allows overriding assigned Blueprints in Epic."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the custom entitlement parameters available for the Epic driver and what default entitlements do they include for EMP and SER management?",
+      "input": "",
+      "output": "Parameter | Description\n--- | ---\n**List of Custom Entitlements** | List of entitlement names that the driver will process during a CodeMapRefresh request. For EMP record management, the default entitlements are AppliedTemplate, AvailableTemplate, DefaultTemplate, ExternalIdentifier, InBasketClassification, Subtemplate, and UserAccount. For SER record management, the default entitlements are Blueprint and SERRecord."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameters control account activation and deactivation behavior in the EMP Default Configuration of the Epic driver?",
+      "input": "",
+      "output": "Parameter | Description\n--- | ---\n**Action to take when ‘User Account’ is deleted in IDV** | Select Inactivate Account or Block Account.\n**Value for IsBlocked** | Select True or False; determines the Epic record’s IsBlocked value when Inactivate Account is selected.\n**Text to send as ‘Block Comment’** | Text included to document the reason for blocking (used for both Inactivate and Block options).\n**Value for IsActive** | Select True or False; determines the Epic record’s IsActive value when Block Account is selected.\n**Synchronize ‘Login Disabled’ attribute** | Select whether changes to the 'Login Disabled' attribute in IDVault should be synced.\n**Synchronize Account Lockout** | Select Yes or No; determines whether the Epic record’s IsBlocked status is set when the IDV user account is locked by intruder detection."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the \"Enable UserAccount Entitlement\" setting affect account provisioning in the Epic driver?",
+      "input": "",
+      "output": "When **Enable UserAccount Entitlement** is set to Yes, the driver uses entitlement agents to control account creation and deletion. Accounts are only created or disabled when the UserAccount entitlement is granted to or revoked from a user. If this setting is Yes, one of the entitlement agents (Role‑Based Entitlements, Workflow, or Roles Based Provisioning Module) must be installed and configured for the driver to operate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Trust All Certs option in the Epic driver and what are the security implications?",
+      "input": "",
+      "output": "1. Open the Epic driver configuration screen.\n2. Locate the **Trust All Certs** driver option.\n3. Select **Yes** to trust all certificates when establishing the HTTPS connection to the Epic SOAP endpoint, or select **No** to enforce normal certificate validation.\n4. Save the configuration.\n\nSecurity implication: Selecting **Yes** disables certificate validation, which can expose the system to man‑in‑the‑middle (MITM) attacks because the driver will accept any certificates presented by the Epic endpoint."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the essential configuration steps and key parameters needed to set up the Epic driver for EMP account provisioning.",
+      "input": "",
+      "output": "To configure the Epic driver for EMP account provisioning, apply the \"Epic Base\" package and the \"Epic EMP Default Configuration\" package with the matching entitlement package. Set the common driver set parameter **User Container** to the DN of the base user container. Provide authentication details (**Authentication ID**, **Set Password**, **Connection Information**). Configure general driver options such as **Epic Version**, **Epic Environment**, **ID Types**, and **Trust All Certs** as appropriate. Define EMP‑specific options via GCVs: **Epic Date Format**, **Custom Epic ID Types**, **Matching Attribute**, and **Matching ID Type**. Adjust EMP Default Configuration parameters for account activation/deactivation (e.g., **Action to take when ‘User Account’ is deleted**, **Value for IsBlocked**, **Synchronize Account Lockout**). Enable **UserAccount Entitlement** if entitlement‑based provisioning is desired, and configure any additional EMP entitlements needed. Finally, save the configuration and verify connectivity to the Epic Interconnect Server."
+    }
+  ]
+}

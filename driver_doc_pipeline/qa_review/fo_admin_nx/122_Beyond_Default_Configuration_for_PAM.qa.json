@@ -1,0 +1,41 @@
+{
+  "driver": "FO Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the FO Admin Nx driver require SSHD to be PAM‑compliant when authenticating users?",
+      "input": "",
+      "output": "The FO Admin Nx driver uses the PAM (Pluggable Authentication Modules) interface to verify user credentials. For this integration to work, the SSH daemon (SSHD) must support PAM so that it can forward authentication requests to the PAM stack used by the FO Admin Nx driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure sshd_config for the FO Admin Nx driver to enable PAM authentication?",
+      "input": "",
+      "output": "1. Open the SSH daemon configuration file (typically /etc/ssh/sshd_config) with a text editor.\n2. Add or modify the following directives:\n   ```\n   PasswordAuthentication yes\n   ChallengeResponseAuthentication no\n   UsePAM yes\n   ```\n3. Save the file and exit the editor.\n4. Restart or reload the SSH service to apply the changes (e.g., `systemctl restart sshd` or `service sshd reload`).\n5. Verify that the SSH daemon is now PAM‑compliant by attempting a login that uses the FO Admin Nx driver’s PAM configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the recommended sshd_config directives and their required values for the FO Admin Nx driver?",
+      "input": "",
+      "output": "The FO Admin Nx driver documentation recommends the following settings in sshd_config:\n\n- **PasswordAuthentication** – set to **yes**\n- **ChallengeResponseAuthentication** – set to **no**\n- **UsePAM** – set to **yes**\n\nThese directives ensure that password authentication is permitted, challenge‑response mechanisms are disabled, and PAM integration is enabled."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If user authentication fails through the FO Admin Nx driver when using SSH, which sshd_config settings should you verify?",
+      "input": "",
+      "output": "Check that the following directives in sshd_config match the recommended values for the FO Admin Nx driver:\n\n- `PasswordAuthentication yes`\n- `ChallengeResponseAuthentication no`\n- `UsePAM yes`\n\nIf any of these settings are missing or have different values, modify them accordingly, then restart the SSH service."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps for configuring SSHD to work with the FO Admin Nx driver via PAM.",
+      "input": "",
+      "output": "To enable PAM authentication for the FO Admin Nx driver through SSHD, ensure your SSH daemon is PAM‑compatible, then edit sshd_config to set `PasswordAuthentication` to **yes**, `ChallengeResponseAuthentication` to **no**, and `UsePAM` to **yes**. After saving the file, restart the SSH service. Consult the sshd_config man pages for additional details."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact sshd_config snippet that the FO Admin Nx driver documentation recommends.",
+      "input": "",
+      "output": "```\nPasswordAuthentication yes\nChallengeResponseAuthentication no\nUsePAM yes\n```"
+    }
+  ]
+}

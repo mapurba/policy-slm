@@ -1,0 +1,71 @@
+{
+  "driver": "JMS driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you open the JMS driver properties page in Identity Console?",
+      "input": "",
+      "output": "In Identity Console, follow these steps:\n1. Click the **IDM Administration** tile.\n2. Select the driver set that contains the JMS driver whose properties you want to edit.\n3. Click the JMS driver icon to display the driver’s properties page."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you edit the JMS driver configuration using Designer?",
+      "input": "",
+      "output": "In Designer, perform the following:\n1. Open a project in the Modeler.\n2. Right‑click the JMS driver line.\n3. Choose **Properties > Driver Configuration**.\nThe configuration screen will show the JMS driver’s sections such as Driver Module, Authentication, Startup Option, and Driver Parameters."
+    },
+    {
+      "category": "config",
+      "instruction": "What Java class name is used for the JMS driver shim when the driver runs locally?",
+      "input": "",
+      "output": "When the JMS driver runs locally, the shim component uses the Java class **com.novell.idm.driver.jms.JMSDriverShim**. This class can be placed either as a compiled *.class* file in the driver’s *classes* directory or packaged in a *.jar* file in the *lib* directory."
+    },
+    {
+      "category": "config",
+      "instruction": "Which option must be set for the JMS driver to connect through a Remote Loader and what password is required?",
+      "input": "",
+      "output": "To connect the JMS driver through a Remote Loader, select the **Connect to Remote Loader** option in the Driver Module section. You must also provide a **Driver Object Password** on the Driver Object Password page; this password is used by the Remote Loader to authenticate to the remote driver shim."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the Remote Loader connection parameters for the JMS driver and what does each parameter represent?",
+      "input": "",
+      "output": "In the Authentication section, the **Remote Loader Connection Parameter** field accepts a space‑separated list of key=value pairs:\n- **hostname** – IP address or DNS name of the Remote Loader server.\n- **port** – TCP/IP port on which the Remote Loader listens (default **8090**).\n- **secureprotocol** – TLS protocol version used (supported values: **TLSv1**, **TLSv1_1**, **TLSv1_2**).\n- **enforceSuiteB** – Set to **true** to require Suite B algorithms (only works with TLS 1.2); set to **false** otherwise.\n- **kmo** – (optional) Name of the certificate used when an SSL connection exists between the Remote Loader and the Identity Manager engine.\nExample: `hostname=10.0.0.1 port=8090 kmo=IDMCertificate`"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JMS driver Authentication section require an Authentication ID, Authentication Context, and Application Password?",
+      "input": "",
+      "output": "The JMS driver’s Authentication section stores the credentials needed for the driver to authenticate to the connected JMS system. **Authentication ID** is the user application ID that passes Identity Vault subscription information to the application (e.g., *Administrator*). **Authentication Context** specifies the IP address or hostname of the server that the driver’s shim should communicate with. **Application Password** is the password for the user identified by the Authentication ID. Together they allow the JMS driver to establish a secure, authenticated connection to the message broker."
+    },
+    {
+      "category": "config",
+      "instruction": "What startup options are available for the JMS driver and what does each option do?",
+      "input": "",
+      "output": "The JMS driver Startup Option section provides four choices:\n- **Auto start** – The driver starts automatically each time the Identity Manager server starts.\n- **Manual** – The driver does not start automatically; it must be started manually via Designer or Identity Console.\n- **Disabled** – The driver’s event cache file is deleted and no new events are stored until the driver state is changed to Manual or Auto start.\n- **Do not automatically synchronize the driver** – Applicable only if the driver was previously disabled; when selected, the driver will not re‑synchronize on the next start. If not selected, the driver re‑synchronizes when started."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter defines the default JMS version for the JMS driver and what value is recommended if you are uncertain?",
+      "input": "",
+      "output": "In the **Driver Options** subsection, the **Default JMS version** parameter specifies the API version the JMS driver uses when communicating with message brokers. If you are uncertain, the recommended value is **1.0.2**, as it is the more widely adopted standard."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure broker authentication credentials (username and password) in the JMS driver?",
+      "input": "",
+      "output": "In the JMS driver configuration, go to **Driver Options** and select **Show connected-related options**. Then:\n1. Check the box to **show** the credentials fields.\n2. Enter the **Username** that the driver should use to authenticate to the message broker.\n3. Enter the **Password** for that username and re‑enter it for validation.\nThese credentials are used when the driver creates connections to the broker."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a remote JMS driver fail to run and how can you fix it?",
+      "input": "",
+      "output": "A remote JMS driver will not run if the required **Driver Object Password** is missing or incorrect. To resolve the issue, open the JMS driver’s **Driver Object Password** page (accessible via Identity Console or Designer) and enter a valid password. This password must match the one configured on the Remote Loader, allowing the Remote Loader to authenticate to the remote driver shim."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main configuration sections of the JMS driver and their purpose.",
+      "input": "",
+      "output": "The JMS driver configuration is organized into several sections:\n- **Driver Module** – Determines whether the driver runs locally (Java shim) or connects remotely via a Remote Loader.\n- **Driver Object Password** – Sets the password the Remote Loader uses to authenticate to the remote driver shim.\n- **Authentication** – Provides the Authentication ID, Context, Application Password, and Remote Loader connection parameters needed to authenticate to the JMS system.\n- **Startup Option** – Controls how the driver starts (Auto, Manual, Disabled) and synchronization behavior.\n- **Driver Parameters** – Includes Driver Options (JMS version, broker ID, JNDI settings), Subscriber Options, and Publisher Options that tune messaging behavior.\n- **ECMAScript** – Lists ECMAScript resource files that extend driver functionality.\n- **Global Configurations** – Lists Global Configuration objects that supply additional GCV definitions for the driver."
+    }
+  ]
+}

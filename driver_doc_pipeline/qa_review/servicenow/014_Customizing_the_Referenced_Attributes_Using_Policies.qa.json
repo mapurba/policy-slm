@@ -1,0 +1,47 @@
+{
+  "driver": "ServiceNow driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are referenced attributes in the ServiceNow driver and why might they need customization?",
+      "input": "",
+      "output": "Referenced attributes in the ServiceNow driver are fields such as Company, Location, and Building that are stored as separate tables in ServiceNow and linked to a user record. They may need customization because the default synchronization may not create or link these records automatically, requiring policies to ensure the attributes exist and are correctly associated with the user during provisioning."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add a custom policy to update the Company attribute for a user in the ServiceNow driver using Designer?",
+      "input": "",
+      "output": "To add a custom policy for the Company attribute in the ServiceNow driver:\n1. In Designer, add the Company attribute to the ServiceNow driver filter and select **Synchronize** under the Subscribe settings.\n2. Right‑click the **Output Transformation Policy**, choose **New**, then **DirXML Script**.\n3. Paste the DirXML script provided (see the policy script in the documentation) into the new policy.\n4. Deploy the driver together with the newly created policy.\nWhen the driver is deployed, the policy will verify whether the company name exists in ServiceNow and either link the existing company to the user or create a new company record and link it."
+    },
+    {
+      "category": "config",
+      "instruction": "Which DirXML elements in the ServiceNow driver policy are used to check if a company record already exists?",
+      "input": "",
+      "output": "The policy uses the following DirXML elements to check for an existing company record:\n- `<do-set-local-variable name=\"companyInstance\" scope=\"policy\">` containing a `<token-query>` that searches the **core_company** class for a record where the **name** attribute matches the variable **companyName**.\n- `<do-if>` with a condition `<if-xpath op=\"not-true\">$companyInstance/../instance</if-xpath>` which evaluates to true when the query does not return an existing instance, indicating the company does not exist."
+    },
+    {
+      "category": "config",
+      "instruction": "What DirXML actions are performed when the company does not exist in ServiceNow according to the ServiceNow driver policy?",
+      "input": "",
+      "output": "When the company does not exist, the policy executes the following DirXML actions inside the `<do-if>` block:\n1. `<do-add-dest-object class-name=\"core_company\" when=\"before\">` creates a new destination object with DN **Companyattr**.\n2. `<do-add-dest-attr-value class-name=\"core_company\" name=\"name\" when=\"before\">` sets the **name** attribute of the new **core_company** object to the value extracted from the modify request (`./modify-attr[@attr-name='company']/add-value/value/text()`).\n3. `<do-add-dest-attr-value class-name=\"sys_user\" name=\"company\">` sets the **company** attribute of the **sys_user** record to the same extracted company name, linking the new company record to the user."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you verify if the ServiceNow driver policy does not link a newly created company to a user after deployment?",
+      "input": "",
+      "output": "If the policy does not link the new company to the user, verify the following in the ServiceNow driver policy:\n- The `<if-attr name=\"company\" op=\"available\"/>` condition correctly detects the presence of the company attribute in the modify request.\n- The XPath expressions (`./modify-attr[@attr-name='company']/add-value/value/text()`) correctly extract the company name.\n- The `<token-query>` for **core_company** uses the correct class name and attribute name (**name**) and that the query returns no instance when the company is absent.\n- The `<do-add-dest-object>` and `<do-add-dest-attr-value>` actions are placed inside the `<do-if>` block and have the correct `class-name` values (**core_company** and **sys_user**).\n- The policy has been deployed with the driver and the driver filter includes the Company attribute with **Synchronize** enabled."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how referenced attributes are customized in the ServiceNow driver using policies.",
+      "input": "",
+      "output": "In the ServiceNow driver, referenced attributes such as Company are customized by creating an Output Transformation Policy in Designer. The policy uses DirXML to examine modify requests, query ServiceNow for existing records, and either link to an existing record or create a new one and link it. The steps include adding the attribute to the driver filter, creating a DirXML script policy, and deploying the driver with the policy so that the policy runs during provisioning."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the DirXML script that verifies the Company attribute and creates the company record if it does not exist, as used in the ServiceNow driver policy.",
+      "input": "",
+      "output": "<rule>\n  <description>Company attribute Verification</description>\n  <conditions>\n   <and>\n    <if-class-name op=\"equal\">sys_user</if-class-name>\n    <if-attr name=\"company\" op=\"available\"/>\n    <if-operation mode=\"nocase\" op=\"equal\">modify</if-operation>\n   </and>\n  </conditions>\n  <actions>\n   <do-set-local-variable name=\"companyName\" scope=\"policy\">\n    <arg-string>\n     <token-xpath expression=\"./modify-attr[@attr-name=&apos;company&apos;]/add-value/value/text()&#xd;&#xa;\"/>\n    </arg-string>\n   </do-set-local-variable>\n   <do-set-local-variable name=\"companyInstance\" scope=\"policy\">\n    <arg-node-set>\n     <token-query class-name=\"core_company\" scope=\"entry\">\n      <arg-match-attr name=\"name\">\n       <arg-value>\n        <token-local-variable name=\"companyName\"/>\n       </arg-value>\n      </arg-match-attr>\n     </token-query>\n    </arg-node-set>\n   </do-set-local-variable>\n   <do-if>\n    <arg-conditions>\n     <and>\n      <if-xpath op=\"not-true\">$companyInstance/../instance</if-xpath>\n     </and>\n    </arg-conditions>\n    <arg-actions>\n     <do-add-dest-object class-name=\"core_company\" when=\"before\">\n      <arg-dn>\n       <token-text xml:space=\"preserve\">Companyattr</token-text>\n      </arg-dn>\n     </do-add-dest-object>\n     <do-add-dest-attr-value class-name=\"core_company\" name=\"name\" when=\"before\">\n      <arg-dn>\n       <token-text xml:space=\"preserve\">Companyattr</token-text>\n      </arg-dn>\n      <arg-value type=\"string\">\n       <token-xpath expression=\"./modify-attr[@attr-name='company']/add-value/value/text()\"/>\n      </arg-value>\n     </do-add-dest-attr-value>\n     <do-add-dest-attr-value class-name=\"sys_user\" name=\"company\">\n      <arg-value type=\"string\">\n       <token-xpath expression=\"./modify-attr[@attr-name='company']/add-value/value/text()\"/>\n      </arg-value>\n     </do-add-dest-attr-value>\n    </arg-actions>\n    <arg-actions/>\n   </do-if>\n  </actions>\n</rule>"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "driver": "Identity Manager Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of configuring PAM for the Identity Manager Fan-Out driver on Linux/UNIX systems?",
+      "input": "",
+      "output": "The Identity Manager Fan-Out driver uses the Pluggable Authentication Modules (PAM) framework to integrate system‑entry services such as login, ssh, passwd and su with Identity Manager. By adding the driver’s PAM module (pam_ascauth) to the appropriate PAM configuration files, authentication requests from those services are redirected to Identity Manager, allowing central management of credentials and policies."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you activate PAM support for the Identity Manager Fan-Out driver using the sample configuration templates?",
+      "input": "",
+      "output": "1. Locate the sample PAM configuration files that are installed with Platform Services. Their locations are listed in the documentation table.\n2. Choose one of the two methods:\n   a. **Replace current file(s)** – copy the supplied sample file (e.g., /usr/local/ASAM/bin/PlatformServices/pam.d) over your existing PAM configuration file(s) if you have never modified them.\n   b. **Use sample(s) as a guide** – open your existing PAM configuration file(s) and manually insert the lines shown in the sample, preserving any custom entries you already have.\n3. Ensure the lines that load the driver’s module (pam_ascauth.so) are present for the services you want to redirect (ssh, passwd, su by default).\n4. Restart any affected services or reboot the system so the new PAM configuration is read."
+    },
+    {
+      "category": "config",
+      "instruction": "Where are the PAM configuration file templates for the Identity Manager Fan-Out driver located on each supported operating system?",
+      "input": "",
+      "output": "For the Identity Manager Fan-Out driver the templates are stored in the following locations:\n\n| Operating System | PAM Configuration File Templates Location |\n|------------------|-------------------------------------------|\n| AIX              | /usr/local/ASAM/bin/PlatformServices/pam.conf.sample |\n| FreeBSD          | /usr/local/ASAM/bin/PlatformServices/pam.d |\n| HP‑UX            | /usr/local/ASAM/bin/PlatformServices/pam.conf.sample |\n| Linux            | /usr/local/ASAM/bin/PlatformServices/pam.d |\n| Solaris          | /usr/local/ASAM/bin/PlatformServices/pam.conf.sample |"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the two methods for using the sample PAM configuration files with the Identity Manager Fan-Out driver, and when should each be used?",
+      "input": "",
+      "output": "1. **Replace current configuration file(s) with provided sample(s).**\n   *Description*: Use the pre‑configured sample files supplied with Platform Services in place of your existing PAM files.\n   *When to use*: If you have never altered the default PAM configuration files that came with your OS, this is the easiest approach.\n   *Applications redirected*: ssh, passwd, su (default configuration).\n\n2. **Use sample(s) as a guide.**\n   *Description*: Manually edit your current PAM configuration files, using the supplied samples as reference.\n   *When to use*: If you have already customized your PAM configuration, or your OS version does not match the supplied sample files.\n   *Applications redirected*: Any services you choose to modify."
+    },
+    {
+      "category": "config",
+      "instruction": "List and explain the control‑flag values that can be used in a pam.conf entry for the Identity Manager Fan-Out driver.",
+      "input": "",
+      "output": "The control‑flag determines how PAM proceeds through a stack of modules:\n\n- **required** – The module must succeed for the overall result to be successful, but processing continues even if it fails.\n- **requisite** – Like *required* but aborts the stack immediately on failure.\n- **sufficient** – If the module succeeds, PAM skips the remaining modules in the stack; if it fails, the result is determined by other modules.\n- **optional** – The module’s success or failure is ignored unless no other module in the stack is marked *required* or *sufficient*.\nThese flags are used when stacking the Identity Manager Fan-Out driver (pam_ascauth) with other PAM modules."
+    },
+    {
+      "category": "config",
+      "instruction": "What options can be passed to the Platform Services PAM module used by the Identity Manager Fan-Out driver, and what does each option do?",
+      "input": "",
+      "output": "The following options are supported by the Platform Services PAM module (pam_ascauth):\n\n| option          | Description |\n|-----------------|-----------------------------------------------|\n| always_fail     | Forces the module to return PAM_AUTH_ERR (useful for testing). |\n| always_ignore   | Forces the module to return PAM_IGNORE (useful for testing). |\n| conf            | Specifies the location of the platform configuration file. Default: /usr/local/ASAM/data/asamplat.conf. Example: conf=/usr/local/ASAM/data/myplat.conf |\n| debug           | Writes debugging records to syslog. |\n| ignore_no_user  | Returns PAM_IGNORE when an authentication request yields “No user.” |\n| must_prompt     | Prompts all users for the current password during a password change, even excluded users. |\n| no_warn         | Suppresses warnings to the requesting application. |\n| root_nds        | Forces the root user to be authenticated by the Identity Manager Fan-Out driver; otherwise root is handled locally. |\n| stats           | Writes authentication statistics to syslog (type of request, result, elapsed time). |\n| succeed_no_user | Returns PAM_SUCCESS when an authentication request yields “No user.” |\n| try_first_pass  | Tries the password supplied by a previous module; if it fails, prompts the user. |\n| use_first_pass  | Uses the password supplied by a previous module; if it fails, the module fails without prompting. |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you modify a SUSE® Linux Enterprise Server sshd PAM configuration to include the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "1. Open the PAM file for sshd, typically `/etc/pam.d/sshd`.\n2. Insert the driver’s PAM line before the common‑auth include, as shown in the example:\n   ```\n   # Identity Manager Fan-Out driver variation\n   auth   sufficient     pam_ascauth.so\n   auth   include        common-auth\n   auth   required       pam_nologin.so\n   ```\n3. Save the file and restart the sshd service (e.g., `systemctl restart sshd`). This adds the Identity Manager Fan-Out driver to the authentication stack while preserving the original common‑auth configuration."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure a Solaris 2.9 PAM file to use the Identity Manager Fan-Out driver for a custom service named OTHER?",
+      "input": "",
+      "output": "1. Edit the Solaris PAM configuration file (e.g., `/etc/pam.conf`).\n2. Add the following fragment for the service name **OTHER**:\n   ```\n   # Identity Manager Fan-Out Driver variation\n   OTHER  auth required     pam_unix_cred.so.1\n   OTHER  auth sufficient   pam_ascauth.so.1 stats\n   OTHER  auth requisite    pam_unix_authtok_get.so.1\n   OTHER  auth required     pam_dhkeys.so.1\n   OTHER  auth required     pam_unix_auth.so.1\n   ```\n3. The `pam_ascauth.so.1` line loads the Identity Manager Fan-Out driver with the `stats` option. Save the file and ensure the PAM service is reloaded (restart the affected service or reboot)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What warning does the documentation give about creating custom PAM configuration files for the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "The documentation warns that you must be familiar with PAM configuration for your specific Linux/UNIX implementation before creating custom PAM files. Misconfiguration can lead to major security exposures, such as allowing logins without passwords or preventing all logins, including root."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to configure PAM for the Identity Manager Fan-Out driver on supported Linux/UNIX platforms.",
+      "input": "",
+      "output": "1. Locate the appropriate sample PAM configuration templates for your OS (see the template location table). 2. Choose a method: replace the existing PAM file with the sample, or use the sample as a guide to manually edit your existing file. 3. Ensure the driver’s PAM module (`pam_ascauth.so` or `pam_ascauth.so.1`) is referenced for the services you want to redirect (ssh, passwd, su by default). 4. Optionally add driver‑specific options (e.g., `stats`, `debug`, `root_nds`) to control behavior. 5. Test the configuration thoroughly, keeping in mind the importance of control flags and the effect on root and other users. 6. Restart affected services or reboot the system to apply the changes."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a pam.conf entry that redirects the ssh service to the Identity Manager Fan-Out driver, using the options `stats` and `debug`, and falls back to the local Unix authentication if the driver fails.",
+      "input": "",
+      "output": "```\nssh   auth   sufficient   pam_ascauth.so   stats,debug\nssh   auth   required     pam_unix.so      try_first_pass\n```"
+    }
+  ]
+}

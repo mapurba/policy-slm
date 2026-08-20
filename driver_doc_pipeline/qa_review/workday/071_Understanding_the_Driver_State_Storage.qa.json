@@ -1,0 +1,59 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the DirXML-DriverStorage attribute in the Workday driver?",
+      "input": "",
+      "output": "In the Workday driver, the DirXML-DriverStorage attribute, stored in Identity Vault, holds an XML document that records the driver’s current status. The driver updates this document periodically and reads it after a restart to resume its operation from the last known state."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How are individual elements formatted in the XML document used by the Workday driver?",
+      "input": "",
+      "output": "Each element in the XML document used by the Workday driver follows the format:\n```\n<Object Class-Poll Type-Status Type>Value</Object Class-Poll Type-Status Type>\n```\nFor example:\n```\n<worker-regular-poll-start-timestamp>03-12-2019 14:37:20</worker-regular-poll-start-timestamp>\n```\nIn this example, \"worker\" is the object class, \"regular-poll\" is the poll type, and \"start-timestamp\" is the status type."
+    },
+    {
+      "category": "config",
+      "instruction": "Which object classes are stored in the XML document of the Workday driver?",
+      "input": "",
+      "output": "The Workday driver stores information for the following object classes in the XML document:\n* Worker\n* Terminated Worker\n* Job Profile\n* Job Family\n* Location\n* Organization\n* Photo"
+    },
+    {
+      "category": "config",
+      "instruction": "What poll types are recorded in the XML document for the Workday driver?",
+      "input": "",
+      "output": "The XML document maintained by the Workday driver records the following poll types:\n* Migration\n* Migration_Restart\n* Regular_Poll"
+    },
+    {
+      "category": "config",
+      "instruction": "List and describe all status types stored in the Workday driver’s XML document.",
+      "input": "",
+      "output": "Table E-1 – Explanation of Status Types for the Workday driver:\n\n| Status Type                     | Description                                                                                               |\n|---------------------------------|-----------------------------------------------------------------------------------------------------------|\n| start-timestamp                 | Start timestamp of the specified latest poll type                                                         |\n| end-timestamp                   | End timestamp of the specified latest poll type                                                           |\n| restart-timestamp               | Restart timestamp of the specified latest poll type                                                       |\n| last-page-poll-start-timestamp  | Start timestamp of the last page that is fetched during the specified latest poll type                    |\n| last-page-poll-end-timestamp    | End timestamp of the last page that is fetched during the specified latest poll type                      |\n| last-poll-timestamp             | The last timestamp for which the polling was requested to the Workday server                              |\n| last-effective-poll-timestamp   | The last timestamp for which the effective polling was requested to the Workday server                    |\n| migration-completed             | Timestamp of the migration completion                                                                      |\n| last-request-doc                | The last request sent to the Workday server, stored in Base64 format (not in conventional format)        |\n| page-count                      | The number of pages fetched during the specified latest poll type                                         |\n| total-page                      | The total number of pages in the Workday response during the specified latest poll type                   |\n| entry-time                      | The entry timestamp for which the polling was requested to the Workday server                            |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the last-request-doc status type in the Workday driver not follow the conventional XML format?",
+      "input": "",
+      "output": "In the Workday driver, the last-request-doc status type stores the exact request that was sent to the Workday server, regardless of object class or poll type. Because it needs to preserve the raw request payload, it is saved in Base64 format and therefore does not use the standard <status-type>Value</status-type> XML element structure."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When does effective polling occur in the Workday driver and which object classes are involved?",
+      "input": "",
+      "output": "Effective polling in the Workday driver occurs once per day and is performed for the Worker and Job Profile object classes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Workday driver resume its operation after a restart using the XML document in DirXML-DriverStorage?",
+      "input": "",
+      "output": "To resume after a restart, the Workday driver follows these steps:\n1. Read the DirXML-DriverStorage attribute from Identity Vault.\n2. Parse the XML document to extract the latest status elements for each object class, poll type, and status type.\n3. Identify the most recent timestamps (e.g., start‑timestamp, end‑timestamp) and page counters (page-count, total-page).\n4. Use the extracted values to determine where the previous poll left off.\n5. Continue polling from the stored last‑page‑poll‑start‑timestamp or last‑poll‑timestamp, fetching any remaining pages.\n6. Update the XML document with new status values as polling proceeds.\nBy using the stored timestamps and counters, the Workday driver can pick up exactly where it stopped before the restart."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about driver state storage for the Workday driver.",
+      "input": "",
+      "output": "The Workday driver records its operational state in an XML document saved in the DirXML-DriverStorage attribute in Identity Vault. Each XML element follows a <ObjectClass-PollType-StatusType>Value</...> format, covering object classes such as Worker, Terminated Worker, Job Profile, Job Family, Location, Organization, and Photo. It stores three poll types—Migration, Migration_Restart, and Regular_Poll—and a set of status types (e.g., start-timestamp, end-timestamp, page-count) that capture timestamps, page counts, and the last request (Base64‑encoded). This stored state enables the driver to resume polling after a restart, and effective polling runs once daily for Worker and Job Profile objects."
+    }
+  ]
+}

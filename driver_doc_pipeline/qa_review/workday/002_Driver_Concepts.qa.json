@@ -1,0 +1,41 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What SOAP version does the Workday driver support and what are the primary SOAP envelope elements it uses?",
+      "input": "",
+      "output": "The Workday driver supports SOAP 1.1. The primary SOAP envelope elements used are the Envelope (the root XML node), the Header (which provides context such as a transaction ID and security information), and the Body (which contains the method-specific information)."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which Human Resource APIs are utilized by the Workday driver when communicating with Workday?",
+      "input": "",
+      "output": "The Workday driver uses several Human Resource APIs from Workday, including: Get_Workers, Get_Worker_Photos, Get_Locations, Get_Organizations, Get_Job_Profiles, Get_Job_Families, Update_Workday_Account, Get_Assign_User-Based_Security_Group, Get_Assign_User-Based_Security_Groups, Put_Assign_User-Based_Security_Groups, Assign_Roles, Change_Other_IDs, Get_Server_Timestamp, and Put_Worker_Photo."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Workday driver poll data from Workday and process the response into Identity Manager events?",
+      "input": "",
+      "output": "In the Workday driver, the data polling and processing occurs as follows:\n1. The driver sends a SOAP request to the Workday service to poll for data.\n2. Workday processes the request and returns a SOAP response to the driver shim.\n3. The driver shim converts the SOAP response into XDS (a specialized XML format) using XSLT style sheets.\n4. The converted XDS data is stored in a cache file.\n5. The Publisher channel periodically reads the cache file, identifies additions or modifications, and stores the polling time for the next cycle.\n6. The driver creates an optimized XDS modify document from the cache and submits it to the Identity Manager Engine.\n7. The Identity Manager Engine uses XDS to represent events in the Identity Vault, which are then passed to the Subscriber channel for further processing.\n8. On the Subscriber side, the driver policy channel (basic policies, DirXML Script, and XSLT style sheets) generates an XDS document that the driver shim converts back into a SOAP request for any required outbound actions."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the two polling methods used by the Workday driver and which object classes are associated with each method?",
+      "input": "",
+      "output": "The Workday driver uses two polling methods:\n* Recurring Polling – occurs at a fixed interval and is used for the Worker, Relation, and Job Profile object classes. It queries Workday for changes since the last successful recurring poll.\n* Scheduled Polling – occurs once a day at a fixed time and is used for the Terminated Workers, Location, Worker Photo, Job Family, and Organization object classes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of how the Workday driver exchanges data with Workday and processes it within Identity Manager.",
+      "input": "",
+      "output": "The Workday driver communicates with Workday over HTTPS using the SOAP 1.1 API. It sends SOAP requests to poll for data, receives SOAP responses, and transforms them into XDS format via XSLT style sheets. The transformed data is cached, and the Publisher channel reads the cache to detect changes, creating optimized XDS modify documents for the Identity Manager Engine. The engine represents these changes as events in the Identity Vault, which are then processed by the Subscriber channel's policy stack (basic policies, DirXML Script, XSLT) to generate outbound SOAP requests as needed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which network protocol does the Workday driver use for communication, and what security transport does it require?",
+      "input": "",
+      "output": "The Workday driver uses the HTTP protocol for communication, but all communication with Workday must occur over HTTPS, ensuring secure transport."
+    }
+  ]
+}

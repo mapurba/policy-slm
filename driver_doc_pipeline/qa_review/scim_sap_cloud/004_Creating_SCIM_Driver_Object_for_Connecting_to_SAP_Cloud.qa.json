@@ -1,0 +1,71 @@
+{
+  "driver": "SCIM SAP Cloud driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What authentication method is supported by the SCIM SAP Cloud driver and why?",
+      "input": "",
+      "output": "The SCIM SAP Cloud driver is currently certified with Basic authentication only. This limitation is noted in the configuration steps where the Authentication Method field must be set to Basic, and the driver does not support other authentication types for SAP Cloud."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a SCIM SAP Cloud driver object in Designer from start to finish?",
+      "input": "",
+      "output": "To create a SCIM SAP Cloud driver object in Designer, follow these steps:\n1. Open Designer.\n2. Click Help > Check for Package Updates and install the required driver packages.\n3. Open your project in the Outline view.\n4. Right‑click the project > New > Identity Vault (or drag the Identity Vault icon to the Modeler window).\n5. In the Add Server Association screen, select Server DN, Identity Manager Version, and Identity Manager Edition, then click OK.\n6. In the Identity Vault Credentials window, enter the Host IP, Username, and Password, optionally select Save Password, and click OK.\n7. Drag the SCIM driver icon from Palette > Tool tab to the Modeler window.\n8. In the Driver Configuration Wizard, select **SCIM Base** and click Next.\n9. On the Select Mandatory Features page, choose **SCIM Default Package**, then Next.\n10. On the Select Optional Features page, select **SCIM SAPCloud Configuration Package** (mandatory) and optionally **SCIM JSON Package**, then Next.\n11. Verify the Important Note items and click Next.\n12. On the Driver Information page, give the driver a name and click Next.\n13. On the Connection Parameters page, select **Basic** for Authentication Method, then click Next.\n14. Enter the required fields (User Name, Password, Application Login URL, Header Fields, Application Truststore File, etc.) as described in the documentation, then click Next.\n15. On the Install SCIM Base page, configure Subscriber Options and Publisher Options as needed, then Next.\n16. On the Schema Settings page, set Refresh Schema on Driver Startup, Schema Options, Resource Type details, and Modifier Settings, then Next.\n17. Review the summary and click Finish. The configured SCIM SAP Cloud driver now appears in Designer."
+    },
+    {
+      "category": "config",
+      "instruction": "Which fields must be filled on the Connection Parameters page for the SCIM SAP Cloud driver and what sample values are shown?",
+      "input": "",
+      "output": "On the Connection Parameters page for the SCIM SAP Cloud driver, you must fill the following fields:\n| Field | Sample Values |\n|---|---|\n| Authentication Method | Select **Basic** |\n| User Name | `<be1a0804-7e91-46a1-be48-8a728fb60ef8>` (User ID obtained from SAP Cloud) |\n| Password | `<user defined password set in SAP Cloud>` |\n| Application Login URL | `<https://tenant_name.accounts.ondemand.com/admin/>` |\n| Header Fields | Name: **Content-Type**<br>Value: **application/scim+json** |\n| Application Truststore File | `</root/scim_configuration/trustSapCloud/SapCloud>` (path to keystore containing trusted DigiCert CA certificate) |\n| Mutual Authentication | Not mandatory for SAP Cloud (can be left disabled) |\n| Proxy Authentication | Defaults to **Hide**; set to **Show** and provide proxy host, port, username, and passwords if required |\n| HTTPS Connection Timeout | Must be greater than 0 (value in minutes) |\n| SCIM 2.0 URL | `<https://<tenant ID>.accounts.ondemand.com/service/scim/>` |\nThese values must be entered before proceeding to the next step of driver configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "What Subscriber Options can be set for the SCIM SAP Cloud driver and how should HTTPS error codes be formatted?",
+      "input": "",
+      "output": "In the Install SCIM Base page for the SCIM SAP Cloud driver, the **Subscriber Options** include the field **HTTPS error codes for retry**. This field expects a list of integer error codes separated by spaces. For example, you can enter `307 408 503 504`. When any of these HTTPS errors are encountered, the driver will automatically retry the operation."
+    },
+    {
+      "category": "config",
+      "instruction": "What Publisher Options are available for the SCIM SAP Cloud driver and what does each option control?",
+      "input": "",
+      "output": "For the SCIM SAP Cloud driver, the **Publisher Options** include:\n- **Enable Publisher Channel**: Select **Yes** to activate the Publisher channel.\n- **Polling interval in minutes**: Determines how often the driver polls resources from SAP Cloud (e.g., `10` minutes).\n- **Heartbeat interval in minutes**: Configures the periodic status message sent on the Publisher channel; default is 10 minutes.\n- **Configured Resources** (appears after initial setup): Choose **All resources** or **Custom Resources**. For custom resources, click the plus icon to add Resource ID and Resource URL for each resource type (User, Group, etc.). Example Resource IDs are `urn:ietf:params:scim:schemas:core:2.0:User` and `urn:ietf:params:scim:schemas:core:2.0:Group`. Example URLs include `https://<tenant ID>.accounts.ondemand.com/service/scim/Users?startIndex=1&count=100` and `https://<tenant ID>.accounts.ondemand.com/service/scim/Groups?startIndex=1&count=100`.\nThese options control how the driver retrieves and publishes changes from SAP Cloud."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you configure Header Fields for the SCIM SAP Cloud driver and what values are required for Basic authentication?",
+      "input": "",
+      "output": "To configure Header Fields for the SCIM SAP Cloud driver, click the green plus icon (![](../graphics/icon_plus_green_n.png)) on the Connection Parameters page. Add a header with:\n- **Name**: `Content-Type`\n- **Value**: `application/scim+json`\nThese header fields are required for the Basic authentication method used by the SCIM SAP Cloud driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What steps are required to set the Application Truststore File for the SCIM SAP Cloud driver?",
+      "input": "",
+      "output": "For the SCIM SAP Cloud driver, set the **Application Truststore File** by providing the full path and filename of the keystore that contains the trusted certificates for SAP Cloud. Example path: `</root/scim_configuration/trustSapCloud/SapCloud>`. Before using the truststore, import the DigiCert CA certificate from the SAP Cloud portal using the command:\n```\nkeytool -import -file <name_of_cert_file> -trustcacerts -noprompt -keystore <filename> -storepass <password>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What options are available in the Schema Settings for the SCIM SAP Cloud driver?",
+      "input": "",
+      "output": "In the Schema Settings page for the SCIM SAP Cloud driver, you can configure:\n- **Refresh Schema on Driver Startup**: Set to **Yes** the first time you load the application schema or after a schema change; change to **No** afterwards.\n- **Schema Options**: Select **SCIM 2.0** (uses the SCIM 2.0 schema defined in RFC7643).\n- **Resource Type**: Define Resource ID (URN) and Resource Endpoint for each resource (Users, Groups, etc.). Example for Users: Resource ID `urn:ietf:params:scim:schemas:core:2.0:Users`, Endpoint `Users`. Example for Groups: Resource ID `urn:ietf:params:scim:schemas:core:2.0:Group`, Endpoint `Groups`.\n- **Modify Method Operation**: Choose **PUT** to make partial updates for both Users and Groups.\n- **Custom Java Class**: Not applicable for SAP Cloud.\n- **Document Handling**: Not applicable for SAP Cloud."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable Mutual Authentication for the SCIM SAP Cloud driver if the connected application supports it?",
+      "input": "",
+      "output": "To enable Mutual Authentication for the SCIM SAP Cloud driver, locate the **Mutual Authentication** field on the Connection Parameters page. Set the field to **Enable** and specify the required information. Ensure that both the server certificates are stored in Identity Manager and the connected application. Note that Mutual Authentication is not mandatory for SAP Cloud, so you may leave it disabled if not needed."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the SCIM SAP Cloud driver repeatedly fails due to HTTPS errors, which Subscriber Option should you adjust and how?",
+      "input": "",
+      "output": "When the SCIM SAP Cloud driver encounters HTTPS errors and retries are not happening, adjust the **HTTPS error codes for retry** field under Subscriber Options. Enter a space‑separated list of integer error codes that should trigger a retry, such as `307 408 503 504`. After updating this list, the driver will retry operations when any of these error codes are received."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration steps for setting up the SCIM SAP Cloud driver in Designer.",
+      "input": "",
+      "output": "To set up the SCIM SAP Cloud driver in Designer, you must:\n1. Install the required driver packages and create an Identity Vault.\n2. Add the SCIM driver to the model, select the SCIM Base, SCIM Default Package, and the mandatory SCIM SAPCloud Configuration Package.\n3. Choose **Basic** authentication and provide SAP Cloud credentials, login URL, header fields, truststore path, and optional proxy settings.\n4. Configure Subscriber Options (HTTPS error codes for retry) and Publisher Options (enable channel, polling and heartbeat intervals, resource URLs).\n5. Define Schema Settings, including refresh schema on startup, SCIM 2.0 schema, resource IDs/endpoints, and set Modify Method to PUT.\n6. Review the summary and finish; the driver appears ready in Designer."
+    }
+  ]
+}

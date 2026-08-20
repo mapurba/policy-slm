@@ -1,0 +1,65 @@
+{
+  "driver": "Work Order driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of using the Work Order driver in the human resource example that does not have an HR driver?",
+      "input": "",
+      "output": "In the Work Order driver, policies are used to postpone activation of a new employee's access until the hire date by creating a work order that later sets the loginDisabled attribute to False on the loginActivationTime."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the filter to allow user objects with loginActivationTime and loginDisabled attributes to synchronize on the Subscriber channel in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, modify the filter to include user objects that have the loginActivationTime and loginDisabled attributes. The sample filter can be viewed at wo-filter.xml; it shows the XML additions that extend the Subscriber channel filter to accept those attributes."
+    },
+    {
+      "category": "config",
+      "instruction": "Which DirXML attributes are set by the Subscriber Command Transform policy in the Work Order driver when it creates a work order?",
+      "input": "",
+      "output": "The Subscriber Command Transform policy in the Work Order driver sets the following DirXML attributes on the new work order:\n- DirXML-nwoContent (the DN of the user object)\n- DirXML-DueDate (set to the value of loginActivationTime)\n- DirXML-nwoStatus (set to \"pending\")\n- DirXML-nwoSendToPublisher (set to True)"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a Create rule in the Work Order driver that vetoes events missing loginActivationTime or loginDisabled, or where loginDisabled is False?",
+      "input": "",
+      "output": "In the Work Order driver, add a Create rule that checks the incoming event. If the loginActivationTime attribute or the loginDisabled attribute is not present, or if loginDisabled is set to False, the rule vetoes (blocks) the event. The sample Create rule is available in wo-create.xml."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What happens if the loginDisabled attribute is not set to True when a new user is created, and how does the Work Order driver respond?",
+      "input": "",
+      "output": "When a new user is created, the Work Order driver checks the loginDisabled attribute. If loginDisabled is not set to True, the Create rule in the Work Order driver blocks the event, preventing the work order from being generated."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the sample configuration steps for postponing user activation using the Work Order driver.",
+      "input": "",
+      "output": "The Work Order driver sample configuration postpones user activation by:\n1. Modifying the Subscriber filter to include loginActivationTime and loginDisabled attributes (wo-filter.xml).\n2. Adding a Create rule that vetoes events lacking those attributes or where loginDisabled is False (wo-create.xml).\n3. Using a Subscriber Command Transform to create a work order with DirXML-nwoContent, DirXML-DueDate, DirXML-nwoStatus, and DirXML-nwoSendToPublisher set to True (wo-sub-cmd-transform.xml).\n4. Optionally adding a Publisher Command Transform that sends an e‑mail notification when the work order is completed (wo-pub-cmd-transform.xml)."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example XML snippet for the Subscriber Command Transform policy in the Work Order driver that sets the required DirXML attributes for a new work order.",
+      "input": "",
+      "output": "<policy name=\"Subscriber Command Transform\" type=\"CommandTransform\">\n  <condition>\n    <event type=\"Add\" objectClass=\"User\"/>\n  </condition>\n  <actions>\n    <set-attribute name=\"DirXML-nwoContent\" value=\"${objectDN}\"/>\n    <set-attribute name=\"DirXML-DueDate\" value=\"${loginActivationTime}\"/>\n    <set-attribute name=\"DirXML-nwoStatus\" value=\"pending\"/>\n    <set-attribute name=\"DirXML-nwoSendToPublisher\" value=\"true\"/>\n  </actions>\n</policy>"
+    },
+    {
+      "category": "config",
+      "instruction": "Which policy in the Work Order driver sends e‑mail notifications after a work order is completed, and what data does it include in the e‑mail?",
+      "input": "",
+      "output": "The Publisher Command Transform policy in the Work Order driver sends e‑mail notifications after a work order is completed. It builds the e‑mail from the work order's status, description, and process log, and then sends it to an administrator."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Work Order driver set the DirXML-nwoSendToPublisher attribute to True when creating a work order?",
+      "input": "",
+      "output": "Setting DirXML-nwoSendToPublisher to True tells the publisher component of the Work Order driver to write the work order into the work order container in the Identity Vault, making it available for processing."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable e‑mail notification of work order completion using the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, add the Publisher Command Transform policy that checks for a DirXML-WorkOrder modify event. The policy builds an e‑mail using the work order's status, description, and process log, then sends it to an administrator. The sample implementation can be viewed at wo-pub-cmd-transform.xml."
+    }
+  ]
+}

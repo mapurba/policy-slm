@@ -1,0 +1,65 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the status level \"Retry\" mean for the Google Apps driver when handling an exception?",
+      "input": "",
+      "output": "In the Google Apps driver, the status level \"Retry\" indicates that the driver will automatically attempt to re‑execute the operation that caused the exception. This status is used for transient errors where a subsequent attempt may succeed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which HTTP response codes cause the Google Apps driver to assign a \"Retry\" status level?",
+      "input": "",
+      "output": "The Google Apps driver assigns a \"Retry\" status level for the following HTTP response codes, which are considered transient server errors:\n- 408 – Client Timeout\n- 500 – Server Error\n- 503 – Unavailable"
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Google Apps driver handle a 403 Forbidden error when the Reason code is \"RateLimitExceeded\"?",
+      "input": "",
+      "output": "When the Google Apps driver receives a 403 Forbidden error with the Reason code \"RateLimitExceeded\", it does not treat the condition as fatal. Instead, the driver:\n1. Applies Google's exponential back‑off algorithm, waiting an increasing amount of time between retries.\n2. Attempts up to five consecutive retries using the back‑off strategy.\n3. If the retry attempts succeed, processing continues; otherwise, after the fifth attempt the driver reports the error.\nThis handling allows the driver to recover from temporary rate‑limit conditions."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should an administrator do when the Google Apps driver throws a com.google.api.client.auth.oauth2.TokenResponseException with error 401 Unauthorized?",
+      "input": "",
+      "output": "A com.google.api.client.auth.oauth2.TokenResponseException with error 401 Unauthorized indicates that the service account used by the Google Apps driver is not authorized to access the target Google service. To resolve the issue, the administrator should:\n1. Verify that the service account has been granted the necessary OAuth2 scopes for the API being accessed.\n2. Ensure the service account is correctly configured in the Google Cloud project.\n3. If required, re‑authorize the service account or grant additional permissions in the Google Admin console.\n4. After correcting the permissions, restart the driver or re‑run the failed operation."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can the \"Access Not Configured. Gmail API has not been used in project\" error be resolved for the Google Apps driver?",
+      "input": "",
+      "output": "The error \"Access Not Configured. Gmail API has not been used in project\" means the Gmail API is disabled for the service account's Google Cloud project. To fix this:\n1. Open the Google Cloud Console for the project associated with the service account.\n2. Navigate to **APIs & Services > Library**.\n3. Search for \"Gmail API\" and click **Enable**.\n4. Wait a few minutes for the change to propagate, then retry the operation in the Google Apps driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When does the Google Apps driver treat a 404 Not Found response as a Success versus an Error?",
+      "input": "",
+      "output": "In the Google Apps driver, a 404 Not Found response is interpreted as:\n- **Success** if the driver was processing a query, because a query that returns no matching object is a valid outcome.\n- **Error** if the driver was attempting to retrieve a specific Google object based on an association value, since the expected object does not exist."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key error handling categories and their corresponding status levels for the Google Apps driver.",
+      "input": "",
+      "output": "The Google Apps driver classifies exceptions into three primary status levels:\n- **Retry** – Used for transient errors such as HTTP 408, 500, 503, Java.io.IOException, and certain Google service exceptions; the driver will attempt the operation again.\n- **Error** – Assigned to permanent or data‑related problems like Bad Request (400 series), InvalidEntryException, ResourceNotFoundException (when not a query), and other service exceptions; the driver records the error without retrying.\n- **Fatal** – Applied to unrecoverable conditions such as Unauthorized (401), Forbidden (403) without RateLimitExceeded, and TokenResponseException 401; processing stops and requires administrator intervention.\nSpecific handling nuances include treating 404 as Success for queries, using exponential back‑off for RateLimitExceeded, and distinguishing RateLimitExceeded from QuotaExceeded."
+    },
+    {
+      "category": "config",
+      "instruction": "What status levels does the Google Apps driver assign to GoogleJsonResponseException for HTTP response codes 401 and 403?",
+      "input": "",
+      "output": "For the Google Apps driver:\n- A GoogleJsonResponseException with HTTP response code **401 – Unauthorized** is assigned the **Fatal** status level.\n- A GoogleJsonResponseException with HTTP response code **403 – Forbidden** is generally assigned the **Fatal** status level, **unless** the Reason code on the exception is \"RateLimitExceeded\", in which case the driver treats it as a **Retry** after applying exponential back‑off."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the difference between RateLimitExceeded and QuotaExceeded as described for the Google Apps driver?",
+      "input": "",
+      "output": "In the context of the Google Apps driver:\n- **RateLimitExceeded** is a transient condition that occurs when the driver sends requests too quickly. The driver can recover by applying an exponential back‑off algorithm and retrying the request.\n- **QuotaExceeded** is a non‑transient condition that occurs when the driver exceeds the allotted daily quota for a service. This cannot be resolved by back‑off; instead, the administrator must request a higher quota from Google."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How should the Google Apps driver respond when a Java.io.IOException occurs?",
+      "input": "",
+      "output": "When a Java.io.IOException is encountered, the Google Apps driver classifies it with the **Retry** status level. The driver will automatically attempt to repeat the operation, assuming the underlying I/O interruption was temporary."
+    }
+  ]
+}

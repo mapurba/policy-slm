@@ -1,0 +1,53 @@
+{
+  "driver": "Sentinel Identity Tracking driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the Sentinel Identity Tracking driver, what is the overall purpose of the schema mapping between Identity Vault attributes and Sentinel tables?",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver uses a default schema mapping to copy user identity information from the Identity Vault into the Sentinel database, populating the USR_IDENTITY table with identity details and the USR_ACCOUNT table with account details, so that Sentinel can correlate events with the correct user identities and their associated accounts."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Sentinel Identity Tracking driver, which Identity Vault attribute is stored in the Sentinel column SRC_IDENTITY_ID?",
+      "input": "",
+      "output": "The Identity Vault attribute **GUID** is stored in the Sentinel column **SRC_IDENTITY_ID**."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Sentinel Identity Tracking driver, how is the manager relationship represented in the Sentinel USR_IDENTITY table?",
+      "input": "",
+      "output": "In the Sentinel Identity Tracking driver, the Identity Vault attribute **manager** is mapped to the Sentinel column **MGR_GUID**. Sentinel uses the object referenced by the Identity Vault “manager” attribute to locate the manager's Sentinel Identity object and stores that object's Sentinel GUID in the MGR_GUID column."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Sentinel Identity Tracking driver, which Sentinel column receives the Identity Vault attribute 'mailstop'?",
+      "input": "",
+      "output": "The Identity Vault attribute **mailstop** is mapped to the Sentinel column **OFFICE_LOC_CD**."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Sentinel Identity Tracking driver, what Sentinel column holds the value of the Identity Vault attribute 'Internet Email Address'?",
+      "input": "",
+      "output": "The Identity Vault attribute **Internet Email Address** is stored in the Sentinel column **PRIMARY_EMAIL**."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Sentinel Identity Tracking driver, how are values from the DirXML-Accounts multi‑valued attribute parsed into the USR_ACCOUNTS table?",
+      "input": "",
+      "output": "For the Sentinel Identity Tracking driver, each DirXML-Accounts value is formatted as `<driver guid>#<account id type>#<account id>#<idv account status>#<app account status>#<app Name>`. The `<account id>` portion is parsed into the Sentinel column **USR_NAME**, and the `<account id type>` portion is parsed into the Sentinel column **AUTHORITY**.\nThe `<idv account status>` is used to set **BEGIN_EFFECTIVE_DATE**, and the `<app account status>` is used to set **END_EFFECTIVE_DATECURRENT_F** (the effective‑end field)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the key points covered in the Sentinel Identity Tracking driver documentation about schema mapping.",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver maps Identity Vault attributes to Sentinel USR_IDENTITY columns (e.g., GUID → SRC_IDENTITY_ID, Given Name → FIRST_NAME) and maps values from the DirXML-Accounts attribute to the USR_ACCOUNTS table (account id → USR_NAME, account id type → AUTHORITY, status fields → effective dates). Sentinel generates internal GUID fields, sets tenant‑specific columns, and allows customization via the USR_IDENTITY_EXT_ATTR table."
+    },
+    {
+      "category": "grounded",
+      "instruction": "In the Sentinel Identity Tracking driver, write an example DirXML-Accounts attribute value using driver GUID \"1234‑ABCD\", account id type \"email\", account id \"jane.doe@example.com\", identity‑vault account status \"ACTIVE\", application account status \"ENABLED\", and application name \"SentinelApp\".",
+      "input": "",
+      "output": "<1234‑ABCD>#email#jane.doe@example.com#ACTIVE#ENABLED#SentinelApp"
+    }
+  ]
+}

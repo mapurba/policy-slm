@@ -1,0 +1,71 @@
+{
+  "driver": "HTTP/SOAP driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does a 307 Temporary Redirect error mean for the HTTP/SOAP driver?",
+      "input": "",
+      "output": "In the HTTP/SOAP driver, a 307 Temporary Redirect error indicates that the Subscriber channel attempted to send data to the target application or Web service but received a 307 response, meaning the service is not currently available. The driver treats this as a retryable condition, waiting about 30 seconds before attempting again."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the HTTP/SOAP driver log “The HTTP/SOAP driver doesn’t return any application schema by default”?",
+      "input": "",
+      "output": "The HTTP/SOAP driver logs that message because the Identity Manager engine calls the DriverShim.getSchema() method, and the driver is not using a SchemaReporter implementation. Without a custom SchemaReporter Java class, the driver does not supply an application schema, though it continues to run."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the significance of the “pubHostPort must be in the form host:port” error in the HTTP/SOAP driver?",
+      "input": "",
+      "output": "This error indicates that the Publisher channel configuration for the HTTP/SOAP driver is malformed. The driver requires the pubHostPort parameter to be expressed as a hostname (or IP address) followed by a colon and a port number (e.g., \"example.com:8080\"). If the format is incorrect, the driver cannot establish communication and logs a fatal error."
+    },
+    {
+      "category": "config",
+      "instruction": "What format must the pubHostPort parameter follow in the HTTP/SOAP driver configuration?",
+      "input": "",
+      "output": "In the HTTP/SOAP driver configuration, the pubHostPort parameter must be provided in the format **host:port** (for example, \"myserver.example.com:8443\"). This ensures the Publisher channel can locate and connect to the correct host and port."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver configuration option should be reviewed if a MalformedURLException is reported by the HTTP/SOAP driver?",
+      "input": "",
+      "output": "If a MalformedURLException occurs, you should review the URL specified in the **Subscriber channel parameters** of the HTTP/SOAP driver. The URL must be a valid URL format; incorrect syntax will trigger this fatal error."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you resolve a “Problem communicating with HTTP server” error in the HTTP/SOAP driver?",
+      "input": "",
+      "output": "To resolve a “Problem communicating with HTTP server” error in the HTTP/SOAP driver, take the following actions: \n1. Verify that the HTTP server is running. \n2. If the server is overloaded, reduce its load by removing unnecessary services. \n3. Check and adjust any firewall rules that might be blocking access to the server. \n4. Confirm that the URL in the Subscriber configuration is correct (see the Subscriber Options documentation). After correcting these issues, the driver should be able to communicate successfully."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken when the HTTP/SOAP driver waits indefinitely for a SOAP response?",
+      "input": "",
+      "output": "When the HTTP/SOAP driver waits indefinitely for a SOAP response, perform one of the following: \n* Restart eDirectory, then restart the web service, and finally restart the driver. \n* Add a custom request header to limit the wait time. For example, include an `<operation-data>` element with a `<request-header name=\"Expect\">60-continue</request-header>` to make the driver wait up to 60 seconds before proceeding."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the HTTP/SOAP driver to limit the wait time for a SOAP response to 60 seconds?",
+      "input": "",
+      "output": "To limit the wait time for a SOAP response in the HTTP/SOAP driver to 60 seconds, add the following XML to the operation data sent to the driver:\n```\n<operation-data>\n  <request-headers remove-existing=\"false\">\n    <request-header name=\"Expect\">60-continue</request-header>\n  </request-headers>\n</operation-data>\n```\nThis request-header tells the driver to wait for a maximum of 60 seconds for the SOAP service to respond before continuing with the next operation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you implement a SchemaReporter to provide an application schema for the HTTP/SOAP driver?",
+      "input": "",
+      "output": "To provide an application schema for the HTTP/SOAP driver, follow these steps: \n1. Write a Java class that implements the **SchemaReporter** interface. \n2. In the implementation, supply the required schema definitions for the target application or Web service. \n3. Configure the HTTP/SOAP driver to load this class as a Java extension (typically by adding the class name to the driver’s Java extensions list in the driver configuration). Once loaded, the driver will call DriverShim.getSchema() and receive the custom schema."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the common error handling behavior of the HTTP/SOAP driver as described in the documentation.",
+      "input": "",
+      "output": "The HTTP/SOAP driver categorizes errors by HTTP response codes and other conditions. For 307, 408, 503, and 504 responses, it retries after about 30 seconds. Success messages (200‑299) require no action. Other HTTP errors are logged without retry. Communication failures (e.g., server down, firewall blocks, malformed URL) trigger retries or fatal actions depending on severity. Schema‑related warnings indicate missing SchemaReporter implementation. Configuration errors (e.g., bad pubHostPort) cause fatal failures. SSL hostname mismatches advise using DNS hostnames. Indefinite waits for SOAP responses can be mitigated by restarts or adding request‑header timeouts."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the XML snippet that can be used to add a request header so the HTTP/SOAP driver waits 60 seconds for a SOAP response.",
+      "input": "",
+      "output": "<operation-data>\n  <request-headers remove-existing=\"false\">\n    <request-header name=\"Expect\">60-continue</request-header>\n  </request-headers>\n</operation-data>"
+    }
+  ]
+}

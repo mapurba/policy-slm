@@ -1,0 +1,47 @@
+{
+  "driver": "SOAP driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of using Java extensions with the SOAP driver?",
+      "input": "",
+      "output": "In the SOAP driver, Java extensions are used to convert non‑XML data to XML, to change protocols such as XML and HTTP, and to provide custom processing at eleven extension points (four in the Subscriber channel, four in the Publisher channel, two for transport, and one for reporting the application schema). They are intended for transformations that cannot be performed with policies or style sheets."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which five Java interfaces can be used to extend or customize the SOAP driver, and what is each one used for?",
+      "input": "",
+      "output": "The SOAP driver provides five Java interfaces for extensibility:\n1. **DocumentModifiers** – gives access to commands and events as XML DOM documents for modification.\n2. **ByteArrayModifiers** – provides the same access but as serialized byte arrays.\n3. **PublisherTransport** – allows you to replace the default HTTP listener on the Publisher channel with a custom transport implementation.\n4. **SubscriberTransport** – lets you replace the HTTP/HTTPS connections used on the Subscriber channel.\n5. **SchemaReporter** – enables programmatic discovery of the classes and attributes used by a remote Web service, simplifying schema‑mapping rule creation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the difference between DocumentModifiers and ByteArrayModifiers in the SOAP driver?",
+      "input": "",
+      "output": "Both DocumentModifiers and ByteArrayModifiers are used to access and modify the commands and events passing through the SOAP driver shim. The difference is the data format they expose: DocumentModifiers works with the data as XML DOM documents, while ByteArrayModifiers works with the same data serialized as byte arrays. You typically choose one based on whether you need DOM manipulation or byte‑level processing."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you replace the default HTTP listener on the Publisher channel of the SOAP driver with a custom implementation?",
+      "input": "",
+      "output": "To replace the default HTTP listener on the Publisher channel of the SOAP driver:\n1. Create a Java class that implements the **PublisherTransport** interface.\n2. Within your implementation, provide the desired event‑driven or polling logic for publishing events.\n3. Package the class into a JAR file and place it on the classpath of the Identity Manager runtime.\n4. Configure the SOAP driver to use your implementation (typically by setting the appropriate driver property or by registering the class in the driver’s initialization code as described in the Javadoc).\n5. Restart the driver so that it loads the new PublisherTransport implementation, which will now handle HTTP publishing instead of the default listener."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you replace the HTTP or HTTPS connections used on the Subscriber channel of the SOAP driver?",
+      "input": "",
+      "output": "To replace the HTTP/HTTPS connections on the Subscriber channel of the SOAP driver:\n1. Implement the **SubscriberTransport** interface in a Java class.\n2. Provide your custom connection handling logic (e.g., using a different protocol or library).\n3. Compile the class and include the resulting JAR on the Identity Manager classpath.\n4. Register the custom SubscriberTransport implementation with the SOAP driver configuration so that the driver uses it instead of the built‑in HTTP/HTTPS transport.\n5. Restart the driver to apply the new SubscriberTransport implementation."
+    },
+    {
+      "category": "config",
+      "instruction": "Which interface should be used to report the application schema in the SOAP driver, and what benefit does it provide?",
+      "input": "",
+      "output": "The **SchemaReporter** interface is used to report the application schema in the SOAP driver. It allows a programmatic determination of the classes and attributes used by the remote Web service, making it easier to create and maintain schema‑mapping rules because the driver can dynamically obtain the service schema."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of how the SOAP driver can be extended or customized.",
+      "input": "",
+      "output": "The SOAP driver is highly extensible through Java extensions. Developers can implement five interfaces—DocumentModifiers, ByteArrayModifiers, PublisherTransport, SubscriberTransport, and SchemaReporter—to respectively modify XML or byte‑array data, replace the default HTTP listener on the Publisher channel, replace HTTP/HTTPS connections on the Subscriber channel, and dynamically report the remote service schema. These extensions are applied at eleven defined points in the driver’s processing flow and should be used when transformations cannot be achieved with policies or style sheets."
+    }
+  ]
+}

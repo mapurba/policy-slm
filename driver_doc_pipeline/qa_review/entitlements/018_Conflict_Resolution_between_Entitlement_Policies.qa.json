@@ -1,0 +1,53 @@
+{
+  "driver": "Entitlements driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does it mean when the Entitlements driver resolves conflicts additively for entitlements that don’t have values?",
+      "input": "",
+      "output": "In the Entitlements driver, additive conflict resolution for entitlements that don’t have values means that if any entitlement policy grants the user an account on a connected system, the user receives that account regardless of any other policy that might exclude the same entitlement. The entitlement is treated as a simple \"grant\" and the result is always additive; the order of policies does not matter and this behavior cannot be changed."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the \"priority\" conflict-resolution setting work in the Entitlements driver for entitlements that have values?",
+      "input": "",
+      "output": "When an entitlement in the Entitlements driver is configured with conflict-resolution=\"priority\", the driver evaluates the list of entitlement policies in order. If two policies assign conflicting values (or one includes the user while another excludes the user), only the values from the policy that appears higher in the list are applied. The lower‑ranked policy’s values are ignored. This setting is useful for hierarchical or role‑based structures where a user should be placed in only one group or location."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible values for the conflict-resolution attribute on an entitlement in the Entitlements driver and what does each value do?",
+      "input": "",
+      "output": "The Entitlements driver supports two possible values for the conflict-resolution attribute on an entitlement:\n\n* `conflict-resolution=\"union\"` – The entitlement is additive (union). All values assigned by any policy are combined, and the user receives every entitlement from every matching policy.\n* `conflict-resolution=\"priority\"` – The entitlement is resolved by priority. Only the values from the highest‑ranked policy (the one listed earlier in the Entitlement policies list) are applied; lower‑ranked conflicting values are ignored."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you change the conflict resolution method for a specific entitlement in the Entitlements driver?",
+      "input": "",
+      "output": "To change the conflict resolution method for an individual entitlement in the Entitlements driver:\n\n1. Log in to Identity Console and select **IDM Administration** under Identity Manager. Choose a driver set.\n2. Click the **List of Entitlement Policies** button and select **Stop driver**.\n3. Click the driver icon for the driver that offers the entitlement you want to modify.\n4. On the Driver Overview page, open the **Advanced** tab and then click **Entitlements**.\n5. Click the entitlement name to open it in the XML viewer.\n6. Check the **Enable XML editing** box.\n7. Locate the entitlement definition line, for example:\n   ```\n   <entitlement conflict-resolution=\"union\" description=\"Grants membership to GroupWise Distribution lists\" display-name=\"GroupWise Distribution Lists\" name=\"gwDistLists\">\n   ```\n8. Change the `conflict-resolution` attribute to either `\"union\"` or `\"priority\"` as needed.\n9. Click **OK** to save the changes and restart the driver.\n10. Return to **IDM Administration** and restart the Entitlements Service driver to apply the change."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you change the priority order of Entitlement policies in the Entitlements driver?",
+      "input": "",
+      "output": "To prioritize Entitlement policies in the Entitlements driver:\n\n1. In Identity Console, navigate to **Role‑Based Entitlements > Role‑Based Entitlements**.\n2. Search for and select the desired driver set; a page showing the list of Entitlement policies appears.\n3. Select a policy and use the arrow buttons to move it up or down in the list. Moving a policy higher gives it a higher priority.\n4. Click **Close**. The priority changes take effect only after you restart the driver.\n5. Restart the driver (for example, by stopping and starting the Entitlements Service driver) to apply the new ordering."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a user still receive an Exchange account entitlement even though an exclusion policy exists, according to the Entitlements driver documentation?",
+      "input": "",
+      "output": "In the Entitlements driver, account entitlements are additive and do not have values. Therefore, if any entitlement policy grants the user an Exchange account, the user receives that account regardless of other policies that exclude it. The exclusion policy does not affect account entitlements because the conflict‑resolution method for granting accounts is fixed to additive and cannot be changed."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about conflict resolution between entitlement policies in the Entitlements driver.",
+      "input": "",
+      "output": "The Entitlements driver resolves conflicts as follows:\n\n* Account‑type entitlements (without values) are always additive; any grant creates the account, and this behavior cannot be altered.\n* Entitlements with values (e.g., group membership) default to additive (`conflict-resolution=\"union\"`) but can be switched to priority‑based (`conflict-resolution=\"priority\"`).\n* With `union`, all values from all matching policies are combined; order of policies does not matter.\n* With `priority`, only the values from the highest‑ranked policy in the Entitlement policies list are applied; lower‑ranked conflicting values are ignored. Policy order matters only for entitlements set to priority.\n* The conflict‑resolution setting is configured per entitlement in the driver’s XML configuration.\n* When using priority, place administrator or manager policies higher in the list, and narrower groups above broader ones."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example XML fragment for an entitlement that uses priority conflict resolution in the Entitlements driver.",
+      "input": "",
+      "output": "```xml\n<entitlement conflict-resolution=\"priority\" description=\"Grants membership to the Admins AD group\" display-name=\"Admins Group\" name=\"adminADGroup\">\n    <!-- Additional entitlement definition elements go here -->\n</entitlement>\n```"
+    }
+  ]
+}

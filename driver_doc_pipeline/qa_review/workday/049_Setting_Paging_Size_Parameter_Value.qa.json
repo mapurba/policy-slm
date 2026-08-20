@@ -1,0 +1,41 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Paging Size parameter in the Workday driver?",
+      "input": "",
+      "output": "The Paging Size parameter in the Workday driver determines how many Workday records are fetched in each SOAP API call. The driver retrieves one page at a time, processes the records, stores them in the cache, updates driver storage, and then requests the next page. This paging mechanism limits the number of records processed at once and ties directly to the Java heap available to the driver, as the records are held in heap memory until they are cached."
+    },
+    {
+      "category": "config",
+      "instruction": "How should the Paging Size value be set for the Workday driver?",
+      "input": "",
+      "output": "The Paging Size value for the Workday driver should be set based on the Java heap size allocated to the driver. Because the driver stores fetched records in the Java heap until they are cached, the paging size must be proportional to the available heap. A larger heap permits a larger paging size, while a smaller heap requires a smaller paging size."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you adjust the remote loader configuration to support a larger Paging Size in the Workday driver?",
+      "input": "",
+      "output": "To support a larger Paging Size in the Workday driver, follow these steps:\n1. Open the remote loader configuration for the Workday driver.\n2. Increase the Java heap size parameter (for example, by setting a higher -Xmx value).\n3. Verify or increase the number of remote loader instances if needed, ensuring that the total virtual memory available across instances can accommodate the larger heap.\n4. Save the configuration and restart the remote loader(s) so the new heap settings take effect.\n5. After the remote loader restarts, adjust the Paging Size value in the Workday driver to a larger number that matches the new heap capacity."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the Workday driver experience memory errors during polling, and how can you resolve them?",
+      "input": "",
+      "output": "The Workday driver may encounter memory errors if the Paging Size is set larger than the Java heap can accommodate. Because each page of records is stored in the heap until cached, an oversized page can exhaust heap space, causing OutOfMemory errors. To resolve this, reduce the Paging Size to a value proportionate to the current Java heap, or increase the Java heap size (and optionally the number of remote loader instances) in the remote loader configuration so that more memory is available for processing larger pages."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What effect does setting a smaller Paging Size have on the polling behavior of the Workday driver?",
+      "input": "",
+      "output": "Setting a smaller Paging Size causes the Workday driver to fetch more pages, each containing fewer records. Consequently, multiple smaller pages are processed during a poll cycle, which increases the frequency of driver processing and storage operations in the driver cache. This can lead to higher CPU usage due to more frequent processing, but reduces the amount of heap memory required for each page."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key considerations for configuring paging in the Workday driver.",
+      "input": "",
+      "output": "When configuring paging for the Workday driver, ensure the Paging Size is proportional to the Java heap allocated to the driver, as pages are stored in heap memory before caching. Adjust the remote loader's Java heap size and the number of remote loader instances to provide sufficient virtual memory. A larger paging size reduces the number of fetch cycles but requires more heap; a smaller size increases processing frequency but uses less memory. Properly balancing these settings prevents memory errors and optimizes polling performance."
+    }
+  ]
+}

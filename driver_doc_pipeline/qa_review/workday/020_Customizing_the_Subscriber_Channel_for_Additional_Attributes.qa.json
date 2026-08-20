@@ -1,0 +1,65 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of customizing the subscriber channel in the Workday driver?",
+      "input": "",
+      "output": "Customizing the subscriber channel in the Workday driver allows you to add additional attributes—such as BirthDate—to the synchronization process. By providing a custom XSLT stylesheet that extracts and transforms the new attribute from Workday XDS events, the driver can populate those attributes in Identity Manager and keep them in sync."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add the BirthDate attribute to the subscriber channel of the Workday driver?",
+      "input": "",
+      "output": "To add the BirthDate attribute to the subscriber channel of the Workday driver, follow these steps:\n1. Fetch the XDS event from the Workday log and identify the XPATH of the BirthDate attribute.\n2. Build the XPATH in the required format and add it to a custom XSLT stylesheet (create a BirthDate template and a BirthDate Caller template as shown in the documentation).\n3. In Identity Console, go to the IDM Administration tile > Driver Dashboard > Workday driver icon.\n4. Open the **Data Transformation and Synchronization** tab and click **Filter** in the Subscriber Channel.\n5. Add the attribute **wd-BirthDate**:\n   a. Select **User** as the class and click **Add Attribute**.\n   b. Click **Show All Attribute** and choose **wd-BirthDate**, then save.\n6. Select the newly added attribute from the class list and set the **Subscriber option** to **Synchronize**.\n7. In Designer, double‑click the connector line, navigate to **Driver Configuration > Driver Parameters**.\n8. Under **Subscriber Options > Worker Settings**, select **Import Worker Stylesheet** and enter the path to the custom XSLT stylesheet.\n9. Deploy the driver and restart the Workday driver for the changes to take effect."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter must be set to point to the custom XSLT stylesheet when customizing the subscriber channel of the Workday driver?",
+      "input": "",
+      "output": "In the Workday driver, set the **Import Worker Stylesheet** parameter (found under **Subscriber Options > Worker Settings**) to the full path of the custom XSLT stylesheet you prepared."
+    },
+    {
+      "category": "config",
+      "instruction": "What subscriber option must be configured for a newly added attribute in the Workday driver to ensure it synchronizes correctly?",
+      "input": "",
+      "output": "After adding a new attribute (e.g., **wd-BirthDate**) to the subscriber channel of the Workday driver, select the attribute from the class list and set its **Subscriber option** to **Synchronize**."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the complete XSLT template that the Workday driver uses to update the Date_of_Birth field.",
+      "input": "",
+      "output": "<xsl:template name=\"Date_of_Birth\">\n  <xsl:param name=\"Birthdate\"/>\n  <xsl:param name=\"workerIdValue\"/>\n  <xsl:param name=\"workerIdType\"/>\n  <!-- Prepare SOAP envelope for DOB -->\n  <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                    xmlns:bsvc=\"urn:com.workday/bsvc\">\n    <soapenv:Header/>\n    <soapenv:Body>\n      <xsl:message>version is: <xsl:value-of select=\"$wdVersion\"/></xsl:message>\n      <bsvc:Change_Personal_Information_Request bsvc:version=\"{$wdVersion}\">\n        <bsvc:Change_Personal_Information_Data>\n          <bsvc:Worker_Reference bsvc:Descriptor=\"?\">\n            <bsvc:ID bsvc:type=\"{$workerIdType}\">\n              <xsl:value-of select=\"$workerIdValue\"/>\n            </bsvc:ID>\n          </bsvc:Worker_Reference>\n          <bsvc:Personal_Information_Data>\n            <bsvc:Date_of_Birth><xsl:value-of select=\"$Birthdate\"/></bsvc:Date_of_Birth>\n          </bsvc:Personal_Information_Data>\n        </bsvc:Change_Personal_Information_Data>\n      </bsvc:Change_Personal_Information_Request>\n    </soapenv:Body>\n  </soapenv:Envelope>\n</xsl:template>"
+    },
+    {
+      "category": "grounded",
+      "instruction": "Show the XSLT caller snippet that extracts the BirthDate value for the Workday driver.",
+      "input": "",
+      "output": "<!--Personal Info attributes -->\n<xsl:variable name=\"lv-Birthdate\" select=\"modify-attr[(@attr-name='wd-BirthDate')]/add-value/value/text()\"/>\n<xsl:call-template name=\"Date_of_Birth\">\n  <xsl:with-param name=\"Birthdate\" select=\"$lv-Birthdate\"/>\n  <xsl:with-param name=\"workerIdType\" select=\"$lv-wd-WorkerIDType\"/>\n  <xsl:with-param name=\"workerIdValue\" select=\"$lv-wd-EMPLID\"/>\n</xsl:call-template>"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If a newly added attribute does not synchronize after customizing the subscriber channel, what checks should be performed for the Workday driver?",
+      "input": "",
+      "output": "When a new attribute fails to synchronize in the Workday driver, verify the following:\n1. The custom XSLT stylesheet was uploaded completely (the driver requires a full updated stylesheet file).\n2. The XPATH for the attribute is correctly built and included in both the template and the caller snippet.\n3. The attribute (e.g., **wd-BirthDate**) was added to the Subscriber Channel filter and saved.\n4. The attribute’s **Subscriber option** is set to **Synchronize**.\n5. The **Import Worker Stylesheet** driver parameter points to the correct stylesheet path.\n6. The driver was restarted after the changes.\n7. The external stylesheet returns only attributes with changed or new values, and retains the association‑generation code so the results merge correctly with the internal stylesheet."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to customize the subscriber channel for additional attributes in the Workday driver.",
+      "input": "",
+      "output": "To customize the subscriber channel for additional attributes in the Workday driver:\n1. Retrieve the XDS event from the Workday log and locate the XPATH for the desired attribute.\n2. Create or edit a custom XSLT stylesheet, adding a template for the attribute (e.g., BirthDate) and a caller snippet that extracts the attribute value.\n3. Upload the complete updated stylesheet via the **Import Worker Stylesheet** driver parameter.\n4. In Identity Console, add the new attribute (e.g., **wd-BirthDate**) to the Subscriber Channel filter, set its class to **User**, and set the **Subscriber option** to **Synchronize**.\n5. Deploy the changes and restart the Workday driver.\n6. Ensure the external stylesheet returns only changed or new attributes while preserving association logic."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the full updated stylesheet file be provided when configuring the Workday driver?",
+      "input": "",
+      "output": "The Workday driver replaces its internal stylesheet with the supplied file; therefore a complete, updated stylesheet is required so that all necessary templates—including the newly added ones—are present. Supplying only a partial stylesheet would cause missing processing logic and prevent the driver from correctly generating the SOAP request and association values."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you restart the Workday driver after modifying the subscriber channel configuration?",
+      "input": "",
+      "output": "After modifying the subscriber channel configuration for the Workday driver, open the driver dashboard, locate the Workday driver icon, and use the driver management controls to **restart** the driver. Alternatively, you can restart the driver from the Designer deployment view after redeploying the driver."
+    }
+  ]
+}

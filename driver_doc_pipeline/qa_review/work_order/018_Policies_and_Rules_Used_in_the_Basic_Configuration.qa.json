@@ -1,0 +1,53 @@
+{
+  "driver": "Work Order driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Subscriber Filter in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, the Subscriber Filter allows only events for WorkOrder objects to be processed by the Subscriber channel."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which attributes must be present on a WorkOrder object for the Create Rule to succeed in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, the Create Rule requires the following attributes on a WorkOrder object: nwoStatus, nwoSendToPublisher, nwoDoItNow, nwoContent, and nwoType. If any of these values are missing, the work order is not sent to the Publisher channel and is not updated by the driver."
+    },
+    {
+      "category": "config",
+      "instruction": "List all policies used in the Subscriber channel of the Work Order driver and describe what each does.",
+      "input": "",
+      "output": "In the Work Order driver, the Subscriber channel uses these policies:\n\n- **Subscriber Filter** – Allows only events for WorkOrder objects to be processed.\n- **Event Transformation** – Not used in the packages.\n- **Matching Rule** – Not used in the packages.\n- **Create Rule** – Contains rules only for WorkOrder objects and requires the nwoStatus, nwoSendToPublisher, nwoDoItNow, nwoContent, and nwoType attributes.\n- **Placement Rule** – Maps work orders from the specified work order container to the driver so the Subscriber can check the DoItNow flag.\n- **Command Transformation** – Not used in the packages.\n- **Schema Mapping** – Maps the eDirectory namespace to the Work Order namespace.\n- **Output Transformation** – Not used in the packages."
+    },
+    {
+      "category": "config",
+      "instruction": "What policies are configured in the Publisher channel of the Work Order driver and what are their functions?",
+      "input": "",
+      "output": "In the Work Order driver, the Publisher channel uses these policies:\n\n- **Schema Mapping** – Maps the Work Order driver namespace to the eDirectory namespace.\n- **Event Transformation** – Not used in the packages.\n- **Publisher Filter** – Allows only events for WorkOrder objects to be processed.\n- **Matching Rule** – Not used in the packages.\n- **Placement Rule** – Places WorkOrder and WorkToDo objects in the correct container as defined in the driver’s configuration parameters.\n- **Command Transformation** – Not used in the packages."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you ensure that only WorkOrder events are processed by the Publisher channel in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, configure the Publisher Filter policy in the Publisher channel. This filter permits only events for WorkOrder objects to be processed, blocking all other event types."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should the Placement Rule be set up for the Subscriber channel in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, set the Placement Rule for the Subscriber channel to map work orders from the work order container specified in the driver’s configuration to the driver itself. This mapping enables the Subscriber channel to locate work orders and evaluate the DoItNow flag."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a work order not be sent to the Publisher channel in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, a work order will not be sent to the Publisher channel if any of the required attributes (nwoStatus, nwoSendToPublisher, nwoDoItNow, nwoContent, nwoType) are missing on the WorkOrder object. The Create Rule checks for these values and aborts processing when they are absent."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key policies and rules used in the basic configuration of the Work Order driver.",
+      "input": "",
+      "output": "The Work Order driver’s basic configuration uses the following key policies and rules:\n- **Subscriber Channel**: Subscriber Filter (processes only WorkOrder events), Create Rule (requires nwoStatus, nwoSendToPublisher, nwoDoItNow, nwoContent, nwoType), Placement Rule (maps work orders from the configured container), Schema Mapping (eDirectory to Work Order namespace). Event Transformation, Matching Rule, Command Transformation, and Output Transformation are not used.\n- **Publisher Channel**: Schema Mapping (maps driver namespace to eDirectory), Publisher Filter (processes only WorkOrder events), Placement Rule (places WorkOrder and WorkToDo objects into the configured container). Event Transformation, Matching Rule, and Command Transformation are not used."
+    }
+  ]
+}

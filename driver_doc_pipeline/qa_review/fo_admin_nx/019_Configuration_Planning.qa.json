@@ -1,0 +1,53 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of Include/Exclude lists in the Fan-Out driver?",
+      "input": "",
+      "output": "In the Fan-Out driver, Include/Exclude lists are used to control which user accounts the driver handles for authentication and provisioning. The lists let you specify users that the driver should manage, while all other users are deferred to the native authentication mechanism or managed locally."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why would you install additional Core Drivers for the Fan-Out driver deployment?",
+      "input": "",
+      "output": "Additional Core Drivers provide redundancy. Installing extra Core Drivers gives load‑balancing and fail‑over support for both Authentication Services and Identity Provisioning, ensuring continued processing if the primary Core Driver becomes unavailable."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you plan the placement of the ASAM System container and ASAM Master User objects in the eDirectory tree for the Fan-Out driver?",
+      "input": "",
+      "output": "1. Decide where in the eDirectory tree the ASAM System container and ASAM Master User objects should reside.\n2. Create a special container for these objects – this is a best‑practice recommendation.\n3. Place the ASAM System container inside the chosen container.\n4. Create the ASAM Master User object within the ASAM System container.\n5. Apply appropriate password policies to the ASAM Master User object as required by the ASAM Master User security guidelines."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver setting controls password replication on a platform and what value enables it in the Fan-Out driver?",
+      "input": "",
+      "output": "The setting is **Permit Password Replication** on the Platform object in the Web interface. Setting this property to **Yes** enables the driver to replicate passwords to that platform."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you configure additional attributes for Platform Receiver scripts in the Fan-Out driver?",
+      "input": "",
+      "output": "To configure extra attributes, add the desired eDirectory attribute names to the **Event Subsystem Subscriber filter**. The attribute names must be the exact eDirectory names. This extends the default attribute list defined in the Core Driver Requirements."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a platform using password replication not receive provisioning events in the Fan-Out driver, and how can this be resolved?",
+      "input": "",
+      "output": "Platforms that use password replication normally do not get provisioning events until their passwords are known to the driver. The driver collects password information via Universal Password. If users have not yet changed passwords or authenticated on another platform, the driver lacks the password data. Resolve this by ensuring users change their passwords on platforms that support Universal Password, or have them authenticate on another platform first, so the driver can obtain the password before provisioning to the replication‑enabled platform."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main planning considerations for deploying the Fan-Out driver.",
+      "input": "",
+      "output": "When deploying the Fan-Out driver, you must decide on scope (which platforms and user groups), administrator access to the Web interface, placement of Core Drivers and ASAM containers, redundancy for authentication and provisioning, Census parameters (source objects, trawl frequency, inactive‑user handling), password replication requirements, naming exception handling, Platform Set organization, UID/GID reservations, and whether additional attributes are needed for Platform Receiver scripts."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps should you follow to define Census parameters for the Fan-Out driver?",
+      "input": "",
+      "output": "1. Identify which eDirectory objects will serve as the source of Enterprise Users and Enterprise Groups.\n2. Choose a Census Trawl schedule; a daily trawl is typical to verify Census consistency.\n3. Decide how to handle deleted user objects—either automatically remove them after a configurable inactivity period or manage them manually.\n4. Determine whether to delay password expiration until the end of the expiration day for smoother operation.\n5. Choose whether deletions of users and groups should be immediate on platforms or allow a grace period for recovery.\n6. Apply these settings in the **Configuring the Census** section of the Fan-Out driver documentation."
+    }
+  ]
+}

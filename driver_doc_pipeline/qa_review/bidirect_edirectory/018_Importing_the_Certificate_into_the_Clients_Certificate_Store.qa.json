@@ -1,0 +1,47 @@
+{
+  "driver": "Bidirectional eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why do you need to import the trusted root certificate into a keystore for the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "The Bidirectional eDirectory driver uses SSL to communicate securely with the eDirectory server. Importing the trusted root certificate into a keystore provides the driver with a trusted certificate chain so it can verify the server’s identity during SSL handshakes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you export the trusted root certificate from the connected eDirectory server for the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "1. Log in to Identity Console.\n2. Under eDirectory, navigate to **Certificate Management > Server Certificate Management** and select a server certificate.\n   - Choose an Elliptic Curve (EC) certificate if both the Identity Vault and the connected system run eDirectory 9.0.2.x.\n   - Choose a non‑EC certificate if they run eDirectory 8.8.8.x.\n3. Click **Export**.\n4. In the **Certificate** drop‑down, select **OU=Organizational CA certificate**.\n5. Set the **Export format** to **der** and click **OK**.\n6. Save the exported .der file to a local file system."
+    },
+    {
+      "category": "howto",
+      "instruction": "What command should you run to add the exported .der file to a keystore for the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "Use the Java keytool command (Java 1.8 or later):\n```\nkeytool -import -file PATH_OF_DERFile\\PublicKeyCert.der -keystore KEYSTOREPATH\\NAME.keystore -storepass keystorepass\n```\nReplace **PATH_OF_DERFile** with the folder containing the exported .der file and **KEYSTOREPATH\\NAME.keystore** with the desired keystore location and name."
+    },
+    {
+      "category": "howto",
+      "instruction": "After creating the keystore, how do you configure the Bidirectional eDirectory driver to use SSL with that keystore?",
+      "input": "",
+      "output": "1. Copy the .keystore file to a directory that already contains the Identity Vault files.\n2. In Identity Console, select **IDM Administrator**.\n3. Choose the required driveset.\n4. Click the **Bidirectional eDirectory driver** icon and open the **Configuration** tab.\n5. Set the **Use SSL** option to **Yes**.\n6. Enter the full path to the keystore file in the provided field.\n7. Enable the driver’s SSL parameter and adjust any additional SSL parameters as needed (see the Driver Parameters documentation for details)."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter must be set to Yes and what additional value must be supplied in the Bidirectional eDirectory driver configuration to enable SSL?",
+      "input": "",
+      "output": "Set the **Use SSL** parameter to **Yes** and provide the **complete path to the keystore file** in the accompanying keystore path field."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to import a trusted root certificate and enable SSL for the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "To enable SSL for the Bidirectional eDirectory driver, export the trusted root certificate from eDirectory in DER format via Identity Console, import the .der file into a Java keystore using the keytool command, copy the keystore to the Identity Vault directory, then in Identity Console open the driver’s Configuration tab, set **Use SSL** to **Yes**, specify the keystore’s full path, and enable any additional SSL parameters as needed."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact keytool command line snippet shown in the documentation for importing the DER certificate into a keystore for the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "```\nkeytool -import -file PATH_OF_DERFile\\PublicKeyCert.der -keystore KEYSTOERPATH\\NAME.keystore -storepass keystorepass\n```"
+    }
+  ]
+}

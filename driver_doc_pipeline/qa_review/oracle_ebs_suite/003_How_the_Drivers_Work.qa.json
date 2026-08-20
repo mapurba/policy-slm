@@ -1,0 +1,59 @@
+{
+  "driver": "Oracle EBS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Oracle EBS driver?",
+      "input": "",
+      "output": "The Oracle EBS driver is a bidirectional synchronization product that connects the Oracle E-Business Suite (EBS) system with the Identity Vault. It uses XML and XSLT to transform data and events so that changes made in Oracle EBS are reflected in the Identity Vault and vice‑versa."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the Publisher channel of the Oracle EBS driver work?",
+      "input": "",
+      "output": "In the Oracle EBS driver, the Publisher channel starts with the Oracle Workflow Business Event System (BES), which uses Oracle Advanced Queuing (AQ) to generate business events (Add, Delete, Modify). The Event Manager selects only the events that the system administrator has configured for export. These events are written to the idmusrmgt.idm_events table in the Oracle EBS database. PL/SQL APIs installed with the driver parse each event, read the data fields defined in the driver configuration, and package the information into an XML‑formatted document. The XML is then transmitted over an HTTP/HTTPS port to the Identity Manager Publisher endpoint, where the Identity Manager engine publishes the data into the Identity Vault. Future events are also stored in the same table with an execution date; they are immediately synchronized but the login attribute remains disabled until the specified date."
+    },
+    {
+      "category": "config",
+      "instruction": "Which database table does the Oracle EBS driver use to cache business events before they are sent to the Identity Vault?",
+      "input": "",
+      "output": "The Oracle EBS driver caches business events in the **idmusrmgt.idm_events** table."
+    },
+    {
+      "category": "config",
+      "instruction": "What security token does the Subscriber channel of the Oracle EBS driver use for authentication?",
+      "input": "",
+      "output": "The Subscriber channel of the Oracle EBS driver uses a **Web Service Security (WSS) token** for authentication."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the step‑by‑step process the Oracle EBS driver follows to publish an Add, Delete, or Modify event from Oracle EBS to the Identity Vault.",
+      "input": "",
+      "output": "1. The Oracle Workflow Business Event System (BES) generates a business event (Add, Delete, or Modify).\n2. The Event Manager, based on the administrator’s Publisher filter, selects the event for export.\n3. The selected event is written to the **idmusrmgt.idm_events** table in the Oracle EBS database.\n4. PL/SQL APIs installed with the Oracle EBS driver read the event record.\n5. The APIs parse the event and retrieve the data fields specified in the driver configuration.\n6. An XML‑formatted document is created containing the event data.\n7. The XML document is sent over an HTTP/HTTPS port to the Identity Manager Publisher endpoint.\n8. Identity Manager receives the XML and publishes it into the Identity Vault.\n9. If the event is a future‑dated event, it remains in the **idmusrmgt.idm_events** table until the execution date, with the login attribute disabled until then."
+    },
+    {
+      "category": "howto",
+      "instruction": "Outline the sequence the Oracle EBS driver follows to receive an Identity Vault event and update the Oracle EBS system via the Subscriber channel.",
+      "input": "",
+      "output": "1. Identity Manager generates an XML‑formatted event for a change that originated in the Identity Vault.\n2. The Oracle EBS driver’s Subscriber endpoint receives the XML via a SOAP/REST call.\n3. The driver authenticates the request using a Web Service Security (WSS) token.\n4. The driver parses the incoming XML to determine the operation (Add, Delete, Modify) and the target object.\n5. The driver updates the corresponding record in the **idmusrmgt.idm_events** table with the changes received from the Identity Vault.\n6. Any additional business logic or downstream propagation (e.g., sending the change to other applications) can be performed using the same SOAP/REST functions."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Oracle EBS driver store future events in the idmusrmgt.idm_events table until their execution date?",
+      "input": "",
+      "output": "The Oracle EBS driver stores future events in the **idmusrmgt.idm_events** table to guarantee reliable delivery. By keeping the event record until the specified execution date, the driver ensures that the event will be processed at the correct time even if the Identity Vault is temporarily unavailable. Additionally, the login attribute for these future events is disabled until the event becomes operational, preventing premature activation of the associated account."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the three main components of the Oracle EBS driver and how they interact during synchronization.",
+      "input": "",
+      "output": "The Oracle EBS driver consists of three core components: the Publisher channel, the Subscriber channel, and Associations. The Publisher channel captures business events generated by Oracle's Workflow Business Event System, filters them based on administrator settings, and sends XML‑formatted event data to the Identity Vault via HTTP/HTTPS. The Subscriber channel receives XML events from the Identity Vault, authenticates them with a WSS token, and updates the Oracle EBS **idmusrmgt.idm_events** table to reflect the changes. Associations link Oracle EBS objects to Identity Vault objects using the multivalued DirXML‑Association attribute, allowing the driver to maintain a unique 7‑digit Oracle user identifier while supporting multiple identity sources."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example XML fragment that could be sent by the Oracle EBS driver on the Publisher channel, including the DirXML-Association attribute that carries a 7‑digit Oracle user ID.",
+      "input": "",
+      "output": "<PublishEvent>\n  <ObjectType>User</ObjectType>\n  <Operation>Add</Operation>\n  <Attributes>\n    <Attribute name=\"UserID\">1234567</Attribute>\n    <Attribute name=\"DirXML-Association\">OracleEBS=1234567</Attribute>\n  </Attributes>\n</PublishEvent>"
+    }
+  ]
+}

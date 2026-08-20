@@ -1,0 +1,71 @@
+{
+  "driver": "Entity Data Model driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is TLS/SSL communication in the Entity Data Model driver and why must it be enabled for both the driver and the databases?",
+      "input": "",
+      "output": "TLS/SSL communication in the Entity Data Model driver is a secure channel that encrypts data exchanged between the driver and its underlying databases. Enabling SSL for both the Entity Data Model driver and the databases ensures that credentials, configuration data, and user information are protected from interception or tampering during transmission."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you prepare PostgreSQL for SSL communication for use with the Entity Data Model driver?",
+      "input": "",
+      "output": "To prepare PostgreSQL for SSL communication for the Entity Data Model driver:\n1. Stop Tomcat on the server where the Entity Data Model driver is deployed.\n2. Log in to the PostgreSQL server and stop the Postgres service.\n3. Generate a passphrase‑protected certificate:\n   ```\n   openssl req -new -text -out cert.req\n   ```\n4. Remove the passphrase so the server can start automatically:\n   ```\n   openssl rsa -in privkey.pem -out cert.pem\n   ```\n5. Convert the request into a self‑signed certificate:\n   ```\n   openssl req -x509 -in cert.req -text -key cert.pem -out cert.cert\n   ```\n6. Copy the generated files to the PostgreSQL data directory (e.g., `/opt/netiq/idm/apps/postgresql/data/`):\n   ```\n   cp cert.pem $PGDATA/server.key\n   cp cert.cert $PGDATA/server.crt\n   ```\n7. Set appropriate ownership and permissions:\n   ```\n   chown postgres:postgres server.key\n   chown postgres:postgres server.crt\n   chmod 600 server.key\n   ```\n8. Edit `$PGDATA/postgresql.conf` and enable SSL:\n   ```\n   ssl=on\n   ssl_cert_file = '/opt/netiq/idm/apps/postgresql/data/server.crt'\n   ssl_key_file = '/opt/netiq/idm/apps/postgresql/data/server.key'\n   ```\n9. Save the file and restart Postgres.\n10. (Optional) Verify SSL by connecting with psql and confirming the output shows an SSL connection.\n11. Import the server certificate into the Java cacerts keystore used by the Entity Data Model driver:\n    ```\n    keytool -import -trustcacerts -alias ar -file server.crt -keystore /opt/netiq/idm/apps/jre/lib/security/cacerts\n    ```\n12. Restart Tomcat.\n13. Ensure the Entity Data Model databases are updated to recognize the secured connection."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you prepare Oracle for SSL communication for use with the Entity Data Model driver?",
+      "input": "",
+      "output": "To prepare Oracle for SSL communication for the Entity Data Model driver:\n1. Download and unpack the helper scripts `ssl.ca-0.1.tar.gz`.\n2. Create a certificate request with Oracle Wallet Manager (`/opt/oracle/product/11gR1/db/owm`):\n   ```\n   su –oracle\n   owm\n   ```\n3. In Wallet Manager, select **Wallet > New**, enter a password, and accept folder creation.\n4. Fill in the required request information and click OK.\n5. Highlight the request, choose **Operations > Export Certificate Request**, and save it as a `.csr` file in the folder where you extracted `ssl.ca-0.1.tar.gz`.\n6. Create a self‑signed root certificate by running `new‑root‑ca.sh` in the extracted `ssl.ca-0.1` directory; this generates `ca.crt`.\n7. Generate a server certificate by running:\n   ```\n   ./sign-server-cert.sh CerReq\n   ```\n8. Import `ca.crt` into the Oracle wallet as a trusted certificate and import the generated server certificate (`certificate-request-filename.crt`) as a user certificate.\n9. Enable auto‑login for the wallet and save it.\n10. Configure Oracle advanced security and the listener:\n    ```\n    su –oracle\n    netmgr\n    ```\n11. In Net Manager, select **Profile > Select Network Security > SSL** and ensure `sqlnet.ora` and `listener.ora` reference the wallet.\n12. If client authentication is not required, add `SSL_CLIENT_AUTHENTICATION=FALSE` to the end of both `$TNS_ADMIN/listener.ora` and `$TNS_ADMIN/sqlnet.ora`.\n13. Restart the listener:\n    ```\n    lsnrctl stop\n    lsnrctl start\n    ```\n14. Update the Entity Data Model databases to recognize the secured connection."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the JDBC URL format to enable SSL for PostgreSQL databases used by the Entity Data Model driver?",
+      "input": "",
+      "output": "For PostgreSQL databases, the Entity Data Model driver uses the following JDBC URL to enable SSL:\n```url=\"jdbc:postgresql://hostname:5432/database_username?ssl=true\"```\nReplace `hostname` with the PostgreSQL server host, `5432` with the port if different, and `database_username` with the appropriate database name."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the JDBC URL format to enable SSL for Oracle databases used by the Entity Data Model driver?",
+      "input": "",
+      "output": "For Oracle databases, the Entity Data Model driver uses this JDBC URL to enable SSL:\n```url=\"jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCPS)(HOST = hostname)(PORT = 2484))(CONNECT_DATA =(SERVER = DEDICATED) (SERVICE_NAME = name))(SECURITY=(SSL_SERVER_CERT_DN='CN=OracleDB,OU=IN,O=IN,L=IN,ST=IN,C=IN'))\"```\nReplace `hostname`, `2484`, and `name` with the appropriate host, TLS port, and Oracle service name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add the SSL server certificate to the Java keystore for the Entity Data Model driver when using PostgreSQL?",
+      "input": "",
+      "output": "To add the PostgreSQL SSL server certificate to the Java keystore used by the Entity Data Model driver, run the following command on the server where the driver is installed:\n```bash\nkeytool -import -trustcacerts -alias ar -file server.crt -keystore /opt/netiq/idm/apps/jre/lib/security/cacerts\n```\nThis imports `server.crt` (the PostgreSQL server certificate) into the `cacerts` keystore under the alias `ar`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you verify that SSL communication is enabled for PostgreSQL after configuring it for the Entity Data Model driver?",
+      "input": "",
+      "output": "After configuring PostgreSQL for SSL, verify the connection by:\n1. Running the psql client:\n   ```\n   $ /opt/netiq/idm/apps/postgres/bin/psql -U postgres -h localhost\n   ```\n2. Observing the output; a successful SSL connection will display a line similar to:\n   ```\n   SSL connection (cipher: DHE-RSA-AES256-SHA, bits: 256)\n   ```\nIf the SSL line appears, SSL communication is enabled and functional for the Entity Data Model driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable SSL communication in the Entity Data Model driver’s Remote Loader configuration for PostgreSQL?",
+      "input": "",
+      "output": "To enable SSL in the Remote Loader configuration for PostgreSQL for the Entity Data Model driver:\n1. Stop the Remote Loader:\n   ```\n   rdxml -config /home/ARShim.conf -u\n   ```\n2. Open the Remote Loader configuration file (`ARShim.conf`) in a text editor.\n3. Add or modify the `-connection` line to reference the PostgreSQL certificate file, for example:\n   ```\n   -connection \"port=8090 rootfile=path/server.crt\"\n   ```\n   (Replace `path/server.crt` with the actual path to the PostgreSQL server certificate.)\n4. Save and close the file.\n5. Import the PostgreSQL certificate into the Remote Loader Java keystore:\n   ```\n   keytool -import -trustcacerts -alias ar -file server.crt -keystore /opt/novell/eDirectory/lib64/nds-modules/jre/lib/security/cacerts\n   ```\n6. Restart the Remote Loader:\n   ```\n   rdxml -config /home/ARShim.conf\n   ```\n7. Verify that the Entity Data Model driver’s database connection URL in its configuration contains `?ssl=true` as shown:\n   ```\n   url=\"jdbc:postgresql://hostname:5432/database_username?ssl=true\"\n   ```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable SSL communication in the Entity Data Model driver’s Remote Loader configuration for Oracle?",
+      "input": "",
+      "output": "To enable SSL in the Remote Loader configuration for Oracle for the Entity Data Model driver:\n1. Stop the Remote Loader:\n   ```\n   rdxml -config /home/ARShim.conf -u\n   ```\n2. Edit the Remote Loader configuration file (`ARShim.conf`).\n3. Add or modify the `-connection` line to reference the Oracle CA certificate, for example:\n   ```\n   -connection \"port=8090 rootfile=path/ca.crt\"\n   ```\n   (Replace `path/ca.crt` with the actual location of the Oracle CA certificate.)\n4. Save and close the file.\n5. Import the Oracle CA certificate into the Remote Loader Java keystore:\n   ```\n   keytool -import -trustcacerts -alias aroracle -file ca.crt -keystore /opt/novell/eDirectory/lib64/nds-modules/jre/lib/security/cacerts\n   ```\n6. Restart the Remote Loader:\n   ```\n   rdxml -config /home/ARShim.conf\n   ```\n7. Ensure the Entity Data Model driver’s JDBC URL for Oracle includes the SSL server certificate DN, for example:\n   ```\n   url=\"jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCPS)(HOST = hostname)(PORT = 2484))(CONNECT_DATA =(SERVER = DEDICATED) (SERVICE_NAME = name))(SECURITY=(SSL_SERVER_CERT_DN='CN=OracleDB,OU=IN,O=IN,L=IN,ST=IN,C=IN'))\"\n   ```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to configure TLS/SSL communication between the Entity Data Model driver and its databases.",
+      "input": "",
+      "output": "To configure TLS/SSL for the Entity Data Model driver:\n1. Prepare the database platform (PostgreSQL or Oracle) by creating a server certificate and enabling SSL in the database configuration.\n2. Import the database’s server certificate into the Java `cacerts` keystore used by the Entity Data Model driver.\n3. Stop Tomcat (or the Remote Loader) before making changes.\n4. Update `server.xml` (for Tomcat) or the Remote Loader configuration file (`ARShim.conf`) to reference the SSL-enabled JDBC URL for each database.\n5. Add the SSL certificate file path to the Remote Loader configuration (`-connection \"port=... rootfile=...\"`).\n6. Import the same certificate into the Remote Loader’s Java keystore.\n7. Restart Tomcat and the Remote Loader, then verify the driver’s database connection URLs contain the SSL parameters.\n8. Optionally, test the database connection (e.g., using psql for PostgreSQL) to confirm an SSL session is established."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact Remote Loader configuration snippet for the Entity Data Model driver when using an Oracle database with SSL.",
+      "input": "",
+      "output": "```text\n-description ARDriver\n-commandport 8000\n-connection \"port=8090 rootfile=path/ca.crt\"\n-trace 5\n-tracefile /tmp/remoteloader.log\n-class com.novell.nds.dirxml.driver.arshim.AccessReviewDriverShim\n```"
+    }
+  ]
+}

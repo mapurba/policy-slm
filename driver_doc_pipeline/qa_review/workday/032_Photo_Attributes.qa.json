@@ -1,0 +1,35 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the Photo attributes defined by the Workday driver and what does each attribute represent?",
+      "input": "",
+      "output": "The Workday driver defines four Photo attributes that can be retrieved via the Get_Worker_Photos API:\n\n1. **wd-photo** – Holds the photo file content encoded as base64Binary (SOAP path: wd:Worker_Photo_Data/wd:File).\n2. **wd-photoFilename** – Contains the file name of the photo (SOAP path: wd:Worker_Photo_Data/wd:Filename).\n3. **wd-photoID** – Provides the identifier for the photo. For a regular employee the SOAP path is wd:Worker_Photo_Reference/wd:ID[@wd:type='Employee_ID'] with the **-E** option appended; for a contingent worker the path is wd:Worker_Photo_Reference/wd:ID[@wd:type='Contingent_Worker_ID'] with the **-C** option appended.\n4. **wd-originalPhoto** – Stores the data and specifications of the worker’s original photo (SOAP path: wd:Worker_Photo_Data/wd:File)."
+    },
+    {
+      "category": "config",
+      "instruction": "List the complete mapping of Photo attributes for the Workday driver, including attribute name, nds-name, SOAP response path, and description.",
+      "input": "",
+      "output": "Mapping of Photo Attributes for the Workday driver:\n\n| Attribute Name | nds-name | Workday SOAP Response Path | Description |\n|----------------|----------|----------------------------|-------------|\n| wd-photo | wd-photo | wd:Worker_Photo_Data/wd:File | Photo file content in base64Binary format |\n| wd-photoFilename | wd-photoFilename | wd:Worker_Photo_Data/wd:Filename | File name of the photo |\n| wd-photoID | wd-photoID | For worker photo: wd:Worker_Photo_Reference/wd:ID[@wd:type='Employee_ID'] -E  For contingent worker’s photo: wd:Worker_Photo_Reference/wd:ID[@wd:type='Contingent_Worker_ID'] -C | Identifier for the photo, with **-E** for employees and **-C** for contingent workers |\n| wd-originalPhoto | wd-originalPhoto | wd:Worker_Photo_Data/wd:File | This attribute holds the data and specifications of the worker’s original photo |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve the Photo attributes using the Get_Worker_Photos API in the Workday driver?",
+      "input": "",
+      "output": "To retrieve the Photo attributes with the Workday driver, follow these steps:\n1. Invoke the **Get_Worker_Photos** API provided by the Workday driver.\n2. The API response will include the four Photo attributes (wd-photo, wd-photoFilename, wd-photoID, wd-originalPhoto) as defined in the driver’s mapping table.\n3. Parse the SOAP response using the paths listed for each attribute (e.g., wd:Worker_Photo_Data/wd:File for wd-photo).\n4. The wd-photoID attribute will include the **-E** suffix for regular employees or the **-C** suffix for contingent workers, allowing you to differentiate the type of worker.\n5. Use the retrieved base64Binary data from wd-photo or wd-originalPhoto as needed, and the filename from wd-photoFilename for storage or display purposes."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the wd-photoID attribute differ between employee and contingent worker photos in the Workday driver?",
+      "input": "",
+      "output": "In the Workday driver, the **wd-photoID** attribute returns a different SOAP path depending on the type of worker:\n- For a regular employee, the path is **wd:Worker_Photo_Reference/wd:ID[@wd:type='Employee_ID']** and the attribute value is appended with the **-E** option.\n- For a contingent worker, the path is **wd:Worker_Photo_Reference/wd:ID[@wd:type='Contingent_Worker_ID']** and the attribute value is appended with the **-C** option.\nThus, the **-E** suffix identifies employee photos, while the **-C** suffix identifies contingent worker photos."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key Photo attribute mappings provided for the Workday driver.",
+      "input": "",
+      "output": "The Workday driver defines four Photo attributes—wd-photo, wd-photoFilename, wd-photoID, and wd-originalPhoto—that are accessed via the Get_Worker_Photos API. Each attribute maps to a specific SOAP response path: wd-photo and wd-originalPhoto use wd:Worker_Photo_Data/wd:File, wd-photoFilename uses wd:Worker_Photo_Data/wd:Filename, and wd-photoID uses worker‑specific ID paths with **-E** for employees and **-C** for contingent workers. These mappings allow Identity Vault to retrieve photo content, filenames, identifiers, and original photo specifications from Workday."
+    }
+  ]
+}

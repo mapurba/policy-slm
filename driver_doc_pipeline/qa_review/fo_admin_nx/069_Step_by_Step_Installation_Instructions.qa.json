@@ -1,0 +1,59 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Fan-Out driver and why do you need to install Platform Services for it?",
+      "input": "",
+      "output": "The Fan-Out driver is a component of NetIQ Identity Manager that enables communication between the Core Driver Shim and UNIX/Linux platforms. Installing Platform Services configures the target host so it can provision users, handle authentication, and interact with the Core Driver. Platform Services also provides optional provisioning methods (local /etc/passwd, NSS virtual provisioning, or API‑only) and authentication options (redirect to Metadirectory, local /etc/shadow, or redirect with password synchronization)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install Platform Services for the Fan-Out driver on a Linux x86_64 system using the self‑extracting installer?",
+      "input": "",
+      "output": "To install Platform Services for the Fan-Out driver on Linux x86_64:\n1. Locate the installer file on the installation media, e.g. **linux_x86_64_platformservices.bin**.\n2. Execute the installer:\n   ```\n   sh linux_x86_64_platformservices.bin\n   ```\n3. When prompted, select a language and accept the License Agreement.\n4. Press **Enter** to accept the default installation path (**/usr/local**) or type an alternative path.\n5. Enter the hostname or IP address of the system running the Core Driver Shim.\n6. Enter the TCP port of the Core Driver (default is **3451**).\n7. If secondary drivers are required, answer **y** and repeat steps 5‑6 for each; otherwise answer **n**.\n8. Type the name of the platform (must have been pre‑created in the Core Driver configuration).\n9. Provide an eDirectory administrative user DN that has read/write rights to the ASAM System container.\n10. Enter the password for that eDirectory user.\n11. Choose a provisioning option (a = local /etc/passwd, b = NSS virtual provisioning, c = API‑only).\n12. Choose an authentication option (a = redirect to Metadirectory, b = local /etc/shadow, c = redirect with password sync).\n13. If you selected option **b** or **c** in the previous step, decide whether users may change their eDirectory passwords from this platform.\n14. The installer completes and creates the Platform Services daemon."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade an existing installation of the Fan-Out driver Platform Services?",
+      "input": "",
+      "output": "To upgrade Platform Services for the Fan-Out driver:\n1. Stop any running Platform Services daemons (see the \"Stopping Platform Services\" procedure).\n2. From the installation media, run the appropriate self‑extracting installer for your platform, for example:\n   ```\n   sh linux_x86_64_platformservices.bin\n   ```\n3. Select a language and accept the License Agreement.\n4. When prompted with **Update Package**, answer **y** to apply the upgrade.\n5. After the installer finishes, restart the Platform Services daemon (see the \"Starting Platform Services\" procedure)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you perform an unattended (non‑interactive) installation of the Fan-Out driver Platform Services on Linux?",
+      "input": "",
+      "output": "The Fan-Out driver Platform Services installer supports a **-non-interactive** mode with command‑line options. An example command that installs Platform Services on Linux with local provisioning and authentication is:\n```\nsh linux_x86_platformservices.bin -non-interactive \\\n    -corehost 10.0.0.1:3451 \\\n    -admin admin.acme \\\n    -password novell \\\n    -platname linux123 \\\n    -local-prov \\\n    -auth-local \\\n    -pam-pass \\\n    -path /usr/local \\\n    -runmode persistent\n```\nThis single line performs all interactive steps automatically."
+    },
+    {
+      "category": "config",
+      "instruction": "What command‑line parameters are available for unattended installation of the Fan-Out driver Platform Services and what does each one configure?",
+      "input": "",
+      "output": "The following parameters can be used with the **-non-interactive** option of the Fan-Out driver Platform Services installer:\n- **-corehost hostname:port[,hostname:port]** – Specifies one or more DNS/IP hostnames and TCP ports of the Core Driver Shim.\n- **-admin admin-dn** – Sets the distinguished name of the eDirectory administrative user.\n- **-password password** – Provides the password for the eDirectory administrative user.\n- **-platname name** – Defines the name of the platform object to be created/configured.\n- **-platformset name** – Indicates the platform set under which the platform object will be auto‑created.\n- **-permit-pass-sync <yes|no|ifAvailable>** – Determines whether password synchronization is permitted for the platform set.\n- **-local-prov**, **-nss-prov**, **-no-prov** – Choose the provisioning mode: local (/etc/passwd), NSS virtual provisioning, or API‑only.\n- **-auth-redir**, **-auth-local**, **-auth-local-failover** – Choose the authentication mode: redirect to Metadirectory, local /etc/shadow, or redirect with local failover.\n- **-pam-pass**, **-no-pam-pass** – Enable or disable automatic PAM configuration for password publishing.\n- **-path path** – Set the installation directory (default **/usr/local**).\n- **-runmode <persistent|polling>** – Select the default run mode (operation mode) of the Platform Receiver."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the native package names for each supported platform when extracting the Fan-Out driver Platform Services installer?",
+      "input": "",
+      "output": "The native package names used by the Fan-Out driver Platform Services installer are listed in Table 11‑2:\n| Platform | Native Package Name |\n|----------|---------------------|\n| Linux    | novell-DXMLfanplat-4.8.rpm |\n| Solaris  | DXMLfanplat-4.8.pkg |\n| AIX      | novell-DXMLfanplat-4.8.rpm |\n| HP‑UX    | novell-DXMLfanplat-4.8.depot |\n| FreeBSD  | novell-DXMLfanplat-4.8.tgz |\n| Debian   | novell-DXMLfanplat-4.8.deb |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you extract the contents of the Fan-Out driver Platform Services installer for custom modification?",
+      "input": "",
+      "output": "To extract the installer contents for a custom deployment of the Fan-Out driver Platform Services:\n1. Choose the installer that matches your target OS, e.g. **linux_x86_64_platformservices.bin**.\n2. Run the installer with the **-extract** option:\n   ```\n   sh linux_x86_64_platformservices.bin -extract\n   ```\n3. The command creates a temporary directory structure such as:\n```\nlinux_86_64/\nlinux_86_64/setup/\nlinux_86_64/setup/admin.fanplat\nlinux_86_64/setup/install\nlinux_86_64/license-*.txt\nlinux_86_64/package/\nlinux_86_64/package/novell-DXMLfanplat-4.8.rpm\n```\n4. Modify any files under the **setup** directory as required (for example, edit **install**)."
+    },
+    {
+      "category": "howto",
+      "instruction": "After customizing the installation script, how do you rebuild a new .bin installer for the Fan-Out driver Platform Services?",
+      "input": "",
+      "output": "To rebuild a .bin installer for the Fan-Out driver after modifying the extracted files:\n1. Extract the first 76 lines (the header) from the original installer:\n   ```\n   head -n 76 <os>_platformservices.bin > header\n   ```\n   Replace **<os>** with your platform identifier (e.g., **linux_x86_64**).\n2. Inside the extracted **<os>** directory, make the desired changes to configuration scripts.\n3. Create a new tar archive of the modified directory contents:\n   ```\n   tar cf <os>_platformservices.tar <os>\n   ```\n4. Concatenate the saved header with the new tar file to produce a new self‑extracting installer:\n   ```\n   cat header <os>_platformservices.tar > <os>_platformservices.bin\n   ```\n5. The resulting **<os>_platformservices.bin** can be distributed and executed like the original installer."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main procedures for installing, upgrading, performing unattended installation, and customizing the Fan-Out driver Platform Services.",
+      "input": "",
+      "output": "The Fan-Out driver Platform Services are installed via a self‑extracting **.bin** installer. For a standard install, run the installer, accept the license, provide the Core Driver host and port, eDirectory admin credentials, platform name, and choose provisioning and authentication options. Upgrading requires stopping the daemon, running the same installer with **Update Package = y**, and restarting the daemon. Unattended installations use the **-non-interactive** flag together with parameters such as **-corehost**, **-admin**, **-password**, **-platname**, provisioning/authentication flags, **-pam-pass**, **-path**, and **-runmode**, allowing a single scripted command. For custom deployments, extract the installer with **-extract**, modify the **setup/install** script or other files, then rebuild the .bin by extracting the header, creating a new tar archive of the modified directory, and concatenating the header and tar file."
+    }
+  ]
+}

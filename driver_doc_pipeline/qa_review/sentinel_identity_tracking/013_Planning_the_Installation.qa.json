@@ -1,0 +1,53 @@
+{
+  "driver": "Sentinel Identity Tracking driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Identity Vault component in the Sentinel Identity Tracking driver and why is it used?",
+      "input": "",
+      "output": "In the Sentinel Identity Tracking driver, the Identity Vault is a persistent database powered by NetIQ eDirectory that is used by NetIQ Identity Manager to store data for synchronization with Sentinel. It acts as a private data store for Identity Manager or as a metadirectory holding enterprise‑wide data, and its contents are accessible via any eDirectory‑supported protocol such as NCP, LDAP, or DSML. Because it is based on eDirectory, organizations can integrate Identity Manager into their existing directory tree and run the vault on any platform supported by Identity Manager."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the Driver Shim (Integration Module for Sentinel) in the Sentinel Identity Tracking driver and what does it do?",
+      "input": "",
+      "output": "The Driver Shim, also called the Integration Module for Sentinel, is a Java‑based component (provided as SentinelRESTShim.jar) that converts the XML‑based Identity Manager command and event language (XDS) into the protocols and API calls required to interact with Sentinel. It serves as the executable code that bridges Identity Manager and Sentinel, enabling synchronization and communication between the two systems."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the Remote Loader in the Sentinel Identity Tracking driver and when should it be used?",
+      "input": "",
+      "output": "The Remote Loader is a service that runs a driver shim outside of the Identity Manager engine. It is used when the driver shim’s requirements cannot be met on the Identity Manager server itself—for example, when the Identity Manager engine runs on Linux but the integration needs to communicate with a system that requires a Windows environment, such as Active Directory. The Remote Loader executes the driver shim on the remote host and passes information between the shim and the Identity Manager engine, optionally using SSL to encrypt the connection."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Sentinel Identity Tracking driver shim on the Identity Manager system?",
+      "input": "",
+      "output": "To install the Sentinel Identity Tracking driver shim on the Identity Manager system:\n1. Decide that the shim will run on the same host as the Identity Manager engine.\n2. Download the SentinelRESTShim.jar file from the NetIQ download web site.\n3. Stop the Identity Manager server so that the integration module can be added or updated.\n4. Place the SentinelRESTShim.jar file in the appropriate driver directory on the Identity Manager server.\n5. Restart the Identity Manager server to load the new driver shim.\nThe shim will then log its trace messages to the Identity Manager server trace log, simplifying troubleshooting."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Sentinel Identity Tracking driver shim on a remote system using the Remote Loader?",
+      "input": "",
+      "output": "To install the Sentinel Identity Tracking driver shim on a remote system with the Remote Loader:\n1. Choose a remote host that meets the driver shim’s requirements (e.g., appropriate OS and Java runtime).\n2. Install and start the Remote Loader service on that host.\n3. Download the SentinelRESTShim.jar file from the NetIQ download web site.\n4. Copy SentinelRESTShim.jar to the remote host where the Remote Loader is running.\n5. Configure the Remote Loader to execute the driver shim (this may involve specifying the shim’s path in the Remote Loader configuration).\n6. Optionally enable SSL in the Remote Loader settings to encrypt the connection between the Identity Manager engine and the Remote Loader.\n7. Restart only the Remote Loader process (not the Identity Manager server) to load the updated shim.\nAfter these steps, two network connections are established: one between Identity Manager and the Remote Loader, and another between Sentinel and the driver shim."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Where can you find trace messages for the Sentinel Identity Tracking driver when the shim is installed on the Identity Manager server?",
+      "input": "",
+      "output": "When the Sentinel Identity Tracking driver shim is installed on the Identity Manager server, its trace messages are written to the Identity Manager server trace log. Reviewing this log provides the primary source of troubleshooting information for the locally hosted driver shim."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What additional troubleshooting steps are required for the Sentinel Identity Tracking driver when the shim is installed on a remote system?",
+      "input": "",
+      "output": "If the Sentinel Identity Tracking driver shim is installed on a remote system, you must examine trace files from both the Identity Vault process and the Remote Loader process because trace information is split between these two components. This may involve:\n1. Accessing the Identity Vault’s trace log on the Identity Manager server.\n2. Accessing the Remote Loader’s trace log on the remote host where the shim runs.\n3. Correlating events from both logs to diagnose issues, keeping in mind the extra TCP/IP traffic between the Identity Vault and the Remote Loader."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key installation considerations for the Sentinel Identity Tracking driver.",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver can be installed either on the Identity Manager system or on a remote host using a Remote Loader. Installing locally simplifies tracing (logs appear in the Identity Manager server trace log) and removes the need for a Remote Loader, but it consumes server resources and requires a server restart for updates. Installing remotely isolates resource usage and allows updates by restarting only the Remote Loader, but it introduces multiple trace files, the need to configure a Remote Loader instance, and additional TCP/IP traffic between the Identity Vault and the Remote Loader. The driver shim (SentinelRESTShim.jar) converts XDS commands to Sentinel protocols, and the Remote Loader facilitates execution of the shim on a separate host, optionally using SSL for secure communication."
+    }
+  ]
+}

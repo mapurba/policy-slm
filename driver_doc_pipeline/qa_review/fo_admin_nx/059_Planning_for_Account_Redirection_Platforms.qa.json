@@ -1,0 +1,47 @@
+{
+  "driver": "FO Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the Account Redirection option do in the FO Admin Nx driver?",
+      "input": "",
+      "output": "In the FO Admin Nx driver, the Account Redirection option redirects all account information from Identity Manager to the target system. It transfers the loginName, uidNumber, gidNumber, gecos, homeDirectory, loginShell, memberUid fields, and passwords, ensuring that the target system receives a complete set of POSIX account attributes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Name Service Switch for system startup when using Account Redirection in the FO Admin Nx driver?",
+      "input": "",
+      "output": "To configure the Name Service Switch (NSS) for Account Redirection in the FO Admin Nx driver:\n1. Edit the `/etc/nsswitch.conf` file.\n2. Add or modify the appropriate entries (e.g., `passwd`, `group`, `shadow`) to include the FO Admin Nx source, such as `passwd: files foadminnx`.\n3. Save the file and verify the syntax.\n4. Restart any services that rely on NSS (e.g., `nscd` or `systemd-logind`)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Platform Services Cache Daemon to start automatically for Account Redirection in the FO Admin Nx driver?",
+      "input": "",
+      "output": "To configure the Platform Services Cache Daemon for automatic startup when using Account Redirection in the FO Admin Nx driver:\n1. Ensure the daemon package is installed on the system.\n2. Create a system service file (e.g., `/etc/systemd/system/foadminnx-cache.service`) with the appropriate ExecStart command for the cache daemon.\n3. Enable the service to start at boot with `systemctl enable foadminnx-cache.service`.\n4. Start the service immediately using `systemctl start foadminnx-cache.service`.\n5. Verify the daemon is running with `systemctl status foadminnx-cache.service`."
+    },
+    {
+      "category": "config",
+      "instruction": "Which account attributes are redirected by the Account Redirection option in the FO Admin Nx driver?",
+      "input": "",
+      "output": "The Account Redirection option in the FO Admin Nx driver redirects the following attributes:\n- `loginName`\n- `uidNumber`\n- `gidNumber`\n- `gecos`\n- `homeDirectory`\n- `loginShell`\n- `memberUid` fields\n- passwords"
+    },
+    {
+      "category": "config",
+      "instruction": "What preparation is required for user and group entries before using Account Redirection in the FO Admin Nx driver?",
+      "input": "",
+      "output": "Before using Account Redirection with the FO Admin Nx driver, each user and group entry must contain the POSIX auxiliary classes:\n- Users must have the `posixAccount` auxiliary class.\n- Groups must have the `posixGroup` auxiliary class.\nThese classes can be added manually per object, imported in bulk via an LDIF file, or automatically populated by running the Linux and UNIX User Settings Driver when users and groups are created or modified."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example LDIF snippet that adds the posixAccount auxiliary class to a user and the posixGroup auxiliary class to a group for use with the FO Admin Nx driver.",
+      "input": "",
+      "output": "```ldif\n# Add posixAccount to a user\ndn: uid=jdoe,ou=People,dc=example,dc=com\nchangetype: modify\nadd: objectClass\nobjectClass: posixAccount\n-\n# Provide required POSIX attributes for the user\nreplace: uidNumber\nuidNumber: 1001\n-\nreplace: gidNumber\ngidNumber: 1001\n-\nreplace: homeDirectory\nhomeDirectory: /home/jdoe\n-\nreplace: loginShell\nloginShell: /bin/bash\n-\n# Add posixGroup to a group\ndn: cn=developers,ou=Groups,dc=example,dc=com\nchangetype: modify\nadd: objectClass\nobjectClass: posixGroup\n-\n# Provide required POSIX attributes for the group\nreplace: gidNumber\ngidNumber: 2001\n-```\nThis LDIF adds the required `posixAccount` class and its mandatory attributes to the user `jdoe` and adds the `posixGroup` class with its mandatory `gidNumber` to the group `developers`, satisfying the preparation needed for Account Redirection in the FO Admin Nx driver."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key planning considerations for Account Redirection Platforms in the FO Admin Nx driver.",
+      "input": "",
+      "output": "When planning for Account Redirection Platforms with the FO Admin Nx driver, you should:\n1. Use the Account Redirection option to transfer all POSIX account fields and passwords.\n2. Skip running the Platform Receiver and Platform Services Process; instead, configure the Name Service Switch and enable the Platform Services Cache Daemon at system startup.\n3. Ensure all user and group entries include the `posixAccount` and `posixGroup` auxiliary classes, either manually, via bulk LDIF import, or automatically with the Linux and UNIX User Settings Driver."
+    }
+  ]
+}

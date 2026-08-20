@@ -1,0 +1,65 @@
+{
+  "driver": "Platform Services for Linux/UNIX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the four major components of the Platform Services for Linux/UNIX driver and what does each component do?",
+      "input": "",
+      "output": "The Platform Services for Linux/UNIX driver consists of:\n1. **Platform Services Process** – receives requests from other processes, handles password checks and changes, communicates with Core Drivers, redirects requests if a Core Driver is unavailable, and logs performance statistics.\n2. **System Intercept** – implemented via PAM on most Linux/UNIX systems (or LAM on AIX) and forwards password verification and change requests to the Platform Services Process.\n3. **Platform Receiver** – requests provisioning events from Event Journal Services, runs Receiver scripts to act on each event, and logs to the syslog facility.\n4. **Platform Services Cache Daemon** – receives provisioning events, stores them in a memory cache pool for fast local access, and serves account information requests (e.g., from the Name Service Switch)."
+    },
+    {
+      "category": "config",
+      "instruction": "Which statement in the platform configuration file specifies the syslog facility for the Platform Services for Linux/UNIX driver?",
+      "input": "",
+      "output": "The **SYSLOGFACILITY** statement in the platform configuration file (ASAM/data/asamplat.conf) specifies the syslog facility to which the Platform Services Process, Platform Receiver, and Platform Services Cache Daemon log their messages."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the purpose of the ENTROPY statement in the platform configuration file for the Platform Services for Linux/UNIX driver, and when must it be used?",
+      "input": "",
+      "output": "The **ENTROPY** statement defines the source of entropy used by SSL for secure communication with Core Drivers. It must be included when the Linux/UNIX implementation does **not** provide a /dev/random device, and an entropy daemon must be installed to supply the required randomness."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you configure the Platform Services for Linux/UNIX driver to use a specific code page for UTF‑8 data conversion?",
+      "input": "",
+      "output": "Add a **CODEPAGE** statement to the platform configuration file (ASAM/data/asamplat.conf). The CODEPAGE statement specifies the code page that the Platform Receiver and the Platform Services Cache Daemon will use to convert UTF‑8 encoded data.\nExample:\n```\nCODEPAGE 1252\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you start and stop the Platform Services Process for the Platform Services for Linux/UNIX driver during system startup and shutdown?",
+      "input": "",
+      "output": "1. **Create startup script** (e.g., /etc/init.d/platformservices) that executes the Platform Services Process binary.\n2. **Enable the script** to run at the appropriate runlevels (e.g., `chkconfig --add platformservices` on Red Hat or `update-rc.d platformservices defaults` on Debian).\n3. The script should contain `start` and `stop` actions that launch and terminate the Platform Services Process respectively.\n4. Verify that the process reads its configuration from `ASAM/data/asamplat.conf` and logs to the syslog facility defined by `SYSLOGFACILITY`.\nDuring shutdown, the script’s `stop` action cleanly terminates the process so that no pending SSL connections remain."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Platform Receiver to run on a schedule appropriate for your requirements in the Platform Services for Linux/UNIX driver?",
+      "input": "",
+      "output": "1. Create a cron job (or equivalent scheduler entry) that invokes the Platform Receiver executable `asamrcvr`.\n2. Example cron entry to run every 5 minutes:\n```\n*/5 * * * * /path/to/ASAM/bin/PlatformServices/PlatformReceiver/asamrcvr >> /var/log/platformreceiver.log 2>&1\n```\n3. Adjust the frequency according to the desired provisioning latency.\n4. Ensure the cron user has permission to read `ASAM/data/asamplat.conf` and write to the log file.\n5. The Platform Receiver will, on each run, request provisioning events from Event Journal Services via SSL and execute the appropriate Receiver scripts."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take if your Linux/UNIX system lacks a /dev/random device for the Platform Services for Linux/UNIX driver?",
+      "input": "",
+      "output": "1. Install an entropy daemon (e.g., `rngd` or `haveged`).\n2. Verify that the daemon is running and providing sufficient entropy (`cat /proc/sys/kernel/random/entropy_avail`).\n3. Add an **ENTROPY** statement to the platform configuration file (ASAM/data/asamplat.conf) specifying the daemon’s source, such as:\n```\nENTROPY /var/run/rngd.sock\n```\n4. Restart the Platform Services Process so it picks up the new ENTROPY configuration.\n5. Check the syslog for messages confirming that SSL has successfully obtained entropy."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Platform Receiver execute Receiver scripts in a non‑deterministic order for the Platform Services for Linux/UNIX driver?",
+      "input": "",
+      "output": "The execution order can vary because the Platform Receiver’s response is influenced by factors such as prior events received, the current synchronization state between eDirectory and the target system, and the specific type of provisioning event. These variables cause the order of script calls to change from one event to the next, as shown in Table 11‑1."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a shell snippet that a Receiver script for the Platform Services for Linux/UNIX driver could use to map incoming name‑value pairs to environment variables, using the example `enterpriseUserName  bob`.",
+      "input": "",
+      "output": "```sh\n#!/bin/sh\n# Receiver script example for Platform Services for Linux/UNIX driver\n# Map incoming name‑value pairs to environment variables\n\n# The Platform Receiver passes each name‑value pair as a line on STDIN.\n# Example input line: \"enterpriseUserName  bob\"\n\nwhile read name value; do\n  case \"$name\" in\n    enterpriseUserName)\n      export ENTERPRISEUSERNAME=\"$value\"\n      ;;\n    # Add additional mappings as needed\n    *)\n      echo \"Unrecognized attribute: $name\"\n      ;;\n  esac\ndone\n\n# At this point, $ENTERPRISEUSERNAME is available for further processing\n```"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key responsibilities of the Platform Services Process in the Platform Services for Linux/UNIX driver.",
+      "input": "",
+      "output": "The Platform Services Process acts as the central interface between the System Intercept (or AS Client API) and Core Drivers. It handles password verification and change requests, forwards them to Core Drivers over SSL, redirects requests if a Core Driver is unavailable, gathers performance statistics, reads its configuration from `ASAM/data/asamplat.conf`, and logs to the syslog facility defined by the `SYSLOGFACILITY` statement."
+    }
+  ]
+}

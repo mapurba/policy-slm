@@ -1,0 +1,41 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Workday driver require extending the eDirectory schema?",
+      "input": "",
+      "output": "The Workday driver needs additional object types in the Identity Vault (IDV) so it can create and manage Workday‑specific entities such as users, relations, job families, job profiles, locations, organizations, photos, and retry settings. Extending the eDirectory schema adds the required classes, enabling the driver to store and manipulate these objects."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the Workday driver schema extension into eDirectory using the ndssch utility?",
+      "input": "",
+      "output": "Run the ndssch command with the appropriate host name, log file, container DN, and schema file. The syntax is:\n```\n/opt/novell/eDirectory/bin/ndssch -h idv.server.DNS.name -F /tmp/wd-schema.log admin.services.data /tmp/wd-schema.sch\n```\nReplace **idv.server.DNS.name** with the DNS name of your IDV server, **/tmp/wd-schema.log** with the desired log path, and **/tmp/wd-schema.sch** with the path to the Workday schema file."
+    },
+    {
+      "category": "config",
+      "instruction": "Which auxiliary and effective classes are added to the IDV schema for the Workday driver?",
+      "input": "",
+      "output": "The Workday driver adds the following classes:\n* **Auxiliary Class for User**: `wd-User`\n* **Effective Class for Relation Objects**: `wd-Relation`\n* **Effective Class for Job Family Objects**: `wd-Jobfamily`\n* **Effective Class for Job Profile Objects**: `wd-Jobprofile`\n* **Effective Class for Location Objects**: `wd-Location`\n* **Effective Class for Organization Objects**: `wd-Organization`\n* **Effective Class for Photo Objects**: `wd-Photo`\n* **Effective Class for Retry Settings**: `DirXML-WDSyncAttr`"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What problem occurs if you import the Workday driver schema file with a method other than ndssch?",
+      "input": "",
+      "output": "Importing the Workday driver schema file with any method other than the ndssch utility fails for certain attributes, preventing the schema extension from being applied correctly."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the schema file for the Workday driver be extended only with the ndssch utility?",
+      "input": "",
+      "output": "The ndssch utility is the only tool that correctly processes the Workday schema file; using other import methods can cause attribute failures, which would break the functionality of the Workday driver within the IDV."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to extend the IDV schema for the Workday driver and the classes that are added.",
+      "input": "",
+      "output": "To extend the IDV schema for the Workday driver, download the provided ldif and sch schema files, then import them using the ndssch utility with a command such as:\n```\n/opt/novell/eDirectory/bin/ndssch -h <IDV DNS name> -F /tmp/wd-schema.log admin.services.data /tmp/wd-schema.sch\n```\nThe import adds one auxiliary class (`wd-User`) and seven effective classes (`wd-Relation`, `wd-Jobfamily`, `wd-Jobprofile`, `wd-Location`, `wd-Organization`, `wd-Photo`, `DirXML-WDSyncAttr`) to the eDirectory schema, enabling the Workday driver to create the necessary Workday objects in the IDV."
+    }
+  ]
+}

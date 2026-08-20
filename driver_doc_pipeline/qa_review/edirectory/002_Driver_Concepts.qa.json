@@ -1,0 +1,59 @@
+{
+  "driver": "eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the driver shim and what role does it play in the eDirectory driver?",
+      "input": "",
+      "output": "The driver shim for the eDirectory driver is a Java file (NdsToNds.jar) that is loaded directly by Identity Manager. It communicates event changes from the eDirectory driver to an Identity Vault, receives changes from the Identity Vault, and serves as the link that connects the Identity Vault with the driver object."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the eDirectory driver use Publisher and Subscriber channels across two trees?",
+      "input": "",
+      "output": "In the eDirectory driver, each instance is installed in a tree (TreeA or TreeB). The Publisher channel in TreeA communicates with the Subscriber channel in TreeB, and the Publisher channel in TreeB communicates with the Subscriber channel in TreeA. This pairwise configuration enables data synchronization between the two trees."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the GUID attribute included in the Subscriber filter but not in the Publisher filter of the eDirectory driver?",
+      "input": "",
+      "output": "The GUID attribute is required in the Subscriber filter for each synchronized class because it is used to generate an association key when a new object is added. It is omitted from the Publisher filter because synchronizing a globally unique value is generally undesirable; the GUID should remain unique and not be copied between directories."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration setting determines the TCP port used for the Subscriber‑to‑Publisher connection in the eDirectory driver?",
+      "input": "",
+      "output": "The TCP port used for the connections between the Subscriber and Publisher channels in the eDirectory driver is configurable. Administrators can set the desired port number in the driver’s connection parameters."
+    },
+    {
+      "category": "config",
+      "instruction": "How can the frequency of keep‑alive packets be adjusted in the eDirectory driver?",
+      "input": "",
+      "output": "The eDirectory driver includes a configurable keep‑alive frequency. Administrators can tune this setting to either minimize network traffic or to reduce the time needed to detect and recover from a broken connection."
+    },
+    {
+      "category": "config",
+      "instruction": "What steps are required to secure the communication between two eDirectory driver instances with SSL?",
+      "input": "",
+      "output": "To secure communication with SSL in the eDirectory driver:\n1. Create a server certificate for each Publisher instance.\n2. Have each certificate signed by a certificate authority (CA) that is trusted by the corresponding Subscriber channel.\n3. Configure the driver instances to use SSL, referencing the created certificates.\n(See Section 5.0, Securing Driver Communication for additional details.)"
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the eDirectory driver recover from a broken TCP connection between driver instances?",
+      "input": "",
+      "output": "When a TCP connection breaks, the Subscriber channel of the eDirectory driver issues a retry status to the Identity Manager engine. The engine then resends the event, prompting the Subscriber to attempt reconnection. The connection is re‑established on demand and remains active until it is broken again or one of the driver instances is stopped."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What indicates that the eDirectory driver failed to connect to the counterpart driver instance, and what automatic action does it take?",
+      "input": "",
+      "output": "If the eDirectory driver cannot connect to the opposite instance, the Subscriber channel logs a retry status and automatically attempts to reconnect when the Identity Manager engine resends the pending event. This retry mechanism continues until the connection succeeds or the driver instance is stopped."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main concepts and data‑flow mechanisms of the eDirectory driver.",
+      "input": "",
+      "output": "The eDirectory driver connects Identity Manager to an Identity Vault using a driver shim (NdsToNds.jar). It operates in pairs across two trees, with Publisher channels in one tree communicating with Subscriber channels in the other via configurable TCP ports (optionally secured with SSL). Filters control which objects and attributes are synchronized, with the GUID attribute required only in Subscriber filters. Policies govern synchronization, typically applied in the Subscriber Event Transformation policy. Keep‑alive messages, whose frequency is configurable, detect broken connections; the driver retries automatically on failure. Rights to objects are granted through standard eDirectory rights management."
+    }
+  ]
+}

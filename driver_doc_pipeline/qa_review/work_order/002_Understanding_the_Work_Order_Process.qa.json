@@ -1,0 +1,65 @@
+{
+  "driver": "Work Order driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the role of the Subscriber channel in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order driver, the Subscriber channel receives WorkOrder objects that meet the Placement and Create rules, creates an association for each object, checks the DirXML-DoItNow Flag and DirXML-SendToPublisher Flag, and either builds and sends the work order immediately to the Publisher channel (if both flags are true) or waits until the next event (if the flags are not set to true)."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Publisher channel wake up in the Work Order driver?",
+      "input": "",
+      "output": "The Publisher channel in the Work Order driver wakes up either because the Subscriber channel has sent a WorkOrder object (when the SendToPublisher flag is true) or because the configured polling interval has expired, prompting it to query the work order container for pending and due work orders as well as work orders with expired DeleteDueDates. It also wakes to report driver status if a driver heartbeat is configured."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes must be present on a WorkOrder object for it to pass the Create rule and be sent to the Subscriber channel in the Work Order driver?",
+      "input": "",
+      "output": "The required attributes are:\n- DirXML-nwoContent\n- DirXML-nwoStatus\n- DirXML-DoItNow Flag\n- DirXML-SendToPublisher Flag"
+    },
+    {
+      "category": "config",
+      "instruction": "What does the DirXML-DoItNow Flag control in the Work Order driver?",
+      "input": "",
+      "output": "The DirXML-DoItNow Flag indicates whether a work order should be built and sent immediately from the Subscriber channel to the Publisher channel. If the flag is set to True, the Subscriber channel processes the work order right away; otherwise, it waits for the next event."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the Work Order driver determine whether to delete a work order based on the DeleteDueDate attribute?",
+      "input": "",
+      "output": "The Publisher channel queries the work order container for work orders whose DeleteDueDate attribute has expired. If the work order status is Pending or Configured and the DeleteDueDate has passed, the work order is deleted. Additionally, if the work order status is Error and the DeleteOnError attribute is set to True, the work order is also deleted."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure a work order to be processed immediately in the Work Order driver?",
+      "input": "",
+      "output": "To have a work order processed immediately, set both DirXML-DoItNow Flag and DirXML-SendToPublisher Flag to True on the WorkOrder object. When the Subscriber channel receives this object, it builds the work order and sends it right away to the Publisher channel for processing."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure a repeating work order in the Work Order driver?",
+      "input": "",
+      "output": "In the Work Order object, provide a repeat interval value in the appropriate attribute (the documentation refers to a repeat interval value). After the work order is processed, the Publisher channel adds this repeat interval to the Due Date, leaves the status as Pending, and continues processing it according to the repeat interval count value (or indefinitely if no count is specified)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Publisher channel delete work orders that have an error status in the Work Order driver?",
+      "input": "",
+      "output": "The Publisher channel queries the work order container for work orders with an Error status. If the DeleteOnError attribute on the work order is set to True, the Publisher channel deletes the work order during its deletion pass."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a work order not be processed immediately by the Work Order driver, and how can you resolve it?",
+      "input": "",
+      "output": "If a work order is not processed immediately, it is likely because one or both of the required flags—DirXML-DoItNow Flag and DirXML-SendToPublisher Flag—are not set to True on the WorkOrder object. To resolve the issue, verify that both flags are present and set to True; then the Subscriber channel will build and forward the work order to the Publisher channel right away."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key functions of the Subscriber and Publisher channels in the Work Order driver.",
+      "input": "",
+      "output": "In the Work Order driver, the Subscriber channel receives work orders that meet required attribute rules, creates an association, and either forwards the work order immediately to the Publisher channel when DirXML-DoItNow Flag and DirXML-SendToPublisher Flag are true, or waits for the next event. The Publisher channel wakes either due to a received work order or a polling interval, processes pending and due work orders (checking for dependent work orders, writing DirXML-WorkToDo objects, updating status, handling repeat intervals), and deletes work orders whose DeleteDueDate has expired or that have an error status with DeleteOnError set to True."
+    }
+  ]
+}

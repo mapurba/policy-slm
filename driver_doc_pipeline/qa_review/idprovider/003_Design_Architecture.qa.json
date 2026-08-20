@@ -1,0 +1,41 @@
+{
+  "driver": "ID Provider driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ID Provider driver and how does it differ from other Identity Manager drivers?",
+      "input": "",
+      "output": "The ID Provider driver listens for events like other Identity Manager drivers, but it has two distinct sets of policies: the standard Identity Manager policies and the ID Provider policies. The ID Provider policies enable the driver to generate and assign unique IDs to objects, a capability that other drivers do not provide."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which three major components make up the ID Provider driver architecture?",
+      "input": "",
+      "output": "The ID Provider driver architecture consists of:\n1. **ID Client** – communicates with the ID Provider driver to request a unique ID; it can be another Identity Manager driver (e.g., WorkOrder driver) or a standalone Java application.\n2. **ID Provider Driver** – receives ID requests, generates unique IDs, stores them in the Identity Vault, and returns the IDs to the client. It uses LDAP to access the Identity Vault and Java RMI for client communication.\n3. **Identity Vault** – stores the unique IDs and the ID Provider policies within the ID Policy Container."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the ID Provider driver generate and assign a unique ID to a new User object when the ID Provider policies are stored in the Identity Vault (Scenario 1)?",
+      "input": "",
+      "output": "In Scenario 1, the ID Provider driver follows these steps:\n1. A new User object is created in the Identity Vault, triggering a Create event that the ID Provider driver picks up.\n2. The driver reads the last generated ID from the ID Provider policies stored in the Identity Vault.\n3. It increments that value to generate a new unique ID and writes the new ID back to the ID Provider policies in the Identity Vault to keep the sequence up to date.\n4. The driver assigns the newly generated ID to the new User object.\nAll events are tracked and stored in the Identity Vault."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the ID Provider driver generate and assign a unique ID to a new User object when the ID Provider policies are stored in an LDAP database (Scenario 2)?",
+      "input": "",
+      "output": "In Scenario 2, the ID Provider driver performs the following steps:\n1. A new User object is created in the Identity Vault, and the Create event is captured by the ID Provider driver.\n2. The driver reads the last generated ID from the ID Provider policies that are stored in the LDAP database.\n3. It generates a new unique ID by incrementing the stored value and writes the updated ID back to the LDAP database to maintain the sequence.\n4. The driver assigns the newly generated ID to the new User object in the Identity Vault.\nThe process mirrors Scenario 1, but the policy storage location is an LDAP database instead of the Identity Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When should you choose to store ID Provider policies in an LDAP database instead of the Identity Vault for the ID Provider driver?",
+      "input": "",
+      "output": "You should choose to store ID Provider policies in an LDAP database when you need to centralize policy storage outside the Identity Vault, such as when multiple Identity Manager instances share the same policy repository or when organizational policy mandates LDAP as the authoritative store for ID generation rules."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key design architecture and workflow of the ID Provider driver.",
+      "input": "",
+      "output": "The ID Provider driver consists of an ID Client, the ID Provider driver itself, and the Identity Vault. It listens for events, reads the last generated ID from ID Provider policies (stored either in the Identity Vault or an LDAP database), increments the value to create a new unique ID, writes the updated ID back to the policy store, and assigns the new ID to the created object. All event information and policies are tracked in the Identity Vault, and communication with clients uses Java RMI while policy storage can be either the Identity Vault or LDAP."
+    }
+  ]
+}

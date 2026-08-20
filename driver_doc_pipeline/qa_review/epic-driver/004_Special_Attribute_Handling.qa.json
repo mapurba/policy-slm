@@ -1,0 +1,41 @@
+{
+  "driver": "Epic driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of reversing the Login Disabled attribute when mapping it to IsActive in the Epic driver?",
+      "input": "",
+      "output": "In the Epic driver, the Login Disabled attribute from the Identity Vault must be reversed because Epic uses the IsActive flag to indicate whether an account is enabled. When Login Disabled is true (meaning the user should not be able to log in), the corresponding IsActive flag in Epic must be false, and vice‑versa. Reversing the boolean ensures the desired active/inactive state in Epic."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the attribute mapping in the Epic driver so that Login Disabled from the Identity Vault correctly sets IsActive in Epic?",
+      "input": "",
+      "output": "To configure the mapping in the Epic driver:\n1. Open the Epic driver attribute mapping configuration screen.\n2. Locate the source attribute **Login Disabled** from the Identity Vault.\n3. Map it to the target attribute **IsActive** in Epic.\n4. Add a value transformation that inverts the boolean (true → false, false → true).\n5. Save the mapping and redeploy the driver configuration.\nWith this setup, any true value for Login Disabled will be stored as false for IsActive, achieving the correct behavior."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attribute in the Epic driver corresponds to the Identity Vault's Login Disabled, and what transformation must be applied?",
+      "input": "",
+      "output": "In the Epic driver, the Identity Vault attribute **Login Disabled** maps to the Epic attribute **IsActive**. The required transformation is a boolean reversal: if Login Disabled = true, set IsActive = false; if Login Disabled = false, set IsActive = true."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What symptom indicates that the Login Disabled attribute is being synced without reversal in the Epic driver, and how can you resolve it?",
+      "input": "",
+      "output": "Symptom: Users who are marked as \"Login Disabled = true\" in the Identity Vault appear as active (IsActive = true) in Epic, allowing them to log in when they should be blocked. Resolution: Edit the Epic driver mapping for Login Disabled, add a boolean inversion transformation, and redeploy the driver so that the value is correctly reversed before being written to IsActive."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the special attribute handling rules for the Epic driver described on the page.",
+      "input": "",
+      "output": "The Epic driver requires special handling for two attributes: • **Login Disabled** must be mapped to Epic's **IsActive** with the boolean value reversed (true → false, false → true) to achieve the intended active status. • **CustomUserDictionaries** is deprecated and no longer available in Epic versions released from 2014 onward, so it should not be used in any mapping."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example of a transformation rule that reverses the boolean value of Login Disabled for mapping to IsActive in the Epic driver.",
+      "input": "",
+      "output": "```xml\n<!-- Epic driver attribute transformation -->\n<AttributeMapping>\n    <Source name=\"Login Disabled\" />\n    <Target name=\"IsActive\" />\n    <Transformation type=\"BooleanInvert\" />\n</AttributeMapping>\n```\nThe `<Transformation type=\"BooleanInvert\" />` element instructs the Epic driver to flip the true/false value received from the Identity Vault before assigning it to the IsActive attribute in Epic."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "driver": "Core driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a Census Trawl in the Core driver and why is it performed?",
+      "input": "",
+      "output": "In the Core driver, a Census Trawl is a periodic operation performed by Object Services to verify the contents of the Census. It is also run when a new Census Search object is created via the Web interface to initially build the Census or a part of it. The trawl ensures that every user and group found by Census Search objects has a matching eUser or eGroup in the Census container and that stale entries are removed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Core driver build the Census when a new Census Search object is defined through the Web interface?",
+      "input": "",
+      "output": "When you define a new Census Search object in the Web interface, the Core driver runs a Census Trawl that performs the following steps for each Census Search object:\n1. Object Services scans the Census Search object for users and groups.\n2. For each user or group without a corresponding eUser or eGroup in the Census container:\n   a. Creates the eUser or eGroup in the Census container and associates it with the Platform Set containers whose Platform Set Search objects cover it. If the common name already exists, the object is created in the Exceptions container and must be resolved by an administrator.\n   b. Notifies Event Journal Services.\n   c. When a Platform Receiver requests the next event, Event Journal Services reads the new object's details from eDirectory and passes the provisioning event to the Platform Receiver (retrying later if directory sync is incomplete).\n   d. The Platform Receiver checks for name collisions (unless excluded in the platform configuration file). If a collision exists, it notifies Event Journal Services; otherwise it runs the Add User or Add Group Receiver script, then notifies Event Journal Services of the script outcome.\n   e. Event Journal Services notifies Audit Services, which records the action in the Audit Log."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration determines whether a user or group is excluded from processing during a Census Trawl in the Core driver?",
+      "input": "",
+      "output": "Exclusions are specified in the platform configuration file used by the Core driver. If a user or group is listed in that file, the Platform Receiver will skip processing for that name during the Census Trawl."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should an administrator do when a new user or group is created in the Exceptions container during a Census Trawl in the Core driver?",
+      "input": "",
+      "output": "If a new user or group is created in the Exceptions container because its common name matches an existing Census entry, the administrator must resolve the exception. Refer to Section II, Core Driver Administration for guidance on avoiding and resolving such exceptions."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps the Core driver takes for each user and group during a Census Trawl.",
+      "input": "",
+      "output": "During a Census Trawl, for each user and group the Core driver:\n1. Verifies the entity is still covered by a Census Search object; if not, it follows the deletion process described in the User Deleted from eDirectory or Group Deleted from eDirectory procedures.\n2. Checks that the corresponding User or Group object still exists in eDirectory; if it does not, it follows the same deletion process.\nThese checks ensure the Census accurately reflects the current state of the directory."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What notifications are generated throughout the Census Trawl process in the Core driver?",
+      "input": "",
+      "output": "The Core driver generates the following notifications during a Census Trawl:\n- Object Services notifies Event Journal Services when it creates a new eUser or eGroup.\n- Platform Receivers notify Event Journal Services about name collisions or after executing the Add User/Add Group Receiver script.\n- Event Journal Services notifies Audit Services, which records the action in the Audit Log."
+    }
+  ]
+}

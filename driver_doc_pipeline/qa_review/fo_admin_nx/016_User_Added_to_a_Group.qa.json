@@ -1,0 +1,41 @@
+{
+  "driver": "FO Admin NX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the sequence of events that occurs when a user is added to a group using the FO Admin NX driver?",
+      "input": "",
+      "output": "When a user is added to a group with the FO Admin NX driver the following sequence is executed:\n1. An administrator adds the user to the member list of the Group object in eDirectory.\n2. The Event Subsystem receives the change and notifies Object Services.\n3. Object Services notifies Event Journal Services.\n4. Each Platform Receiver that is associated with both the eUser and the eGroup requests the next event for its platform; Event Journal Services then reads the detailed user object from eDirectory and passes the provisioning event to the Platform Receiver. If the user information is not yet synchronized, the event is postponed and retried later.\n5. The Platform Receiver runs its *Add User to Group* Receiver script, which adds the user to the group in the local security system.\n6. Event Journal Services notifies Audit Services, which records the action in the Audit Log."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does Event Journal Services retry obtaining updated user information when processing a group‑addition event in the FO Admin NX driver?",
+      "input": "",
+      "output": "Event Journal Services may encounter incomplete directory synchronization when it tries to read the user object. Because the user’s latest attributes might not yet be replicated, Event Journal Services defers processing of the current event, allows the next event for the platform to be processed, and then retries the group‑addition event later once the user information is available."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does an administrator add a user to a group so that the FO Admin NX driver can provision the change to the local security system?",
+      "input": "",
+      "output": "To add a user to a group with the FO Admin NX driver:\n1. Open eDirectory and locate the Group object.\n2. Edit the Group object’s member list and add the desired eUser object.\n3. Save the change; the Event Subsystem will capture the modification.\n4. The change propagates automatically through Object Services, Event Journal Services, and the appropriate Platform Receivers.\n5. The Platform Receiver’s *Add User to Group* script runs, adding the user to the corresponding group in the local security system.\n6. Audit Services logs the action."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which component retrieves the detailed user information from eDirectory during a group‑addition event in the FO Admin NX driver?",
+      "input": "",
+      "output": "Event Journal Services retrieves the detailed user information from eDirectory when processing a group‑addition event in the FO Admin NX driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When is the provisioning action recorded in the audit log for the FO Admin NX driver?",
+      "input": "",
+      "output": "After the Platform Receiver has successfully added the user to the local security system, Event Journal Services notifies Audit Services, which then records the provisioning action in the Audit Log."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the process that occurs when a user is added to a group using the FO Admin NX driver.",
+      "input": "",
+      "output": "In the FO Admin NX driver, adding a user to a group triggers the Event Subsystem, which notifies Object Services and Event Journal Services. Event Journal Services obtains the user’s eDirectory details (retrying if synchronization is incomplete) and passes a provisioning event to the Platform Receiver. The receiver’s script adds the user to the local security system, and the action is finally logged by Audit Services."
+    }
+  ]
+}

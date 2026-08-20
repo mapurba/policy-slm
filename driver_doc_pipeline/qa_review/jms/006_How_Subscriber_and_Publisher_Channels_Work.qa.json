@@ -1,0 +1,65 @@
+{
+  "driver": "JMS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the special attributes used by the Subscriber channel in the JMS driver and why are they needed?",
+      "input": "",
+      "output": "In the JMS driver, the Subscriber channel uses three special attributes—`jms:send-to`, `jms:receive-from`, and `jms:receive-timeout-seconds`—to control where a message is sent, from which destination a reply should be read, and how long the channel should wait for that reply. These attributes enable message routing and emulate Remote Procedure Call (RPC) behavior within a single JMS broker."
+    },
+    {
+      "category": "config",
+      "instruction": "List the XML attributes that define the destination and timeout for a JMS message in the JMS driver.",
+      "input": "",
+      "output": "The XML attributes are:\n- `jms:send-to` – the destination (queue or topic) to which the message is sent.\n- `jms:receive-from` – the destination from which a response should be received.\n- `jms:receive-timeout-seconds` – the number of seconds the Subscriber channel will wait for a response before timing out."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure a Subscriber channel in the JMS driver to send a message to `queueA` and wait up to 10 seconds for a response from `queueB`?",
+      "input": "",
+      "output": "Add a `jms:message` element with the three special attributes set to the desired values:\n```xml\n<jms:message xmlns:jms=\"urn:idm:jms\"\n               jms:send-to=\"queueA\"\n               jms:receive-from=\"queueB\"\n               jms:receive-timeout-seconds=\"10\"/>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you override standard JMS headers in a message sent by the JMS driver?",
+      "input": "",
+      "output": "Include a `<jms:headers>` section inside the `<jms:message>` envelope and add `<jms:header>` elements with the desired `jms:name` and value. Example:\n```xml\n<jms:message xmlns:jms=\"urn:idm:jms\">\n   <jms:headers>\n      <jms:header jms:name=\"JMSType\">type</jms:header>\n      <jms:header jms:name=\"JMSCorrelationID\">blah</jms:header>\n      <jms:header jms:name=\"JMSDeliveryMode\">non-persistent</jms:header>\n      <jms:header jms:name=\"JMSExpiration\">10000</jms:header>\n      <jms:header jms:name=\"JMSPriority\">9</jms:header>\n      <jms:header jms:name=\"JMSReplyTo\">A</jms:header>\n   </jms:headers>\n   <jms:body>text</jms:body>\n</jms:message>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add a vendor‑specific property and an application property to a JMS message using the JMS driver?",
+      "input": "",
+      "output": "Within the `<jms:properties>` element of the `<jms:message>` envelope, add `<jms:property>` elements with the `jms:name` attribute set to the property name and the element content set to the value. Example:\n```xml\n<jms:properties>\n   <jms:property jms:name=\"JMS_IBM_Format\">MQSTR</jms:property>\n   <jms:property jms:name=\"Novell_IDM_MessageType\">bytes</jms:property>\n   <jms:property jms:name=\"Novell_IDM_ContentType\">xml</jms:property>\n   <jms:property jms:name=\"Novell_IDM_CharEncoding\">UTF-8</jms:property>\n</jms:properties>\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Publisher channel in the JMS driver receive messages synchronously instead of asynchronously?",
+      "input": "",
+      "output": "The Publisher channel receives messages synchronously to prevent client overrun, which occurs when the message broker delivers messages faster than the driver can process them. Synchronous reception protects the driver from memory exhaustion caused by an uncontrolled influx of messages."
+    },
+    {
+      "category": "config",
+      "instruction": "What practical limits affect the number of destinations that can be monitored by a Publisher channel in the JMS driver?",
+      "input": "",
+      "output": "Although the Publisher channel can theoretically monitor an unlimited number of destinations on a single broker, two practical limits apply:\n1. Rendering of driver parameters in Identity Console or Designer slows down when many destinations are defined.\n2. All destinations are monitored by a single thread, so a large number can degrade performance.\nAdditionally, the driver configuration is limited to 64 KB of storage."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If performance of the JMS driver’s Publisher channel degrades after adding many destinations, what is the likely cause and how can it be mitigated?",
+      "input": "",
+      "output": "The slowdown is likely caused by the single monitoring thread having to poll a large number of destinations, which also increases the time needed to render driver parameters. Mitigation steps include reducing the number of monitored destinations, grouping destinations into fewer logical endpoints, or splitting the workload across multiple Publisher channels (each with its own broker) to distribute the polling load."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key differences between Subscriber and Publisher channels in the JMS driver.",
+      "input": "",
+      "output": "In the JMS driver, the Subscriber channel primarily sends messages (and can optionally wait for a response) using special attributes, operating asynchronously by default. The Publisher channel extends this functionality by also polling one or more destinations to receive messages for publication; it does so in a round‑robin fashion, receives messages synchronously to avoid client overrun, and can monitor many destinations subject to performance and configuration size limits."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML snippet for the JMS driver that overrides the `JMSPriority` header to 5 and adds a vendor‑specific property named `JMS_IBM_Priority` with the value `5`.",
+      "input": "",
+      "output": "```xml\n<jms:message xmlns:jms=\"urn:idm:jms\">\n   <jms:headers>\n      <jms:header jms:name=\"JMSPriority\">5</jms:header>\n   </jms:headers>\n   <jms:properties>\n      <jms:property jms:name=\"JMS_IBM_Priority\">5</jms:property>\n   </jms:properties>\n   <jms:body>text</jms:body>\n</jms:message>\n```"
+    }
+  ]
+}

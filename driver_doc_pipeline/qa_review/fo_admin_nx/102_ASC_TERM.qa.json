@@ -1,0 +1,35 @@
+{
+  "driver": "FO Admin NX driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ASC_TERM function in the FO Admin NX driver?",
+      "input": "",
+      "output": "In the FO Admin NX driver, the ASC_TERM function terminates and frees the authentication environment that was previously created by a call to ASC_INIT() or ASC_INIT_EXT(). After calling ASC_TERM, no further Core Driver functions can be used until a new ASC_INIT() or ASC_INIT_EXT() call re‑creates the environment."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you properly terminate an authentication environment using ASC_TERM in the FO Admin NX driver?",
+      "input": "",
+      "output": "1. Include the authentication header:\n   ```c\n   #include <ascauth.h>\n   ```\n2. Ensure you have a valid ASCENV pointer that was returned from a prior ASC_INIT() or ASC_INIT_EXT() call.\n3. Call the function, passing the ASCENV pointer:\n   ```c\n   ASC_TERM(asce);\n   ```\n4. After this call, do not invoke any other Core Driver functions until you re‑initialize the environment with ASC_INIT() or ASC_INIT_EXT()."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameter does ASC_TERM require in the FO Admin NX driver and what does it represent?",
+      "input": "",
+      "output": "ASC_TERM takes a single parameter named **asce**. The **asce** parameter is the environment item (of type *ASCENV*) that was returned by a previous call to ASC_INIT() or ASC_INIT_EXT(). It identifies the authentication environment to be terminated."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the ASC_TERM function usage in the FO Admin NX driver.",
+      "input": "",
+      "output": "ASC_TERM in the FO Admin NX driver frees the authentication environment created by ASC_INIT() or ASC_INIT_EXT(). It takes the ASCENV pointer returned by the init call, releases associated resources, and prevents further Core Driver calls until the environment is re‑initialized."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a minimal C program that initializes and then terminates the authentication environment using ASC_INIT and ASC_TERM in the FO Admin NX driver.",
+      "input": "",
+      "output": "```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <ascauth.h>\n\nint main(void)\n{\n    ASCENV *asce;\n\n    /* Initialize the authentication environment */\n    asce = ASC_INIT(NULL);\n    if (asce == NULL) {\n        fprintf(stderr, \"Error: cannot initialize authentication environment\\n\");\n        return EXIT_FAILURE;\n    }\n\n    /* Authentication calls would go here */\n\n    /* Terminate the authentication environment */\n    ASC_TERM(asce);\n    return EXIT_SUCCESS;\n}\n```"
+    }
+  ]
+}

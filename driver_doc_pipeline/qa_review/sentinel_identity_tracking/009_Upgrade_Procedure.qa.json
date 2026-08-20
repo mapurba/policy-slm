@@ -1,0 +1,59 @@
+{
+  "driver": "Sentinel Identity Tracking driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the overall upgrade procedure for the Sentinel Identity Tracking driver?",
+      "input": "",
+      "output": "The upgrade procedure for the Sentinel Identity Tracking driver consists of two main parts: upgrading the installed driver packages through NetIQ Designer and applying the driver patch to update the driver files. First, you download and install newer package versions via Designer’s Package Manager. Then you obtain the appropriate driver patch from the NetIQ Patch Finder, back up the current configuration, stop any running instances, and install the patch either as a root or non‑root user, updating the driver files on Linux or copying the required JAR files on Windows."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the installed packages for the Sentinel Identity Tracking driver using NetIQ Designer?",
+      "input": "",
+      "output": "To upgrade the installed packages for the Sentinel Identity Tracking driver in NetIQ Designer:\n1. Download the latest available packages.\n2. Open the project that contains the Sentinel Identity Tracking driver.\n3. Right‑click the Sentinel Identity Tracking driver and choose **Driver > Properties**.\n4. Click the **Packages** tab.\n5. If a newer version exists, a check mark appears in the **Upgrades** column.\n6. Click **Select Operation** for the package that shows an upgrade.\n7. From the drop‑down list, select **Upgrade**.\n8. Choose the version you want to upgrade to and click **OK** (Designer lists all available versions).\n9. Click **Apply**.\n10. If additional fields are required for the selected package, fill them in and click **Next**.\n11. Review the summary of packages to be installed and click **Finish**.\n12. Review the upgraded package information and click **OK** to close the Package Management page."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Sentinel Identity Tracking driver patch as a root user on a Linux system?",
+      "input": "",
+      "output": "To apply the Sentinel Identity Tracking driver patch as a root user on Linux:\n1. Log in to the server as **root**.\n2. Run the following RPM command, replacing `<Driver Patch File Temporary Location>` with the path where you extracted the patch:\n```\nrpm -Uvh <Driver Patch File Temporary Location>/linux/netiq-DXMLsentinel-REST-<version>.noarch.rpm\n```\n   For example:\n```\nrpm -Uvh <IDM402_SENTINEL_4000.tar.gz>/linux/netiq-DXMLsentinel-REST-4.0.0.0-7.noarch.rpm\n```\n3. (Conditional) If the Sentinel Identity Tracking driver is running locally, start the Identity Vault and the driver instance.\n4. (Conditional) If the driver is running with a Remote Loader instance, start the Remote Loader instance and the driver instance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Sentinel Identity Tracking driver patch as a root user on a Windows system?",
+      "input": "",
+      "output": "To apply the Sentinel Identity Tracking driver patch as a root (administrator) user on Windows:\n1. Extract the patch file and navigate to the `<Extracted Driver Patch File Temporary Location>\\nt` folder.\n2. Copy the following files from that folder to the appropriate Identity Manager installation directories:\n   - **SentinelRESTShim.jar** → `<IdentityManager installation>\\NDS\\lib` or `<IdentityManager installation>\\RemoteLoader\\<architecture>\\lib`\n   - **sentinel-client-base.jar** → same destination as above\n   - **sentinel-client-base-java.jar** → same destination as above\n   - **sentinel-client-beans.jar** → same destination as above\n3. (Conditional) If the Sentinel Identity Tracking driver is running locally, start the Identity Vault and the driver instance.\n4. (Conditional) If the driver is running with a Remote Loader instance, start the Remote Loader instance and the driver instance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Sentinel Identity Tracking driver patch as a non‑root user?",
+      "input": "",
+      "output": "To apply the Sentinel Identity Tracking driver patch as a non‑root user:\n1. Verify that `<non-root eDirectory location>/rpm` exists and contains the file `_db.000`. This file is created during a non‑root installation of the Identity Manager engine.\n2. Set the root directory environment variable to the non‑root eDirectory location:\n```\nROOTDIR=<non-root eDirectory location>\n```\n3. Download the Sentinel Identity Tracking driver patch and unzip or untar it.\n4. Install the driver files with the following RPM command, replacing `<rpm-location>` with the path to the extracted RPM file:\n```\nrpm --dbpath $ROOTDIR/rpm -Uvh \\\n  --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n  --relocate=/etc=$ROOTDIR/etc \\\n  --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n  --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n  --relocate=/var=$ROOTDIR/var \\\n  --badreloc --nodeps --replacefiles <rpm-location>\n```\n   For example, to install version 4.0.0.0-7:\n```\nrpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory --relocate=/etc=$ROOTDIR/etc --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml --relocate=/var=$ROOTDIR/var --badreloc --nodeps --replacefiles /home/user/netiq-DXMLsentinel-REST-4.0.0.0-7.noarch.rpm\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the _db.000 file is missing when applying the Sentinel Identity Tracking driver patch as a non‑root user?",
+      "input": "",
+      "output": "If the `_db.000` file is missing in the `<non-root eDirectory location>/rpm` directory, it indicates that the Identity Manager engine may not have been installed correctly as a non‑root user. The documented resolution is to reinstall Identity Manager using the non‑root installation procedure so that the `_db.000` file is correctly placed in the rpm directory before attempting to apply the Sentinel Identity Tracking driver patch."
+    },
+    {
+      "category": "config",
+      "instruction": "Which files are copied during a Windows installation of the Sentinel Identity Tracking driver patch, and where should they be placed?",
+      "input": "",
+      "output": "During a Windows installation of the Sentinel Identity Tracking driver patch, the following files are copied from the extracted `nt` folder:\n- **SentinelRESTShim.jar**\n- **sentinel-client-base.jar**\n- **sentinel-client-base-java.jar**\n- **sentinel-client-beans.jar**\nThese files should be placed in either:\n1. `<IdentityManager installation>\\NDS\\lib`\n   **or**\n2. `<IdentityManager installation>\\RemoteLoader\\<architecture>\\lib`\nSelect the location that matches your deployment (local Identity Vault or Remote Loader)."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to upgrade the Sentinel Identity Tracking driver.",
+      "input": "",
+      "output": "To upgrade the Sentinel Identity Tracking driver, first upgrade its installed packages via NetIQ Designer’s Package Manager, selecting the desired version and applying the upgrade. Next, download the appropriate driver patch from the NetIQ Patch Finder, back up the current configuration, and stop any running driver or engine instances. Install the patch as a root user (using rpm on Linux or copying JAR files on Windows) or as a non‑root user (setting ROOTDIR and running a relocation‑enabled rpm command). Finally, restart any stopped services."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact rpm command line to install Sentinel Identity Tracking driver version 4.0.0.0‑7 as a non‑root user, assuming the non‑root eDirectory location is /opt/novell/edirectory and the rpm file is located at /home/user/netiq-DXMLsentinel-REST-4.0.0.0-7.noarch.rpm.",
+      "input": "",
+      "output": "```\nROOTDIR=/opt/novell/edirectory\nrpm --dbpath $ROOTDIR/rpm -Uvh \\\n  --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n  --relocate=/etc=$ROOTDIR/etc \\\n  --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n  --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n  --relocate=/var=$ROOTDIR/var \\\n  --badreloc --nodeps --replacefiles /home/user/netiq-DXMLsentinel-REST-4.0.0.0-7.noarch.rpm\n```"
+    }
+  ]
+}

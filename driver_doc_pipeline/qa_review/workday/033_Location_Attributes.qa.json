@@ -1,0 +1,41 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the Location attributes exposed by the Workday driver and how can they be obtained?",
+      "input": "",
+      "output": "The Workday driver defines a set of Identity Vault Location attributes that represent address and identifying information for a location in Workday. These attributes, such as wd-AddressType, wd-BusinessCity, wd-LocationID, and wd-WID, can be retrieved by calling the Get_Locations API provided by the Workday driver. The API returns a Workday SOAP response, and each attribute maps to a specific XPath defined in the \"Workday SOAP Response Path\" column of the Location Attributes table."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve the list of locations and their attributes using the Workday driver?",
+      "input": "",
+      "output": "To retrieve locations with the Workday driver, follow these steps:\n1. Invoke the Get_Locations API exposed by the Workday driver.\n2. The API returns a SOAP response containing the XML structure defined by Workday.\n3. For each location element, map the XML nodes to Identity Vault attributes using the \"Workday SOAP Response Path\" values listed in the Location Attributes table (e.g., wd:Location_Data/wd:Location_ID maps to the wd-LocationID attribute).\n4. The returned data can then be stored in the Identity Vault using the corresponding nds-name values (e.g., wd-LocationID)."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the nds-name and SOAP response path for the wd-BusinessCity attribute in the Workday driver?",
+      "input": "",
+      "output": "For the Workday driver, the wd-BusinessCity attribute has:\n- nds-name: **wd-BusinessCity**\n- Workday SOAP Response Path: **wd:Location_Data/wd:Contact_Data/wd:Address_Data/wd:Municipality**\nThe description states that this attribute provides the city part of the address of the location."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attribute in the Workday driver provides the two‑digit ISO country code and what is its SOAP response path?",
+      "input": "",
+      "output": "The attribute that provides the two‑digit ISO country code is **wd-ShortCountryCode**. Its SOAP response path is **wd:Location_Data/wd:Contact_Data/wd:Address_Data/wd:Country_Reference/wd:ID[@wd:type='ISO_3166-1_Alpha-2_Code']**."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key mapping information for Location attributes in the Workday driver.",
+      "input": "",
+      "output": "The Workday driver maps a set of Location attributes to specific XML paths in the Workday SOAP response. Each attribute has an nds-name used in Identity Vault, a corresponding Workday SOAP Response Path that defines where to extract the value, and a description of the data (e.g., address lines, city, country, postal code, identifiers, and inactive flag). The Get_Locations API returns these values, enabling synchronization of Workday location data into Identity Vault."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an XSLT fragment that extracts the wd-LocationName value from a Workday SOAP response using the path defined for the Workday driver.",
+      "input": "",
+      "output": "<xsl:template match=\"wd:Location_Data\">\n    <LocationName>\n        <xsl:value-of select=\"wd:Location_Name\"/>\n    </LocationName>\n</xsl:template>\n\n<!-- The wd-LocationName attribute in the Workday driver maps to the SOAP path wd:Location_Data/wd:Location_Name -->"
+    }
+  ]
+}

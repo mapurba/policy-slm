@@ -1,0 +1,65 @@
+{
+  "driver": "FO Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "config",
+      "instruction": "What constant fields are defined in the FO Admin Nx driver and what integer values do they have?",
+      "input": "",
+      "output": "The FO Admin Nx driver defines the following public static int fields that map the AS Client API return codes:\n```\npublic static int AS_OK = 0\npublic static int AS_NO = 1\npublic static int AS_NOUSER = 2\npublic static int AS_NOAGENT = 3\npublic static int AS_NOSERVER = 3\npublic static int AS_BADCLIENT = 4\npublic static int AS_REVOKED = 5\npublic static int AS_INTRUDER = 6\npublic static int AS_INVALIDARGS = 7\npublic static int AS_INVALIDOBJ = 8\npublic static int AS_INVALIDOBJLEN = 9\npublic static int AS_PASSDUPLICATE = 10\npublic static int AS_PASSTOOSHORT = 11\npublic static int AS_TOOSMALL = 12\npublic static int AS_ATTRNOTFOUND = 13\npublic static int AS_WSOCKUP = 14\npublic static int AS_WSOCKDOWN = 15\npublic static int AS_NOAUTHENV = 16\npublic static int AS_PRODUCTEXPIRED = 17\npublic static int AS_INCLUDED = 18\npublic static int AS_EXCLUDED = 19\npublic static int AS_NOMATCH = 20\npublic static int AS_NOLICENSE = 21\npublic static int AS_INVALIDREQ = 22\npublic static int AS_KEYEXPIRED = 23\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What do the AS Client API return codes represent in the FO Admin Nx driver?",
+      "input": "",
+      "output": "In the FO Admin Nx driver, each constant field corresponds to a specific return condition from the AS Client API. For example, `AS_OK` (0) indicates success, `AS_NOUSER` (2) means the specified user does not exist, `AS_REVOKED` (5) signals a revoked credential, `AS_BADCLIENT` (4) denotes an invalid client, and `AS_KEYEXPIRED` (23) indicates that a key has expired. The full list of meanings is described in Section C.0, Troubleshooting the API of the NetIQ documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you perform an administrative password reset with the FO Admin Nx driver?",
+      "input": "",
+      "output": "To perform an administrative password reset using the FO Admin Nx driver, follow these steps:\n1. Call `init()` (or `init(String filename)`) to initialize the JAscAuth environment.\n2. Invoke the `adminResetPassword` method with four arguments:\n   ```java\n   public void adminResetPassword(String adminUser, String adminPass, String user, String pass)\n   ```\n   * `adminUser` – Enterprise User ID of an administrative user with rights to change passwords.\n   * `adminPass` – Password of that administrative user.\n   * `user` – Enterprise User ID of the target account.\n   * `pass` – The new password for the target account.\n3. The new password will be marked as expired unless it is a non‑expiring password.\n4. After the operation, you may call `destroy()` to free resources when finished."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you change a user's password using the FO Admin Nx driver?",
+      "input": "",
+      "output": "To change a user's password with the FO Admin Nx driver:\n1. Ensure the JAscAuth environment is initialized by calling `init()`.\n2. Call the `changePassword` method:\n   ```java\n   public void changePassword(String user, String oldPass, String newPass)\n   ```\n   * `user` – Enterprise User ID whose password is to be changed.\n   * `oldPass` – The current password of the user.\n   * `newPass` – The desired new password.\n3. Handle any exceptions defined in the driver’s exception classes.\n4. When finished with all operations, call `destroy()` to release resources."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you verify a user's password with the FO Admin Nx driver, and how can you retrieve additional user information?",
+      "input": "",
+      "output": "To verify a password using the FO Admin Nx driver:\n1. Initialize the environment with `init()`.\n2. Use one of the two overloads of `checkPassword`:\n   * Simple verification:\n     ```java\n     public void checkPassword(String user, String pass)\n     ```\n   * Verification with user details:\n     ```java\n     public void checkPassword(String user, String pass, JAscUser ascuser)\n     ```\n   * `user` – Enterprise User ID to be verified.\n   * `pass` – Password to verify.\n   * `ascuser` – (Optional) a `JAscUser` object that will be populated with information about the user and password if provided.\n3. After the call, inspect the return code via `getLastReturnCode()` or `strError(int rc)` for details.\n4. Call `destroy()` when all operations are complete."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the init method be called before invoking most methods in the FO Admin Nx driver?",
+      "input": "",
+      "output": "The `init` method sets up the JAscAuth environment by loading the platform configuration file and establishing the connection to the AS Client API. Without this initialization, the driver has no context or configuration information, causing subsequent method calls (such as `adminResetPassword`, `changePassword`, `effectiveRights`, etc.) to fail. Therefore, the FO Admin Nx driver requires `init()` to be called first, and `destroy()` should be called later to clean up resources."
+    },
+    {
+      "category": "config",
+      "instruction": "What characters are valid for the rights parameter in the effectiveRights method of the FO Admin Nx driver?",
+      "input": "",
+      "output": "In the FO Admin Nx driver, the `effectiveRights` method accepts a `rights` string where each character must be one of the following set:\n```\n[S, C, R, W, A]\n```\nThese correspond to:\n* **S** – Supervisor\n* **C** – Compare\n* **R** – Read\n* **W** – Write\n* **A** – Add Self"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you retrieve the fully distinguished object name (context) for a user using the FO Admin Nx driver?",
+      "input": "",
+      "output": "To obtain a user's context with the FO Admin Nx driver:\n1. Call `init()` to initialize the environment.\n2. Invoke the `getContext` method:\n   ```java\n   public String getContext(String user)\n   ```\n   * `user` – The Enterprise User ID whose context you need.\n3. The method returns the fully distinguished object name from the Census for the specified user.\n4. After completing your operations, call `destroy()` to release the environment."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key capabilities provided by the FO Admin Nx driver class com.novell.asam.JAscAuth.JAscAuth.",
+      "input": "",
+      "output": "The FO Admin Nx driver class `com.novell.asam.JAscAuth.JAscAuth` offers a Java wrapper around the AS Client API, providing:\n* Initialization and cleanup of the JAscAuth environment (`init`, `destroy`).\n* Constants representing AS Client API return codes.\n* User password management (`adminResetPassword`, `changePassword`, `checkPassword`).\n* Retrieval of user context (`getContext`) and attribute values (`readAttribute`).\n* Enumeration of group members and security equivalences (`groupMembers`, `listSecurityEquivalences`).\n* Rights checking (`effectiveRights`) and security equivalence testing (`securityEquals`).\n* Conversion of return codes to readable strings (`strError`).\n* Inclusion/exclusion checking for users (`userIncludeExclude`).\nAll methods require the environment to be initialized first."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible return values of the userIncludeExclude method in the FO Admin Nx driver and what does each indicate?",
+      "input": "",
+      "output": "The `userIncludeExclude` method of the FO Admin Nx driver returns an integer that matches one of the following constants:\n* **AS_NOMATCH** – The user does not match any INCLUDE/EXCLUDE statement; because `AS.USER.INCLUDE *` is implicit when no EXCLUDE statements exist, the user is considered included.\n* **AS_INCLUDED** – The user matches an `AS.USER.INCLUDE` statement.\n* **AS_EXCLUDED** – The user matches an `AS.USER.EXCLUDE` statement or is present in the built‑in standard exclude list.\nThese constants correspond to the values defined in the driver’s return code fields."
+    }
+  ]
+}

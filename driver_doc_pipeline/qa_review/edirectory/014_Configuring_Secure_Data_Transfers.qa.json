@@ -1,0 +1,65 @@
+{
+  "driver": "eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What SSL types are available for securing connections in the eDirectory driver?",
+      "input": "",
+      "output": "The eDirectory driver supports two SSL types for securing the connection: Key Material Objects (KMOs) and Keystore."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the NetIQ Certificate Server be running in each tree for the eDirectory driver SSL connection?",
+      "input": "",
+      "output": "The NetIQ Certificate Server must be running in each tree because the eDirectory driver uses digital certificates issued by a certificate authority to authenticate the parties in an SSL connection. Running the Certificate Server in each tree ensures that the required certificates can be created and managed locally, providing trusted authentication for secure data transfers."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the configurable settings on the eDir-to-eDir SSL/TLS tab for the eDirectory driver and their possible values?",
+      "input": "",
+      "output": "In the eDirectory driver, the **eDir-to-eDir SSL/TLS** tab contains the following settings:\n\n| Setting | Description |\n|---------|-------------|\n| Preferred key size | Specifies the preferred key size that is generated when drivers are encrypted and stored in eDirectory. Valid values: **256, 384, 512, 768, 1024, or 2048 bytes**. |\n| Preferred secure hash algorithm | Specifies the preferred hash algorithm to use when encrypting drivers. Valid values: **SHA1-RSA, MD2-RSA, MD5-RSA, SHA256-ECDSA, SHA384-ECDSA**. For a 256‑byte key size Designer provides **SHA256-ECDSA**; for a 384‑byte key size Designer provides **SHA384-ECDSA**. Both are Suite B‑compliant. |\n| Preferred validity period | Specifies the validity period for a driver certificate. Allowed range: **6 months to 10 years**. |\n| Always overwrite existing certificates | If selected, existing driver certificates are deleted and new ones are created on each deployment (default two‑year validity). |\n| Overwrite certificates only if they have expired | If selected (default), only expired certificates are replaced during deployment. The default expiration length is two years; an expired certificate stops SSL/TLS operation. |\n| Never overwrite existing certificates | Prevents any replacement of driver certificates. |\n| Restart drivers after building certificates | Restarts the eDirectory drivers after certificates have been created or updated. |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable TLS for an eDirectory driver using Designer?",
+      "input": "",
+      "output": "To enable TLS for the eDirectory driver in Designer, follow these steps:\n\n1. In Designer, right‑click **eDir-to-eDir** in the Outline view and choose **Secure Connection Settings**.\n2. Right‑click the specific eDir-to-eDir driver, select **Properties > Driver Configuration > Authentication**, and click **Configure TLS** (the icon appears only on eDir-to-eDir driver pages).\n3. Click **Enable SSL/TLS**.\n4. Choose a **Direction of Trust** (Mutual Trust is the default and most secure; other options are available when only encryption is required).\n5. (Optional) Open **Advanced TLS Configuration** to set the key size, hash algorithm, and validity period.\n6. Click **OK** to finish.\n\nThe TLS settings can be configured before the drivers are deployed, but certificates are created only after deployment."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you create driver certificates using Designer for the eDirectory driver?",
+      "input": "",
+      "output": "To create driver certificates for the eDirectory driver using Designer:\n\n1. Open your project in Designer.\n2. Drag two Identity Vaults onto the palette that will communicate securely.\n3. The **Driver Configuration Wizard** opens; select an available base package (or import packages if none are listed).\n4. Configure the driver (or import a driver configuration file via **Import Driver Configuration**).\n5. Deploy the driver.\n6. Open the eDirectory driver’s TLS settings: **Preferences > NetIQ > Identity Manager > Configuration > eDir-to-eDir SSL/TLS** tab and adjust settings such as Preferred key size, Preferred secure hash algorithm, and Preferred validity period.\n7. Right‑click the eDir-to-eDir driver, choose **Secure Connection Settings**, then **Configure TLS** and click **Enable SSL/TLS**.\n8. Select the desired direction of trust (default is Mutual Trust).\n9. (Optional) Use **Advanced TLS Configuration** to fine‑tune key size, hash algorithm, and validity period.\n10. Click **OK**.\n11. After the driver is deployed, Designer will prompt to create certificates; confirm by clicking **Yes** in the Create Certificates dialog.\n12. The certificates are generated according to the settings you defined and stored as KMOs in the eDirectory trees."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you manually create certificates using the KMO method for two eDirectory drivers?",
+      "input": "",
+      "output": "To manually create certificates with the KMO method for two eDirectory drivers:\n\n**Prerequisites**: Two Linux servers (e.g., SLES 12.2 as the main vault and Red Hat 7.2 as the counterpart), each with eDirectory, Identity Manager 4.6, and the eDirectory driver installed.\n\n**On each server**:\n1. In Identity Console, go to **Certificate Management > Server Certificate Management** and click **Create Certificate**.\n2. Provide a nickname, select **Custom** as the creation method, and click **Next**.\n3. Choose the default **Organizational Certificate Authority** and click **Next**.\n4. Set **Key type** to **SSL or TLS** and **Extended key type** to **Server**, then click **Next**.\n5. Choose **SHA‑256‑RSA (SHA2)** as the signature algorithm and set the validity period to **Maximum**, then click **Next**.\n6. Accept the default organization certificate and click **Next**.\n7. Review the summary and click **OK** – the KMO object appears under **Tree view > system > servers**.\n\n**Additional steps for the Red Hat server**:\n1. In step 3, select **External certificate authority** instead of the default.\n2. After step 7, click **Save Certificate Signing Request** to create a *.csr* file and store it.\n\n**Back on the main SLES server**:\n1. Navigate to **Certificate Management > Issue certificate**, browse to the saved *.csr* file and click **Next**.\n2. Keep the same Key Type and Extended Key Type, accept default Certificate Type and Path length, and click **Next**.\n3. Set the validity period to **Maximum**, click **Next**, then save the file in **Base 64** format.\n4. Export the self‑signed CA certificate (uncheck **Export private key**, choose **Base64**, and save the .b64 file).\n\n**Synchronize the certificates**:\n1. On the Red Hat server, open **View Objects**, locate the KMO object, and on the **Certificate** tab import the exported self‑signed CA certificate.\n2. Click **New**, browse for the issued certificate, and finish the import wizard.\n3. Configure and start the eDirectory driver on both servers.\n4. Test the secure connection by editing an object on one vault and confirming the change replicates to the other.\n\nThese steps create a pair of KMOs—one in each tree—allowing the eDirectory drivers to establish an SSL/TLS‑protected connection."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you establish a secure connection using a keystore for the eDirectory driver?",
+      "input": "",
+      "output": "To set up a secure eDirectory driver connection with a keystore:\n\n1. **Create a server certificate** in Identity Console:\n   - Open **Certificate Management > Server Certificate Management**.\n   - Click **Create Certificate**, select the server where the eDirectory driver is installed, and give the certificate a nickname (e.g., `maincert`).\n   - Choose **Custom** as the creation method, keep the default Organizational CA, uncheck **Enable extended key usage**, accept defaults, and click **OK**.\n2. **Export the certificate**:\n   - Validate the newly created KMO object, select it, and click **Export**.\n   - Ensure **Export private key** is checked, provide a password (used later as the keystore source password), and save the file as a **.pfx**.\n3. **Generate a keystore** from the exported .pfx file using the command line:\n   ```\n   keytool -importkeystore -srckeystore <file saved in step 2> -srcstoretype PKCS12 -destkeystore <name of the keystore> -alias <kmo name provided in Step 1>\n   ```\n   Example:\n   ```\n   keytool -importkeystore -srckeystore maincert.pfx -srcstoretype PKCS12 -destkeystore new.keystore -alias maincert\n   ```\n   Provide the destination password and the source password (the one set in step 2).\n4. **Export the trusted root certificate** from the partner eDirectory server as a **.der** file.\n5. **Import the DER certificate** into the keystore created in step 3:\n   ```\n   keytool -import -file <Certificate name> -keystore <path>\\new.keystore -storepass <keystore password>\n   ```\n   Example:\n   ```\n   keytool -import -file PATH_OF_DERFile\\PublicKeyCert.der -keystore KEYSTOERPATH\\new.keystore -storepass keystorepass\n   ```\n   Answer **YES** when prompted to trust the certificate.\n6. Copy the resulting **new.keystore** file to a directory that contains the Identity Vault files.\n7. In Identity Console, select **IDM Administrator**, choose the required driverset, click the eDirectory driver icon, and go to the **Configuration** tab.\n8. Open **Driver Parameters**, set **Use SSL** to **Yes**, and enter the full path to the keystore file.\n9. Enable the driver’s SSL parameters and configure any additional SSL options as needed.\n10. Repeat the entire procedure on the partner eDirectory server so that both sides have matching keystores.\n\nAfter these steps, the eDirectory drivers will communicate over a mutually authenticated SSL/TLS connection using the keystore."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write the keytool command that imports a PKCS12‑formatted certificate into a new keystore for the eDirectory driver, using the alias of the KMO name.",
+      "input": "",
+      "output": "```\nkeytool -importkeystore -srckeystore <file saved in step 2> -srcstoretype PKCS12 -destkeystore <name of the keystore> -alias <kmo name provided in Step 1>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What happens if a driver certificate expires in the eDirectory driver, and how can you configure the driver to automatically handle expired certificates?",
+      "input": "",
+      "output": "If a driver certificate expires, SSL/TLS communication stops working for the eDirectory driver. To handle this situation, the driver provides the **\"Overwrite certificates only if they have expired\"** option on the eDir-to-eDir SSL/TLS tab. When this option (the default) is selected, the driver overwrites only expired certificates during deployment, automatically creating a new valid certificate and restoring secure communication."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to configure secure data transfers for the eDirectory driver.",
+      "input": "",
+      "output": "Configuring secure data transfers for the eDirectory driver involves:\n1. Ensuring the NetIQ Certificate Server is running in each tree and using a certificate authority to issue SSL certificates.\n2. Choosing an SSL type—either Key Material Objects (KMOs) or a Java keystore.\n3. Creating driver certificates via Designer (or manually with the KMO method), setting preferences such as key size, hash algorithm, and validity period on the **eDir-to-eDir SSL/TLS** tab.\n4. Enabling TLS in Designer by configuring secure connection settings, selecting a trust direction, and optionally adjusting advanced TLS parameters.\n5. Deploying the driver so Designer can generate or import the required certificates.\n6. For KMO, manually creating KMOs on each server, exporting/importing certificates, and synchronizing data.\n7. For keystore, exporting the private key, converting it to a PKCS12 keystore with `keytool -importkeystore`, importing the partner’s root certificate, and configuring the driver parameters to point to the keystore file.\n8. Optionally configuring the driver to overwrite expired certificates automatically, ensuring continuous SSL/TLS operation."
+    }
+  ]
+}

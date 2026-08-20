@@ -1,0 +1,47 @@
+{
+  "driver": "PeopleSoft driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does it mean when a transaction is left in the “Process” state in the PeopleSoft driver?",
+      "input": "",
+      "output": "In the PeopleSoft driver, a transaction that is left in the “Process” state indicates that the driver started processing the transaction but was unable to complete it, so the transaction remains pending with a status of I (Incomplete). This situation occurs when an error prevents the transaction from moving to a final Success (S), Warning (W), or Error (E) status."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible status values for a transaction in the PeopleSoft driver and what do they represent?",
+      "input": "",
+      "output": "The PeopleSoft driver uses the following status values for a transaction:\n- S – Success: the transaction completed successfully.\n- W – Warning: the transaction completed with warnings.\n- E – Error: the transaction completed with errors.\n- I – Incomplete: the transaction is still in the “Process” state because it could not be finished."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you verify that all CI objects can be processed and that their status can be updated to Success, Warning, or Error in the PeopleSoft driver?",
+      "input": "",
+      "output": "To verify that all CI objects can be processed and that their status can be updated in the PeopleSoft driver, follow these steps:\n1. Open the PeopleSoft application and navigate to the CI (Configuration Item) management area.\n2. Initiate processing for each CI object you want to test.\n3. After processing, check the transaction status for each CI.\n4. Confirm that the status column shows one of the following values: S (Success), W (Warning), or E (Error).\n5. If any CI remains with status I (Incomplete), investigate the causes described on the troubleshooting page."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take if transactions remain in the “Process” state with status I in the PeopleSoft driver?",
+      "input": "",
+      "output": "If transactions remain in the “Process” state with status I in the PeopleSoft driver, take these steps:\n1. Verify that all CI objects can be processed and that their status can be updated to S, W, or E.\n2. Check whether PeopleSoft e‑mail is configured and confirm that the SMTP gateway is operational; a down SMTP gateway can prevent status updates.\n3. Review any PeopleCode attached to the update operation for errors that might cause the transaction to fail.\n4. Ensure system connectivity is stable; loss of database or application server connectivity during processing can cause the driver to abandon the transaction.\n5. If notification processing is required, switch to using the NetIQ Identity Manager Notification Service instead of PeopleSoft SMTP processing."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might an SMTP gateway outage cause transactions to remain in the “Process” state in the PeopleSoft driver, and how can you avoid this issue?",
+      "input": "",
+      "output": "An SMTP gateway outage can cause transactions to remain in the “Process” state in the PeopleSoft driver because the driver attempts to send e‑mail notifications as part of the transaction update. When the SMTP gateway is down, the e‑mail send fails, which aborts the status‑update step and leaves the transaction with status I (Incomplete). To avoid this issue, configure the PeopleSoft driver to use the NetIQ Identity Manager Notification Service for notifications instead of relying on PeopleSoft SMTP processing."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is it recommended to use the Identity Manager Notification Service instead of PeopleSoft SMTP processing for notification handling in the PeopleSoft driver?",
+      "input": "",
+      "output": "The recommendation to use the Identity Manager Notification Service instead of PeopleSoft SMTP processing for the PeopleSoft driver is based on reliability. The Notification Service handles e‑mail delivery within NetIQ Identity Manager and does not depend on the PeopleSoft SMTP configuration, which can be unavailable or misconfigured. Using the Notification Service prevents transaction failures caused by SMTP gateway outages and provides a more robust notification mechanism."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main causes and recommended actions for transactions staying in the “Process” state in the PeopleSoft driver.",
+      "input": "",
+      "output": "Transactions stay in the “Process” state in the PeopleSoft driver when the driver cannot complete the update. Main causes include a down SMTP gateway, errors in PeopleCode attached to the update, and loss of system connectivity during processing. Recommended actions are to verify that CI objects can reach a final status (S, W, or E), ensure e‑mail configuration and SMTP availability, review and correct PeopleCode errors, maintain stable database and application server connectivity, and use the NetIQ Identity Manager Notification Service for notifications instead of PeopleSoft SMTP processing."
+    }
+  ]
+}

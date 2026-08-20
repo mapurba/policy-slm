@@ -1,0 +1,41 @@
+{
+  "driver": "Oracle EBS driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of subscribing to business events in the Oracle EBS driver?",
+      "input": "",
+      "output": "In the Oracle EBS driver, subscribing to business events enables the driver to receive notifications when specific actions occur in the Oracle EBS system (e.g., user insert or update). When a subscribed event fires, the PL/SQL API captures the event data and performs an HTTP POST to the driver, allowing Identity Manager to process the change and keep the two systems synchronized."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a subscription for the oracle.apps.fnd.user.insert business event in the Oracle EBS driver?",
+      "input": "",
+      "output": "To create a subscription for the **oracle.apps.fnd.user.insert** business event in the Oracle EBS driver, follow these steps:\n1. Using a web browser, log into the Oracle EBS system as the **sysadmin** user.\n2. On the Dashboard, click **Workflow Administrator Web Applications**.\n3. Click **Business Events** under the **Administrator Workflow** tab.\n4. In the **Search** text field, type **oracle.apps.fnd.user.insert** and click **Go**.\n5. In the search results, click the **Subscription** link.\n6. Click **Create Subscription** and then **Next**.\n   - **system**: Click **Search**, browse to and select the appropriate system name.\n   - **action type**: Select **custom**.\n7. Click **Apply** after entering the following details:\n   - **PL/SQL Rule Function**: `IDM_DRIVER.PUBLISH_EVENT_TO_IDM`\n   - **Owner Name**: `PER`\n   - **Owner Tag**: `PER`\n8. Complete the wizard to finish the subscription.\nAfter these steps, the Oracle EBS driver will receive HTTP posts whenever a user insert event occurs."
+    },
+    {
+      "category": "config",
+      "instruction": "Which PL/SQL Rule Function, Owner Name, and Owner Tag must be configured when creating a subscription in the Oracle EBS driver?",
+      "input": "",
+      "output": "When configuring a subscription in the Oracle EBS driver, set the following values:\n- **PL/SQL Rule Function**: `IDM_DRIVER.PUBLISH_EVENT_TO_IDM`\n- **Owner Name**: `PER`\n- **Owner Tag**: `PER`\nThese values are required for the subscription to correctly invoke the Identity Manager driver when the business event occurs."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you repeat the subscription steps for the oracle.apps.fnd.user.update business event in the Oracle EBS driver?",
+      "input": "",
+      "output": "To create a subscription for the **oracle.apps.fnd.user.update** business event in the Oracle EBS driver, repeat steps 1‑7 used for the insert event, substituting the search term:\n1. Log in to Oracle EBS as **sysadmin**.\n2. Navigate to **Workflow Administrator Web Applications → Business Events**.\n3. Search for **oracle.apps.fnd.user.update** and click **Go**.\n4. Click the **Subscription** link for the result.\n5. Choose **Create Subscription → Next**.\n6. Select the appropriate **system** and set **action type** to **custom**.\n7. Click **Apply** and enter the same configuration values as for the insert event:\n   - **PL/SQL Rule Function**: `IDM_DRIVER.PUBLISH_EVENT_TO_IDM`\n   - **Owner Name**: `PER`\n   - **Owner Tag**: `PER`\nCompleting these steps creates the update‑event subscription for the Oracle EBS driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you provision users in the Oracle EBS system for the Oracle EBS driver after configuring business event subscriptions?",
+      "input": "",
+      "output": "After subscribing to business events, provision users in the Oracle EBS system for the Oracle EBS driver by performing the following actions:\n1. **Install a custom PL/SQL package** that processes events sent from Identity Manager via the SOAP/REST endpoint. This PL/SQL API will handle inbound requests and execute the necessary SQL operations.\n2. **Create a SOAP/REST endpoint** using the **IREP** (Integration Repository) of the Oracle EBS system. The endpoint invokes the custom PL/SQL package, allowing Identity Manager to send user provisioning requests to Oracle EBS.\nOnce these components are in place, the Oracle EBS driver can receive HTTP posts from the PL/SQL API when subscribed business events occur, and it can also push provisioning actions back to Oracle EBS via the SOAP/REST endpoint."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the process for enabling the Oracle EBS driver to receive business events from Oracle EBS.",
+      "input": "",
+      "output": "To enable the Oracle EBS driver to receive business events, you must:\n1. Log into Oracle EBS as **sysadmin** and navigate to **Workflow Administrator Web Applications → Business Events**.\n2. Search for the desired event (e.g., **oracle.apps.fnd.user.insert**), open its **Subscription**, and create a new subscription.\n3. Set **system** to the appropriate system name and **action type** to **custom**.\n4. Configure the subscription with **PL/SQL Rule Function** `IDM_DRIVER.PUBLISH_EVENT_TO_IDM`, **Owner Name** `PER`, and **Owner Tag** `PER`.\n5. Repeat the steps for any additional events such as **oracle.apps.fnd.user.update**.\n6. Install a custom PL/SQL package that processes Identity Manager requests.\n7. Create a SOAP/REST endpoint using the Oracle EBS IREP to expose the PL/SQL API.\nWhen a subscribed event occurs, the PL/SQL API captures the data and sends an HTTP POST to the Oracle EBS driver, enabling Identity Manager to process the event and provision users as needed."
+    }
+  ]
+}

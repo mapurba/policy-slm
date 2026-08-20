@@ -1,0 +1,77 @@
+{
+  "driver": "Identity Manager Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ADMINPASSWORD statement in the Identity Manager Fan-Out driver configuration?",
+      "input": "",
+      "output": "The ADMINPASSWORD statement in the Identity Manager Fan-Out driver configuration specifies the password of the administrative user defined by the ADMINUSER statement. If the statement is omitted, the driver prompts for the password when obtaining a platform security certificate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the ADMINUSER statement for the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "To configure the ADMINUSER statement for the Identity Manager Fan-Out driver, add a line to the platform configuration file using the syntax:\n```\nADMINUSER Fdn\n```\nReplace **Fdn** with the fully distinguished name of an eDirectory user that has Read and Create object rights to the ASAM System container. For example:\n```\nADMINUSER .Admin.DigitalAirlines\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the exact syntax for including groups with the AM.GROUP.INCLUDE statement in the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "The syntax for the AM.GROUP.INCLUDE statement in the Identity Manager Fan-Out driver is:\n```\nAM.GROUP.INCLUDE GroupMask[ GroupMask, GroupMask ...]\n```\n**GroupMask** can be a complete group name or include masking characters. Multiple masks are separated by commas."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why should you not code both an AM.GROUP.INCLUDE statement and an AM.GROUP.EXCLUDE statement in the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "In the Identity Manager Fan-Out driver, coding both an AM.GROUP.INCLUDE statement and an AM.GROUP.EXCLUDE statement is prohibited because the driver expects only one type of rule for group filtering. Mixing them can lead to ambiguous inclusion/exclusion logic and is explicitly disallowed by the documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you specify a custom authentication Core Driver address and port for the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "Add an AUTHENTICATION statement to the configuration file with the desired address and optional port. Use the syntax:\n```\nAUTHENTICATION Address [PORT PortNumber] [PREF PrefGroup]\n```\nFor example, to set a custom port:\n```\nAUTHENTICATION cdriver5.digitalairlines.com PORT 5009 PREF 2\n```\nIf you specify a non‑default port, also configure the same port in the Core Driver Web interface."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default values for the PORT and PREF parameters in an AUTHENTICATION statement for the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "In an AUTHENTICATION statement for the Identity Manager Fan-Out driver, the default PORT is **3451** if omitted, and the default PREF (preference group) is **1** (all listed Core Drivers belong to Preference Group 1 unless a different value is specified)."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When should the DIRECTTOAUTHENTICATION statement be used with the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "The DIRECTTOAUTHENTICATION statement should be used with the Identity Manager Fan-Out driver on platforms where traffic to Core Drivers is low enough that running the Platform Services Process is not justified. It causes Authentication Services to connect directly to a Core Driver, bypassing load balancing."
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the syntax for setting the polling interval using the POLLRAND statement in the Identity Manager Fan-Out driver.",
+      "input": "",
+      "output": "The syntax for the POLLRAND statement in the Identity Manager Fan-Out driver is:\n```\nPOLLRAND minsec maxsec\n```\nReplace **minsec** with the minimum number of seconds and **maxsec** with the maximum number of seconds for the random polling interval."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the IGNORESTANDARDEXCLUDES statement control in the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "The IGNORESTANDARDEXCLUDES statement in the Identity Manager Fan-Out driver disables the use of the built‑in standard list of users and groups that are normally excluded from Identity Provisioning and Authentication Services processing. When present, the driver does not apply the default exclude list."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the CRYPTTYPE statement to use SHA512 with 7000 rounds in the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "Add a CRYPTTYPE statement to the platform configuration file with the desired format and rounds:\n```\nCRYPTTYPE SHA512 7000\n```\nThis configures the Identity Manager Fan-Out driver to store passwords using the SHA512 format with 7000 rounds."
+    },
+    {
+      "category": "config",
+      "instruction": "List the possible format values for the CRYPTTYPE statement in the Identity Manager Fan-Out driver.",
+      "input": "",
+      "output": "The CRYPTTYPE statement in the Identity Manager Fan-Out driver accepts the following format values:\n- DES\n- MD5\n- BLOWFISH\n- SHA256\n- SHA512\n- SUN_MD5"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration statements covered for the Identity Manager Fan-Out driver.",
+      "input": "",
+      "output": "The Identity Manager Fan-Out driver configuration includes statements for administrative credentials (ADMINUSER, ADMINPASSWORD), inclusion/exclusion of groups and users (AM.GROUP.*, AM.USER.*, AS.USER.*), core driver connection details (AUTHENTICATION, PROVISIONING), operational parameters (RUNMODE, POLLINT, POLLRAND), logging and debugging (DEBUGLOGFILE, DEBUGTOSTDOUT, TRACEFILE, TRACETOSTDOUT, SYSLOGFACILITY), password handling (UPDATEPASSWORD, CRYPTTYPE, PASSWORDSOURCE, UPDATESAMBA), locale and code page (LOCALE, CODEPAGE), and special behavior controls (IGNORESTANDARDEXCLUDES, DIRECTTOAUTHENTICATION, USEFILEIPC, EXCLUDEUNMANAGED). Each statement follows a specific syntax documented in the platform configuration file."
+    }
+  ]
+}

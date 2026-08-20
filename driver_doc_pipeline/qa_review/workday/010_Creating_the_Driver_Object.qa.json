@@ -1,0 +1,77 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are Workday driver packages and why must they be imported before creating a Workday driver object?",
+      "input": "",
+      "output": "The Workday driver packages contain the items required to create a driver, such as policies, entitlements, filters, and Schema Mapping policies. They are needed because they provide the foundational configuration that the Workday driver uses to communicate with Workday. Importing the latest packages ensures the driver has the most recent definitions and can be updated after the initial installation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the current Workday driver packages in Designer?",
+      "input": "",
+      "output": "1. Open Designer.\n2. In the Outline view, right‑click the Package Catalog.\n3. Click **Import Package**.\n4. Browse to the location where the Workday packages were downloaded.\n5. Select the required Workday packages, or click **Select All** to import every displayed package.\n6. Click **OK** to import the selected packages, then click **OK** in the \"successfully imported packages\" message.\n7. After the packages are imported, continue with the driver installation steps."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add the Workday driver to a driver set in the Modeler?",
+      "input": "",
+      "output": "1. In Designer, open your project.\n2. From the Palette, drag‑and‑drop the **Workday driver** (found under the **Enterprise** category) onto the desired driver set in the Modeler."
+    },
+    {
+      "category": "config",
+      "instruction": "What authentication parameters can be selected for the Workday driver and what fields are required for each option?",
+      "input": "",
+      "output": "The Workday driver supports two authentication types:\n\n* **Basic** – Requires the following fields:\n  - **Workday Login ID** – The user ID used to log in to Workday (e.g., `<IntegrationUsername@tenantName>`). The user must have permission to fetch and modify data.\n  - **Workday Login Password** – The password for the Workday login.\n* **OAuth 2.0** – Requires the following fields:\n  - **Access token URL** – URL of the server used to request an access token (e.g., `<https://wd2-impl-services1.workday.com/ccx/oauth2/tenantname/token>`).\n  - **Client ID** – Workday client ID for OAuth 2.0.\n  - **User Name** – Workday integration user name.\n  - **Keystore File** – Path to the keystore file containing the client certificate.\n  - **Alias** – Alias name for the private key in the keystore.\n  - **Keystore Password** – Password for the keystore file.\n\nAll fields must be filled according to the selected authentication type."
+    },
+    {
+      "category": "config",
+      "instruction": "Which connection parameters must be configured for the Workday driver and how can you find the Workday Login URL?",
+      "input": "",
+      "output": "The Workday driver requires the following connection parameters:\n\n* **Workday Login URL** – The login URL of Workday. To obtain it, log in to the Workday sandbox or production instance, search for **Public Web Services**, select it, scroll to **Human Resources (Public)**, click the ellipsis, view the Web Services list, select **View WSDL**, and copy the `soapbind:address` location value (e.g., `https://hostName/ccx/service/tenantName/Human_Resources/v32.0`).\n* **Workday API Version** – Fixed value `v32.0 onwards` (should not be changed).\n* **Proxy Authentication** – Optional. If used, specify:\n  - Proxy hostname and port\n  - User name\n  - User password"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the General Parameter required for cache files in the Workday driver?",
+      "input": "",
+      "output": "The General Parameter **Cache Files Directory** must be set to an absolute path where the driver can create cache files. Example values are `/var/opt/novell/eDirectory/data/dib` on Linux or `C:/NetlQ/IDM/NDS/DIBFiles/` on Windows."
+    },
+    {
+      "category": "config",
+      "instruction": "What SSL parameters need to be specified for the Workday driver and where can you obtain the required certificates?",
+      "input": "",
+      "output": "The Workday driver SSL parameters are:\n\n* **Workday Keystore File** – Path and name of the keystore that holds trusted certificates for the remote server. Example paths: `C:\\security\\keystore` on Windows or `/var/opt/novell/eDirectory/workday/idmworkday.jks` on Linux. The Workday tenant root CA certificate must be imported into this keystore (see the \"Securing Communication\" section of the documentation).\n* **Workday Keystore Password** – Password for the keystore file."
+    },
+    {
+      "category": "config",
+      "instruction": "What paging parameters are available in the Workday driver and what are their default values?",
+      "input": "",
+      "output": "The Workday driver includes two paging parameters:\n\n* **Page size** – Number of pages processed at a time by the driver. Default is **50**. The value should be set based on the Java heap available to the driver.\n* **Query‑Ex timeout in seconds** – Timeout for query execution. Example value is **120** seconds."
+    },
+    {
+      "category": "config",
+      "instruction": "Which transformation parameters are provided by default in the Workday driver and what does each control?",
+      "input": "",
+      "output": "The Workday driver defines the following default transformation parameters on the Publisher channel:\n\n* **wdOrgList** – Types of organizational data returned from the `Get_Worker` SOAP API (e.g., Supervisory, Cost_Center, Company, Cost_Center_Hierarchy, Matrix, Region).\n* **wdIntFieldAttrList** – Names of custom or override fields created in Workday for workers that should be synchronized to the Identity Vault.\n* **wdAutoCompleteBP** – When set to **true**, marks the business process for the modification as complete and immediately commits the update to the worker.\n* **wdCustomIdList** – Names of other/custom IDs that the driver should synchronize to the Identity Vault or write back to Workday via the `Change_Other_IDs` API.\n* **wdFetchPrivatePhoneInformation** – When **true**, the driver retrieves phone numbers marked private in Workday; default is **false** (only public numbers are published).\n* **wdTransactionLimit** – Maximum number of transactions the `wd-TransactionLog` attribute can hold. Available values are **3, 5, 10, 15, 30**."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Subscriber Options section in the Workday driver configuration?",
+      "input": "",
+      "output": "Subscriber Options allow you to specify custom stylesheets that transform incoming data before it is stored in the Identity Vault. You can provide separate stylesheet paths for **Worker Settings** (worker data) and **Worker Photo Settings** (worker photo data). If the fields are left empty, the driver uses default stylesheets. Proper folder permissions are required so that only the system administrator or the Identity Vault process user can modify the stylesheet files."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Publisher Options to enable polling of worker objects in the Workday driver?",
+      "input": "",
+      "output": "1. In the Publisher Options page, set **Enable Publisher Channel** to **Yes**.\n2. Set **Heartbeat Interval** (default 10 minutes) if desired.\n3. Under **Recurring API**, configure:\n   - **Polling interval in minutes** (default 10).\n   - **Migrate on Startup** – set to **True** to run migration on driver start, or **False** for normal polling.\n   - **Enable Delta and Future Object Creation on initial Migration** – set to **True** (requires Migrate on Startup = True).\n4. Expand the **Worker** section and set **Poll Worker** to **Enable**.\n5. Click **Show** for **Worker Poll Settings** and configure:\n   - **Worker Poll Offset in seconds** (default 0).\n   - **Response Group Element List** – select the elements to include (e.g., Include_Reference, Include_Additional_Jobs, etc.).\n   - Optionally specify **Field and Parameter Criteria Provider Reference List** and **Transaction Log Criteria Reference List**.\n6. (Optional) Specify an **Import Worker Stylesheet** path if a custom stylesheet is required.\n7. Click **Next** to continue."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete process of creating and configuring a Workday driver object in Identity Manager.",
+      "input": "",
+      "output": "To create a Workday driver object, first import the latest Workday driver packages into Designer via the Package Catalog. Then, drag the Workday driver from the Enterprise palette onto a driver set. Select the required packages and proceed through the wizard, providing a driver name. Configure driver parameters:\n- Choose **Basic** or **OAuth 2.0** authentication and fill the appropriate fields.\n- Enter connection parameters, including the Workday Login URL and API version.\n- Optionally configure proxy authentication.\n- Set the General Parameter **Cache Files Directory**.\n- Provide SSL parameters: keystore file path and password.\n- Adjust Advanced Parameters such as paging (page size, timeout).\n- Define Transformation Parameters (wdOrgList, wdIntFieldAttrList, etc.).\n- Specify Subscriber Options for custom worker and photo stylesheets.\n- Configure Publisher Options: enable the channel, set heartbeat, polling intervals, migration settings, and enable polling for workers, job profiles, locations, etc., with their respective poll settings and optional stylesheets.\n- Configure Remote Loader settings if used, including host, port, KMO, and passwords.\n- Set default configuration for users (merge workers, placement and search containers, password policy, mandatory attributes, matching attributes, contact settings).\n- Define object‑specific placement, search containers, and advanced settings for relations, job families, locations, photos, job profiles, and organizations.\n- Add any Retry Attributes for attribute modifications.\n- Review the summary and finish the wizard. After installation, the driver can be deployed to the Identity Vault and started."
+    }
+  ]
+}

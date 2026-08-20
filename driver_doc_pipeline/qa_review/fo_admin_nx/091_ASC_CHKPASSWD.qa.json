@@ -1,0 +1,53 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ASC_CHKPASSWD function in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, the ASC_CHKPASSWD function verifies the password of a user by checking the supplied user ID and password against the Core Driver. If the credentials are valid, it can also populate an ASCUSER structure with additional user details."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameters are required by ASC_CHKPASSWD in the Fo Admin Nx driver and what does each represent?",
+      "input": "",
+      "output": "ASC_CHKPASSWD in the Fo Admin Nx driver takes four parameters:\n\n| Parameter | Description |\n|-----------|-------------|\n| asce | The environment item returned from a prior call to ASC_INIT() or ASC_INIT_EXT(). |\n| user | The Enterprise User ID to be checked. |\n| pass | The password to be checked for the user. |\n| ascu | A pointer to an ASCUSER structure (defined in ascauth.h) that will be filled in by ASC_CHKPASSWD() if the password is valid. |\n\nThe caller must provide all four arguments when invoking the function."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible return codes of ASC_CHKPASSWD in the Fo Admin Nx driver and what does each indicate?",
+      "input": "",
+      "output": "ASC_CHKPASSWD in the Fo Admin Nx driver returns one of the integer constants defined in ascauth.h:\n\n| Return Code | Meaning |\n|-------------|---------|\n| AS_OK | Password is okay |\n| AS_NO | User ID/Password combination is invalid |\n| AS_NOUSER | User inactive or not found in the Census |\n| AS_REVOKED | User's password is okay, but the user is disabled |\n| AS_INTRUDER | Intruder lockout enabled for this user |\n| AS_BADCLIENT | Local host is not authorized to query the Core Driver |\n| AS_NOAGENT | No Core Driver could be contacted |\n| AS_NOAUTHENV | No environment has been established |\n| AS_INVALIDREQ | Call rejected by the Core Driver as not valid or not supported |\n| AS_INVALIDARGS | Invalid arguments supplied to the function |\n| AS_KEYEXPIRED | Old key rejected by the Core Driver because the expiration date has passed |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When ASC_CHKPASSWD returns AS_OK in the Fo Admin Nx driver, which fields of the ASCUSER structure contain additional information about the authenticated user?",
+      "input": "",
+      "output": "If ASC_CHKPASSWD returns AS_OK in the Fo Admin Nx driver, the following fields of the ASCUSER structure are populated:\n\n| Field | Description |\n|-------|-------------|\n| <ascu>.pass.expire | Number of seconds until the password expires (or -1 if the password does not expire) |\n| <ascu>.pass.interval | Password change interval in seconds (or -1 if the password does not expire) |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What additional information is provided in the ASCUSER structure when ASC_CHKPASSWD returns AS_REVOKED in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "When ASC_CHKPASSWD returns AS_REVOKED in the Fo Admin Nx driver, the ASCUSER structure contains the field:\n\n| Field | Description |\n|-------|-------------|\n| <ascu>.login.disabled | User disabled flag |\n\nThis flag indicates that the user’s account is disabled even though the password itself is valid."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you write a C program that uses ASC_CHKPASSWD to validate a user's password with the Fo Admin Nx driver?",
+      "input": "",
+      "output": "To write a C program that validates a user's password with the Fo Admin Nx driver, follow these steps (as shown in the example on the documentation page):\n\n1. Include the required headers:\n   ```c\n   #include <stdio.h>\n   #include <stdlib.h>\n   #include <ascauth.h>\n   ```\n2. Parse command‑line arguments to obtain the user ID and password.\n3. Initialize the authentication environment by calling `ASC_INIT(NULL)` and store the returned pointer in an `ASCENV *` variable.\n4. Check that the initialization succeeded; if not, output an error and exit.\n5. Call `ASC_CHKPASSWD(asce, user, pass, &ascu);` where `asce` is the environment pointer, `user` and `pass` are the strings from step 2, and `ascu` is an `ASCUSER` variable.\n6. Evaluate the return code:\n   - If it equals `AS_OK`, print \"password ok\".\n   - If it equals `AS_NO`, print \"password invalid\".\n   - For any other code, print the numeric return code and a textual description using `ASC_STRERROR(rc)`.\n7. Terminate the authentication environment with `ASC_TERM(asce);`.\n8. Return from `main`.\n\nThe full example code from the documentation implements exactly these steps."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "In the Fo Admin Nx driver, what does an AS_BADCLIENT return code from ASC_CHKPASSWD mean and how can you resolve it?",
+      "input": "",
+      "output": "An `AS_BADCLIENT` return code from ASC_CHKPASSWD in the Fo Admin Nx driver means that the local host from which the request originated is not authorized to query the Core Driver. To resolve this issue, ensure that the host running the application is listed in the Core Driver’s authorized client list or configure the Core Driver’s access control settings to allow connections from that host."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using ASC_CHKPASSWD in the Fo Admin Nx driver.",
+      "input": "",
+      "output": "ASC_CHKPASSWD in the Fo Admin Nx driver is used to verify a user's password. It requires an initialized authentication environment (`ASCENV *`), the user ID, the password, and a pointer to an `ASCUSER` structure. The function returns one of several integer codes such as `AS_OK`, `AS_NO`, `AS_REVOKED`, etc., indicating the result of the check. When the return code is `AS_OK`, the `ASCUSER` structure provides password expiration and interval information; when the return code is `AS_REVOKED`, it indicates the user's account is disabled. The driver also defines error codes like `AS_BADCLIENT` for unauthorized hosts. Proper initialization with `ASC_INIT`, handling of return codes, and termination with `ASC_TERM` are required for correct usage."
+    }
+  ]
+}

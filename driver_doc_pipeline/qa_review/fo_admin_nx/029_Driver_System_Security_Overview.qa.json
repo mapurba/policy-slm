@@ -1,0 +1,53 @@
+{
+  "driver": "Identity Manager Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of SSL certificates in the Identity Manager Fan-Out driver and how are they created?",
+      "input": "",
+      "output": "In the Identity Manager Fan-Out driver, SSL certificates are used to authenticate and encrypt connections between Core Driver components, Event Journal Services, and Platform Receivers. The certificates are minted by the Certificate Services component of the Core Driver when the Core Driver is started for the first time, or automatically when the Core Driver’s network address is changed. Each certificate includes the Core Driver’s network address in the X.509 Alternate Subject field, which must resolve via reverse‑lookup DNS so that Platform Services can trust the Core Driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the network address in an Identity Manager Fan-Out driver certificate have a reverse‑lookup DNS record?",
+      "input": "",
+      "output": "The Identity Manager Fan-Out driver stores the Core Driver’s network address in the X.509 Alternate Subject field of its certificate. Platform Services use a reverse‑lookup DNS query to resolve this address and verify it before establishing an SSL connection. If the address cannot be resolved, the Platform Services installation fails, and the Core Driver will reject the Platform component, preventing a secure SSL link."
+    },
+    {
+      "category": "config",
+      "instruction": "Where does the Identity Manager Fan-Out driver store its security certificates and what access restrictions should be applied?",
+      "input": "",
+      "output": "The Identity Manager Fan-Out driver stores certificates in the following directories:\n* Core Driver: `asam\\data\\coredriver\\certs`\n* Platform Services: `asam\\data\\platformservices\\certs`\nAccess to these **certs** directories should be limited to the driver system itself and to its administrators only."
+    },
+    {
+      "category": "config",
+      "instruction": "What password policy settings are required for the ASAM Master User used by the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "For the ASAM Master User that the Identity Manager Fan-Out driver uses to bind to eDirectory, the following settings are required:\n* Maximum password length must be **at least 32 characters**.\n* Intruder detection must be **disabled** for the ASAM Master User object.\n* The user must have **Supervisor rights** to the User and Group Subtree container.\n* If the AS Client API accesses objects outside this subtree, the ASAM Master User must also have **Browse** and **Compare** rights on accessed objects, and **Read** rights on any attribute whose Security Equals list, Group Membership list, or other value is accessed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you obtain a new SSL certificate for a platform in the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "To obtain a new SSL certificate for a platform in the Identity Manager Fan-Out driver, start the Platform Receiver with the appropriate command‑line parameter as described in the Platform Services Administration documentation (see Section IV, Platform Services Administration). This triggers the Platform Receiver to request and receive a new certificate from the Core Driver’s Certificate Services component."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to create an alternate ASAM Master User object for the Identity Manager Fan-Out driver?",
+      "input": "",
+      "output": "To create an alternate ASAM Master User object for the Identity Manager Fan-Out driver:\n1. Open **iManager** and create a new User object, preferably using the same directory context as the original ASAM Master User.\n2. In iManager, assign **Security Equivalence** from the new User object to the original ASAM Master User object.\nAfter these steps you will have two User objects, each with the rights required to act as the ASAM Master User."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you change the ASAM Master User password and update the Identity Manager Fan-Out driver configuration?",
+      "input": "",
+      "output": "To change the ASAM Master User password and update the Identity Manager Fan-Out driver configuration:\n1. Use iManager to set a new password for the alternate user (e.g., **ASAM2**).\n2. Update the Driver object for each Core Driver:\n   a. In iManager, navigate to **Identity Manager Management > Overview**.\n   b. Locate the driver within its driver set.\n   c. Click the driver status indicator on the upper‑right of the driver icon, then select **Edit Properties**.\n   d. Under **Identity Manager > Driver Configuration**, find the **Authentication** heading and change **Authentication ID** to **ASAM2** and enter the new password in **Application Password**.\n3. Use iManager to change the password of the original user (e.g., **ASAM1**) to a random, undisclosed value.\nThe Core Driver will use the new ASAM Master User (ASAM2) the next time it starts; no driver restart is required for the change to take effect."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key security responsibilities and procedures for the Identity Manager Fan-Out driver.",
+      "input": "",
+      "output": "The Identity Manager Fan-Out driver secures communications with SSL certificates minted by the Core Driver’s Certificate Services; these certificates embed a network address that must resolve via reverse‑lookup DNS. Certificates are stored in `asam\\data\\coredriver\\certs` and `asam\\data\\platformservices\\certs` and must be protected from non‑administrator access. The driver binds to eDirectory using the ASAM Master User, which requires a password of at least 32 characters, disabled intruder detection, and Supervisor rights to the User and Group Subtree. Additional Browse, Compare, and Read rights are needed when the AS Client API accesses objects outside that subtree. Administrators can create an alternate ASAM Master User with Security Equivalence, swap users, and change passwords via iManager without restarting the driver."
+    }
+  ]
+}

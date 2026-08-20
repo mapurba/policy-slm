@@ -1,0 +1,29 @@
+{
+  "driver": "Bidirectional eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the loopback detection limitation for delete events in the Bidirectional eDirectory driver and why does it occur?",
+      "input": "",
+      "output": "In the Bidirectional eDirectory driver, loopback detection does not work for delete events on the Subscriber channel. The eDirectory system does not provide the modifier's (deleter's) name for a delete operation, so the changelog module cannot flag the event as a loopback. Because the engine sees the same change twice, it simply ignores the additional delete event, resulting in no functional impact."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What symptom should an administrator look for to identify that loopback detection failed for a delete event in the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "The administrator will see an extra delete event appear on the Publisher channel after a delete originates from the Identity Vault, even though loopback detection is enabled. The engine will ignore this duplicate event, so there is no functional loss, but the presence of the additional event indicates the loopback detection limitation for deletes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the behavior of loopback detection for delete events in the Bidirectional eDirectory driver as described in the documentation.",
+      "input": "",
+      "output": "For the Bidirectional eDirectory driver, loopback detection works for add and modify events but not for delete events. Because eDirectory does not supply the deleter's name, the changelog cannot flag delete loopbacks, causing a duplicate delete event on the Publisher channel that the engine simply ignores, resulting in no loss of functionality."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the loopback detection issue only affect delete events and not add or modify events in the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "The loopback detection issue is limited to delete events because eDirectory fails to provide the modifier's (deleter's) name for deletions. For add and modify events, the required information is available, allowing the changelog module to correctly identify and suppress loopback events."
+    }
+  ]
+}

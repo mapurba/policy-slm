@@ -1,0 +1,41 @@
+{
+  "driver": "ServiceNow driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Subscriber channel in the ServiceNow driver and why does it require a truststore?",
+      "input": "",
+      "output": "The Subscriber channel in the ServiceNow driver sends information from the Identity Vault to the ServiceNow web service, and it needs a truststore that contains a certificate issued by the certificate authority that signed the ServiceNow server’s certificate to establish a secure TLS connection."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import a server certificate into a truststore for the ServiceNow driver?",
+      "input": "",
+      "output": "1. Ensure you have a server certificate that is signed by a certificate authority.\n2. Open a command prompt and run the keytool import command, for example:\n   ```\n   keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -truststore dirxml.truststore -storepass novell\n   ```\n   Replace `tree_ca_root.b64` with the name of your certificate file, `dirxml.truststore` with the desired truststore filename, and `novell` with the password you want to use for the truststore.\n3. The certificate will be added to the specified truststore, ready for use by the ServiceNow driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the ServiceNow driver’s Subscriber channel to use the truststore you created?",
+      "input": "",
+      "output": "1. In Identity Console, click the IDM Administration tile.\n2. On the Driver Dashboard, click the ServiceNow driver’s icon.\n3. Select the Configuration tab and expand the Driver Parameters section.\n4. On the Driver Settings tab, set **Always accept server certificate** to **No**.\n5. In the **Truststore file path** field, enter the full path to the truststore you created in the previous step.\n6. Click Save to apply the configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "In the ServiceNow driver, what value should be set for the ‘Always accept server certificate’ option to ensure a secure Subscriber channel connection?",
+      "input": "",
+      "output": "Set **Always accept server certificate** to **No** in the ServiceNow driver’s Driver Settings tab to require the use of a trusted certificate from the configured truststore."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration parameter in the ServiceNow driver specifies where the truststore file is located?",
+      "input": "",
+      "output": "The **Truststore file path** parameter on the Driver Settings tab of the ServiceNow driver specifies the location of the truststore file."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps needed to secure the Subscriber channel of the ServiceNow driver.",
+      "input": "",
+      "output": "To secure the Subscriber channel of the ServiceNow driver, first obtain a server certificate signed by a certificate authority. Import this certificate into a truststore using the keytool command (e.g., `keytool -import -file <cert> -trustcacerts -noprompt -truststore <filename> -storepass <password>`). Then, in Identity Console, navigate to the ServiceNow driver’s Configuration tab, set **Always accept server certificate** to **No**, provide the path to the created truststore in the **Truststore file path** field, and save the changes."
+    }
+  ]
+}

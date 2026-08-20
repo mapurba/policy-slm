@@ -1,0 +1,65 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the Fan-Out driver, what does the return code AS_OK represent?",
+      "input": "",
+      "output": "AS_OK (return code 0) indicates that the action was successful. For calls such as check password, it corresponds to an answer of “Yes.”"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "In the Fan-Out driver, what does the return code AS_NOUSER indicate and what should be done?",
+      "input": "",
+      "output": "AS_NOUSER (return code 2) means the Enterprise User ID specified on the call is inactive or not in the Census. Action: verify that the user is expected to be active in the Census and consult the Core Driver Administration section for additional information."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "In the Fan-Out driver, describe the meaning of the return code AS_NOAGENT and the typical causes.",
+      "input": "",
+      "output": "AS_NOAGENT (return code 3) indicates that no Core Drivers are available for authentication. This is usually caused by a configuration problem, such as incorrect network addresses in the platform configuration file, the Core Driver not running or listening on the specified port, the Platform Services Process not running, missing DIRECTTOAUTHENTICATION statement, lack of network connectivity, or the driver not being activated or its evaluation period having expired."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you troubleshoot an AS_NOAGENT error in the Fan-Out driver?",
+      "input": "",
+      "output": "To troubleshoot an AS_NOAGENT error in the Fan-Out driver, perform the following steps:\n1. Verify that the platform configuration file specifies the correct network addresses for the Core Drivers.\n2. Ensure that each Core Driver is running on the specified servers and is listening on the port defined in the platform configuration file.\n3. Confirm that the Platform Services Process is running, or add the DIRECTTOAUTHENTICATION statement to the platform configuration file.\n4. Check network connectivity from the platform host to the Core Driver servers.\n5. Verify that the driver has been activated and that its evaluation period has not expired.\n6. Review parts 2 and 3 of the guide for additional details."
+    },
+    {
+      "category": "config",
+      "instruction": "List all return code symbols and their numeric values defined for the Fan-Out driver API.",
+      "input": "",
+      "output": "The Fan-Out driver API defines the following return codes:\n- 0 : AS_OK\n- 1 : AS_NO\n- 2 : AS_NOUSER\n- 3 : AS_NOAGENT\n- 4 : AS_BADCLIENT\n- 5 : AS_REVOKED\n- 6 : AS_INTRUDER\n- 7 : AS_INVALIDARGS\n- 8 : AS_INVALIDOBJ\n- 9 : AS_INVALIDOBJLEN\n- 10 : AS_PASSDUPLICATE\n- 11 : AS_PASSTOOSHORT\n- 12 : AS_TOOSMALL\n- 13 : AS_ATTRNOTFOUND\n- 14 : AS_WSOCKUP\n- 15 : AS_WSOCKDOWN\n- 16 : AS_NOAUTHENV\n- 17 : AS_PRODUCTEXPIRED\n- 18 : AS_INCLUDED\n- 19 : AS_EXCLUDED\n- 20 : AS_NOMATCH\n- 21 : AS_NOLICENSE\n- 22 : AS_INVALIDREQ\n- 23 : AS_KEYEXPIRED\n- 24 : AS_INSUFFICIENTRIGHTS"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken when the Fan-Out driver returns AS_BADCLIENT?",
+      "input": "",
+      "output": "When the Fan-Out driver returns AS_BADCLIENT (return code 4), the local host is not authorized to query the Core Driver. To resolve:\n1. Verify that the network address used by the platform to contact the Core Driver matches the address listed in the Platform Configuration object in the ASAM System container.\n2. If managing Platform objects via the Web interface, ensure the correct address is configured.\n3. For an administrative password reset, confirm that the administrator user ID/password is valid and that the administrator has rights to change the password."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you address an AS_INVALIDARGS error returned by the Fan-Out driver?",
+      "input": "",
+      "output": "AS_INVALIDARGS (return code 7) means invalid arguments were supplied to the API call. To address this:\n- Ensure that each argument is of the correct type and value.\n- Do not pass blank or null strings for object names.\n- Provide a non‑zero buffer size for result buffers."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the Fan-Out driver returns AS_KEYEXPIRED, what corrective action is required?",
+      "input": "",
+      "output": "AS_KEYEXPIRED (return code 23) indicates the DES encryption key used by a non‑SSL version of Platform Services has expired. Corrective action: update the KEY statement in the platform configuration file with the same encryption key specified for the Platform object in the ASAM System container, using the Web interface as described in the Core Driver Administration section."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the return code AS_INSUFFICIENTRIGHTS signify in the Fan-Out driver?",
+      "input": "",
+      "output": "AS_INSUFFICIENTRIGHTS (return code 24) indicates that an administrative password reset was rejected because the administrative user does not exist, the provided password is invalid, or the administrative user lacks rights to change the target user's password."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the troubleshooting information for the Fan-Out driver API return codes.",
+      "input": "",
+      "output": "The Fan-Out driver API returns numeric codes defined in ascauth.h, each with a symbolic name and text description. Positive outcomes return AS_OK; negative outcomes include codes such as AS_NOUSER (unknown user), AS_NOAGENT (no Core Driver available), AS_BADCLIENT (unauthorized host), and various argument or object errors. The table also lists suggested actions, such as verifying configuration files, ensuring Core Drivers are running, checking network addresses, validating arguments, updating expired keys, and confirming licensing. These messages can be converted to readable text using ASC_STRERROR() in C or strError() in Java."
+    }
+  ]
+}

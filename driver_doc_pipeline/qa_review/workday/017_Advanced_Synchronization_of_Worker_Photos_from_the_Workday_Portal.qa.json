@@ -1,0 +1,65 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the default interval at which the Workday driver synchronizes worker photos?",
+      "input": "",
+      "output": "The Workday driver synchronizes worker photos once every 24 hours."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is it recommended to use the photo change business process instead of the default photo synchronization in the Workday driver?",
+      "input": "",
+      "output": "The photo change business process is recommended because the default synchronization can take longer for large organizations and may fail due to timeout; additionally, the default functionality might be deprecated in the near future."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create the first calculated field needed for photo synchronization in the Workday driver?",
+      "input": "",
+      "output": "1. In the Workday portal, select *Create Calculated Field*.\n2. Name the field (for example, **CF_TF_RPT_Is Action Event Photo Change**).\n3. Save the calculated field.\nThis field will be used as the basis for subsequent calculated fields for the Workday driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the custom report required for the Workday driver to synchronize worker photos?",
+      "input": "",
+      "output": "1. In the Workday portal, choose *Create Custom Report* and ensure the integration user has access, or create the report as the integration user.\n2. Add the following mandatory fields to the report:\n   - Employee ID\n   - Worker is Contingent Worker\n   - The calculated field **CF_LRV_RPT Completion Date and Time of Latest Photo Event** (created in step 1.c).\n3. Note the calculated field name shown under *Column Heading Override XML Alias* and later enter it in the **Photo Update Calculated Field** in Designer for the Workday driver.\n4. On the *Sort* tab, enable sorting by alphabetical descending order to show the latest changes at the top.\n5. On the *Prompts* tab, create prompts and set default values for **Worker Types** to *Contingent Worker* and *Employee*.\n6. On the *Advanced* tab, enable the report as a Web Service.\n   - Record the **Namespace** value; it will be entered in the **Photo Report Namespace** field in Designer.\n7. Go to *Actions > Web Service > View URLs* and copy the URL for **Workday XML > WSDL**.\n   - Paste this URL into the **Photo Update Report URL** field in Designer.\n8. Save the report configuration.\nThese steps complete the custom report setup for the Workday driver."
+    },
+    {
+      "category": "config",
+      "instruction": "Which fields are mandatory in the custom report used by the Workday driver for photo updates?",
+      "input": "",
+      "output": "The mandatory fields in the custom report are:\n- Employee ID\n- Worker is Contingent Worker\n- The calculated field **CF_LRV_RPT Completion Date and Time of Latest Photo Event** (the field created in step 1.c)."
+    },
+    {
+      "category": "config",
+      "instruction": "What value should be entered in the *Photo Update Calculated Field* in Designer when configuring the Workday driver?",
+      "input": "",
+      "output": "Enter the calculated field name that appears under *Column Heading Override XML Alias* in the custom report—specifically the name **CF_LRV_RPT Completion Date and Time of Latest Photo Event**."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Designer field receives the Namespace value from the custom report for the Workday driver?",
+      "input": "",
+      "output": "The Namespace value from the custom report should be entered in the **Photo Report Namespace** field in Designer."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Designer field receives the Web Service URL for the custom report in the Workday driver configuration?",
+      "input": "",
+      "output": "The Web Service URL (Workday XML > WSDL) should be entered in the **Photo Update Report URL** field in Designer."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What common problem can cause the Workday driver photo synchronization to fail, and how can it be mitigated?",
+      "input": "",
+      "output": "When an organization has a large number of workers, the photo synchronization may exceed the default timeout and fail. To mitigate this, create calculated fields and a custom report that use the date/time of the last photo change, enable sorting to show recent changes first, and configure the driver to use these fields. Additionally, using the photo change business process is recommended to avoid reliance on the potentially deprecated default sync."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the recommended steps to improve performance of worker photo synchronization in the Workday driver.",
+      "input": "",
+      "output": "The Workday driver performs photo sync once every 24 hours, but for large organizations it may time out. To improve performance, create three calculated fields that identify the latest photo‑change event, build a custom report that includes Employee ID, Contingent Worker flag, and the final calculated field, enable descending alphabetical sorting, add prompts with default values for both worker types, enable the report as a Web Service, record the report’s Namespace and WSDL URL, and enter these values into the corresponding fields (Photo Update Calculated Field, Photo Report Namespace, Photo Update Report URL) in Designer. Using the photo change business process is also recommended."
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "driver": "GroupWise driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the lock-level component in the GroupWise driver XML and which values can the driver set?",
+      "input": "",
+      "output": "In the GroupWise driver, the lock-level component defines the ability to modify a client option field. The GroupWise driver can only set lock-level values of 0 (not locked) or 5 (locked on the user). Any lock levels greater than 5 must not be changed by the driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must some client option fields be locked at the domain or post‑office level rather than by the GroupWise driver on users?",
+      "input": "",
+      "output": "In the GroupWise driver, certain fields are restricted to domain‑ or post‑office‑level locks because the driver can only set lock levels on user objects. Locking those fields at the user level is not supported, so they must be locked through the GroupWise Administration console at a higher level."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the autoSpellCheck field control in the GroupWise driver and what values enable or disable it?",
+      "input": "",
+      "output": "In the GroupWise driver, the autoSpellCheck field determines whether the client spell‑checks message text before sending. Set the value to 1 to enable spell‑checking and to 0 to disable it. The default is 0 (disabled)."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the difference between the allowSharedFolders and allowSharedAddressBooks fields in the GroupWise driver.",
+      "input": "",
+      "output": "In the GroupWise driver, allowSharedFolders enables users to create shared folders (value 1 = enabled, 0 = disabled), while allowSharedAddressBooks enables users to create shared address books (value 1 = enabled, 0 = disabled). Both fields default to enabled (value 1)."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the possible values for the clientLicense field in the GroupWise driver and what do they represent?",
+      "input": "",
+      "output": "In the GroupWise driver, the clientLicense field can be set to FULL or LIMITED. FULL grants an unrestricted mailbox license usable by any client. LIMITED restricts mailbox access to WebAccess, Proxy, Busy Search, and POP/IMAP clients."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Describe how the asteriskSendRestriction field works in the GroupWise driver and list its possible settings.",
+      "input": "",
+      "output": "In the GroupWise driver, the asteriskSendRestriction field controls wildcard addressing. The possible settings are:\n- LIMITED_TO_SYSTEM\n- LIMITED_TO_POST_OFFICE\n- LIMITED_TO_DOMAIN\n- UNLIMITED\n- NOT_ALLOWED\nEach setting determines the scope (system, post office, domain, or unrestricted) where a user can use asterisks (*) as wildcards in e‑mail addresses."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does setting the concealedSubject field to 1 achieve in the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, setting the concealedSubject field to 1 conceals the item’s subject in notifications and in the recipient’s mailbox so that the subject is only visible when the item is opened."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add the AdvancedSettings attribute to a Create policy for an Add operation using the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, follow these steps:\n1. Open Designer and double‑click the default Create policy in the Subscriber channel of the GroupWise driver.\n2. Right‑click the last rule and choose New > Rule > Insert Rule After.\n3. Name the new rule and click Next.\n4. Select AND Conditions, OR Groups and click Next.\n5. Choose the operation condition, set it to equal, case‑sensitive, and set the value to add. Click Next.\n6. Select Continue and click Next.\n7. Choose the action “add destination attribute value”.\n8. Enter AdvancedSettings as the attribute name and User as the class name.\n9. Select “add to current operation” mode and “Current object”.\n10. Set the value type to structured and click the Edit components icon.\n11. Add three components:\n   - Name: lock-level, Value: 0\n   - Name: value, Value: 0\n   - Name: field, Value: autoSpellCheck\n12. Click Finish, then Next, Continue, Next, review the summary, Finish, and press Ctrl+S to save the rule."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you view the GroupWise client options for a user using the GroupWise driver documentation?",
+      "input": "",
+      "output": "In the GroupWise driver, open the GroupWise Administration console, select a Domain, Post Office, or User object, and click the Client Options button. The displayed dialog contains the Environment, Send, Calendar, and other option tabs referenced in the GroupWise driver documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set a custom archive directory for Windows clients in the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, use the following XML snippet inside a do-set-dest-attr-value element named LocationsSettings:\n```xml\n<do-set-dest-attr-value name=\"LocationsSettings\">\n  <arg-value type=\"structured\">\n    <arg-component name=\"lock-level\"><token-text xml:space=\"preserve\">NONE</token-text></arg-component>\n    <arg-component name=\"value\"><token-text xml:space=\"preserve\">C:\\GWARCHIVE</token-text></arg-component>\n    <arg-component name=\"field\"><token-text xml:space=\"preserve\">archiveLocation</token-text></arg-component>\n    <arg-component name=\"itemLocked\"><token-text xml:space=\"preserve\">true</token-text></arg-component>\n  </arg-value>\n</do-set-dest-attr-value>\n```\nInsert this into a policy that adds the attribute to the user."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the default read view to HTML using the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, add a structured value to the EnvironmentSettings attribute with the field component set to defaultViewRead and the value component set to HTML, for example:\n```xml\n<attr attr-name=\"EnvironmentSettings\">\n  <value type=\"structured\">\n    <component name=\"lock-level\">0</component>\n    <component name=\"value\">HTML</component>\n    <component name=\"field\">defaultViewRead</component>\n  </value>\n</attr>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable the appointment alarm with a default of 10 minutes using the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, modify the AppointmentViewSettings attribute as follows:\n```xml\n<attr attr-name=\"AppointmentViewSettings\">\n  <value type=\"structured\">\n    <component name=\"lock-level\">0</component>\n    <component name=\"value\">1</component>\n    <component name=\"field\">appointmentAlarmSet</component>\n  </value>\n  <value type=\"structured\">\n    <component name=\"value\">10</component>\n    <component name=\"field\">appointmentAlarmMinutes</component>\n  </value>\n</attr>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "List the XML structure and valid values for the allowPOP_IMAPAccounts field in the GroupWise driver.",
+      "input": "",
+      "output": "In the GroupWise driver, the allowPOP_IMAPAccounts field is stored under the EnvironmentSettings attribute. Example XML:\n```xml\n<attr attr-name=\"EnvironmentSettings\">\n  <value type=\"structured\">\n    <component name=\"lock-level\">0</component>\n    <component name=\"value\">1</component> <!-- 1 = enabled, 0 = disabled -->\n    <component name=\"field\">allowPOP_IMAPAccounts</component>\n  </value>\n</attr>\n```\nValid values are 1 to enable POP/IMAP accounts in Online mode and 0 to disable them (default)."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible values for the trashPurge field and how do you specify the number of days for auto‑purge in the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, the trashPurge field can be set to:\n- ManualDeleteArchive\n- AUTO_PURGE\nWhen set to AUTO_PURGE, you must also define a trashDays field to specify the purge interval. Example XML for a 7‑day auto‑purge:\n```xml\n<attr attr-name=\"DiscardSettings\">\n  <value type=\"structured\">\n    <component name=\"lock-level\">0</component>\n    <component name=\"value\">AUTO_PURGE</component>\n    <component name=\"field\">trashPurge</component>\n  </value>\n  <value type=\"structured\">\n    <component name=\"value\">7</component>\n    <component name=\"field\">trashDays</component>\n  </value>\n</attr>\n```\nThe trashDays value must be between 1 and 9999."
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the XML snippet to set the showIMPresence field to enabled with a lock level of 5 in the GroupWise driver.",
+      "input": "",
+      "output": "```xml\n<attr attr-name=\"EnvironmentSettings\">\n  <value type=\"structured\">\n    <component name=\"lock-level\">5</component>\n    <component name=\"value\">1</component>\n    <component name=\"field\">showIMPresence</component>\n  </value>\n</attr>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a policy fail to change a lock level for a field when the current lock level is greater than 5 in the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, the policy engine checks the existing lock level before modifying it. If the current lock level is greater than 5, the driver is designed to skip the change, because it is only allowed to set lock levels of 0 or 5 on user objects. Therefore, a policy will not change the lock level when the existing value exceeds 5."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key capabilities of the GroupWise driver for setting client options.",
+      "input": "",
+      "output": "The GroupWise driver enables Identity Manager policies to set many GroupWise client options—such as spelling checks, shared folder creation, account type usage, licensing, view preferences, cleanup, archive locations, send‑options, security, disk‑space limits, and calendar settings—by defining structured XML attributes (e.g., AdvancedSettings, EnvironmentSettings, DiscardSettings). It supports lock‑level control on user objects (values 0 or 5) and provides XML examples for each configurable field."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an XML fragment that the GroupWise driver would use to enable the allowSharedAddressBooks option, set its value to 1, and lock the field at the user level.",
+      "input": "",
+      "output": "```xml\n<attr attr-name=\"EnvironmentSettings\">\n  <value type=\"structured\">\n    <component name=\"lock-level\">5</component>\n    <component name=\"value\">1</component>\n    <component name=\"field\">allowSharedAddressBooks</component>\n  </value>\n</attr>\n```"
+    }
+  ]
+}

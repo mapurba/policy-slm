@@ -1,0 +1,65 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the CN attribute in the Google Apps driver and how does it affect the user’s primary email address?",
+      "input": "",
+      "output": "In the Google Apps driver, the CN attribute of a user object is mapped to Google’s UserName, which becomes the user’s primary email address. By default the driver uses the source name of the user object (the naming value) and appends the primary G Suite email domain (e.g., user@mycompany.com). In a multi‑domain environment you must set the CN value to the full email address (user@domainname.org) for the domain where the user should be created."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you configure the Permission attribute for a group in the Google Apps driver, and what valid values can be assigned?",
+      "input": "",
+      "output": "The Permission attribute is set on Group objects during creation in the Google Apps driver. It is a GCV setting that can be overwritten in the Create Rule. Use the following XML syntax:\n\n```xml\n<add-attr attr-name=\"Permission\">\n    <value>Owner</value>\n</add-attr>\n```\n\nValid values for Permission are: Owner, Member, Domain, Anyone."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the DirXMLGAGroupEMailAddress attribute for a group when using the Google Apps driver in a multi‑email domain environment?",
+      "input": "",
+      "output": "1. In the group object, add the DirXMLGAGroupEMailAddress attribute using an <add-attr> element.\n2. Set the <value> to the desired group email address, including the appropriate domain (primary or secondary).\n3. Example for a secondary domain (mycompany.org):\n\n```xml\n<add-attr attr-name=\"DirXMLGAGroupEMailAddress\">\n    <value>groupa@mycompany.org</value>\n</add-attr>\n```\n\nThe default driver pre‑configuration sets this value to the object's CN plus the primary domain name, but you can override it as shown to place the group in a secondary domain. After creation the Google Admin UI will not allow manual creation of such a group, but it will display and manage it once created via the driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default mapping for the preferredName attribute in the Google Apps driver and what format must its value follow?",
+      "input": "",
+      "output": "By default, the preferredName attribute is mapped to Google Workspace’s Alias attribute. It is used to add a nickname to the user’s mail account. The value must always be in the form of an email address (name@domain). Example XML:\n\n```xml\n<add-attr attr-name=\"preferredName\">\n    <value>First.Last@mycompany.com</value>\n    <value>first@mycompany.com</value>\n</add-attr>\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why do the Assistant and Manager attributes require a transformation when used with the Google Apps driver?",
+      "input": "",
+      "output": "In the Google Apps driver, Assistant and Manager are not treated as special attributes. They only synchronize the distinguished name (DN) of the related object (e.g., \\tree\\org\\user\\myname). To send meaningful information such as the assistant’s or manager’s email address to Google, you must write a transformation—typically in the output transformation—that queries the DN for the Internet Email Address and reformats the result. Without this custom policy, only the DN would be sent, which Google Contacts cannot interpret as an email address."
+    },
+    {
+      "category": "config",
+      "instruction": "How is the ExternalId attribute structured for the Google Apps driver, and what components are required when the type is \"custom\"?",
+      "input": "",
+      "output": "ExternalId is sent to the Google Apps driver as a structured type. The XML must contain a <value> element with attribute type=\"structured\" and one or more <component> elements. Required components are:\n- name=\"value\" – the external identifier value.\n- name=\"type\" – one of the valid types (account, custom, customer, network, organization).\nIf the type is \"custom\", an additional component name=\"customtype\" must be provided to specify the custom type name. Example:\n\n```xml\n<modify-attr attr-name=\"ExternalId\">\n    <add-value>\n        <value timestamp=\"1467727743#2\" type=\"structured\">\n            <component name=\"value\">bob@dog.com</component>\n            <component name=\"type\">account</component>\n        </value>\n    </add-value>\n</modify-attr>\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the AgreedToTerms attribute indicate in the Google Apps driver and can it be set by the driver?",
+      "input": "",
+      "output": "AgreedToTerms is a query‑only attribute that indicates whether the user has accepted Google’s terms and conditions the first time they logged into Google Workspace. The Google Provisioning API does not allow this attribute to be set, so the driver can only read it to determine if the user has accepted the terms."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you set the IsAdmin attribute to grant or revoke domain admin rights using the Google Apps driver?",
+      "input": "",
+      "output": "The IsAdmin attribute is a boolean flag on a user object. Set it to true to make the user a domain admin, or set it to false to remove admin rights. Example XML to grant admin rights:\n\n```xml\n<add-attr attr-name=\"IsAdmin\">\n    <value>true</value>\n</add-attr>\n```\n\nTo revoke admin rights, change the value to false."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the additional schema attributes supported by the Google Apps driver and their typical usage.",
+      "input": "",
+      "output": "The Google Apps driver exposes several extra attributes:\n- **CN**: Mapped to Google UserName; defines the primary email address (must include domain in multi‑domain setups).\n- **Permission**: Sets group role (Owner, Member, Domain, Anyone) during group creation.\n- **Assistant & Manager**: Only sync the DN; requires a transformation to send email addresses to Google Contacts.\n- **DirXMLGAGroupEMailAddress**: Required for group sync; defines the group’s email address, allowing creation in secondary domains.\n- **preferredName**: Mapped to Google Alias; used for nicknames; must be in email format.\n- **Facsimile Telephone Number**: Needs a transformation before sending to Google.\n- **AgreedToTerms**: Query‑only flag indicating acceptance of Google terms; cannot be set.\n- **IsAdmin**: Boolean flag to grant or revoke domain admin rights.\n- **ExternalId**: Structured attribute for external system identifiers; supports types like account, custom, etc., with an extra customtype component for custom types."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML snippet that adds the Permission attribute with the value \"Owner\" to a group using the Google Apps driver.",
+      "input": "",
+      "output": "```xml\n<add-attr attr-name=\"Permission\">\n    <value>Owner</value>\n</add-attr>\n```"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "driver": "PeopleSoft driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Mapping policy in the PeopleSoft driver and what does it do?",
+      "input": "",
+      "output": "In the PeopleSoft driver, the Mapping policy is a NetIQ eDirectory object that defines the relationship between data fields defined in the PeopleSoft application and eDirectory attributes. It resides in the driver object container and is used by both the Publisher and Subscriber channels. The policy maps PeopleSoft Component Interface (CI) field names (app‑name) to eDirectory class or attribute names (nds‑name)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you modify the PeopleSoft driver Mapping policy to include a new attribute?",
+      "input": "",
+      "output": "To modify the PeopleSoft driver Mapping policy and add a new attribute:\n1. Open the Mapping policy with the Identity Manager Mapping policy editor.\n2. Verify that the PeopleSoft field name (spelling and capitalization) exactly matches the field name in the PeopleSoft CI definition.\n3. Add a new `<attr-name>` element to the XML, setting `<nds-name>` to the eDirectory attribute name and `<app-name>` to the PeopleSoft CI field name.\n4. Save the updated Mapping policy.\n5. Ensure the same attribute is added to the Publisher and Subscriber filter definitions; otherwise the attribute will not be synchronized."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes are included in the default Publisher Channel filter of the PeopleSoft driver?",
+      "input": "",
+      "output": "The default Publisher Channel filter in the PeopleSoft driver includes the following attribute pairs (PeopleSoft field → eDirectory attribute):\n\n| PeopleSoft field | eDirectory attribute |\n|------------------|----------------------|\n| departmentNumber | OU |\n| employeeStatus   | pager |\n| Full Name        | Physical Delivery Office Name |\n| Given Name       | Postal Code |\n| homePhone        | S |\n| Initials         | SA |\n| isManager        | Surname |\n| jobCode          | Telephone Number |\n| mailstop         | Title |\n| managerWorkforceID | workforceID |\n| mobile           | (no eDirectory attribute listed) |"
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes are included in the default Subscriber Channel filter of the PeopleSoft driver?",
+      "input": "",
+      "output": "The default Subscriber Channel filter in the PeopleSoft driver includes the following attribute pairs (eDirectory attribute → PeopleSoft field):\n\n| eDirectory attribute | PeopleSoft field |\n|----------------------|-----------------|\n| CN                  | managerWorkforceID |\n| departmentNumber    | mobile |\n| Description         | pager |\n| employeeStatus      | Physical Delivery Office Name |\n| Given Name          | Postal Code |\n| homePhone           | S |\n| Initials            | SA |\n| Internet EMail Address | Surname |\n| jobCode             | Telephone Number |\n| mailstop            | workforceID |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Publisher filter in the PeopleSoft driver?",
+      "input": "",
+      "output": "The Publisher filter in the PeopleSoft driver is a logical component of the driver filter object that specifies which object classes and attributes are passed from the PeopleSoft Component Interface (CI) to eDirectory after schema mapping. It determines the set of data considered authoritative from the PeopleSoft database and controls which attributes are synchronized, including required “notify” attributes needed by Publisher policies."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are “notify” attributes in the PeopleSoft driver filters?",
+      "input": "",
+      "output": "In the PeopleSoft driver, “notify” attributes are attributes that are required by the channel policies (Publisher or Subscriber) but are not themselves synchronized. They must be present in the filter so that the policies can read them and perform business logic, even though the attribute values are not passed through to the other system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you secure sensitive data from being published by the PeopleSoft driver?",
+      "input": "",
+      "output": "To prevent sensitive data from being published by the PeopleSoft driver, follow one of two methods:\n1. Remove the sensitive attribute from the PeopleSoft Component Interface (CI) definition, which guarantees the data never leaves PeopleSoft.\n2. Remove the sensitive attribute from the Publisher filter, which ensures the attribute is not synchronized to Identity Vault via the driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you refresh the PeopleSoft schema Component Interface after changing the CI definition in the PeopleSoft driver?",
+      "input": "",
+      "output": "When the PeopleSoft Component Interface (CI) is renamed, modified, or additional Data Schema CIs are added, you must refresh the schema definition used by the PeopleSoft driver. Use the driver’s Schema Query feature to re‑read the PeopleSoft application schema and then re‑map any affected attributes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main components and policies of the PeopleSoft driver.",
+      "input": "",
+      "output": "The PeopleSoft driver consists of a Mapping policy that maps PeopleSoft CI fields to eDirectory attributes, Publisher and Subscriber filters that control which attributes flow in each direction, and a set of channel policies for each side. Publisher policies include Input Transformation, Matching, Create, Placement, and Command Transformation, which handle data conversion, matching, object creation, placement, and final command processing. Subscriber policies include Event Transformation, Matching, Create, and Output Transformation, which manage data coming from Identity Vault to PeopleSoft. Both channels support bidirectional synchronization, and filters can be secured by removing sensitive attributes."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample XML snippet of a Mapping policy entry that maps the PeopleSoft field FIRST_NAME to the eDirectory attribute \"Given Name\" for the User class in the PeopleSoft driver.",
+      "input": "",
+      "output": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<attr-name-map>\n    <class-name>\n        <nds-name>User</nds-name>\n        <app-name>DIRXML_SCHEMA01</app-name>\n    </class-name>\n    <attr-name classname=\"User\">\n        <nds-name>Given Name</nds-name>\n        <app-name>FIRST_NAME</app-name>\n    </attr-name>\n</attr-name-map>"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Placement policy in the PeopleSoft driver to place active users in the Active Users Container and inactive users in the Inactive Users Container?",
+      "input": "",
+      "output": "To configure the Placement policy in the PeopleSoft driver:\n1. Open the default Placement policy, which is a DirXML Script policy.\n2. Ensure the script checks the `employeeStatus` attribute.\n3. Add logic (or confirm existing logic) so that:\n   - If `employeeStatus` equals **A**, the user is placed in the Organizational Unit specified by the **Active Users Container** GCV.\n   - If `employeeStatus` equals **I** (or the attribute is missing), the user is placed in the Organizational Unit specified by the **Inactive Users Container** GCV.\n4. Save the policy. The driver will now use the appropriate container based on the employeeStatus value."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What actions does the Command Transformation policy’s \"match <add> element\" perform in the PeopleSoft driver?",
+      "input": "",
+      "output": "In the PeopleSoft driver, the Command Transformation policy’s `match <add>` element performs several actions when a new User is added:\n- Finds the User’s manager and, if the manager is active (`employeeStatus` = A), sets the manager and `managerWorkforceID` on the new User.\n- Sets the `Login Disabled` attribute: False for active (A) users, True for inactive (I) users.\n- Adds or removes Group Membership based on `employeeStatus` and `isManager` (active non‑managers go to an Employee Group, active managers to a Manager Group, inactive users are removed from groups).\n- Determines placement of the object using the employeeStatus attribute (active users to the Active OU, inactive to the Inactive OU).\n- Updates other User objects: adds the manager attribute to users whose `managerWorkforceID` matches the new User, and adds `directReports` to the manager.\n- Generates a write‑back `<operation-data>` element to add the CN and DN values in PeopleSoft."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why might you need to modify the Publisher and Subscriber filters after changing the Mapping policy in the PeopleSoft driver?",
+      "input": "",
+      "output": "After adding or removing attributes in the Mapping policy of the PeopleSoft driver, the corresponding attributes must also be present in the Publisher and Subscriber filters. If an attribute is mapped but not included in the filters, the driver will not synchronize that attribute, causing data mismatches or missing information during integration."
+    }
+  ]
+}

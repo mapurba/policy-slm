@@ -1,0 +1,59 @@
+{
+  "driver": "GroupWise driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What components need to be upgraded when converting an existing driver to the GroupWise driver?",
+      "input": "",
+      "output": "To upgrade an existing driver to the supported GroupWise driver, you must upgrade two components: the driver shim and the driver packages."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the driver shim on a Linux system for the GroupWise driver?",
+      "input": "",
+      "output": "To upgrade the driver shim on Linux for the GroupWise driver, follow these steps:\n1. Stop the driver instance (and the Identity Vault) using a command prompt, e.g., run `ndsmanage stopall`.\n2. Download the driver patch file to a temporary folder on the server.\n3. Extract the contents of the patch file.\n4. Open a command prompt and run the RPM upgrade command, replacing `(image-path)` with the actual path to the extracted file:\n   ```\n   rpm -U (image-path)/novell-DXMLGWRest.rpm\n   ```\n5. If the driver runs locally, restart the Identity Vault and driver instance with `ndsmanage startall`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the driver shim on a Windows system for the GroupWise driver?",
+      "input": "",
+      "output": "To upgrade the driver shim on Windows for the GroupWise driver:\n1. Stop the driver instance (and the Remote Loader instance, if applicable) using Identity Console, Designer, or `dxcmd`.\n2. Download the driver patch file to a temporary folder and extract it.\n3. Navigate to the extracted folder's `windows` subdirectory.\n4. Copy `GWRestShim.jar` from that location to the GroupWise driver install directory:\n   `<IdentityManager installation>\\RemoteLoader\\lib`\n5. If the driver runs with a Remote Loader, restart the Remote Loader and the driver instance.\n6. If the driver runs locally, restart the Identity Vault and the driver instance."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the step‑by‑step instructions to upgrade the existing driver packages to GroupWise 2.5 or 2.6 for the GroupWise driver?",
+      "input": "",
+      "output": "To upgrade the existing driver packages to GroupWise 2.5 or 2.6 for the GroupWise driver, perform the following:\n1. Download all GroupWise 2.5 or 2.6 packages from the Package Update site (http://cdn.novell.com/cached/designer/packages/idm/customupdatesite2_0_0/). Verify the package version is 2.5 or 2.6.\n2. In Identity Manager Designer, right‑click the driver and select **Properties**.\n3. Click the **Packages** tab and select **all** packages that need to be upgraded. Do not perform a partial upgrade, as it may break driver functionality.\n4. If you need to keep a legacy GroupWise driver, manually select the 2.0.x packages during installation and ignore the 2.5 packages, because 2.5 packages become the default.\n5. Follow the standard driver configuration steps as described in *Installing the Driver Packages*.\n6. Click **Next**.\n7. On the driver configuration page, set the **GroupWise Driver Class name** to:\n   `com.novell.gw.dirxml.driver.rest.shim.GWdriverShim`\n   - If the driver runs locally, also change the driver module name.\n   - If the driver runs remotely, modify the Remote Loader instance configuration with the new class name before starting the driver.\n8. Deploy the driver.\n9. Start the driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the fully qualified class name that must be entered for the GroupWise driver after upgrading the driver packages?",
+      "input": "",
+      "output": "The GroupWise driver class name to enter after upgrading the driver packages is:\n`com.novell.gw.dirxml.driver.rest.shim.GWdriverShim`"
+    },
+    {
+      "category": "config",
+      "instruction": "Where should the GWRestShim.jar file be placed on a Windows system when updating the GroupWise driver shim?",
+      "input": "",
+      "output": "On Windows, after extracting the driver patch, copy `GWRestShim.jar` to the following directory:\n`<IdentityManager installation>\\RemoteLoader\\lib`"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What can cause the upgraded GroupWise driver to lose functionality during package upgrade, and how can it be avoided?",
+      "input": "",
+      "output": "A partial upgrade of the driver packages can break the existing driver functionality. To avoid this, always upgrade **all** required GroupWise packages together and do not select only a subset of packages."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete upgrade process for moving an existing driver to the GroupWise driver.",
+      "input": "",
+      "output": "Upgrading an existing driver to the GroupWise driver involves two main tasks: upgrading the driver shim and upgrading the driver packages. For the shim, stop the driver (and Identity Vault or Remote Loader), download and extract the patch, then replace the shim files (RPM on Linux or GWRestShim.jar on Windows) and restart the appropriate services. For the packages, download GroupWise 2.5/2.6 packages, select all of them in the driver’s Properties → Packages screen (avoiding partial upgrades), update the driver class name to `com.novell.gw.dirxml.driver.rest.shim.GWdriverShim`, deploy, and start the driver. The upgraded driver supports Modify operations for Distribution List and External Entities, but does not support those objects themselves."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact command line to stop all Identity Manager services on a Linux server before upgrading the GroupWise driver shim.",
+      "input": "",
+      "output": "```bash\nndsmanage stopall\n```"
+    }
+  ]
+}

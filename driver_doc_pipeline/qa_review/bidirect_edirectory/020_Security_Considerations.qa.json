@@ -1,0 +1,59 @@
+{
+  "driver": "Bidirectional eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Bidirectional eDirectory driver and what synchronization requirements does it have?",
+      "input": "",
+      "output": "The Bidirectional eDirectory driver enables two‑way synchronization between eDirectory and Identity Vault. It requires that the eDirectory servers where the driver is installed hold a master or read/write replica of the objects to be synchronized, and that the driver have appropriate read/write rights on both the eDirectory container and the Identity Vault container."
+    },
+    {
+      "category": "config",
+      "instruction": "Which entry and attribute rights are required on the connected eDirectory system for the Bidirectional eDirectory driver to receive events?",
+      "input": "",
+      "output": "For the Bidirectional eDirectory driver to receive events from the connected eDirectory system, the driver’s Authentication DN must have the following rights on the base container:\n\n*Entry Rights:* Browse permission.\n*Attributes Rights:* Read permission.\n*ACL:* Supervisor."
+    },
+    {
+      "category": "config",
+      "instruction": "Which entry and attribute rights are required on the connected eDirectory system for the Bidirectional eDirectory driver to synchronize changes?",
+      "input": "",
+      "output": "To synchronize changes to the connected eDirectory system, the Bidirectional eDirectory driver’s Authentication DN must have on the base container:\n\n*Entry Rights:* The rights to create entries.\n*Attributes Rights:* The rights to modify the attributes.\n*ACL:* Supervisor.\n\nIn addition, to modify write‑managed attributes, the Authentication DN must have management rights on the objects whose DN is being modified."
+    },
+    {
+      "category": "config",
+      "instruction": "Which entry and attribute rights are required on the Identity Vault for the Bidirectional eDirectory driver to synchronize changes?",
+      "input": "",
+      "output": "For the Bidirectional eDirectory driver to synchronize changes to the Identity Vault, the driver’s Security Equals DN must have on the object container and the driver object:\n\n*Entry Rights:* Browse, Create, Rename, and Delete entries.\n*Attributes Rights:* Compare, Read, Write, and Modify attributes.\n\nFor write‑managed attributes, the Security Equals DN also needs management rights on the objects whose DN is being modified."
+    },
+    {
+      "category": "config",
+      "instruction": "Which entry and attribute rights are required on the Identity Vault for the Bidirectional eDirectory driver to receive events?",
+      "input": "",
+      "output": "To receive events from the Identity Vault, the Bidirectional eDirectory driver’s Security Equals DN must have on the object container and the driver object:\n\n*Entry Rights:* Browse, Create, Rename, and Delete entries.\n*Attributes Rights:* Compare, Read, Write, and Modify attributes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Authentication DN for the Bidirectional eDirectory driver to have the necessary rights on the connected eDirectory container?",
+      "input": "",
+      "output": "To configure the Authentication DN for the Bidirectional eDirectory driver:\n1. Identify the DN that the driver will use for authentication.\n2. In eDirectory, locate the base container that will be synchronized.\n3. Assign the following rights to the Authentication DN on that container:\n   - Entry Rights: Browse (for receiving events) and Create (for synchronizing changes).\n   - Attribute Rights: Read (for receiving events) and Modify (for synchronizing changes).\n   - Set the ACL to Supervisor.\n4. If the driver will modify write‑managed attributes, also grant management rights on the specific objects whose DN will be altered.\n5. Save the ACL changes and verify that the Authentication DN can perform the required operations."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Security Equals DN for the Bidirectional eDirectory driver to have the necessary rights on the Identity Vault container?",
+      "input": "",
+      "output": "To configure the Security Equals DN for the Bidirectional eDirectory driver:\n1. Determine the DN that will be used as the driver’s Security Equals DN in Identity Vault.\n2. Open the Identity Vault console and navigate to the object container that holds synchronized objects and to the driver object itself.\n3. Grant the following rights to the Security Equals DN on both the container and the driver object:\n   - Entry Rights: Browse, Create, Rename, Delete.\n   - Attribute Rights: Compare, Read, Write, Modify.\n4. Ensure the same set of rights is granted for receiving events (Browse, Create, Rename, Delete entries and Compare, Read, Write, Modify attributes).\n5. If the driver will modify write‑managed attributes, also assign management rights on the objects whose DN will be changed.\n6. Apply the changes and confirm that the Security Equals DN can perform the required operations."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken if the change‑log file of the Bidirectional eDirectory driver is accessible by unauthorized users?",
+      "input": "",
+      "output": "If the change‑log file of the Bidirectional eDirectory driver is accessible by unauthorized users, take the following steps:\n1. Verify the file location: it resides in the DIB directory of eDirectory and its name is the driver’s GUID with a .TAO extension.\n2. Ensure that only the owner of the eDirectory instance has file system permissions to read the file.\n3. Adjust the file system ACLs so that the file is not readable or writable by other accounts.\n4. Confirm that the eDirectory server’s operating system enforces the owner‑only access.\n5. Restart the driver to ensure it picks up the corrected permissions.\n6. Review the change‑log encryption settings; the file is already encrypted, but proper file permissions provide an additional layer of protection."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the security considerations for the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "The Bidirectional eDirectory driver requires read/write rights on the eDirectory container (master or read/write replica) and equivalent rights on the Identity Vault container. The driver’s Authentication DN needs Browse and Read rights to receive events and Create/Modify rights to synchronize changes on eDirectory. The driver’s Security Equals DN needs Browse, Create, Rename, Delete, Compare, Read, Write, and Modify rights on Identity Vault for both receiving events and synchronizing changes. The change‑log file (.TAO) is encrypted, stored in the DIB directory, named after the driver’s GUID, and must be protected so only the eDirectory instance owner can access it."
+    }
+  ]
+}

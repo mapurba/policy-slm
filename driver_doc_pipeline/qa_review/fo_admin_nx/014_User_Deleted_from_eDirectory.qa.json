@@ -1,0 +1,35 @@
+{
+  "driver": "FO Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the FO Admin Nx driver, what actions does Object Services take when a user covered by a Census Search object is deleted from eDirectory?",
+      "input": "",
+      "output": "When a user that is covered by a Census Search object is deleted from eDirectory, Object Services either (a) marks the corresponding eUser object in the Census as inactive—preventing the user from authenticating through Authentication Services—or (b) marks the eUser object for deletion after the event has been processed by all associated platforms, depending on the configuration you have specified."
+    },
+    {
+      "category": "config",
+      "instruction": "What configuration option in the FO Admin Nx driver determines whether a deleted eUser is marked inactive or scheduled for deletion?",
+      "input": "",
+      "output": "The configuration option that controls this behavior is the setting that specifies whether to \"remove deleted users rather than mark them inactive\". When this option is enabled, Object Services marks the eUser for deletion after all platform receivers have processed the event; when it is disabled, the eUser is simply marked as inactive."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the Delete Pending Duration setting affect user deletion handling in the FO Admin Nx driver?",
+      "input": "",
+      "output": "If you have specified a Delete Pending Duration, Event Journal Services informs the Platform Receiver that a delete is pending for the user. The actual delete event is not delivered until the Delete Pending Duration has expired, at which point Event Journal Services delivers the delete event to the Platform Receiver."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "In the FO Admin Nx driver, why might a deleted eUser not be disabled in the local security system after the eDirectory deletion event?",
+      "input": "",
+      "output": "One possible reason is that the user is excluded from processing based on specifications in the platform configuration file. If the platform configuration excludes the user, the Platform Receiver will not invoke the Disable/Delete User Receiver script, so the user remains enabled in the local security system."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the steps the FO Admin Nx driver follows when a user covered by a Census Search object is deleted from eDirectory.",
+      "input": "",
+      "output": "When a covered user is deleted from eDirectory, the Event Subsystem notifies Object Services, which either marks the eUser as inactive or schedules it for deletion based on configuration. Object Services then notifies Event Journal Services, which passes the provisioning event to each Platform Receiver in the relevant Platform Set. Each Platform Receiver runs its Disable/Delete User Receiver script (unless excluded). Event Journal Services notifies Audit Services to log the action. If a Delete Pending Duration is configured, the delete event is held pending until that duration expires."
+    }
+  ]
+}

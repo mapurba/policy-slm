@@ -1,0 +1,53 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the ASC_CHGPASSWD function in the Fo Admin Nx driver and what does it do?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, the ASC_CHGPASSWD function changes the password of an Enterprise User. It takes the authentication environment, the user ID, the current (old) password, and the desired new password, and attempts to update the password in the Core Driver. A successful call results in the user’s password being changed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you compile and run a program that uses ASC_CHGPASSWD in the Fo Admin Nx driver to change a user's password?",
+      "input": "",
+      "output": "1. Create a C source file (e.g., changepass.c) and copy the example code from the ASC_CHGPASSWD documentation.\n2. Ensure the Fo Admin Nx driver header file ascauth.h is accessible (include path may be /usr/include or a driver-specific directory).\n3. Compile the program, for example:\n   ```\n   gcc -o changepass changepass.c -I/path/to/foadminnx/include\n   ```\n   Adjust the include path as needed for your installation.\n4. Run the resulting executable with three arguments: the user ID, the old password, and the new password:\n   ```\n   ./changepass jsmith oldSecret newSecret\n   ```\n5. The program will initialize the authentication environment with ASC_INIT, call ASC_CHGPASSWD, print the result based on the return code, and finally terminate the environment with ASC_TERM.\n\nAll steps follow the example provided in the Fo Admin Nx driver documentation."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameters does ASC_CHGPASSWD require in the Fo Admin Nx driver and what does each parameter represent?",
+      "input": "",
+      "output": "ASC_CHGPASSWD in the Fo Admin Nx driver requires four parameters:\n| Parameter | Description |\n|-----------|-------------|\n| asce      | The environment item returned from a call to ASC_INIT() or ASC_INIT_EXT(). |\n| user      | The Enterprise User ID whose password is to be changed. |\n| oldpass   | The old (current) password for the specified user. |\n| newpass   | The new password that will replace the old password. |\nThese parameters are passed by reference to the function as `ASCENV *asce, char *user, char *oldpass, char *newpass`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What return value does ASC_CHGPASSWD give when the old password is invalid in the Fo Admin Nx driver, and how should an application handle it?",
+      "input": "",
+      "output": "When the old password supplied to ASC_CHGPASSWD is invalid, the function returns the integer constant **AS_NO**. An application should detect this value and inform the caller that the password was not changed because the old password did not match. For example:\n```c\nrc = ASC_CHGPASSWD(asce, user, oldpass, newpass);\nif (rc == AS_OK) {\n    printf(\"Password changed successfully\\n\");\n} else if (rc == AS_NO) {\n    printf(\"Old password is invalid; password not changed\\n\");\n} else {\n    printf(\"Error %d: %s\\n\", rc, ASC_STRERROR(rc));\n}\n```\nThis handling follows the sample code in the Fo Admin Nx driver documentation."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How should you respond when ASC_CHGPASSWD returns AS_PASSDUPLICATE in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "If ASC_CHGPASSWD returns **AS_PASSDUPLICATE**, it indicates that the new password has been used previously for the user and therefore cannot be reused. The application should notify the user that the selected new password is not acceptable because it was used before, and prompt for a different password. Example handling:\n```c\nrc = ASC_CHGPASSWD(asce, user, oldpass, newpass);\nif (rc == AS_PASSDUPLICATE) {\n    printf(\"The new password has been used previously; choose a different password.\\n\");\n}\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does the AS_INTRUDER return code indicate in the Fo Admin Nx driver, and what action is recommended?",
+      "input": "",
+      "output": "The **AS_INTRUDER** return code from ASC_CHGPASSWD signals that an intruder lockout is enabled for the user. This means the user account is temporarily locked due to repeated authentication failures. The recommended action is to inform the user of the lockout status and advise contacting an administrator to reset the lockout or wait for the lockout period to expire before attempting another password change."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points of the ASC_CHGPASSWD documentation for the Fo Admin Nx driver.",
+      "input": "",
+      "output": "The ASC_CHGPASSWD function in the Fo Admin Nx driver changes an Enterprise User's password. It requires an authentication environment (asce) and three strings: user ID, old password, and new password. The function returns integer constants defined in ascauth.h indicating success (AS_OK) or various error conditions such as invalid old password (AS_NO), user not found (AS_NOUSER), password reuse (AS_PASSDUPLICATE), password too short (AS_PASSTOOSHORT), intruder lockout (AS_INTRUDER), and others. Example C code shows initialization with ASC_INIT, calling ASC_CHGPASSWD, handling return codes, and terminating with ASC_TERM."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a C function named change_user_password that uses ASC_CHGPASSWD from the Fo Admin Nx driver to change a password and returns a human‑readable string describing the result.",
+      "input": "",
+      "output": "```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <ascauth.h>\n\n/*\n * change_user_password – attempts to change the password for a given user.\n * Parameters:\n *   asce    – pointer to an already‑initialized ASCENV environment.\n *   user    – Enterprise User ID.\n *   oldpass – Current password.\n *   newpass – Desired new password.\n * Returns:\n *   A string describing the outcome. Caller must not free the returned string.\n */\nconst char *change_user_password(ASCENV *asce, const char *user,\n                                 const char *oldpass, const char *newpass)\n{\n    int rc = ASC_CHGPASSWD(asce, (char *)user, (char *)oldpass, (char *)newpass);\n    switch (rc) {\n        case AS_OK:\n            return \"Password changed successfully\";\n        case AS_NO:\n            return \"Old password is invalid\";\n        case AS_NOUSER:\n            return \"User not found or inactive\";\n        case AS_REVOKED:\n            return \"User is disabled\";\n        case AS_INTRUDER:\n            return \"Intruder lockout is active for this user\";\n        case AS_PASSDUPLICATE:\n            return \"New password has been used previously\";\n        case AS_PASSTOOSHORT:\n            return \"New password is too short\";\n        case AS_BADCLIENT:\n            return \"Local host not authorized to query the Core Driver\";\n        case AS_NOAGENT:\n            return \"No Core Driver could be contacted\";\n        case AS_NOAUTHENV:\n            return \"No authentication environment has been established\";\n        case AS_INVALIDREQ:\n            return \"Call rejected as not valid or not supported\";\n        case AS_INVALIDARGS:\n            return \"Invalid arguments supplied to ASC_CHGPASSWD\";\n        case AS_KEYEXPIRED:\n            return \"Old key expired\";\n        default:\n            return ASC_STRERROR(rc);\n    }\n}\n```"
+    }
+  ]
+}

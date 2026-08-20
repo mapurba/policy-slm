@@ -1,0 +1,65 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the \"Validate Resource with Required Attributes\" global configuration value in the SCIM driver and how should it be set?",
+      "input": "",
+      "output": "In the SCIM driver, the \"Validate Resource with Required Attributes\" global configuration value determines whether the driver validates resources against the required attributes defined in the schema. According to the documentation, you should set this field to **false**."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the \"Enable JSON To XDS Conversion Logs\" GCV do in the SCIM driver and what warning is associated with it?",
+      "input": "",
+      "output": "The \"Enable JSON To XDS Conversion Logs\" global configuration value, when set to **True**, enables logging of the JSON‑to‑XDS conversion process only in the remote loader. The documentation warns that enabling this field exposes JSON XDS logs that contain sensitive data in the trace, and it should be used **only for debugging in a test environment** and never in a production environment."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default setting and purpose of the \"Connecting to SAP Cloud\" GCV in the SCIM driver?",
+      "input": "",
+      "output": "The \"Connecting to SAP Cloud\" global configuration value indicates whether the SCIM driver is connecting to SAP Cloud. Its default is **false**. Set it to **true** only when the driver is intended to communicate with SAP Cloud."
+    },
+    {
+      "category": "config",
+      "instruction": "Which fields are available under the \"Enable User Account Entitlement\" setting in the SCIM driver and what options can be selected for each?",
+      "input": "",
+      "output": "Under **Enable User Account Entitlement** in the SCIM driver the following fields are available:\n\n1. **Sync Login Disabled attribute** – Controls synchronization of the Login Disabled attribute to SAP Cloud.\n   - **Yes** – Sync changes made in Identity Manager to SAP Cloud.\n   - **No** – Restrict syncing of those changes.\n2. **Action on Account Revocation** – Determines the action taken in SAP Cloud when a user account entitlement is revoked.\n   - **Disable Account**\n   - **Delete Account**"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default value for the \"Enable Group Entitlement\" GCV in the SCIM driver and what does it control?",
+      "input": "",
+      "output": "The default value for **Enable Group Entitlement** in the SCIM driver is **false**. When set to **true**, the driver manages group memberships using the Group entitlement; when false, group synchronization is handled by the non‑entitlement configuration method."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable entitlements for the SCIM driver in Identity Manager?",
+      "input": "",
+      "output": "To enable entitlements for the SCIM driver:\n1. In the Modeler window, right‑click the SCIM driver icon or driver line and select **Properties**.\n2. Choose **GCVs > Entitlements**.\n3. Set **Enable User Account Entitlement** to **true** (and configure its sub‑fields as needed).\n4. Set **Enable Group Entitlement** to **true** if group membership entitlement is required.\n5. Click **Apply**, then **OK** to save the changes."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps must be followed to configure the \"Sync Login Disabled attribute\" field for user account entitlement in the SCIM driver?",
+      "input": "",
+      "output": "To configure the **Sync Login Disabled attribute** field for user account entitlement in the SCIM driver:\n1. Open the SCIM driver Properties (Modeler → right‑click driver → Properties).\n2. Navigate to **GCVs > Entitlements** and expand **Enable User Account Entitlement**.\n3. Locate the **Sync Login Disabled attribute** field.\n4. Choose **Yes** to sync Login Disabled changes to SAP Cloud, or **No** to prevent syncing.\n5. Click **Apply** and then **OK** to confirm."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If JSON To XDS Conversion Logs are inadvertently enabled in a production environment for the SCIM driver, what risk does this pose and how should it be remedied?",
+      "input": "",
+      "output": "Enabling **Enable JSON To XDS Conversion Logs** in a production environment causes the SCIM driver to write JSON XDS logs that contain sensitive data to the trace, exposing confidential information. To remediate, set the **Enable JSON To XDS Conversion Logs** GCV back to **False** and redeploy the driver configuration, ensuring that logging is only enabled in test or debugging environments."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key global configuration values and entitlement settings that must be reviewed to get the SCIM driver operational.",
+      "input": "",
+      "output": "The SCIM driver requires the following key global configuration values (GCVs):\n- **Validate Resource with Required Attributes** – set to **false**.\n- **Enable JSON To XDS Conversion Logs** – default **false**; enable only for test debugging.\n- **Connecting to SAP Cloud** – default **false**; set to **true** only when connecting to SAP Cloud.\n- **Connected Application’s Name** – specify the application name displayed in entitlements.\n- **SCIM 2.0 URL** – auto‑populated during driver creation.\n\nEntitlement settings (if the SCIM Entitlements package is installed):\n- **Enable User Account Entitlement** – set to **true** and configure **Sync Login Disabled attribute** (Yes/No) and **Action on Account Revocation** (Disable Account/Delete Account).\n- **Enable Group Entitlement** – set to **true** to manage group memberships via entitlements; if false, group sync uses the non‑entitlement method.\nAll changes are applied via the driver’s Properties dialog under GCVs > Entitlements."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample GCV configuration table for the SCIM driver with the recommended default values as described in the documentation.",
+      "input": "",
+      "output": "| GCV | Recommended Value | Description |\n|-----|-------------------|-------------|\n| Validate Resource with Required Attributes | false | Validates resources against required schema attributes (set to false). |\n| Enable JSON To XDS Conversion Logs | false | Disables detailed JSON‑to‑XDS logs; enable only for debugging in a test environment. |\n| Connecting to SAP Cloud | false | Indicates whether the driver connects to SAP Cloud (default false). |\n| Connected Application’s Name | <Your Application Name> | Name of the connected application as it appears in entitlements. |\n| SCIM 2.0 URL | (auto‑populated) | URL provided automatically when the driver object is created. |\n\n*Note: Replace `<Your Application Name>` with the actual name of the connected application.*"
+    }
+  ]
+}

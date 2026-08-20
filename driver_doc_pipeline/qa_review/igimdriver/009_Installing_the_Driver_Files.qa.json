@@ -1,0 +1,65 @@
+{
+  "driver": "IGIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the IGIM driver and on which platforms can it be run?",
+      "input": "",
+      "output": "The IGIM driver is a Java‑based driver for NetIQ Identity Manager. It can be run on the Identity Manager engine itself or on a Remote Loader server, and it works only with native and Java Remote Loader implementations."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the IGIM driver files on the Identity Manager server?",
+      "input": "",
+      "output": "When you install the Identity Manager engine, the installation program automatically installs the IGIM driver files on the Identity Manager server. The installer extends the Identity Vault’s schema and installs the driver shim (IGDriverShim.jar) and the driver configuration file. Note that the installer does not create the driver object in the Identity Vault nor upgrade an existing driver’s configuration; you must create the driver object separately."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you verify that the IGDriverShim.jar file is present for the Remote Loader and copy it if it is missing?",
+      "input": "",
+      "output": "1. Check the Remote Loader’s library directory for the IGDriverShim.jar file:\n   * On Linux/UNIX: /opt/novell/eDirectory/lib/dirxml/classes\n   * On Windows: C:\\novell\\remoteloader\\lib\n2. If the file is not present, locate IGDriverShim.jar on the Identity Vault server (where the IGIM driver was installed).\n3. Copy the JAR file from the Identity Vault server to the appropriate directory for your operating system (the paths listed above).\n4. After copying, ensure the file permissions allow the Remote Loader to read the JAR."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration parameters must be provided to configure the IGIM driver with the Remote Loader?",
+      "input": "",
+      "output": "When configuring the IGIM driver for the Remote Loader, you must supply the following parameters (either on the command line, in a configuration file, or via the Remote Loader Console):\n\n* -description (optional)\n* -commandport\n* -connection parameters (mandatory \"port\" plus optional values):\n  + port\n  + address\n  + fromaddress\n  + handshaketimeout\n  + rootfile\n  + keystore\n  + storepass\n  + localaddress\n  + hostname\n  + kmo\n  + secureprotocol\n  + enforceSuiteB\n  + useMutualAuth\n* Trace file parameters (optional):\n  + -trace\n  + -tracefile\n  + -tracefilemax\n* -javaparam\n* -class or -module"
+    },
+    {
+      "category": "config",
+      "instruction": "Provide the sample configuration file entries for the IGIM driver as shown in the documentation.",
+      "input": "",
+      "output": "```\n-description \"IGIM Driver\"\n-commandport 8000\n-connection \"port=8090\"\n-trace 3\n-tracefile \"/opt/netiq/igimdriver.log\"   (or \"C:\\novell\\remoteloader\\64bit\\IGIMDriver-Trace.log\" on Windows)\n-tracefilemax 100M\n-class \"com.netiq.idm.driver.igdriver.IGDriverShim\"\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Remote Loader for the IGIM driver on a Linux system?",
+      "input": "",
+      "output": "1. Log in to the computer where the Remote Loader is installed.\n2. Open a text editor and create a new file or edit the sample file `config8000.txt` located in `/opt/novell/dirxml/doc`.\n3. Add the required configuration parameters for the IGIM driver (e.g., -description, -commandport, -connection, trace settings, -class) to the file.\n4. Save the file.\n5. Note the port number assigned to the Remote Loader instance; you will need this value when configuring the driver in Designer.\n6. (Optional) To have the Remote Loader start the driver automatically at system boot, place the configuration file in `/etc/opt/novell/dirxml/rdxml`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Remote Loader for the IGIM driver on a Windows system?",
+      "input": "",
+      "output": "1. Log in to the computer where the Remote Loader is installed.\n2. Run `rlconsole.exe`, which is normally found in `C:\\novell\\remoteloader\\nnbit`.\n3. Click **Add**, then enter the Description, select the Driver, and fill in the other parameters (command port, connection settings, trace options, class name, etc.) in the dialog that appears.\n4. Save the configuration file in the default location or choose another location, for example `C:\\novell\\remoteloader\\IGIMRemoteLoader-Config.txt`.\n5. Record the port number shown for the Remote Loader instance; you will need this when configuring the driver in Designer.\n6. (Optional) To have the Remote Loader start the driver automatically at system start, ensure **Establish a Remote Loader service for this driver instance** is selected. To configure the driver as an application (manual start), deselect this option.\n7. Click **OK** to finish."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the IGDriverShim.jar file is not found in the expected Remote Loader directory?",
+      "input": "",
+      "output": "If the IGDriverShim.jar file is missing from the Remote Loader’s library directory ( `/opt/novell/eDirectory/lib/dirxml/classes` on Linux/UNIX or `C:\\novell\\remoteloader\\lib` on Windows ), locate the JAR file on the Identity Vault server where the IGIM driver was originally installed, and copy it to the appropriate directory on the Remote Loader host. After copying, verify that the Remote Loader can read the file and then proceed with driver configuration."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to set up the IGIM driver with a Remote Loader.",
+      "input": "",
+      "output": "To set up the IGIM driver with a Remote Loader: (1) Ensure the IGIM driver files are installed on the Identity Manager server during engine installation. (2) Verify that `IGDriverShim.jar` exists in the Remote Loader’s library directory; if not, copy it from the Identity Vault server. (3) Configure an SSL connection between the Remote Loader and the Identity Manager server. (4) Provide the required Remote Loader parameters (description, commandport, connection settings, optional trace and Java parameters, class/module) via command line, a configuration file, or the Remote Loader Console. (5) On Linux, edit or create a configuration file (e.g., `config8000.txt`) and optionally place it in `/etc/opt/novell/dirxml/rdxml` for automatic start. (6) On Windows, use `rlconsole.exe` to add the driver instance, specify parameters, save the configuration file, and optionally enable the Remote Loader service for automatic start."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the example configuration file for the IGIM driver that includes a description, command port, connection port, trace level, trace file path, trace file maximum size, and class name.",
+      "input": "",
+      "output": "```\n-description \"IGIM Driver\"\n-commandport 8000\n-connection \"port=8090\"\n-trace 3\n-tracefile \"/opt/netiq/igimdriver.log\"   (or \"C:\\novell\\remoteloader\\64bit\\IGIMDriver-Trace.log\" on Windows)\n-tracefilemax 100M\n-class \"com.netiq.idm.driver.igdriver.IGDriverShim\"\n```"
+    }
+  ]
+}

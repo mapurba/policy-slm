@@ -1,0 +1,59 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of debugging output in the Fan-Out driver and why should it not be used for routine operations?",
+      "input": "",
+      "output": "In the Fan-Out driver, debugging output provides extensive, low‑level information about driver routines that is primarily intended for NetIQ Technical Support. Because generating this output consumes extra CPU and I/O resources, the documentation warns that debugging mode adversely affects performance and therefore should not be enabled during normal, routine operations."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration parameters define where debugging information is written for the Fan-Out driver?",
+      "input": "",
+      "output": "The destination for debugging information in the Fan-Out driver is defined by the **Debug Log File** and **Debug to DSTrace** configuration parameters. These parameters are set in the driver’s object configuration (see the Driver Object Configuration Parameters reference)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable debugging for specific Core Driver components using the iManager GUI in the Fan-Out driver?",
+      "input": "",
+      "output": "To enable debugging via iManager in the Fan-Out driver:\n1. In iManager, navigate to **Fan‑Out Driver Configuration > Configure Logs**. The Log Configuration page appears.\n2. In the list of components, select the **Core Driver** items for which you want debugging information.\n3. Click **Apply** to save the changes. The selected Core Driver components will now produce debugging output according to the configured log destination."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you turn on and then turn off debugging for the Core Driver using the command line in the Fan-Out driver?",
+      "input": "",
+      "output": "Use the following commands on the Fan-Out driver host:\n1. To turn on debugging:\n```\n/usr/local/ASAM/bin/CoreDriver/asamcdrv debug\n```\n2. To turn off debugging:\n```\n/usr/local/ASAM/bin/CoreDriver/asamcdrv nodebug\n```\nThese commands toggle the Core Driver’s debugging mode without requiring a GUI."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the asamcdrv command cannot find LDAP client libraries when enabling debugging for the Fan-Out driver?",
+      "input": "",
+      "output": "If the `asamcdrv` command reports missing LDAP client libraries, export the library path before running the command. For example:\n```\nexport LD_LIBRARY_PATH=/opt/novell/eDirectory/lib64\n```\nAfter setting `LD_LIBRARY_PATH` to include the eDirectory library directory, re‑run the `asamcdrv debug` or `nodebug` command."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Fan-Out driver require a driver shim restart after changing individual debug options?",
+      "input": "",
+      "output": "Individual debug options affect low‑level driver routines that are loaded into memory when the driver shim starts. Changing these options does not automatically refresh the in‑memory configuration, so the documentation states that restarting the driver shim is necessary to apply the new debug settings."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to obtain debugging output for the Core Driver in the Fan-Out driver.",
+      "input": "",
+      "output": "To obtain Core Driver debugging output in the Fan-Out driver:\n1. Set the **Debug Log File** and **Debug to DSTrace** parameters to define the log destination.\n2. Choose either the GUI method or the command‑line method.\n   - GUI: Go to **Fan‑Out Driver Configuration > Configure Logs**, select the desired Core Driver components, and click **Apply**.\n   - Command line: Run `/usr/local/ASAM/bin/CoreDriver/asamcdrv debug` to enable, and `/usr/local/ASAM/bin/CoreDriver/asamcdrv nodebug` to disable.\n3. If required, export `LD_LIBRARY_PATH` to include LDAP libraries.\n4. Restart the driver shim if you changed individual debug options, because the new settings only take effect after a shim restart."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the trace level set in fanout.conf interact with individual debug options in the Fan-Out driver?",
+      "input": "",
+      "output": "The trace level configured in **fanout.conf** provides a baseline amount of logging for the Fan-Out driver. Some individual debug options may already be covered by the selected trace level, meaning that enabling those options separately will not produce additional output unless the trace level is lower than the option’s granularity."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If enabling debugging for the Fan-Out driver noticeably slows down processing, what does the documentation recommend?",
+      "input": "",
+      "output": "The documentation advises that because debugging mode adversely affects performance, it should be disabled after troubleshooting. Turn off debugging with the `nodebug` command or by deselecting the components in the iManager Log Configuration page to restore normal performance."
+    }
+  ]
+}

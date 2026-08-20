@@ -1,0 +1,65 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the GmailSettingsDelegates attribute and why is it used in the Google Apps driver?",
+      "input": "",
+      "output": "In the Google Apps driver, the GmailSettingsDelegates attribute is used to add, remove, or list the delegates that have access to a user’s Gmail account. It can be supplied either as a plain string containing the delegate’s email address or as a distinguished name with an association reference. This attribute allows administrators to manage mailbox delegation directly through IDM without modifying eDirectory attributes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable IMAP for a user with the Google Apps driver?",
+      "input": "",
+      "output": "To enable IMAP for a user in the Google Apps driver, perform the following steps:\n1. Create a modify‑attr block with the attribute name \"GmailSettingsEnableIMAP\".\n2. Use an <add-value> command (remove‑value is not supported).\n3. Provide a <value> element of type \"string\" with the text \"true\".\nExample XML:\n```xml\n<modify-attr attr-name=\"GmailSettingsEnableIMAP\">\n    <add-value>\n        <value type=\"string\">true</value>\n    </add-value>\n</modify-attr>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which values are valid for the EnableFor component of the GmailSettingsEnablePOP attribute in the Google Apps driver?",
+      "input": "",
+      "output": "The EnableFor component of the GmailSettingsEnablePOP attribute in the Google Apps driver accepts the following enumerated values:\n- ALL_MAIL\n- MAIL_FROM_NOW_ON"
+    },
+    {
+      "category": "config",
+      "instruction": "What actions can be specified for the Action component of the GmailSettingsForwarding attribute in the Google Apps driver?",
+      "input": "",
+      "output": "The Action component of the GmailSettingsForwarding attribute in the Google Apps driver can be set to one of these enumerated values:\n- KEEP (keep the message in the inbox)\n- ARCHIVE (archive the message)\n- DELETE (delete the message)\n- MARK_READ (mark the message as read)"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might setting GmailSettingsEnableIMAP fail immediately after creating a new user with the Google Apps driver, and how can it be resolved?",
+      "input": "",
+      "output": "The GmailSettingsEnableIMAP attribute cannot be set during the user‑creation event because of limitations in the Gmail and Directory APIs. If you attempt to set it immediately after creation, the operation may be rejected. The recommended resolution is to wait at least five seconds (or longer) after the user is created before issuing a modify‑attr command to set GmailSettingsEnableIMAP."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you add a SendAs alias for a user using the Google Apps driver?",
+      "input": "",
+      "output": "To add a SendAs alias with the Google Apps driver, follow these steps:\n1. Use a <modify-attr> block with attr-name=\"GmailSettingsSendAs\".\n2. Include an <add-value> command.\n3. Provide a <value> element of type \"structured\" containing the components Name, SendAs, ReplyTo, and IsDefault.\nExample XML:\n```xml\n<modify-attr attr-name=\"GmailSettingsSendAs\">\n    <add-value>\n        <value type=\"structured\">\n            <component name=\"Name\">John Doe</component>\n            <component name=\"SendAs\">john.doe@example.com</component>\n            <component name=\"ReplyTo\">john.doe@example.com</component>\n            <component name=\"IsDefault\">true</component>\n        </value>\n    </add-value>\n</modify-attr>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What command types does the GmailSettingsLabel attribute support in the Google Apps driver?",
+      "input": "",
+      "output": "The GmailSettingsLabel attribute in the Google Apps driver supports the following command types:\n- add-value\n- remove-value\n- remove-all-values"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must the value for GmailSettingsLanguage be in RFC 3066 format when using the Google Apps driver?",
+      "input": "",
+      "output": "The GmailSettingsLanguage attribute is constrained to RFC 3066 language tags because the underlying Gmail API only accepts language identifiers that conform to this international standard. Using RFC 3066 ensures that the language code is recognized and correctly applied to the user's Gmail interface."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key constraints and supported operations for Gmail settings attributes in the Google Apps driver.",
+      "input": "",
+      "output": "The Google Apps driver exposes several Gmail settings attributes that can be modified only on update events. Key points:\n- Attributes cannot be set during user creation; a pause of at least five seconds after creation is recommended.\n- GmailSettingsDelegates accepts a DN or plain email string; add-value is used to assign delegates.\n- GmailSettingsEnableIMAP takes a Boolean (true/false) and supports only add-value.\n- GmailSettingsEnablePOP is structured with EnableFor (ALL_MAIL or MAIL_FROM_NOW_ON), Action (KEEP, ARCHIVE, DELETE), and Enable (Boolean); only add-value is allowed.\n- GmailSettingsForwarding is structured with Enable (Boolean), ForwardAddress (must be verified), and Action (KEEP, ARCHIVE, DELETE, MARK_READ); only add-value is allowed.\n- GmailSettingsLabel works with string values and supports add-value, remove-value, and remove-all-values.\n- GmailSettingsLanguage uses RFC 3066 tags and supports only add-value.\n- GmailSettingsSendAs is structured (Name, SendAs, ReplyTo, IsDefault) and supports add-value, remove-value, and remove-all-values.\n- GmailSettingsSignature is a simple string and supports add-value."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML modify‑attr snippet that enables auto‑forwarding to forward@example.com with the action ARCHIVE using the Google Apps driver.",
+      "input": "",
+      "output": "```xml\n<modify-attr attr-name=\"GmailSettingsForwarding\">\n    <add-value>\n        <value type=\"structured\">\n            <component name=\"ForwardAddress\">forward@example.com</component>\n            <component name=\"Action\">ARCHIVE</component>\n            <component name=\"Enable\">true</component>\n        </value>\n    </add-value>\n</modify-attr>\n```"
+    }
+  ]
+}

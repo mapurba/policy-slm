@@ -1,0 +1,65 @@
+{
+  "driver": "Work Order driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the upgrade process for the Work Order driver?",
+      "input": "",
+      "output": "The upgrade process for the Work Order driver updates the installed driver packages and applies a driver patch to refresh the driver files, ensuring the driver runs with the latest bug fixes, features, and compatibility with the Identity Manager environment."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the installed packages for the Work Order driver using NetIQ Designer?",
+      "input": "",
+      "output": "To upgrade the installed packages for the Work Order driver in NetIQ Designer:\n1. Open the project that contains the Work Order driver.\n2. Right‑click the Work Order driver and select **Driver > Properties**.\n3. Click the **Packages** tab.\n4. Locate any package that shows a check mark in the **Upgrades** column.\n5. Click **Select Operation** for that package and choose **Upgrade** from the drop‑down list.\n6. Choose the desired version from the list and click **OK** (Designer lists all versions available for upgrade).\n7. Click **Apply**.\n8. If additional information is required for the selected package, fill in the fields and click **Next**.\n9. Review the summary of packages to be installed and click **Finish**.\n10. After the upgrade completes, review the upgraded package and click **OK** to close the Package Management page."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Designer preference enables automatic reading of package updates for the Work Order driver?",
+      "input": "",
+      "output": "In NetIQ Designer, enable automatic reading of package updates by navigating to **Windows > Preferences > NetIQ > Package Manager > Online Updates**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Work Order driver patch as a root user on a Linux system?",
+      "input": "",
+      "output": "To apply the Work Order driver patch as a root user on Linux:\n1. Log in to the server as **root**.\n2. Ensure the patch file has been downloaded and unzipped to a temporary location (e.g., `IDM45_Workorder_4000.zip`).\n3. Run the following command, replacing the placeholder with the actual temporary location of the RPM:\n```\nrpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLwkodr.rpm\n```\nFor example:\n```\nrpm -Uvh /tmp/IDM45_Workorder_4000.zip/linux/novell-DXMLwkodr.rpm\n```\n4. If the Work Order driver is running locally, start the Identity Vault and the driver instance.\n5. If the driver is running with a Remote Loader instance, start the Remote Loader instance and the driver instance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Work Order driver patch as a root user on a Windows system?",
+      "input": "",
+      "output": "To apply the Work Order driver patch as a root (administrative) user on Windows:\n1. Download and unzip the patch file to a temporary location (e.g., `IDM45_Workorder_4000.zip`).\n2. Open the extracted folder and navigate to the **windows** subfolder.\n3. Copy the file **WorkOrder.jar** from that folder.\n4. Paste the copied **WorkOrder.jar** into one of the following default locations, depending on your installation:\n   * `<IdentityManager installation>\\NDS\\lib`\n   * `<IdentityManager installation>\\RemoteLoader\\<architecture>\\lib`\n5. If the Work Order driver was stopped before the patch, restart the Identity Vault and driver instance (or the Remote Loader instance and driver instance) as appropriate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Work Order driver patch as a non‑root user?",
+      "input": "",
+      "output": "To apply the Work Order driver patch as a non‑root user:\n1. Verify that the directory `<non-root eDirectory location>/rpm` exists and contains the file `_db.000`. This file is created during a non‑root installation of the Identity Manager engine.\n2. Set the root directory environment variable to point to the non‑root eDirectory location by running:\n```\nROOTDIR=<non-root eDirectory location>\n```\n3. Download the Work Order driver patch and unzip (or untar) it to a temporary location.\n4. Install the driver RPM with the following command, replacing `<rpm-location>` with the path to `novell-DXMLwkodr.rpm`:\n```\nrpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/etc=$ROOTDIR/etc \\\n    --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n    --relocate=/var=$ROOTDIR/var \\\n    --badreloc --nodeps --replacefiles <rpm-location>\n```\nFor example:\n```\nrpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/etc=$ROOTDIR/etc \\\n    --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n    --relocate=/var=$ROOTDIR/var \\\n    --badreloc --nodeps --replacefiles /home/user/novell-DXMLwkodr.rpm\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you verify before applying a non‑root patch for the Work Order driver, and what does the absence of the verification file indicate?",
+      "input": "",
+      "output": "Before applying a non‑root patch for the Work Order driver, verify that the file `_db.000` exists in the `<non-root eDirectory location>/rpm` directory. The absence of `_db.000` suggests that the Identity Manager engine was not installed correctly as a non‑root user, and you should reinstall Identity Manager to place the file in the expected location."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to upgrade the Work Order driver.",
+      "input": "",
+      "output": "To upgrade the Work Order driver:\n1. **Upgrade installed packages**: In Designer, open the project, access the driver’s Properties, select the Packages tab, identify packages with upgrades available, choose **Upgrade**, select the desired version, apply and finish the upgrade wizard.\n2. **Apply the driver patch**:\n   * **Prerequisites**: back up the driver configuration and stop the Identity Vault/driver or Remote Loader/driver if they are running.\n   * **Download** the appropriate Work Order driver patch from the NetIQ Patch Finder and unzip it.\n   * **Root installation**: on Linux, run `rpm -Uvh <temp>/linux/novell-DXMLwkodr.rpm`; on Windows, copy `WorkOrder.jar` to the appropriate `lib` folder.\n   * **Non‑root installation**: ensure `_db.000` exists, set `ROOTDIR`, then run the complex `rpm` command with `--relocate` options to install the RPM.\n3. **Restart services**: after patching, restart the Identity Vault and driver instance or the Remote Loader and driver instance as needed."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the name of the RPM file used to update the Work Order driver on Linux?",
+      "input": "",
+      "output": "The RPM file used to update the Work Order driver on Linux is **novell-DXMLwkodr.rpm**."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must you stop the Identity Vault and driver instance before applying a Work Order driver patch?",
+      "input": "",
+      "output": "Stopping the Identity Vault and driver instance (or the Remote Loader instance and driver instance) ensures that no files are in use while the patch replaces driver files. This prevents file lock conflicts and guarantees that the new driver files are correctly loaded the next time the services start."
+    }
+  ]
+}

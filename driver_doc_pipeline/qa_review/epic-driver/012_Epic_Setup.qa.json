@@ -1,0 +1,47 @@
+{
+  "driver": "Epic driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you create the service account required for the Epic driver username token authentication?",
+      "input": "",
+      "output": "To create the service account for the Epic driver:\n1. In Epic, create a new active foreground user.\n2. Set the user ID (e.g., EMP .1) and a password (e.g., EMP 40). Both fields are case‑sensitive.\n3. Ensure the password is configured not to expire.\n4. Assign a security class to the user – either a new static security class or an existing static class as recommended.\n5. Add this security class to the user record.\n6. Use the default security class for the relevant Epic application; the user’s security will not inherit overrides by service area or location.\n7. Communicate the user ID and password to your Interconnect administrator for use by the driver’s web‑service calls."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Epic driver require an Epic user with a non‑expiring password?",
+      "input": "",
+      "output": "The Epic driver uses Basic Auth (username token authentication) for every web‑service call to the Epic database. If the password expires, authentication will fail, breaking the driver’s functionality. Therefore the driver requires an active foreground user whose password is set to never expire, ensuring uninterrupted authentication for Interconnect."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps must be performed to set up the Epic ID type for the Epic driver?",
+      "input": "",
+      "output": "To configure the Epic ID type for the Epic driver:\n1. Verify whether a suitable Epic identifier type (similar to an NPI) already exists.\n2. If it does not exist, create a new Epic ID type in Epic.\n3. Configure a HL7 assigning authority for the new ID type.\n4. Ensure the Type.text value is populated when reading Provider records, so the driver can retrieve the SER record ID."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which web services are scoped for use by the Epic driver?",
+      "input": "",
+      "output": "The Epic driver is scoped for the following web services:\n- ActivateUser, CreateUser (2014), DeleteUser, GetUserPagerID, InactivateUser, SetReportSelectionCriteria, SerUserExternalPasswords, SetUserPagerID, SetUserPassword, UpdateAuthorizedServiceAreas, UpdateBIDefaultUser, UpdateCommunityUser, UpdateFacilityDepartmentList, UpdateLoginDepartments, UpdateUser (2014), UpdateUserGroups, ViewAuthorizedServiceAreas, ViewBIDefaultUser, ViewCommunityUser, ViewCurrentReportSelectionCriteria, ViewFacilityDepartmentList, ViewLoginDepartments, ViewUser (2014), ViewUserGroups (all in the Security / PersonnelManagement category)\n- GetImportDataLog, ImportData (2019) (Core / DataUtility)\n- GetInternalIdentifier (Common / Utility)\n- UpdateUserDemographics (Common / User)\n- Practitioner.Read (R4), Practitioner.Search (R4), PractitionerRole.Read (R4), PractitionerRole.Search (R4) (FHIR / R4)\nThese services are listed in the Web Service Information table of the Epic driver documentation."
+    },
+    {
+      "category": "config",
+      "instruction": "What security policy settings are required for the Epic driver in Epic Interconnect?",
+      "input": "",
+      "output": "For the Epic driver, configure the following security policy in Epic Interconnect:\n- **Policy Name**: EpicDriverBasicAuth\n- **Services**: Include all application services listed in the Web Service Information table (DataUtility, PersonnelManagement, R4, Utility, User).\n- **Authentication**: Username tokens – use the EMP ID and password created in the Epic Service Account Setup.\n- **Encryption**: TLS\n- **Bindings**: Rest"
+    },
+    {
+      "category": "config",
+      "instruction": "Which reverse proxy rewrite rules must be created for the Epic driver when using Microsoft ARR on IIS?",
+      "input": "",
+      "output": "Create a rewrite rule for each of the following patterns, using wildcards (*) instead of regular expressions, and rewrite to `https://[hostname]/[instance]/{R:0}`:\n- api/fhir/*\n- api/epic/2011/Common/User/UPDATEUSERDEMOGRAPHICS/*\n- api/epic/2010/Common/Utility/GETINTERNALIDENTIFIER/*\n- api/epic/2016/Core/DataUtility/GetImportDataLog/*\n- api/epic/2019/Core/DataUtility/ImportData/*\n- api/epic/2012/Security/PersonnelManagement/ActivateUser/*\n- api/epic/2012/Security/PersonnelManagement/DeleteUser/*\n- api/epic/2012/Security/PersonnelManagement/InactivateUser/*\n- api/epic/2012/Security/PersonnelManagement/SetUserExternalPasswords/*\n- api/epic/2012/Security/PersonnelManagement/SetUserPassword/*\n- api/epic/2014/Security/PersonnelManagement/CreateUser/*\n- api/epic/2014/Security/PersonnelManagement/UpdateUser/*\n- api/epic/2014/Security/PersonnelManagement/ViewUser*\n- api/epic/2015/Security/PersonnelManagement/SetReportSelectionCriteria*\n- api/epic/2015/Security/PersonnelManagement/ViewCurrentReportSelectionCriteria/*\n- api/epic/2016/Security/PersonnelManagement/UpdateCommunityUser/*\n- api/epic/2016/Security/PersonnelManagement/UpdateLoginDepartments/*\n- api/epic/2016/Security/PersonnelManagement/UpdateUserGroups/*\n- api/epic/2016/Security/PersonnelManagement/ViewCommunityUser/*\n- api/epic/2016/Security/PersonnelManagement/ViewLoginDepartments/*\n- api/epic/2016/Security/PersonnelManagement/ViewUserGroups/*\n- api/epic/2017/Security/PersonnelManagement/UpdateAuthorizedServiceAreas/*\n- api/epic/2017/Security/PersonnelManagement/UpdateFacilityDepartmentList/*\n- api/epic/2017/Security/PersonnelManagement/GetUserPagerID/*\n- api/epic/2017/Security/PersonnelManagement/SetUserPagerID/*\n- api/epic/2017/Security/PersonnelManagement/ViewAuthorizedServiceAreas/*\n- api/epic/2017/Security/PersonnelManagement/ViewFacilityDepartmentList/*\n- api/epic/2017/Security/PersonnelManagement/UpdateBIDefaultUser/*\n- api/epic/2017/Security/PersonnelManagement/ViewBIDefaultUser/*\nEach rule must use wildcards and rewrite to the target URL as shown."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration steps required to deploy the Epic driver.",
+      "input": "",
+      "output": "To deploy the Epic driver you must:\n1. Create an active foreground Epic user with a non‑expiring password for Basic Auth and share the credentials with the Interconnect admin.\n2. Set up a unique Epic ID type (with HL7 assigning authority) for storing the SER record ID.\n3. Ensure the driver’s required web services are available (as listed in the Web Service Information table).\n4. Configure an Epic Interconnect security policy named **EpicDriverBasicAuth** that uses username‑token authentication, TLS encryption, and Rest bindings for all listed services.\n5. Define reverse‑proxy rewrite rules (using wildcards) for each Epic driver endpoint in Microsoft ARR (or equivalent) to forward calls to the appropriate Interconnect host."
+    }
+  ]
+}

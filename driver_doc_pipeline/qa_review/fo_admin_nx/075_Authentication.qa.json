@@ -1,0 +1,65 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is local authentication in the Fan-Out driver and how are passwords stored?",
+      "input": "",
+      "output": "In the Fan-Out driver, local authentication means that user passwords are stored locally on the Linux or UNIX system (for example in /etc/shadow). When a user logs on, the password is verified against this local store."
+    },
+    {
+      "category": "config",
+      "instruction": "Which keyword statement must be placed in the asamplat.conf file to synchronize passwords with the Identity Vault for local authentication in the Fan-Out driver?",
+      "input": "",
+      "output": "The keyword statement required in the asamplat.conf file is:\n```\nUPDATEPASSWORD\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What optional statement can be added after UPDATEPASSWORD to specify the password storage format in the Fan-Out driver, and which formats are supported?",
+      "input": "",
+      "output": "You may include a CRYPTTYPE statement in the asamplat.conf file to override the password storage format. The supported formats are: DES, MD5, BLOWFISH, SHA256, SHA512, and SUN_MD5.\nExample:\n```\nCRYPTTYPE SHA512\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure authentication redirection using the PAM module for the Fan-Out driver?",
+      "input": "",
+      "output": "To configure authentication redirection with the Fan-Out driver using PAM:\n1. Ensure the Platform Services Process (asampsp file) is running to provide a connection pool and driver load balancing.\n2. Manually edit the PAM configuration for each application that should use PAM, adding the Fan-Out driver’s PAM module as described in the PAM Configuration Notes.\n3. Restart the affected applications so they pick up the new PAM settings."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set up authentication redirection with local failover in the Fan-Out driver, and which services must be running?",
+      "input": "",
+      "output": "To set up authentication redirection with local failover in the Fan-Out driver:\n1. Enable authentication redirection as described for the PAM (or LAM on AIX) module.\n2. Ensure the Platform Receiver (asamrcvr file) is running so passwords can be synchronized with the Identity Vault.\n3. Ensure the Platform Services Process (asampsp file) is running to provide authentication services.\nWhen the connection to the Identity Vault is unavailable, the driver will fall back to local authentication."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is Name Service Switch authentication in the Fan-Out driver and what benefits does it provide?",
+      "input": "",
+      "output": "Name Service Switch (NSS) authentication in the Fan-Out driver is used when virtual provisioning is enabled. Users authenticate through the NSS supplied by Platform Services, which keeps virtual user and password information in a local protected cache on the connected Linux or UNIX system. This gives the system a local copy of credentials, providing the advantages of local provisioning while still allowing eDirectory password and login rule enforcement (if PAM is also configured)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If passwords are not synchronizing with the Identity Vault when using local authentication in the Fan-Out driver, which component is likely not running?",
+      "input": "",
+      "output": "The Platform Receiver (asamrcvr) is likely not running, because it must be active to keep passwords synchronized with the Identity Vault."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "When authentication redirection fails in the Fan-Out driver, what fallback mechanism is available?",
+      "input": "",
+      "output": "When authentication redirection fails, the Fan-Out driver can fall back to local authentication if the configuration includes authentication redirection with local failover."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the four authentication methods supported by the Fan-Out driver.",
+      "input": "",
+      "output": "The Fan-Out driver supports:\n1. Local Authentication – passwords stored locally and synchronized with the Identity Vault via UPDATEPASSWORD.\n2. Authentication Redirection – passwords are checked in the Identity Vault via the PAM (or LAM) module.\n3. Authentication Redirection with Local Failover – redirects authentication but falls back to local authentication if the Identity Vault is unreachable; requires both Platform Receiver and Platform Services Process.\n4. Name Service Switch Authentication – uses a local protected cache for virtual users when virtual provisioning is enabled, optionally combined with PAM for eDirectory rule enforcement."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example asamplat.conf snippet that enables password synchronization and forces SHA512 encryption for the Fan-Out driver.",
+      "input": "",
+      "output": "```bash\n# asamplat.conf for Fan-Out driver\nUPDATEPASSWORD\nCRYPTTYPE SHA512\n```"
+    }
+  ]
+}

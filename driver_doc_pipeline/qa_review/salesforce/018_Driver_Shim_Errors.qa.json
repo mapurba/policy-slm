@@ -1,0 +1,65 @@
+{
+  "driver": "Salesforce driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does a 307 Temporary Redirect indicate in the Salesforce driver?",
+      "input": "",
+      "output": "In the Salesforce driver, a 307 Temporary Redirect means that the Subscriber channel attempted to send data to the application or Web service but received a 307 response from the server. The possible cause is that the Web service is not available. The driver’s action is to wait for a period of time (usually 30 seconds) and then try again. The error level is marked as Retry."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the significance of HTTP 200-299 messages for the Salesforce driver?",
+      "input": "",
+      "output": "In the Salesforce driver, HTTP status codes in the 200-299 range indicate successful communication with the HTTP server. No further action is required, and the error level is recorded as Success."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you handle a 503 Service Unavailable error when using the Salesforce driver?",
+      "input": "",
+      "output": "To handle a 503 Service Unavailable error in the Salesforce driver, follow these steps:\n1. Recognize that the Subscriber channel received a 503 response, meaning the Web service or application is down.\n2. Allow the driver to wait for a period of time (typically 30 seconds).\n3. After the wait, the driver will automatically retry the request.\nThe error level for this situation is Retry, so the driver will continue attempting until the service becomes available."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the required format for the pubHostPort parameter in the Salesforce driver?",
+      "input": "",
+      "output": "In the Salesforce driver, the pubHostPort parameter must be provided in the form *host:port*. Both a valid host name (or IP address) and a numeric port value are required."
+    },
+    {
+      "category": "config",
+      "instruction": "What must be implemented to provide an application schema for the Salesforce driver?",
+      "input": "",
+      "output": "For the Salesforce driver to return an application schema, you need to create a Java class that implements the **SchemaReporter** interface and configure the driver to load this class as a Java extension."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take if the Salesforce driver reports \"Problem communicating with HTTP server\"?",
+      "input": "",
+      "output": "When the Salesforce driver logs \"Problem communicating with HTTP server,\" take the following actions:\n1. Verify that the HTTP server is running.\n2. If the server is overloaded, remove unnecessary services to reduce load.\n3. Check for firewall restrictions and adjust them to allow access to the HTTP server.\n4. Ensure the URL provided in the Subscriber configuration is correct (see Driver Parameters documentation).\nThese steps correspond to the Retry error level."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How do you resolve a \"MalformedURLException\" error in the Salesforce driver?",
+      "input": "",
+      "output": "To resolve a MalformedURLException in the Salesforce driver, change the URL supplied in the Subscriber channel parameters so that it conforms to a valid URL format. This error is marked as Fatal."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What actions are recommended when the Salesforce driver logs \"HTTPS Hostname Wrong: Should Be ...\"?",
+      "input": "",
+      "output": "When the Salesforce driver reports \"HTTPS Hostname Wrong: Should Be ...,\" it indicates an SSL handshake failure because the server certificate’s subject does not match the IP address or hostname in the HTTPS URL. The recommended action is to use a DNS hostname rather than an IP address in the URL. The error level is Retry."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you correct an incorrectly configured Subscriber channel that results in \"Subscriber.execute() was called but the Subscriber was not configured correctly\" in the Salesforce driver?",
+      "input": "",
+      "output": "To correct this warning in the Salesforce driver, follow these steps:\n1. Review the driver configuration and ensure it is formatted correctly (refer to Section 4.0, Schema Mapping for guidance).\n2. Clear the Subscriber’s filter so that it does not receive commands unintentionally.\nThese actions address the improperly formatted driver configuration and resolve the warning."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the error handling guidelines for the Salesforce driver as described in the documentation.",
+      "input": "",
+      "output": "The Salesforce driver defines specific actions for various HTTP and communication errors:\n- 307, 408, 503, 504 responses and generic I/O issues trigger a retry after a ~30‑second wait (Retry level).\n- Successful 200‑299 responses require no action (Success level).\n- Other HTTP error codes are logged as errors without automatic retries (Error level), with a reference to RFC 2616 for details.\n- Fatal issues such as malformed URLs, incorrect pubHostPort format, or multiple initialization exceptions require immediate configuration correction.\n- Warnings include missing schema (requires a SchemaReporter Java class) and improperly configured Subscriber (requires fixing driver configuration and clearing filters).\nOverall, the driver categorizes errors into Retry, Success, Error, Fatal, and Warning, each with prescribed remedial actions."
+    }
+  ]
+}

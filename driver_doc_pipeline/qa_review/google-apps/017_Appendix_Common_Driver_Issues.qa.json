@@ -1,0 +1,65 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the correct way to specify the dest-dn for placing a user in an organizational unit with the Google Apps driver?",
+      "input": "",
+      "output": "In the Google Apps driver, the dest-dn attribute must not start with a leading \"\\\\\". It should contain only the organizational unit path followed by the username, using backslashes as separators. For example, to place a user named \"myname\" in the Sales\\Marketing OU, the dest-dn should be \"Sales\\Marketing\\myname\"."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you troubleshoot the Google Apps driver when it fails to start?",
+      "input": "",
+      "output": "To troubleshoot a startup failure of the Google Apps driver, follow these steps:\n1. Verify that the driver JAR files are installed and that eDirectory has been restarted.\n2. Ensure you have created the administrator account in Google and that you have logged into the Google web interface at least once.\n3. Examine a level 3 (or higher) trace log for the driver start‑up and look for error messages that indicate the root cause."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Google Apps driver, how should the dest-dn attribute be formatted for user placement?",
+      "input": "",
+      "output": "The dest-dn attribute for the Google Apps driver must be a plain path without a leading backslash. Use backslashes to separate each organizational unit and end with the username. Example format:\n```xml\n<add class-name=\"User\" dest-dn=\"Sales\\Marketing\\myname\"/>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the Google Apps driver receive an HTTP 403 Forbidden error due to quota limits, and how can it be resolved?",
+      "input": "",
+      "output": "The Google Apps driver is subject to default daily quotas for the Google services it calls. When the number of requests exceeds a quota, the service returns an HTTP 403 Forbidden error. To resolve the issue, review the quota limits in Appendix D – Google API Quotas, then either reduce the request rate, request a higher quota from Google, or spread the workload over multiple days."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What causes a TokenResponseException 401 Unauthorized when using Gmail Settings attributes in the Google Apps driver, and how do you fix it?",
+      "input": "",
+      "output": "The TokenResponseException 401 Unauthorized is caused by missing or improperly authorized Gmail scopes for the service account. Fix the problem by authorizing the required Gmail scopes in the Security section of your G Suite domain, as described in the OAuth Guide, and then reset the authorized scopes for the service account."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does a GoogleJsonResponseException 403 Forbidden indicate when accessing Gmail Settings attributes in the Google Apps driver, and what steps should be taken?",
+      "input": "",
+      "output": "A GoogleJsonResponseException 403 Forbidden indicates that the Gmail API has not been enabled for the project associated with the service account. To fix this, open the Google Developers Console for the project, navigate to the Gmail API page (https://console.developers.google.com/apis/api/gmail.googleapis.com/overview), enable the API, and then retry the operation after a few minutes to allow the change to propagate."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why are placement rules not used for groups in the Google Apps driver?",
+      "input": "",
+      "output": "The Google Apps driver does not support placing groups in organizational units because Google treats groups as a flat, non‑hierarchical collection. Therefore, placement rules are irrelevant for group objects."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must nicknames, group names, and usernames be unique across the G Suite domain in the Google Apps driver?",
+      "input": "",
+      "output": "In the Google Apps driver, nicknames, group names, and usernames must be unique throughout the entire G Suite domain because Google does not allow duplicate identifiers in different organizational units. Having two users named \"myname\" in separate OUs (e.g., Sales\\Marketing\\myname and Engineering\\myname) would violate this uniqueness requirement."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the common issues and recommended resolutions for the Google Apps driver.",
+      "input": "",
+      "output": "The Google Apps driver commonly encounters the following issues: incorrect user placement syntax (avoid leading \"\\\\\" and use proper OU path), unsupported group placement (groups are flat), requirement for unique nicknames, group names, and usernames across the domain, driver startup failures (check JAR installation, admin account creation, and trace logs), quota exceedances leading to HTTP 403 errors (monitor and adjust usage), TokenResponseException 401 errors due to missing Gmail scopes (authorize required scopes), and GoogleJsonResponseException 403 errors when the Gmail API is not enabled (enable the API in the developers console). Resolving each issue involves following the specific steps outlined for that symptom."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML example for adding a user named \"myname\" to the Sales\\Marketing organizational unit using the Google Apps driver.",
+      "input": "",
+      "output": "<add class-name=\"User\" dest-dn=\"Sales\\Marketing\\myname\"/>"
+    }
+  ]
+}

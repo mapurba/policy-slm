@@ -1,0 +1,47 @@
+{
+  "driver": "Fan-Out Driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why must the Fan-Out Driver PAM module be removed before uninstalling the Fan-Out Driver Platform Services?",
+      "input": "",
+      "output": "In the Fan-Out Driver, the PAM module (ascauth) creates a library reference that is provided by the Platform Services component. If the Platform Services product is removed while the PAM configuration still points to ascauth, the system will encounter invalid library references. This can cause unpredictable behavior for new logon requests, so the Fan-Out Driver requires the PAM entry to be removed before running the uninstall script."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you remove the Fan-Out Driver PAM configuration before uninstalling the Fan-Out Driver?",
+      "input": "",
+      "output": "1. Open the PAM configuration file(s) that contain the Fan-Out Driver entry (typically /etc/pam.d/* or the file where ascauth is referenced). 2. Locate the line that loads the Fan-Out Driver Platform Services module, ascauth. 3. Delete that line or comment it out. 4. Save the file and verify that no remaining references to ascauth exist. After completing these steps, you can safely run the Fan-Out Driver uninstall script."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps are required to remove LAM-related modifications for the Fan-Out Driver before uninstalling the Fan-Out Driver?",
+      "input": "",
+      "output": "1. Open the file /etc/security/user in a text editor. 2. Find and delete any entries that were added for the Fan-Out Driver LAM module (/usr/lib/security/DCE). 3. Save the file. 4. Open the file usr/lib/security/methods.cfg. 5. Remove any lines that reference the Fan-Out Driver LAM module. 6. Save the file. Once both files have been cleaned, the Fan-Out Driver LAM changes are removed and you can proceed with the uninstall."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you run the uninstall script for the Fan-Out Driver Platform Services?",
+      "input": "",
+      "output": "Execute the following command with appropriate privileges:\n```\n/usr/local/ASAM/bin/PlatformServices/plat-uninstall\n```\nThis script will remove the Fan-Out Driver Platform Services components from the target platform."
+    },
+    {
+      "category": "config",
+      "instruction": "Which files must be edited to remove LAM-related changes for the Fan-Out Driver?",
+      "input": "",
+      "output": "The Fan-Out Driver LAM module modifies the following files, which need to be edited before uninstall:\n```\n/etc/security/user\nusr/lib/security/methods.cfg\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What problem might occur if the Fan-Out Driver Platform Services are uninstalled without first removing the PAM module?",
+      "input": "",
+      "output": "If you uninstall the Fan-Out Driver Platform Services without first removing the ascauth entry from the PAM configuration, the system will retain a reference to a library that no longer exists. This results in invalid library references and can leave the system in an unpredictable state for new logon requests."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete process for uninstalling Platform Services for the Fan-Out Driver.",
+      "input": "",
+      "output": "To uninstall Platform Services for the Fan-Out Driver, first remove any PAM configuration that references the ascauth module, then delete LAM-related entries from /etc/security/user and usr/lib/security/methods.cfg, and finally run the uninstall script located at /usr/local/ASAM/bin/PlatformServices/plat-uninstall."
+    }
+  ]
+}

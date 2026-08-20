@@ -1,0 +1,23 @@
+{
+  "driver": "Salesforce driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What causes the DirXML-DriverStorage attribute to not change with the latest polling interval in the Salesforce driver?",
+      "input": "",
+      "output": "In the Salesforce driver the source system does not frequently change the timestamp value it returns. Salesforce.com continues to send the same timestamp for a period of time, so the Identity Manager engine does not receive a new timestamp and therefore does not update the DirXML-DriverStorage attribute. Because the stored timestamp does not change, the engine treats each poll as if it were the same event, causing the previous updates to be replayed."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the Identity Manager engine repeatedly replay previous updates when using the Salesforce driver, and does this lead to event loss?",
+      "input": "",
+      "output": "The repeated replay occurs because Salesforce keeps sending the same timestamp, so the DirXML-DriverStorage attribute is not refreshed. The engine therefore processes the same data on each poll, causing prior updates to be replayed. According to the documentation, this behavior does not result in any loss of events; all events are eventually processed, but they may be processed multiple times until the timestamp changes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the timestamp behavior of Salesforce affects DirXML-DriverStorage updates in the Identity Manager engine.",
+      "input": "",
+      "output": "The Salesforce driver sends an unchanged timestamp for a period, preventing the DirXML-DriverStorage attribute from being updated with the latest polling interval. Consequently, the Identity Manager engine reprocesses previous updates repeatedly, although no events are lost."
+    }
+  ]
+}

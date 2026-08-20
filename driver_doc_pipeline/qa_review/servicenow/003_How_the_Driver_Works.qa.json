@@ -1,0 +1,41 @@
+{
+  "driver": "ServiceNow driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is XDS and how is it used by the ServiceNow driver in Identity Manager?",
+      "input": "",
+      "output": "XDS (Extensible Data Services) is a specialized form of XML that the Identity Manager engine uses to represent events occurring in the Identity Vault. In the ServiceNow driver, Identity Manager passes the XDS document to the driver policy, which may contain basic policies, DirXML Script, and XSLT style sheets. The ServiceNow driver then processes this XDS, converting it into the appropriate ServiceNow API calls that are sent over SOAP."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the ServiceNow driver use SOAP to communicate with ServiceNow?",
+      "input": "",
+      "output": "The ServiceNow driver uses SOAP 1.1 as its messaging protocol. A SOAP message consists of three elements: an Envelope (the root XML node), a Header (providing context such as transaction ID and security information), and a Body (containing method‑specific information). The driver places the SOAP request parameters in an HTTP request, sends them to the ServiceNow SOAP endpoint, receives the SOAP response in the HTTP response, and then processes the response."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the ServiceNow driver transform an Identity Manager event into a ServiceNow API call?",
+      "input": "",
+      "output": "1. Identity Manager creates an XDS event representing a change in the Identity Vault.\n2. The XDS document is passed to the ServiceNow driver policy, which may apply basic policies, DirXML Script, or XSLT style sheets.\n3. The driver shim on the Subscriber channel receives the XDS command document.\n4. The shim translates the XDS into an XML payload suitable for ServiceNow.\n5. The shim invokes the appropriate ServiceNow SOAP endpoint for the required CRUD (Create, Read, Update, Delete) operation.\n6. ServiceNow processes the SOAP request and returns a SOAP response.\n7. The shim receives the response as an array of bytes, converts it to an XML document, and passes it back to the driver policies.\n8. The input transformation style sheet processes the response XML and converts it back into XDS, which is reported to the Identity Manager engine."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What role does the driver shim play in the ServiceNow driver architecture?",
+      "input": "",
+      "output": "In the ServiceNow driver, the driver shim acts as the translator and transport component on the Subscriber channel. It converts the incoming XDS command documents from Identity Manager into XML payloads, then calls the appropriate ServiceNow SOAP endpoints to perform object CRUD operations. After ServiceNow returns a SOAP response, the shim receives the byte array, converts it to an XML document, and forwards it to the driver policies for further processing."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which Internet protocols and languages does the ServiceNow driver use to exchange data with ServiceNow?",
+      "input": "",
+      "output": "The ServiceNow driver uses the following protocols and languages for data exchange:\n- SOAP (via SOAP 1.1) for message formatting and transport.\n- HTTP for standard request/response communication.\n- HTTPS for encrypted communication over SSL."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the data flow and protocols used by the ServiceNow driver between Identity Manager and ServiceNow.",
+      "input": "",
+      "output": "The ServiceNow driver receives XDS events from Identity Manager, applies driver policies (including DirXML Script and XSLT), and passes the XDS to the driver shim on the Subscriber channel. The shim translates XDS into an XML payload and invokes ServiceNow SOAP endpoints (using SOAP 1.1) over HTTP or HTTPS to perform CRUD operations. ServiceNow returns a SOAP response, which the shim converts back into XML, processes through an input transformation style sheet, and converts into XDS for the Identity Manager engine. The driver thus uses SOAP, HTTP, and HTTPS to move data between Identity Manager and ServiceNow."
+    }
+  ]
+}

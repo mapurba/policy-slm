@@ -1,0 +1,47 @@
+{
+  "driver": "GroupWise 2014 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Subscriber channel in the GroupWise 2014 driver and how does it function?",
+      "input": "",
+      "output": "In the GroupWise 2014 driver, the Subscriber channel is the one-way communication path that transfers data and events from the Identity Vault to the GroupWise system. It continuously monitors the Identity Vault for new objects and any changes to existing objects, then sends the relevant changes to the driver shim so they can be executed in GroupWise."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the GroupWise 2014 driver support only one-way communication on the Subscriber channel?",
+      "input": "",
+      "output": "The GroupWise 2014 driver is designed to operate with a single-direction flow from the Identity Vault to GroupWise because the driver does not implement a Publisher channel. This limitation simplifies synchronization and ensures that changes originate from the Identity Vault, while any required reverse updates (such as email address attributes) are handled automatically by the driver rather than through a full Publisher implementation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What happens on the Publisher channel when using the GroupWise 2014 driver?",
+      "input": "",
+      "output": "The Publisher channel is not supported by the GroupWise 2014 driver. However, the driver automatically synchronizes the Email Address and Internet Email Address attributes. When a user add event occurs on the Subscriber channel, the driver fetches these attributes from GroupWise, which then triggers a Publisher event that synchronizes the attributes back to the Identity Vault, unless the attributes are disabled in the driver filter."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the GroupWise 2014 driver synchronize Email Address attributes between the Identity Vault and GroupWise?",
+      "input": "",
+      "output": "1. A user add event is received on the Subscriber channel.\n2. The GroupWise 2014 driver fetches the Email Address and Internet Email Address attributes from the GroupWise system.\n3. Fetching these attributes triggers an internal Publisher event.\n4. The Publisher event updates the corresponding attributes in the Identity Vault, provided the attributes are not disabled in the driver filter."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the GroupWise 2014 driver handle modifications to multivalued attributes from the Identity Vault?",
+      "input": "",
+      "output": "When a multivalued attribute in the Identity Vault is modified, the GroupWise 2014 driver overwrites the single allowed value for that attribute in GroupWise with the new value from the Identity Vault."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When you delete a value from a multivalued attribute in the Identity Vault, how does the GroupWise 2014 driver reflect this change in GroupWise?",
+      "input": "",
+      "output": "If any value is deleted from a multivalued attribute in the Identity Vault, the GroupWise 2014 driver deletes the entire attribute from GroupWise, because GroupWise permits only a single value for that attribute."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the data transfer capabilities of the GroupWise 2014 driver.",
+      "input": "",
+      "output": "The GroupWise 2014 driver provides a one‑way Subscriber channel that moves new and changed objects from the Identity Vault to GroupWise. The Publisher channel is not supported, but the driver automatically syncs Email Address attributes via an internal process. For multivalued attributes, the driver overwrites GroupWise with the new value or deletes the attribute entirely if the value is removed in the Identity Vault."
+    }
+  ]
+}

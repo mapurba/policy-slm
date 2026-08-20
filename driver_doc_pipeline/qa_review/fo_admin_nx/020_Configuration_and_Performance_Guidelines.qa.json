@@ -1,0 +1,53 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the role of the Object Services component in the Fan-Out driver?",
+      "input": "",
+      "output": "In the Fan-Out driver, the Object Services component of the Core Driver maintains the Census and other objects in the ASAM System container. It receives provisioning events from the Event Subsystem, updates the Census as required, and passes those events to Event Journal Services. While it must run continuously for identity provisioning, it is mainly a background process that does not require a great deal of processing power and is not time‑critical."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the performance of eDirectory critical for the Fan-Out driver?",
+      "input": "",
+      "output": "The Fan-Out driver interfaces with eDirectory through LDAP, and all Authentication Services requests and provisioning events depend on eDirectory responding promptly. If eDirectory is slow or unhealthy, the driver will experience similar response problems, affecting login times and event delivery. Therefore, the health and performance of eDirectory should be the starting point for any performance planning or troubleshooting with the Fan-Out driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you configure Core Drivers for fault tolerance in the Fan-Out driver?",
+      "input": "",
+      "output": "For fault tolerance in the Fan-Out driver, configure Core Drivers on several servers. Ensure that each Core Driver uses a different LDAP host server. Preferably, place each Core Driver on the same server as its LDAP host server for optimal performance, but maintain separate LDAP hosts for redundancy."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps can you take to improve Trawl performance in the Fan-Out driver?",
+      "input": "",
+      "output": "To improve Trawl performance in the Fan-Out driver:\n1. Focus Search objects on the specific directory locations of users and groups rather than a top‑level container.\n2. This provides better feedback during a Trawl and reduces the chance of LDAP time‑outs caused by slow servers or network links.\n3. Ensure writable replicas containing Census objects reside on the same server as the LDAP host server used by the Core Driver."
+    },
+    {
+      "category": "config",
+      "instruction": "Where should LDAP host servers be placed relative to Core Drivers for optimal performance in the Fan-Out driver?",
+      "input": "",
+      "output": "For optimal performance in the Fan-Out driver, each Core Driver and its LDAP host server should run on the same server. Additionally, the LDAP host servers used by Core Drivers should hold a writable replica that contains the User objects represented in the Census and other frequently referenced objects."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If authentication requests experience delays, what driver‑related factor should you check according to the Fan-Out driver guidelines?",
+      "input": "",
+      "output": "When authentication requests are delayed, check whether the LDAP host servers used by the Core Drivers hold a writable replica containing the User objects referenced by Authentication Services. Also verify network connectivity, TCP/IP configuration, and that the Core Driver is co‑located with the relevant replicas."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What issue can arise from using Persistent Mode on Platform Receivers with the Fan-Out driver, and how can you mitigate it?",
+      "input": "",
+      "output": "Using Persistent Mode on Platform Receivers can increase the number of concurrent connections that a Core Driver host must service, potentially degrading performance. To mitigate this, avoid using Persistent Mode on Platform Receivers, especially when many platforms are connected to Event Journal Services."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key performance guidelines for the Fan-Out driver mentioned in the documentation.",
+      "input": "",
+      "output": "The Fan-Out driver performance guidelines recommend:\n- Using two or three low‑end servers for Core Drivers for acceptable Authentication Services performance.\n- Configuring multiple Core Drivers on separate servers for fault tolerance, each using a different LDAP host.\n- Co‑locating each Core Driver with its LDAP host server for optimal speed.\n- Keeping eDirectory health as the primary focus for performance planning.\n- Focusing Search objects on specific user/group locations to improve Trawl speed.\n- Ensuring writable replicas of Census objects reside on the same server as the Core Driver's LDAP host.\n- Providing adequate network bandwidth for platforms with many users/groups, and avoiding Persistent Mode on Platform Receivers to reduce concurrent connections.\n- Recognizing that a mandatory three‑second delay for bad passwords is inherent to eDirectory and cannot be configured by the driver."
+    }
+  ]
+}

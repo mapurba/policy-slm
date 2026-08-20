@@ -1,0 +1,65 @@
+{
+  "driver": "SOAP driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the upgrade procedure for the SOAP driver and why can the package upgrade and driver file update be performed separately?",
+      "input": "",
+      "output": "The upgrade procedure for the SOAP driver ensures that both the installed driver packages and the driver files are brought up to the latest versions. The package upgrade and driver file update are independent tasks, so they can be planned and executed separately; however, completing all steps within a short time frame is recommended to keep the SOAP driver fully up‑to‑date."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the installed packages for the SOAP driver using NetIQ Designer?",
+      "input": "",
+      "output": "To upgrade the installed packages for the SOAP driver in NetIQ Designer:\n1. Open the project that contains the SOAP driver.\n2. Right‑click the SOAP driver and choose **Driver > Properties**.\n3. Click the **Packages** tab.\n4. Locate any package with a check mark in the **Upgrades** column.\n5. Click **Select Operation** for that package and choose **Upgrade** from the drop‑down list.\n6. Select the desired version and click **OK** (Designer lists all available versions).\n7. Click **Apply**.\n8. If additional fields are required for the selected package, fill them in and click **Next**.\n9. Review the summary of packages to be installed and click **Finish**.\n10. After the upgrade completes, click **OK** to close the Package Management page."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps must be taken before applying a patch to the SOAP driver?",
+      "input": "",
+      "output": "Before applying a patch to the SOAP driver, perform the following steps:\n1. Take a backup of the current SOAP driver configuration.\n2. If the SOAP driver runs with the Identity Manager engine, stop the Identity Vault and the driver instance.\n3. If the SOAP driver runs with a Remote Loader instance, stop the Remote Loader instance and the driver instance.\n4. In a web browser, navigate to the NetIQ Patch Finder Download Page.\n5. Click **Search Patches** under **Patches**.\n6. Enter **Identity Manager SOAP Driver** in the search box.\n7. Download the patch file and unzip its contents to a temporary location on the server (e.g., `IDM45_SOAP_4004.zip`)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the SOAP driver patch as a root user on a Linux system?",
+      "input": "",
+      "output": "To apply the SOAP driver patch as a root user on Linux:\n1. Log in to the server as the root user.\n2. Run the following command, replacing `<Driver Patch File Temporary Location>` with the path to the extracted patch files:\n   ```\n   rpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLsoap.rpm\n   ```\n   For example:\n   ```\n   rpm -Uvh <IDM45_SOAP_4004.zip>/linux/novell-DXMLsoap.rpm\n   ```\n3. If the SOAP driver was stopped, restart the Identity Vault and the driver instance as needed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the SOAP driver patch as a root user on a Windows system?",
+      "input": "",
+      "output": "To apply the SOAP driver patch as a root user on Windows:\n1. Navigate to the extracted patch folder `<Extracted Driver Patch File Temporary Location>\\windows`.\n2. Copy the following files to the appropriate Identity Manager directories:\n   - Copy `SOAPShim.jar` and `SOAPUtil.jar` to `<IdentityManager installation>\\NDS\\lib` **or** to `<IdentityManager installation>\\RemoteLoader\\<architecture>\\lib`.\n3. If the SOAP driver was stopped, start the Identity Vault and the driver instance (or the Remote Loader instance) as required."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the SOAP driver patch as a non‑root user?",
+      "input": "",
+      "output": "To apply the SOAP driver patch as a non‑root user:\n1. Verify that the directory `<non-root eDirectory location>/rpm` exists and contains the file `_db.000`. The presence of this file confirms a proper non‑root installation of the Identity Manager engine.\n2. Set the root directory to the non‑root eDirectory location by executing:\n   ```\n   ROOTDIR=<non-root eDirectory location>\n   ```\n3. Download the SOAP driver patch and unzip or untar it.\n4. Install the driver files with the following rpm command, replacing `<rpm-location>` with the path to the extracted `novell-DXMLsoap.rpm` file:\n   ```\n   rpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles <rpm-location>\n   ```\n   Example:\n   ```\n   rpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles /home/user/novell-DXMLsoap.rpm\n   ```\n5. After the installation, start the Identity Vault and the driver instance (or the Remote Loader instance) if they were stopped."
+    },
+    {
+      "category": "config",
+      "instruction": "What configuration file must exist for a non‑root installation before applying the SOAP driver patch, and what does its absence indicate?",
+      "input": "",
+      "output": "For a non‑root installation, the file `_db.000` must exist in the `<non-root eDirectory location>/rpm` directory. Its absence indicates that the Identity Manager engine is not properly installed for non‑root use, and you should reinstall Identity Manager to correctly place the file."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the `_db.000` file is missing when attempting to apply the SOAP driver patch as a non‑root user?",
+      "input": "",
+      "output": "If the `_db.000` file is missing, it suggests that the Identity Manager engine was not installed correctly for non‑root operation. The recommended resolution is to reinstall Identity Manager so that the `_db.000` file is created in the `<non-root eDirectory location>/rpm` directory."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete upgrade procedure for the SOAP driver.",
+      "input": "",
+      "output": "The SOAP driver upgrade procedure consists of two independent tasks: upgrading installed driver packages and applying a driver patch. First, back up the current SOAP driver configuration. To upgrade packages, use NetIQ Designer to locate available upgrades, select the desired version, and apply the changes. To apply the patch, back up the configuration, stop any running instances, download the SOAP driver patch from the NetIQ Patch Finder, and then install the patch. For root installations, use `rpm -Uvh` on Linux or manually copy JAR files on Windows. For non‑root installations, verify the `_db.000` file, set `ROOTDIR`, and run the provided `rpm` command with relocation options. Finally, restart the Identity Vault, driver, and/or Remote Loader as needed."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact rpm command shown for installing the SOAP driver patch as a non‑root user.",
+      "input": "",
+      "output": "```\nrpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/etc=$ROOTDIR/etc \\\n    --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n    --relocate=/var=$ROOTDIR/var \\\n    --badreloc --nodeps --replacefiles <rpm-location>\n```"
+    }
+  ]
+}

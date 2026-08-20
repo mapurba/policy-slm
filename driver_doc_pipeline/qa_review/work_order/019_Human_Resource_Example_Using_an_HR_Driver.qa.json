@@ -1,0 +1,65 @@
+{
+  "driver": "WorkOrder driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the WorkOrder driver in the Human Resource example described in the documentation?",
+      "input": "",
+      "output": "In the Human Resource example, the WorkOrder driver is used to create a work order that postpones activation of a new employee’s account until the hire date. The work order is marked as pending and later processed by a policy in the WorkOrder driver, which sets the user object's loginDisabled attribute to False, allowing the employee to log in on the hire date."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the HR Identity Manager driver interact with the WorkOrder driver to delay account activation?",
+      "input": "",
+      "output": "The HR Identity Manager driver writes the new user object to the Identity Vault and a policy checks the user’s active flag. If the user is not active, the policy creates a work order in the WorkOrder container and marks it as pending. Later, a policy in the WorkOrder driver processes that work order on the hire date and clears the loginDisabled attribute, thereby activating the account."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the mapping rule for the WorkOrder driver to map HR attributes to the Identity Vault?",
+      "input": "",
+      "output": "1. Open the sample mapping rule file located at hr-drv-schema-map.xml.\n2. Define the attribute mappings so that the WorkOrder driver attributes LastName, FirstName, HireDate, and Disabled are mapped to the corresponding attributes in the Identity Vault.\n3. Save the XML file and load it into the WorkOrder driver configuration.\n4. Verify the mapping by testing a user creation from the HR system and confirming the attributes appear correctly in the vault."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set up the filter in the WorkOrder driver so that only required attributes are passed through and DirXML-DueDate is notify only?",
+      "input": "",
+      "output": "1. Open the filter definition file hr-drv-filter.xml.\n2. Add filter entries for the attributes required by the example (LastName, FirstName, HireDate, Disabled).\n3. Specify DirXML-DueDate with the notification-only flag so it is not written to the user object but remains available for the Command Transformation policy.\n4. Save the file and apply it to the WorkOrder driver configuration.\n5. Test by creating a user and confirming that only the listed attributes are propagated."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes does the WorkOrder driver provide for the HR example and what do they represent?",
+      "input": "",
+      "output": "The WorkOrder driver provides the following attributes for the HR example:\n- LastName – the employee’s surname.\n- FirstName – the employee’s given name.\n- HireDate – the date and time when the employee is scheduled to start work.\n- Disabled – a flag indicating whether the employee’s account should be initially disabled."
+    },
+    {
+      "category": "config",
+      "instruction": "When a work order is created by the HR driver policy, which attribute stores the distinguished name (DN) of the user, and which attribute stores the due date?",
+      "input": "",
+      "output": "The policy places the DN of the created user into the DirXML-nwoContent attribute, and it copies the user’s DirXML-DueDate attribute into the work order’s DirXML-DueDate attribute."
+    },
+    {
+      "category": "config",
+      "instruction": "What status is assigned to a work order after it is created by the HR driver policy?",
+      "input": "",
+      "output": "After creation, the work order status is set to Pending."
+    },
+    {
+      "category": "config",
+      "instruction": "According to the note in the WorkOrder driver policy section, which do-add-dest-attr-value element should not be used and why?",
+      "input": "",
+      "output": "The element <do-add-dest-attr-value class-name=\"User\" direct=\"true\" name=\"Login Disabled\"> should not be used because when direct=\"true\" the action is performed but the results are not returned to the driver, preventing the driver from correctly reporting the write results."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the WorkOrder driver fail to report the results of a write operation when using do-add-dest-attr-value with direct=\"true\"?",
+      "input": "",
+      "output": "When direct=\"true\" is set on the do-add-dest-attr-value element, the attribute is written directly to the target object, but the operation’s outcome is not returned to the driver. Consequently, the WorkOrder driver cannot report whether the write succeeded or failed."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the WorkOrder driver and an HR driver work together to provision user access on the employee’s hire date.",
+      "input": "",
+      "output": "In the example, the HR driver writes a new user to the Identity Vault and a policy checks if the user is active. If not, the policy creates a pending work order containing the user’s DN and hire date. The WorkOrder driver monitors the work order container; on the hire date its policy processes the work order, sets the user’s loginDisabled attribute to False, and thereby enables the user to log in. This coordination delays account activation until the official hire date."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "driver": "GroupWise driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the GroupWise driver packages and why should you ensure they are up to date before creating a driver object?",
+      "input": "",
+      "output": "The GroupWise driver packages contain the items required to create a driver, such as policies, entitlements, filters, and Schema Mapping policies. They are stored in the Package Catalog and are imported when a project is created, imported, or converted. Ensuring the latest packages are imported guarantees that you have the most recent features, bug fixes, and security updates, which is why NetIQ recommends verifying that the Package Catalog holds the latest versions before you create a new GroupWise driver object."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the latest GroupWise driver packages into the Package Catalog using Designer?",
+      "input": "",
+      "output": "1. Open Designer. 2. In the toolbar, click **Help > Check for Package Updates**. 3. If newer packages are found, click **OK** to update the packages; if the packages are already up‑to‑date, click **OK** to continue. After this, you can proceed to installing the driver packages.\n\nThese steps ensure the Package Catalog contains the most recent version of the GroupWise driver packages before you create the driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the step‑by‑step actions to install the GroupWise driver packages and create a new driver object in Designer?",
+      "input": "",
+      "output": "1. In Designer, open your project. 2. In the Modeler, right‑click the driver set where you want to create the driver and select **New > Driver**, or drag the **GroupWise driver** from the palette into the Modeler space. 3. Choose **GroupWise REST Base** and click **Next**. 4. Review the optional feature list (Default Configuration, Password Synchronization, Entitlements, Data Collection, Account Tracking) and keep the desired options selected (all are selected by default). 5. Click **Next**. 6. If prompted, click **OK** to install the Password Synchronization Notification package dependency. 7. If there are package dependencies, click **OK** to install the Advanced Java Class and Common Settings packages. 8. On the Common Settings page, optionally set **User Container** and **Group Container**, then click **Next**. 9. Click **Next**. 10. On the Install GroupWise REST Base page, specify the driver name and click **Next**. 11. Fill in the Authentication ID, Connection Information, Password, SSL settings, and other fields as described (see Configuring the Driver Object), then click **Next**. 12. Continue through the remaining pages (Default Sync Destination GroupWise Post Office, Remote Loader, Managed System Information, Account Tracking) as needed, clicking **Next** after each. 13. Review the summary and click **Finish**. The GroupWise driver is now created."
+    },
+    {
+      "category": "config",
+      "instruction": "Which optional feature packages can be selected during the installation of the GroupWise driver and what does each package provide?",
+      "input": "",
+      "output": "During installation of the GroupWise driver you can select the following optional feature packages:\n\n* **Default Configuration** – Mandatory package that contains the default configuration information for the GroupWise driver. This option must always remain selected.\n* **Password Synchronization** – Packages that contain the policies required to synchronize passwords to GroupWise.\n* **Entitlements** – Packages that contain the policies and entitlements needed to enable account creation and management with entitlements.\n* **Data Collection** – Packages that enable the driver to collect data for reports. Required if you use Identity Reporting.\n* **Account Tracking** – Packages that provide account tracking information for reports. Required if you use the Identity Reporting Module."
+    },
+    {
+      "category": "config",
+      "instruction": "What fields must be filled on the Install GroupWise REST Base page for authentication and connection settings in the GroupWise driver?",
+      "input": "",
+      "output": "On the Install GroupWise REST Base page you must fill in the following fields:\n\n* **Authentication ID** – The user ID used to authenticate to the GroupWise system (default is the GroupWise Administrator user).\n* **Connection Information** – The IP address and decimal port number of the GroupWise server (default port is 9710, the Administration Service port).\n* **Password** – The admin user password for authenticating to GroupWise.\n* **Always accept server certificate** – Set to **No** by default; choose **Yes** to accept the GroupWise server’s certificate automatically. If **Yes**, you can also specify:\n  * **Keystore path for SSL certificates** – Full path to the keystore file containing SSL certificates.\n  * **Keystore Password** – Password to access the keystore file."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you configure the default synchronization destination post office for the GroupWise driver?",
+      "input": "",
+      "output": "On the Install GroupWise REST Base page, locate the field **Default Sync Destination GroupWise Post Office**. Enter the GroupWise post office name in dot format (e.g., `GWDomain.PostOffice`). This post office is where newly added Identity Vault objects will be created in GroupWise. Earlier drivers used a slash format, but the current GroupWise driver requires the dot format."
+    },
+    {
+      "category": "config",
+      "instruction": "What Remote Loader settings are required if you choose to connect the GroupWise driver to a Remote Loader?",
+      "input": "",
+      "output": "If you select **Yes** for **Connect To Remote Loader**, you must provide the following settings:\n\n* **Host Name** – IP address or DNS name of the server where the Remote Loader is installed.\n* **Port** – Port number on which the Remote Loader listens (default is 8090).\n* **KMO** – Key Name of the Key Material Object that contains the keys and certificates used for SSL between the Remote Loader and the Identity Manager engine.\n* **Other parameters** – Any additional parameters required for the Remote Loader connection, formatted as key‑value pairs (e.g., `paraName1=paraValue1 paraName2=paraValue2`).\n* **Remote Loader Password** – Password defined in the Remote Loader for authentication.\n* **Driver Password** – Password defined in the Remote Loader service for the driver to authenticate to the Identity Manager server."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you deploy a created GroupWise driver into the Identity Vault from Designer?",
+      "input": "",
+      "output": "1. In Designer, open your project. 2. In the Modeler, right‑click the GroupWise driver icon or its line and select **Live > Deploy**. 3. If you are not already authenticated to the Identity Vault, provide the **Host** (IP address or DNS name of the Identity Vault server), **Username** (DN of the user object), and **Password** (user’s password), then click **OK**. 4. Click **OK** to confirm the connection. 5. Review the deployment summary and click **Deploy**. 6. After the successful message appears, click **OK**. 7. Click **Define Security Equivalence** to assign rights to the driver, adding the appropriate user object (e.g., Admin or DriversUser). 8. Click **Exclude Administrative Roles** to add any administrative user objects that should not be synchronized, then click **OK**. 9. Click **OK** to finish the deployment process."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the GroupWise driver fail to connect when you specify a host name instead of an IP address, and how can you resolve it?",
+      "input": "",
+      "output": "If you specify a GroupWise server host name rather than an IP address, the driver may fail to connect because the **Set Bind Exclusive** setting in the Message Transfer Agent of the GroupWise server is still set to **true**. To resolve the issue, log in to the GroupWise Administration Service, change the **Set Bind Exclusive** setting to **false**, and then restart the Administration Service. After this change, the GroupWise driver can successfully connect using the host name."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you associate the Identity Vault with a GroupWise system using the GroupWise Administration console?",
+      "input": "",
+      "output": "1. In the GroupWise Administration console, navigate to **System > LDAP Servers** and click **New Directory**. 2. On the **General** tab, fill in the fields:\n   * **Name** – Name of your Identity Vault (eDirectory tree).\n   * **Description** – Description for eDirectory.\n   * **Type** – Select **eDirectory**.\n   * **Address** – IP address of the eDirectory server (must allow clear text for port 389).\n   * **SSL Certificate** – Optional; use if you want SSL communication.\n   * **LDAP User** – Admin user name.\n   * **LDAP User Password** – Password for the admin user.\n   * **Base DN** – Container where objects reside in Identity Vault (e.g., `o=data`).\n   * **Sync Domain** – Select the GroupWise domain that matches the **Default Sync Destination GroupWise Post Office** value.\n   * **Enable Synchronization** – Uncheck this option.\n3. Click **Test Connection** to verify the settings are correct. 4. Click **OK** to save the directory configuration. 5. Click **Close** to return to the main Administration console."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to start the GroupWise driver after it has been created and deployed?",
+      "input": "",
+      "output": "1. In Designer, open your project. 2. In the Modeler, right‑click the GroupWise driver icon or its line and select **Live > Start Driver**. The driver will transition from a stopped state to a running state, ready to process events."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the entire process for creating, configuring, deploying, and starting the GroupWise driver in Designer.",
+      "input": "",
+      "output": "To create a GroupWise driver, first import the latest driver packages into Designer’s Package Catalog, then install the packages by creating a new driver, selecting the desired optional features, and supplying authentication, connection, SSL, default post office, and optional Remote Loader settings. After completing installation, configure additional driver parameters as needed, deploy the driver to the Identity Vault (providing authentication if required), define security equivalence and exclude administrative roles, associate the Identity Vault with GroupWise via the GroupWise Administration console, and finally start the driver in Designer to make it operational."
+    }
+  ]
+}

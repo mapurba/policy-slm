@@ -1,0 +1,59 @@
+{
+  "driver": "Entity Data Model driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Remote Loader when using the Entity Data Model driver?",
+      "input": "",
+      "output": "The Remote Loader loads drivers and communicates with the Identity Manager engine on behalf of drivers installed on remote servers, ensuring appropriate communication between the Entity Data Model driver and Identity Manager."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Remote Loader for the Entity Data Model driver?",
+      "input": "",
+      "output": "1. Log in to the server where you plan to install the Remote Loader.\n2. Follow the instructions in the NetIQ Identity Manager Setup Guide chapter “Installing and Managing the Remote Loader”.\n3. NetIQ recommends installing the Remote Loader on the same server that will host the Entity Data Model driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add the Entity Data Model driver file to the Identity Vault?",
+      "input": "",
+      "output": "The driver files are installed on the Identity Manager server automatically when the Identity Manager engine is installed. The installation program extends the Identity Vault’s schema, installs the driver shim, and creates the driver configuration file, but it does not create the driver entry in the Identity Vault nor upgrade an existing driver’s configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "Which file must be copied to the Remote Loader lib directory for the Entity Data Model driver, and what is the default lib directory path?",
+      "input": "",
+      "output": "Copy the **arshim.jar** file from the Identity Vault server to the Remote Loader lib directory. The default path for the lib directory is **/opt/novell/eDirectory/lib/dirxml/classes**."
+    },
+    {
+      "category": "config",
+      "instruction": "What entries should be included in the classpath text file for the Entity Data Model driver, and where is that file created?",
+      "input": "",
+      "output": "Create a text file in **/etc/opt/novell/dirxml/rdxml** (the Entity Data Model driver directory). The file should contain the following entries:\n```\n-description \"AR Driver\"\n-commandport 8000\n-connection \"port=8090\"\n-trace 3\n-tracefile \"/opt/netiq/ar.log\"\n-tracefilemax 100M\n-class \"com.novell.nds.dirxml.driver.arshim.AccessReviewDriverShim\"\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Where should the third‑party JDBC driver be installed for the Entity Data Model driver on the Remote Loader server?",
+      "input": "",
+      "output": "The third‑party JDBC driver that supports the Entity Data Model database should be installed in the Remote Loader’s **lib** directory (the same directory where **arshim.jar** is placed, i.e., **/opt/novell/eDirectory/lib/dirxml/classes**)."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does NetIQ recommend installing the Remote Loader on the same server as the Entity Data Model driver?",
+      "input": "",
+      "output": "Installing the Remote Loader on the same server as the Entity Data Model driver ensures reliable and efficient communication between the driver and the Identity Manager engine, reducing network latency and simplifying configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "What specific port number must be noted after adding the Entity Data Model driver files to the Remote Loader server, and why is it needed?",
+      "input": "",
+      "output": "You must note the **commandport** value defined in the classpath file (e.g., **8000**). This port number is required later when configuring the Entity Data Model driver in Designer to tell Designer which Remote Loader instance to use."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to prepare the Entity Data Model driver files for use with the Remote Loader.",
+      "input": "",
+      "output": "1. Install the Remote Loader on the Entity Data Model server.\n2. Log in to the Remote Loader server.\n3. Copy **arshim.jar** from the Identity Vault server to **/opt/novell/eDirectory/lib/dirxml/classes**.\n4. Install the required third‑party JDBC driver in the same lib directory.\n5. In **/etc/opt/novell/dirxml/rdxml**, create a text file that defines the driver classpath with entries such as -description, -commandport, -connection, -trace, -tracefile, -tracefilemax, and -class.\n6. Record the command port number (e.g., 8000) for later use when configuring the driver in Designer."
+    }
+  ]
+}

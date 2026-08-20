@@ -1,0 +1,71 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "In the Fan-Out driver, what is the purpose of the ASAM Master User object?",
+      "input": "",
+      "output": "The ASAM Master User object is used by Core Driver processes to perform an LDAP Bind and gain access to eDirectory. It must have Supervisor rights to the User and Group Subtree container, allowing the driver to read configuration and census data."
+    },
+    {
+      "category": "config",
+      "instruction": "Which rights must be granted to the ASAM Master User in the Fan-Out driver when using the AS Client API?",
+      "input": "",
+      "output": "When using the AS Client API, the ASAM Master User must be granted:\n- Browse object rights and Compare property rights to any object accessed through the API.\n- Read property rights to any object whose Security Equals list, Group Membership list, or other attribute value is accessed through the API."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the configuration-oriented objects stored by the Fan-Out driver and what is their role?",
+      "input": "",
+      "output": "The Fan-Out driver stores configuration information in objects that correspond to its components. These objects include:\n- Audit Services object\n- Certificate Services object\n- Event Journal Services object\n- Object Services object\n- Web Services object\n- Event Subsystem objects\n- Authentication Services objects\n- UID/GID Set objects\n- Platform Set objects\n- Platform objects\nEach object lists the host server network addresses for its component, and the component verifies incoming connections against these addresses."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the Census container in the Fan-Out driver and which objects are stored there?",
+      "input": "",
+      "output": "The Census container is maintained by Object Services and holds the Census of users and groups for target platforms. It contains Enterprise User (eUser) objects that represent individual User or Alias objects, and Enterprise Group (eGroup) objects that represent groups based on static Group objects."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must Enterprise User and Enterprise Group names be unique in the Fan-Out driver, and what happens if a duplicate is found?",
+      "input": "",
+      "output": "Enterprise User and Enterprise Group objects share the same name space, so their names must be unique to avoid ambiguity. If a duplicate name is detected based on Census Search objects, the conflicting object is placed in the Exceptions container instead of the Census, and can be reviewed via the Web interface."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How do dynamic groups differ from static groups when used as Search objects in the Fan-Out driver?",
+      "input": "",
+      "output": "Dynamic groups use an LDAP search filter to define membership rules, and eDirectory evaluates membership dynamically without maintaining an explicit member list. Static groups have an explicit list of members. In the Fan-Out driver, dynamic groups are used only as Search objects; events affecting users already in the Census are processed immediately, while events for users not yet in the Census are detected only during the next trawl."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of marking Enterprise User or Enterprise Group objects as inactive in the Fan-Out driver?",
+      "input": "",
+      "output": "Marking Enterprise User or Enterprise Group objects as inactive retains them in the Census after their corresponding User or Group object is deleted from eDirectory or no longer matches a Census Search object. This prevents accidental reuse of the same name to gain unauthorized access. Inactive users cannot authenticate through Authentication Services."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the Delete Pending Duration setting control in the Fan-Out driver and how does it affect delete scripts?",
+      "input": "",
+      "output": "Delete Pending Duration defines a grace period during which eUser and eGroup objects whose corresponding eDirectory objects have been deleted or are no longer covered by a Search object are not removed from target platforms. The Delete User Pending or Delete Group Pending Receiver script runs when the pending interval begins, while the regular Delete User or Delete Group script runs only after the Delete Pending Duration expires."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does a Platform object represent in the Fan-Out driver?",
+      "input": "",
+      "output": "A Platform object represents a specific target platform that runs Platform Services, enabling the Fan-Out driver to provision users and groups to that platform."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How do Platform Set objects relate Search objects to Platforms in the Fan-Out driver?",
+      "input": "",
+      "output": "Platform Set objects define the relationship between one or more Search objects and one or more Platform objects. They allow administrators to group platforms that share the same user and group population, so that the same Census data can be provisioned to all platforms in the set. The documentation provides an example where Academic, Employee, and Everyone Platform Sets link specific Search objects (Students, Faculty, Staff) to respective platforms."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key configuration and census concepts covered in the Fan-Out driver documentation page.",
+      "input": "",
+      "output": "The Fan-Out driver stores configuration objects (e.g., Audit Services, Platform objects) in eDirectory and uses a writable replica of the ASAM System container. The ASAM Master User, configured during installation, must have Supervisor rights and additional Browse, Compare, and Read rights for AS Client API access. Census objects (eUser and eGroup) are built from Search objects defined via the Web interface, with uniqueness enforced and naming exceptions managed in a separate container. Dynamic groups are handled via LDAP filters, while static groups provide explicit membership. Inactive users/groups remain in the Census to prevent name reuse, and Delete Pending Duration offers a grace period before final deletion from target platforms. Platform objects represent target systems, and Platform Set objects link Search objects to groups of platforms for unified provisioning."
+    }
+  ]
+}

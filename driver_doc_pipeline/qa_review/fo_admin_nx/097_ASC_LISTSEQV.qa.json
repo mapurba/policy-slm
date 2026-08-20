@@ -1,0 +1,59 @@
+{
+  "driver": "FO Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ASC_LISTSEQV function in the FO Admin Nx driver?",
+      "input": "",
+      "output": "In the FO Admin Nx driver, the ASC_LISTSEQV function obtains a user's Security Equals attribute list and places it in a caller‑provided buffer."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameters does ASC_LISTSEQV accept in the FO Admin Nx driver and what does each represent?",
+      "input": "",
+      "output": "ASC_LISTSEQV has four parameters:\n- **asce**: The environment item returned from ASC_INIT() or ASC_INIT_EXT().\n- **user**: The Enterprise User ID whose Security Equals list is to be returned.\n- **buf**: The buffer that will receive the security equivalence list; object names are separated by a newline ‘\\n’ character. If the list is larger than the buffer, it is truncated and the call returns AS_TOOSMALL.\n- **size**: The size of the buffer provided."
+    },
+    {
+      "category": "config",
+      "instruction": "What return values can ASC_LISTSEQV produce in the FO Admin Nx driver?",
+      "input": "",
+      "output": "ASC_LISTSEQV can return the following integer values defined in ascauth.h:\n- **AS_OK** – Security equivalence list successfully returned.\n- **AS_NOUSER** – User inactive or not found in the Census.\n- **AS_BADCLIENT** – Local host is not authorized to query the Core Driver.\n- **AS_NOAGENT** – No Core Driver could be contacted.\n- **AS_NOAUTHENV** – No environment has been established.\n- **AS_INVALIDREQ** – Call rejected by the Core Driver as not valid or not supported.\n- **AS_INVALIDARGS** – Invalid arguments supplied to the function.\n- **AS_TOOSMALL** – Size of pre‑allocated buffer is too small—the list is truncated.\n- **AS_INVALIDOBJ** – Specified object does not exist.\n- **AS_KEYEXPIRED** – Old key rejected by the Core Driver because the expiration date has passed."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you obtain a user's security equivalence list using ASC_LISTSEQV in the FO Admin Nx driver?",
+      "input": "",
+      "output": "1. Include the header `#include <ascauth.h>`.\n2. Initialize the authentication environment with `ASCENV *asce = ASC_INIT(NULL);` and verify it is not NULL.\n3. Prepare a character buffer large enough to hold the list, e.g., `char buffer[2000];`.\n4. Call the function: `int rc = ASC_LISTSEQV(asce, userId, buffer, sizeof(buffer));` where `userId` is the Enterprise User ID.\n5. Check the return code:\n   - If `rc == AS_OK`, the buffer contains the full list.\n   - If `rc == AS_TOOSMALL`, the buffer contains a truncated list; allocate a larger buffer and retry.\n6. When finished, terminate the environment with `ASC_TERM(asce);`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you handle an AS_TOOSMALL return from ASC_LISTSEQV in the FO Admin Nx driver?",
+      "input": "",
+      "output": "If ASC_LISTSEQV returns **AS_TOOSMALL**, the supplied buffer was insufficient to hold the entire security equivalence list. The function still places the truncated list into the buffer. To retrieve the full list, allocate a larger buffer (increase the size argument) and call ASC_LISTSEQV again with the new buffer."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does the AS_NOUSER return value indicate when calling ASC_LISTSEQV in the FO Admin Nx driver, and how can the issue be resolved?",
+      "input": "",
+      "output": "**AS_NOUSER** means the specified Enterprise User ID is inactive or not found in the Census. Resolve the issue by verifying that the user identifier is correct, ensuring the user is active in the Census, and that the account exists in the authentication repository."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If ASC_LISTSEQV returns AS_BADCLIENT in the FO Admin Nx driver, what does that signify?",
+      "input": "",
+      "output": "**AS_BADCLIENT** indicates that the local host from which the call is made is not authorized to query the Core Driver. To fix this, add the host to the list of authorized clients in the Core Driver configuration or run the call from an authorized host."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using ASC_LISTSEQV in the FO Admin Nx driver.",
+      "input": "",
+      "output": "ASC_LISTSEQV in the FO Admin Nx driver retrieves a user's Security Equals attribute list into a caller‑provided buffer. It requires an initialized authentication environment, the user ID, a buffer, and its size. The function returns various status codes, including AS_OK for success and AS_TOOSMALL when the buffer is too small. If the list is truncated, the caller can retry with a larger buffer. Proper error handling for codes such as AS_NOUSER, AS_BADCLIENT, and others is essential."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a complete C program example that uses ASC_LISTSEQV to display the security equivalence list for a user, based on the FO Admin Nx driver documentation.",
+      "input": "",
+      "output": "#include <stdio.h>\n#include <stdlib.h>\n#include <ascauth.h>\n\nint main(int argc, char *argv[])\n{\n    ASCENV *asce;\n    char buffer[2000];\n    int rc;\n    char *user;\n\n    if (argc != 2) {\n        fprintf(stderr, \"usage: %s <user>\\n\", argv[0]);\n        exit(EXIT_FAILURE);\n    }\n    user = argv[1];\n\n    /* Initialize the authentication environment */\n    asce = ASC_INIT(NULL);\n    if (asce == NULL) {\n        fprintf(stderr, \"Error: cannot initialize authentication environment\\n\");\n        exit(EXIT_FAILURE);\n    }\n\n    /* Retrieve security equivalence list */\n    rc = ASC_LISTSEQV(asce, user, buffer, sizeof(buffer));\n    if (rc == AS_OK) {\n        printf(\"Security equivalences of user %s:\\n%s\\n\", user, buffer);\n    } else if (rc == AS_TOOSMALL) {\n        printf(\"Security equivalences of user %s (truncated):\\n%s\\n\", user, buffer);\n        printf(\"** list was truncated because of lack of buffer space **\\n\");\n    } else {\n        printf(\"RC=%d, %s\\n\", rc, ASC_STRERROR(rc));\n    }\n\n    /* Terminate the authentication environment */\n    ASC_TERM(asce);\n    return 0;\n}"
+    }
+  ]
+}

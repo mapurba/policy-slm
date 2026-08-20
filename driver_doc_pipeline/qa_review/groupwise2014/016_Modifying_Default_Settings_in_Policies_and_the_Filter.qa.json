@@ -1,0 +1,71 @@
+{
+  "driver": "GroupWise driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the driver filter in the GroupWise driver and how does it affect attribute synchronization?",
+      "input": "",
+      "output": "In the GroupWise driver, the driver filter defines the Identity Vault classes and attributes that are exposed on the Publisher and Subscriber channels. Its purpose is to specify which attributes are shared between systems, thereby controlling which data is synchronized during provisioning and reconciliation."
+    },
+    {
+      "category": "config",
+      "instruction": "When adding a new attribute to the GroupWise driver filter, what XML attribute must be appended and what is its exact syntax?",
+      "input": "",
+      "output": "You must append the attribute merge-authority=\"edir\" to the added attribute. The exact syntax is:\n```xml\n<filter-attr attr-name=\"Description\" merge-authority=\"edir\" publisher=\"ignore\" subscriber=\"sync\"/>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "What is the recommended sequence for modifying default settings in policies and the filter for the GroupWise driver?",
+      "input": "",
+      "output": "When changing the default behavior of the GroupWise driver, NetIQ recommends modifying settings in the following order:\n1. Modify the driver filter to include additional attributes to be synchronized.\n2. Modify the Schema Mapping policy to include all attributes to be synchronized.\n3. Modify the Subscriber Create policy.\n4. Modify the Subscriber Placement policy."
+    },
+    {
+      "category": "config",
+      "instruction": "Which action should be used to set GroupWise attributes in the GroupWise driver to avoid exceptions, and when is the alternative action acceptable?",
+      "input": "",
+      "output": "Use the **do-add-dest-attr-value** action when setting GroupWise attributes in the GroupWise driver. Using **do-set-dest-attr-value** can cause an exception. The do-set-dest-attr-value action is only acceptable in the specific example of creating a Gateway Alias as shown in the \"Creating a Gateway Alias\" documentation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the function of the Schema Mapping policy in the GroupWise driver?",
+      "input": "",
+      "output": "The Schema Mapping policy in the GroupWise driver maps schema names—especially attribute and class names—between the Identity Vault namespace and the GroupWise namespace. It applies to both the Subscriber and Publisher channels and ensures that objects are correctly translated between the two systems."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you add a new entry to the Schema Mapping policy in the GroupWise driver without modifying existing entries?",
+      "input": "",
+      "output": "To add a new entry, edit the Schema Mapping policy contained in the driver object and insert the new mapping. Do **not** modify or remove any existing entries; simply append the new entry to the policy. This preserves the original mappings while extending the schema translation."
+    },
+    {
+      "category": "config",
+      "instruction": "What required attributes must be included in the Create policy for a User object in the GroupWise driver?",
+      "input": "",
+      "output": "The Create policy for a User object in the GroupWise driver requires the attributes **CN** and **Surname**."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Create policy determine in the GroupWise driver?",
+      "input": "",
+      "output": "The Create policy determines whether a GroupWise account is created for a new object. It can also perform additional actions during the Add event, such as providing default values for attributes or applying custom business rules."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the key points for modifying default settings in the GroupWise driver.",
+      "input": "",
+      "output": "To modify default settings in the GroupWise driver, follow the prescribed order: first adjust the driver filter (adding attributes with merge-authority=\"edir\"), then extend the Schema Mapping policy, next tailor the Create policy (ensuring CN and Surname for Users, CN for Groups), and finally update the Placement policy. Use do-add-dest-attr-value for setting GroupWise attributes; do-set-dest-attr-value may cause exceptions except when creating a Gateway Alias."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are matching policies used for in the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, matching policies define the minimum criteria that two objects must meet to be considered the same, enabling the system to correctly identify and reconcile corresponding objects across the Identity Vault and GroupWise."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write an XML snippet to add the Description attribute to the GroupWise driver filter, ensuring it includes the required merge-authority attribute.",
+      "input": "",
+      "output": "```xml\n<filter-attr attr-name=\"Description\" merge-authority=\"edir\" publisher=\"ignore\" subscriber=\"sync\"/>\n```"
+    }
+  ]
+}

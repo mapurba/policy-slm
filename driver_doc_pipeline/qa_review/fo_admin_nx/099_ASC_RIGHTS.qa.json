@@ -1,0 +1,47 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the ASC_RIGHTS function do in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, the ASC_RIGHTS function checks the effective rights that one object (obj1) has over another object (obj2) for a specific attribute. It determines whether the specified rights (Supervisor, Compare, Read, Write, Add Self) are granted."
+    },
+    {
+      "category": "config",
+      "instruction": "What parameters does the ASC_RIGHTS function require in the Fo Admin Nx driver, and what does each represent?",
+      "input": "",
+      "output": "The ASC_RIGHTS function in the Fo Admin Nx driver has the following parameters:\n\n| Parameter | Description |\n|-----------|--------------|\n| asce | The environment item returned from ASC_INIT() or ASC_INIT_EXT(). |\n| obj1 | The Enterprise User ID or fully distinguished object name whose effective rights are to be tested. |\n| obj2 | The Enterprise User ID or fully distinguished object name for which access by obj1 is to be tested. |\n| attribute | The name of an attribute of obj2 for which the effective rights of obj1 are requested. Special attribute names allowed are *All Attributes Rights*, *Entry Rights*, and *SMS Rights*. |\n| rights | The rights to test, expressed as a string of characters from the set [S,C,R,W,A]."
+    },
+    {
+      "category": "config",
+      "instruction": "Which characters are valid for the rights argument in ASC_RIGHTS of the Fo Admin Nx driver?",
+      "input": "",
+      "output": "The rights argument in ASC_RIGHTS of the Fo Admin Nx driver must contain characters from the following set: **S**, **C**, **R**, **W**, **A**. These correspond to Supervisor, Compare, Read, Write, and Add Self respectively."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the possible return values of ASC_RIGHTS in the Fo Admin Nx driver and what do they mean?",
+      "input": "",
+      "output": "ASC_RIGHTS in the Fo Admin Nx driver returns one of the integer constants defined in ascauth.h:\n\n| Return Value | Meaning |\n|--------------|----------|\n| AS_OK | User or object has the specified rights to the specified object attribute |\n| AS_NO | User or object does not have the specified rights |\n| AS_ATTRNOTFOUND | Specified attribute could not be found |\n| AS_INVALIDOBJ | Specified user not found in the Census or the specified object does not exist |\n| AS_INVALIDOBJLEN | Specified object exceeds maximum length |\n| AS_BADCLIENT | Local host not authorized to query the Core Driver |\n| AS_NOAGENT | No Core Driver could be contacted |\n| AS_NOAUTHENV | No environment has been established |\n| AS_INVALIDREQ | Call rejected by the Core Driver as not valid or not supported |\n| AS_INVALIDARGS | Invalid arguments supplied to the function |\n| AS_KEYEXPIRED | Old key rejected by the Core Driver because the expiration date has passed |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you call ASC_RIGHTS in a C program using the Fo Admin Nx driver?",
+      "input": "",
+      "output": "To call ASC_RIGHTS in a C program with the Fo Admin Nx driver, follow these steps:\n\n1. Include the required header:\n   ```c\n   #include <ascauth.h>\n   ```\n2. Initialize the authentication environment using `ASC_INIT(NULL)` (or `ASC_INIT_EXT`). Store the returned pointer in an `ASCENV *` variable.\n3. Prepare the arguments: `obj1`, `obj2`, `attribute`, and `rights` strings.\n4. Call the function:\n   ```c\n   int rc = ASC_RIGHTS(asce, obj1, obj2, attribute, rights);\n   ```\n5. Check the return code:\n   - If `rc == AS_OK`, the specified rights are granted.\n   - Otherwise, use `ASC_STRERROR(rc)` to obtain a readable error message.\n6. When finished, terminate the environment with `ASC_TERM(asce);`.\n\nThe example code in the documentation demonstrates these steps."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if ASC_RIGHTS returns AS_INVALIDOBJ when using the Fo Admin Nx driver?",
+      "input": "",
+      "output": "If ASC_RIGHTS returns **AS_INVALIDOBJ** in the Fo Admin Nx driver, it means the specified user (obj1) was not found in the Census or the target object (obj2) does not exist. To resolve the issue:\n\n1. Verify that `obj1` and `obj2` are correctly spelled and use the proper Enterprise User ID or fully distinguished object name.\n2. Ensure that both objects actually exist in the NetIQ Identity Manager database.\n3. Check that the objects are not exceeding the maximum allowed length (use AS_INVALIDOBJLEN if length is the problem).\n4. If the objects are newly created, confirm that the Core Driver has synchronized the latest data.\n5. Re‑run the ASC_RIGHTS call after correcting any identification errors."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about the ASC_RIGHTS function in the Fo Admin Nx driver.",
+      "input": "",
+      "output": "The ASC_RIGHTS function in the Fo Admin Nx driver checks whether one object has specified rights (Supervisor, Compare, Read, Write, Add Self) over another object's attribute. It requires an authentication environment (`ASCENV *`), the two object identifiers, the attribute name (or special names like All Attributes Rights), and a rights string composed of the characters S, C, R, W, A. The function returns detailed status codes such as AS_OK, AS_NO, AS_ATTRNOTFOUND, and others to indicate success or the nature of any error. Proper initialization with ASC_INIT, error handling with ASC_STRERROR, and termination with ASC_TERM are essential for correct usage."
+    }
+  ]
+}

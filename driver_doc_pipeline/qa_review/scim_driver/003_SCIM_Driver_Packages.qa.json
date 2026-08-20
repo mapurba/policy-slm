@@ -1,0 +1,65 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you update the SCIM driver packages in Designer?",
+      "input": "",
+      "output": "In Designer, open the Help menu and select Package Updates. From the Package Updates window, choose the SCIM driver packages you need to update and apply the updates. Designer will then refresh the policies, rules, and parameters associated with the SCIM driver object."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the SCIM Base package and what configurations does it contain for the SCIM driver?",
+      "input": "",
+      "output": "The SCIM Base package (identified by the GCV NETQSCIMBASE) provides the mandatory basic SCIM configurations required for the SCIM driver. It includes driver authentication methods (Basic and OAuth2.0), subscriber settings with HTTPS error codes to retry (such as 307, 400, etc.), publisher settings (Polling interval, Heartbeat interval, and Polling Resource option), advanced settings (Schema and Modifier options), and options for Remote Loader settings."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver authentication methods are supported by the SCIM driver according to the SCIM Base package?",
+      "input": "",
+      "output": "The SCIM driver supports Basic authentication and OAuth2.0 authentication as defined in the SCIM Base package (NETQSCIMBASE)."
+    },
+    {
+      "category": "config",
+      "instruction": "What HTTPS error codes are configured for retry in the subscriber settings of the SCIM driver?",
+      "input": "",
+      "output": "The subscriber settings of the SCIM driver include retry for HTTPS error codes such as 307 and 400."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Matching policy in the SCIM Default package do for complex multivalued attributes?",
+      "input": "",
+      "output": "The Matching policy in the SCIM Default package (NETQSCIMDCFG) finds matches for objects based on attributes. For complex multivalued attributes, the SCIM driver generates a filter using the value inside the <value> element of the query. The user must provide an appropriate filter through a transformation policy; otherwise, the generated filter may be insufficient."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the output transformation policy XML that the SCIM driver uses to create an appropriate filter for a complex multivalued attribute such as emails:work:value.",
+      "input": "",
+      "output": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<policy>\n  <rule>\n    <description>Replace search-attr value with appropriate filter.</description>\n    <conditions>\n      <and>\n        <if-class-name op=\"equal\">urn:ietf:params:scim:schemas:core:2.0:User</if-class-name>\n        <if-operation op=\"equal\">query</if-operation>\n      </and>\n    </conditions>\n    <actions>\n      <do-for-each>\n        <arg-node-set>\n          <token-xpath expression=\"search-attr\"/>\n        </arg-node-set>\n        <arg-actions>\n          <do-set-local-variable name=\"searchAttr\">\n            <arg-node-set>\n              <token-xpath expression=\"$current-node/@attr-name\"/>\n            </arg-node-set>\n          </do-set-local-variable>\n          <do-if>\n            <arg-conditions>\n              <and>\n                <if-local-variable name=\"searchAttr\" op=\"equal\">emails:work:value</if-local-variable>\n              </and>\n            </arg-conditions>\n            <arg-actions>\n              <do-set-local-variable name=\"emailValue\">\n                <arg-string>\n                  <token-xpath expression=\"$current-node/value\"/>\n                </arg-string>\n              </do-set-local-variable>\n              <do-strip-xpath expression=\"$current-node/value\"/>\n              <do-append-xml-element expression=\"$current-node\" name=\"value\"/>\n              <do-append-xml-text expression=\"$current-node/value\">\n                <arg-string>\n                  <token-text xml:space=\"preserve\">emails eq </token-text>\n                  <token-text xml:space=\"preserve\">\"</token-text>\n                  <token-local-variable name=\"emailValue\"/>\n                  <token-text xml:space=\"preserve\">\"</token-text>\n                </arg-string>\n              </do-append-xml-text>\n            </arg-actions>\n            <arg-actions/>\n          </do-if>\n        </arg-actions>\n      </do-for-each>\n    </actions>\n  </rule>\n</policy>"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you ensure that all required attributes are defined in the Creation policy of the SCIM driver so that a new user created in Identity Manager also syncs to the connected application?",
+      "input": "",
+      "output": "Add attribute templates to both the Subscriber Creation policy and the Publisher Creation policy of the SCIM driver. In the policy editor, include the necessary attribute definitions (such as user name, user ID, email, etc.) within the template sections. This guarantees that when a new user is created in Identity Manager, the creation policy contains complete definitions, allowing the user to be synchronized to the connected application."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default policy types included in the SCIM Default package for the SCIM driver?",
+      "input": "",
+      "output": "The SCIM Default package (NETQSCIMDCFG) includes the following default policy types for the SCIM driver: Matching policy, Creation policy (Subscriber and Publisher), Placement policy, Command Transformation policy, Schema Mapping policy, and Filter policy."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the optional SCIM JSON package for the SCIM driver?",
+      "input": "",
+      "output": "The optional SCIM JSON package (identified by the GCV NETQSCIMJSON) provides JSON configurations that enable XDS to JSON conversion for the SCIM driver. The generated JSON is compatible with the connected application and is used to perform required operations such as provisioning or updating objects."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key components and functions of the SCIM driver packages described in the documentation.",
+      "input": "",
+      "output": "The SCIM driver consists of three packages: SCIM Base (NETQSCIMBASE) supplies mandatory configurations, including Basic and OAuth2.0 authentication, subscriber retry codes, publisher polling settings, advanced schema options, and remote loader settings. SCIM Default (NETQSCIMDCFG) adds required default policies such as Matching, Creation, Placement, Command Transformation, Schema Mapping, and Filter policies, with a special transformation policy for complex multivalued attributes. The optional SCIM JSON package (NETQSCIMJSON) enables XDS‑to‑JSON conversion so that JSON output matches the connected application's expectations."
+    }
+  ]
+}

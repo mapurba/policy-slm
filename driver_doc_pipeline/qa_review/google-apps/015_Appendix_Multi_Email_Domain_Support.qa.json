@@ -1,0 +1,65 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the three types of mail domains supported by the Google Apps driver, and how does each type behave?",
+      "input": "",
+      "output": "The Google Apps driver supports three mail domain types within a G Suite environment:\n1. **Primary Domain** – This is the main domain tied to the G Suite domain name (e.g., https://www.google.com/a/mycompany.com). All default email addresses belong to this domain.\n2. **Domain Alias** – An alternate domain name that points to the primary domain only. A user with an address name@mycompany.com can also receive mail at name@myothercompany.com when a domain alias myothercompany.com is created.\n3. **Secondary or Sub Domain** – A separate, distinct email domain under the same G Suite service (e.g., name@staff.mycompany.com). Users can exist with the same local part in both primary and secondary domains, but a domain alias cannot be created for a secondary domain."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Google Apps driver recommend using a one‑domain‑per‑driver‑instance model instead of managing multiple domains in a single instance?",
+      "input": "",
+      "output": "The Google Apps driver recommends a one‑domain‑per‑driver‑instance model because the connector does not support a one‑to‑many relationship between IDV users and Google domain users; a single IDV user can belong to only one domain at a time. Deploying a separate driver instance for each child domain (setting that domain as the primary domain for its driver) provides greater flexibility for provisioning users and groups across multiple domains from a single IDV source."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you create a user in a specific email domain with the Google Apps driver?",
+      "input": "",
+      "output": "To create a user in a specific email domain using the Google Apps driver:\n1. Ensure the disabled policies for adding a secondary domain are copied and enabled in the driver configuration.\n2. Decide which users should be placed in which domain (using entitlements, group membership, attribute values, or container containment).\n3. In the user creation policy, set the **UserName** attribute (the Google attribute that maps to CN by default) to the full email address that includes the desired domain, e.g., `user@desireddomain.com`.\n4. Apply the policy to the create rule so that when the user is provisioned, the driver creates the account in the specified domain."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attribute does the Google Apps driver map by default to the user's email address (CN) when creating users?",
+      "input": "",
+      "output": "The Google Apps driver maps the **UserName** attribute (Google attribute name) to the CN attribute by default, and this value determines the user's email address."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attribute must be set in a policy to control the email address domain for groups when using the Google Apps driver?",
+      "input": "",
+      "output": "To control the email domain for groups, the policy must set the **DirXML-GAGroupEMailAddress** attribute to the desired email address (including the domain)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you move a user from one domain to another using the Google Apps driver?",
+      "input": "",
+      "output": "To switch a user between a parent and child domain with the Google Apps driver:\n1. Perform a rename operation on the user account, changing the email from `username@domain1.org` to `username@domain2.org`.\n2. Ensure both domains are part of the same G Suite service.\n3. After the rename, the Google Apps driver automatically moves the user account to the target domain."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Can the Google Apps driver configure a GmailSettingsSendAs address for users in a secondary domain?",
+      "input": "",
+      "output": "No. The Google Apps driver can use the GmailSettingsSendAs feature to set a user's From Name and Email Address only when a domain alias is involved. It cannot configure a SendAs address for an account that resides in a secondary domain."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Is it possible to create a domain alias for a secondary domain using the Google Apps driver?",
+      "input": "",
+      "output": "No. The Google Apps driver does not allow the creation of a Domain Alias for a secondary domain; domain aliases can be created only for the primary domain."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the capabilities and best‑practice recommendations for managing multiple email domains with the Google Apps driver.",
+      "input": "",
+      "output": "The Google Apps driver can manage primary, domain alias, and secondary/sub domains within a single G Suite service. It can create and modify users in primary or secondary domains, set GmailSettingsSendAs for domain aliases (but not for secondary domains), and move users between domains via rename. Because a single IDV user can belong to only one domain, the recommended best practice is to run one driver instance per domain, giving flexibility for provisioning. Policies must be enabled to add secondary domains, and attributes such as **UserName** (for users) and **DirXML-GAGroupEMailAddress** (for groups) determine the target email domain."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps are required to enable and use the disabled policies for adding users to a secondary domain in the Google Apps driver?",
+      "input": "",
+      "output": "To enable the disabled policies for adding users to a secondary domain in the Google Apps driver:\n1. Locate the driver package that includes the disabled secondary‑domain policies.\n2. Copy those disabled policies into your active policy set.\n3. Decide the routing logic for users (e.g., based on entitlements, group membership, attribute values, or container containment).\n4. Modify the copied policies to reference the chosen logic—for example, add a condition that checks if the attribute `employeeType` equals `student` and set `UserName` to `user@students.com`.\n5. Update the matching rule and create rule in the policy to incorporate the new domain logic.\n6. Deploy the updated policies to the Google Apps driver; users that meet the criteria will now be created in the specified secondary email domain."
+    }
+  ]
+}

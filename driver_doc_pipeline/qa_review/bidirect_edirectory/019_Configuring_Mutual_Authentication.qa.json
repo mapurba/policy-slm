@@ -1,0 +1,59 @@
+{
+  "driver": "Bidirectional eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is mutual authentication in the Bidirectional eDirectory driver and why is it required?",
+      "input": "",
+      "output": "Mutual authentication in the Bidirectional eDirectory driver is a security configuration where both the driver and the Identity Vault present X.509 certificates to each other during the TLS handshake. It ensures that each side can verify the other's identity, providing stronger protection against man‑in‑the‑middle attacks. The procedure described on the page establishes this two‑way trust between the driver and the Identity Vault."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure mutual authentication between the Bidirectional eDirectory driver and the Identity Vault?",
+      "input": "",
+      "output": "To configure mutual authentication for the Bidirectional eDirectory driver:\n1. Complete Steps 1‑9 in **Importing the Certificate into the Client’s Certificate Store**.\n2. Create a user certificate in Identity Console (administrator login) under **Certificate Management > User Certificate > Management** and specify a Nickname.\n3. Log in as the driver’s authenticated user, select the created certificate, and export it as a **cert.pfx** file (export private key and set a password).\n4. Copy the **cert.pfx** file to a directory that contains the Identity Vault files.\n5. Import the private key into a keystore with the command:\n   ```\n   keytool -importkeystore -srckeystore cert.pfx -srcstoretype PKCS12 -destkeystore mykeystore -alias AliasName\n   ```\n   (AliasName must match the Nickname used when the certificate was created.)\n6. Adjust any driver configuration as required.\n7. In Identity Console, modify the LDAP server used by the connected eDirectory server: set **Client Certificate** to **Requested** (or **Required** if you want only mutual authentication), then save.\n8. Start the Bidirectional eDirectory driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a user certificate for the Bidirectional eDirectory driver in Identity Console?",
+      "input": "",
+      "output": "To create a user certificate for the Bidirectional eDirectory driver:\n1. Log in to the connected eDirectory server in Identity Console with administrator rights.\n2. Navigate to **Certificate Management > User Certificate > Management**.\n3. Click the **Create Certificate** button (icon shown in the documentation).\n4. In the right‑hand pane, enter a **Nickname**, select **Standard**, and click **Next**.\n5. Click **OK** to finish creating the user certificate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you export the user certificate as a .pfx file for the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "To export the user certificate for the Bidirectional eDirectory driver:\n1. Log in to the connected eDirectory server in Identity Console as the driver’s authenticated user.\n2. Go to **Certificate Management > User Certificate > Management** and select the user certificate you created.\n3. Click the **Export Certificate** button (icon shown in the documentation).\n4. Check the **Export Private key** checkbox, provide a private‑key password, and click **OK**.\n5. Save the resulting **cert.pfx** file to a local file system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add the private key from cert.pfx to a keystore for the Bidirectional eDirectory driver using keytool?",
+      "input": "",
+      "output": "Place the **cert.pfx** file on the same file system that holds the Identity Vault files, then run the following command at a command prompt:\n```\nkeytool -importkeystore -srckeystore cert.pfx -srcstoretype PKCS12 -destkeystore mykeystore -alias AliasName\n```\nMake sure that **AliasName** is identical to the Nickname you specified when creating the user certificate, and use the same keystore file that was used for the SSL configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "Which LDAP option must be changed to enable mutual authentication for the Bidirectional eDirectory driver, and what values can it be set to?",
+      "input": "",
+      "output": "In the LDAP server configuration for the connected eDirectory server, change the **Client Certificate** option. It can be set to:\n- **Requested** – the server asks the client for a certificate but will still accept connections without one (default).\n- **Required** – the server accepts only connections that present a client certificate, enforcing strict mutual authentication."
+    },
+    {
+      "category": "config",
+      "instruction": "What must the AliasName be set to when importing the private key into a keystore for the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "The **AliasName** must be exactly the same as the **Nickname** you specified when you created the user certificate."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the procedure to enable mutual authentication for the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "Enabling mutual authentication for the Bidirectional eDirectory driver involves: (1) completing the certificate import steps for the client, (2) creating a user certificate in Identity Console and exporting it as a **cert.pfx** file, (3) copying the file to the Identity Vault location, (4) importing the private key into a keystore with keytool (using an AliasName that matches the certificate’s Nickname), (5) adjusting any driver settings, (6) modifying the LDAP server’s **Client Certificate** option to **Requested** (or **Required** for exclusive mutual authentication), and (7) starting the driver."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact keytool command used to import the private key from cert.pfx into a keystore for the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "```\nkeytool -importkeystore -srckeystore cert.pfx -srcstoretype PKCS12 -destkeystore mykeystore -alias AliasName\n```"
+    }
+  ]
+}

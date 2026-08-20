@@ -1,0 +1,47 @@
+{
+  "driver": "Bidirectional eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the clutil utility in the Bidirectional eDirectory driver and what does it do?",
+      "input": "",
+      "output": "The clutil utility is a change‑log management tool included with the Bidirectional eDirectory driver. It removes change‑log entries on a remote eDirectory server for bidirectional driver shims, which deletes the selected driver entry from the remote server's change‑log and also removes the associated cache files."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the clutil utility for the Bidirectional eDirectory driver on a Linux server?",
+      "input": "",
+      "output": "1. Run the Identity Manager install program on the Linux server.\n2. The installer places clutil as part of the **novell-DXMLChlgx.rpm** package.\n3. After installation, locate the clutil script at **/opt/novell/eDirectory/bin**.\n4. Ensure the script has execute permission (e.g., `chmod +x /opt/novell/eDirectory/bin/clutil`)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the clutil utility for the Bidirectional eDirectory driver on a Windows server?",
+      "input": "",
+      "output": "1. Locate the Identity Manager media that contains the Dirxml‑ChangeLog deliverables.\n2. Create a **lib** directory inside the eDirectory installation folder (for example, **C:\\Novell\\NDS\\lib**).\n3. Copy the **clutil.jar** file from the media into the newly created **lib** directory."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you run the clutil utility to remove a driver entry using the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "1. Set the **PATH** environment variable to a directory that contains a valid Java runtime.\n   - Linux example: **/opt/novell/eDirectory/lib64/nds-modules/embox/jre/bin**\n   - Windows example: **C:\\novell\\NDS\\embox\\jre\\bin**\n2. On Linux, give execute permission to the clutil script if needed, then run `clutil`.\n   On Windows, browse to the eDirectory installation folder (e.g., **C:\\Novell\\NDS\\**) and run **clutil.bat**.\n3. The utility lists change‑log driver entries with their serial numbers.\n4. Stop the driver shim.\n5. Enter the serial number of the driver you wish to remove.\n6. When prompted, provide the administrator credentials in LDAP format and the password.\n7. The utility deletes the driver entry, the TAO files, and updates the configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "Which environment variable must be set before running the clutil utility for the Bidirectional eDirectory driver, and what are the example paths for Linux and Windows?",
+      "input": "",
+      "output": "You must set the **PATH** environment variable to point to a valid Java installation.\n- Linux example path: **/opt/novell/eDirectory/lib64/nds-modules/embox/jre/bin**\n- Windows example path: **C:\\novell\\NDS\\embox\\jre\\bin**"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the clutil utility fail to delete the TAO file on a Windows remote eDirectory server when using the Bidirectional eDirectory driver, and how should you resolve it?",
+      "input": "",
+      "output": "On Windows, the **ndsd** process locks the TAO file, preventing clutil from deleting it. To resolve the issue, shut down the eDirectory service, then manually delete the TAO file from the file system. After the TAO file is removed, the corresponding driver will no longer be usable because it cannot establish a connection without the TAO file."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to remove a driver from a remote eDirectory server using the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "To remove a driver from a remote eDirectory server with the Bidirectional eDirectory driver, first ensure the clutil utility is installed (Linux via novell-DXMLChlgx.rpm, Windows by copying clutil.jar to the eDirectory lib folder). Set PATH to the Java binary directory. Run clutil (or clutil.bat on Windows) to list change‑log entries, stop the driver shim, and select the entry's serial number. Provide LDAP‑format administrator credentials when prompted. The utility will delete the driver entry, associated TAO files, and update the configuration. If the remote server runs on Windows, manually delete the TAO file after shutting down eDirectory because the ndsd process locks it."
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the CPRS computation issue in the Workday driver and why does it require a user migration?",
+      "input": "",
+      "output": "In the Workday driver, the CPRS (Cross-Product Role Service) feature can fail to display user‑based security group assignments because the driver does not have a cached mapping between a user’s name and their Workday worker‑id. After upgrading to Workday driver version 1.3, this mapping is only created when users are migrated from Workday to the Identity Vault. Therefore, without at least one migration, CPRS cannot resolve the assignments."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you migrate all users from Workday to the Identity Vault to resolve the CPRS issue in the Workday driver after upgrading to version 1.3?",
+      "input": "",
+      "output": "To migrate all users and create the required cache mapping for the Workday driver:\n1. Ensure the Workday driver has been upgraded to version 1.3.\n2. Open the Identity Manager console and select the Workday driver configuration.\n3. Initiate a full user migration by running the \"Migrate Users to Identity Vault\" task (or equivalent migration job) for the Workday driver.\n4. Allow the migration process to complete; it will copy each Workday user into the Identity Vault at least once.\n5. Verify that the migration finished without errors.\nAfter this migration, the driver will generate the user‑name‑worker‑id cache used by CPRS."
+    },
+    {
+      "category": "config",
+      "instruction": "Where does the Workday driver store the cache mapping file after migration, and what information does the file contain?",
+      "input": "",
+      "output": "The Workday driver creates a cache mapping file named **user-name-worker-id-mapping.txt** in the **cache** folder of the driver installation. This file holds a mapping of each migrated user’s login name (user‑name) to the corresponding Workday worker‑id, which the driver uses to display assignments in the CPRS feature."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might assignments not be displayed in CPRS when using the Workday driver, and how can this problem be fixed?",
+      "input": "",
+      "output": "Assignments may not appear in CPRS because the Workday driver lacks the required user‑name‑to‑worker‑id cache mapping. This occurs when users have not been migrated to the Identity Vault after upgrading to Workday driver 1.3. To fix the issue, perform a full migration of all users from Workday to the Identity Vault (as described in the \"How to\" steps). The migration creates the **user-name-worker-id-mapping.txt** file, enabling CPRS to correctly display the assignments."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the workaround for the CPRS computation issue in the Workday driver version 1.3.",
+      "input": "",
+      "output": "For the Workday driver version 1.3, the CPRS computation issue is resolved by migrating all users from Workday to the Identity Vault at least once after the upgrade. This migration generates a cache file (**user-name-worker-id-mapping.txt**) in the driver’s cache folder, mapping user names to Workday worker IDs, which CPRS uses to display user‑based security group assignments."
+    }
+  ]
+}

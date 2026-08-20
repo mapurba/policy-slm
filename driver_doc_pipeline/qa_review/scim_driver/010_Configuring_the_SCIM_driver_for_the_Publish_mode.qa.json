@@ -1,0 +1,77 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the SCIM driver in Publish mode?",
+      "input": "",
+      "output": "In Publish mode, the SCIM driver exposes SCIM endpoints that receive events from a connected SCIM service and push those events into the Identity Vault, allowing external applications to create, read, update, and delete resources in OpenText eDirectory via the SCIM API."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which authentication header and content type are mandatory for SCIM methods in the SCIM driver?",
+      "input": "",
+      "output": "For every SCIM request to the SCIM driver, the Authorization header (typically a Basic token) and the Content-Type header set to \"application/json\" are mandatory."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the URLs for Users, Groups, and Custom resources used by the SCIM driver?",
+      "input": "",
+      "output": "The SCIM driver defines the following URLs (replace {ipaddress}, {port}, {id}, and {resourceName} as appropriate):\n\n| Resource | Method(s) | URL |\n|----------|-----------|-----|\n| Users | GET, POST | http://{ipaddress}:{port}/scim/api/v2/Users |\n| Specific user | GET, PUT, PATCH, DELETE | http://{ipaddress}:{port}/scim/api/v2/Users/{id} |\n| Groups | GET, POST | http://{ipaddress}:{port}/scim/api/v2/Groups |\n| Specific group | GET, PUT, PATCH, DELETE | http://{ipaddress}:{port}/scim/api/v2/Groups/{id} |\n| Custom | GET, POST | http://{ipaddress}:{port}/scim/api/v2/custom/{resourceName} |\n| Specific custom | GET, PUT, PATCH, DELETE | http://{ipaddress}:{port}/scim/api/v2/custom/{resourceName}/{id} |"
+    },
+    {
+      "category": "config",
+      "instruction": "What value must be used for the Content-Type header when calling the SCIM driver?",
+      "input": "",
+      "output": "The Content-Type header must be set to \"application/json\" for all SCIM driver requests."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a new user with the SCIM driver using the POST method?",
+      "input": "",
+      "output": "1. Construct the request URL using the Users endpoint, for example: `http://{ipaddress}:{port}/scim/api/v2/Users`.\n2. Set the HTTP method to POST.\n3. Add the mandatory headers:\n   - Authorization: Basic <base64‑encoded‑credentials>\n   - Content-Type: application/json\n4. Use the following JSON payload (replace values as needed):\n```json\n{\n  \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:User\"],\n  \"userName\": \"johndoe@gmail.com\",\n  \"externalId\": \"4wJRiuTHyEC45uMCUYrkxmn=\",\n  \"name\": {\n    \"givenName\": \"John\",\n    \"familyName\": \"Doe\"\n  },\n  \"emails\": [{ \"value\": \"Johndoe@gmail.com\", \"type\": \"work\", \"primary\": true }],\n  \"active\": true\n}\n```\n5. Send the request. A successful response returns **201 Created** and includes a JSON body containing the newly generated `id`. Capture and store this `id` for any later operations on the user."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you delete an existing user with the SCIM driver using the DELETE method?",
+      "input": "",
+      "output": "1. Obtain the user’s unique `id` from the POST response or a prior GET.\n2. Build the request URL: `http://{ipaddress}:{port}/scim/api/v2/Users/{id}` (replace `{id}` with the actual identifier).\n3. Set the HTTP method to DELETE.\n4. Include the mandatory headers:\n   - Authorization: Basic <base64‑encoded‑credentials>\n   - Content-Type: application/json (payload not required).\n5. Send the request. A successful deletion returns **204 No Content**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you retrieve a list of all users from the SCIM driver using the GET method?",
+      "input": "",
+      "output": "1. Use the Users endpoint URL: `http://{ipaddress}:{port}/scim/api/v2/Users`.\n2. Set the HTTP method to GET.\n3. Add the required headers:\n   - Authorization: Basic <base64‑encoded‑credentials>\n   - Content-Type: application/json\n4. No payload is needed.\n5. Send the request. A successful response returns **200 OK** with a JSON body similar to:\n```json\n{\n  \"schemas\": [\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\n  \"totalResults\": 1,\n  \"itemsPerPage\": 100,\n  \"Resources\": [\n    {\n      \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:User\"],\n      \"id\": \"nhjkuijkskhdid==\",\n      \"userName\": \" johndoe@gmail.com \",\n      \"active\": true\n    }\n  ],\n  \"nextCursor\": \"rO0ABXNyACxjb20ubm92ZWxs...BZAO0ig==\"\n}\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve a specific user by ID using the SCIM driver?",
+      "input": "",
+      "output": "1. Insert the user’s `id` into the specific‑user URL: `http://{ipaddress}:{port}/scim/api/v2/Users/{id}`.\n2. Set the HTTP method to GET.\n3. Include the required headers:\n   - Authorization: Basic <base64‑encoded‑credentials>\n   - Content-Type: application/json\n4. No payload is needed.\n5. Send the request. A successful response returns **200 OK** with a JSON payload such as:\n```json\n{\n  \"emails\": [{ \"type\": \"work\", \"value\": \" johndoe@gmail.com \" }],\n  \"name\": { \"familyName\": \"John\", \"givenName\": \"Doe\" },\n  \"active\": \"false\",\n  \"id\": \"CqekLDjY7UW3HAqnpCw42A==\",\n  \"userName\": \" johndoe@gmail.com \",\n  \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:User\"]\n}\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you update a user's family name using the SCIM driver PATCH method?",
+      "input": "",
+      "output": "1. Get the user's `id`.\n2. Build the PATCH URL: `http://{ipaddress}:{port}/scim/api/v2/Users/{id}`.\n3. Set the HTTP method to PATCH.\n4. Add the mandatory headers:\n   - Authorization: Basic <base64‑encoded‑credentials>\n   - Content-Type: application/json\n5. Use this JSON payload (replace the `value` as needed):\n```json\n{\n  \"schemas\": [\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\n  \"Operations\": [\n    {\n      \"op\": \"replace\",\n      \"path\": \"name.familyName\",\n      \"value\": \"Doejohn@gmail.com\"\n    }\n  ]\n}\n```\n6. Send the request. A successful response returns **200 OK**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you completely replace a user's information using the SCIM driver PUT method?",
+      "input": "",
+      "output": "1. Retrieve the existing user’s `id`.\n2. Construct the PUT URL: `http://{ipaddress}:{port}/scim/api/v2/Users/{id}`.\n3. Set the HTTP method to PUT.\n4. Include the required headers:\n   - Authorization: Basic <base64‑encoded‑credentials>\n   - Content-Type: application/json\n5. Provide a full JSON representation of the user, for example:\n```json\n{\n  \"id\": \"CqekLDjY7UW3HAqnpCw42A==\",\n  \"userName\": \" johndoe@gmail.com \",\n  \"externalId\": \"4wJRiuTHyEC45uMCUYrkxmn=\",\n  \"name\": {\n    \"givenName\": \"John\",\n    \"familyName\": \"Doe\"\n  },\n  \"emails\": [{\n    \"value\": \" johndoe@gmail.com \",\n    \"type\": \"work\",\n    \"primary\": true\n  }],\n  \"active\": true,\n  \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:User\"]\n}\n```\n6. Send the request. A successful update returns **200 OK** with the updated representation in the response body."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key capabilities and required request elements of the SCIM driver in Publish mode.",
+      "input": "",
+      "output": "The SCIM driver in Publish mode provides SCIM 2.0 endpoints for Users, Groups, and custom resources, enabling external applications to create, read, update, and delete these objects in OpenText eDirectory. Every request must include an Authorization header (Basic authentication) and a Content-Type of \"application/json\". The driver supports GET, POST, PUT, PATCH, and DELETE methods, each with example URLs and payloads. The POST response returns a unique system `id` that must be stored for subsequent operations on that specific resource."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a SCIM PATCH payload that replaces the familyName attribute of a user, as shown in the SCIM driver documentation.",
+      "input": "",
+      "output": "```json\n{\n  \"schemas\": [\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\n  \"Operations\": [\n    {\n      \"op\": \"replace\",\n      \"path\": \"name.familyName\",\n      \"value\": \"Doejohn@gmail.com\"\n    }\n  ]\n}\n```"
+    }
+  ]
+}

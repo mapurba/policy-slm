@@ -1,0 +1,35 @@
+{
+  "driver": "SOAP driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What limitation does the Publisher channel of the SOAP driver have regarding Modify events for unassociated objects?",
+      "input": "",
+      "output": "The Publisher channel of the SOAP driver can only listen for Change events and has no capability to query the HTTP/SOAP source or poll for additional information. Because of this limitation, Modify events received for objects that are not already associated with the driver (or were not created by the same driver instance) cannot be transformed into Add commands and therefore almost always fail."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the SOAP driver return an error for Modify events on unassociated objects on the Publisher channel?",
+      "input": "",
+      "output": "The SOAP driver returns an error because it lacks a mechanism to query back to the HTTP/SOAP source. Without the ability to send a query, the driver cannot convert an unassociated Modify event into an Add command, so it reports a \"query not implemented\" error."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you enable a Modify event to associate an object in the SOAP driver when inconsistent information is acceptable?",
+      "input": "",
+      "output": "In the SOAP driver, you can achieve association in policy by setting the Destination DN in the Modify event and creating a custom set‑association event. This allows the modification to be applied to the existing object even though the object was not previously associated, provided that the risk of inconsistent data is acceptable."
+    },
+    {
+      "category": "config",
+      "instruction": "Which field must be set in a Modify event to associate an object using the SOAP driver?",
+      "input": "",
+      "output": "To associate an object in the SOAP driver via a Modify event, you must set the Destination DN field in the event. This field tells the driver which existing object the modification should be applied to."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the SOAP driver handles Modify events for unassociated objects on the Publisher channel.",
+      "input": "",
+      "output": "The SOAP driver’s Publisher channel can only receive Change events and cannot query the HTTP/SOAP source. Consequently, Modify events for objects that are not already associated with the driver usually fail with a \"query not implemented\" error. There is no general workaround, but a specific deployment can associate an object by setting the Destination DN in the Modify event and creating a set‑association event in policy, accepting possible data inconsistencies."
+    }
+  ]
+}

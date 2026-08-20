@@ -1,0 +1,53 @@
+{
+  "driver": "Sentinel Identity Tracking driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What Designer packages must be imported to implement the Sentinel Identity Tracking driver?",
+      "input": "",
+      "output": "To implement the Sentinel Identity Tracking driver you need to import two Designer packages: **Sentinel REST API BASE** and **Sentinel Identity Tracking**. Importing these packages creates the driver with its default rules and policies."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a test driver to review the default policies of the Sentinel Identity Tracking driver?",
+      "input": "",
+      "output": "1. Open NetIQ Identity Manager Designer. 2. Import the **Sentinel REST API BASE** and **Sentinel Identity Tracking** packages. 3. In the Designer palette, right‑click the newly created Sentinel Identity Tracking driver and select **Create Test Driver**. 4. Open the test driver and navigate to the **Policies** node. 5. Review each policy; they are commented to explain their function. This lets you understand and modify the default matching policies before using the driver in production."
+    },
+    {
+      "category": "config",
+      "instruction": "Which matching policies does the Sentinel Identity Tracking driver evaluate when deciding whether to reuse an existing Sentinel Identity?",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver evaluates three matching policies in this order:\n1. **Match by Distinguished Name** – compares the DN and the source Identity Vault name stored in the Sentinel Identity object with those of the originating Identity Vault User object.\n2. **Match by GUID** – compares the GUID of the Identity Vault User object (stored in the Sentinel Identity object's **Source Identity Id** field) with existing Sentinel Identity objects.\n3. **Match by User Attribute Values** – uses configured user attribute values for matching (see Step 7 of the driver documentation)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If duplicate Sentinel Identity objects appear after reinstalling the Sentinel Identity Tracking driver, what steps should you take to resolve the issue?",
+      "input": "",
+      "output": "When duplicate Sentinel Identity objects are created after reinstalling the driver, verify and adjust the default matching policies in the Sentinel Identity Tracking driver. Ensure that:\n* The **Match by Distinguished Name** policy correctly stores and compares the Identity Vault name and DN.\n* The **Match by GUID** policy stores the Identity Vault User GUID in the **Source Identity Id** field.\n* Any custom attribute‑based matching is configured to use trusted attribute values. Updating these policies prevents the driver from creating new identities when an existing Sentinel Identity should be reused."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the Sentinel Identity Tracking driver determines whether to reuse an existing Sentinel Identity when creating a new identity from an Identity Vault User object.",
+      "input": "",
+      "output": "When the Sentinel Identity Tracking driver needs to create a Sentinel Identity from an Identity Vault User object, it first searches for an existing Sentinel Identity that can be reused. It performs the searches in order: (1) match by Distinguished Name using the stored Identity Vault name and DN, (2) match by GUID using the GUID stored in the **Source Identity Id** field, and (3) match by configured user attribute values. If a match is found at any stage, the existing Sentinel Identity is used; otherwise, a new Sentinel Identity is created."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why should you review and possibly modify the default matching policies in the Sentinel Identity Tracking driver?",
+      "input": "",
+      "output": "The default matching policies in the Sentinel Identity Tracking driver may not reflect the data you trust for identifying users. Since the policies determine how the driver decides whether an existing Sentinel Identity can be reused, reviewing and adjusting them ensures that the driver uses the correct identifiers (e.g., DN, GUID, or specific user attributes) and prevents duplicate or incorrect identity provisioning."
+    },
+    {
+      "category": "config",
+      "instruction": "Where does the Sentinel Identity Tracking driver store the source Identity Vault name and DN for later matching?",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver stores the source Identity Vault name and the Distinguished Name (DN) of the originating Identity Vault User object as part of the Sentinel Identity object. These values are used by the **Match by Distinguished Name** policy."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Sentinel Identity Tracking driver perform a match by GUID when synchronizing identities?",
+      "input": "",
+      "output": "1. When a Sentinel Identity is created, the driver copies the GUID of the originating Identity Vault User object into the **Source Identity Id** field of the Sentinel Identity object. 2. During a subsequent synchronization, the driver conducts the second search by looking for a Sentinel Identity whose **Source Identity Id** matches the GUID of the Identity Vault User object. 3. If a match is found, the existing Sentinel Identity is reused; otherwise, the driver proceeds to the next matching step."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "driver": "ID Provider driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the ID client in the ID Provider driver and what does it do?",
+      "input": "",
+      "output": "In the ID Provider driver, the ID client is a Java class (com.novell.ncs.idsrv.IDClient) that can be invoked from DirXML style sheets. It provides the getNextID function, which contacts the ID Provider RMI server and returns the next available identifier from a specified ID Policy object stored in the Identity Vault."
+    },
+    {
+      "category": "config",
+      "instruction": "Which parameters must be supplied to the ID Provider driver ID client to obtain the next ID, and what are their sample values?",
+      "input": "",
+      "output": "The ID Provider driver ID client uses the following parameters:\n\n| Parameter   | Description                                     | Sample      |\n|-------------|-------------------------------------------------|-------------|\n| $RMIServer  | RMI server host address.                         | localhost   |\n| $RMIPort    | RMI server port.                                 | 1099        |\n| $UIDRule    | ID Policy object name to retrieve an ID from.   | uniqueCN    |\n| $IDClient   | ID Client name to identify this client at server.| Client-No2  |\n| $Tracelevel | Trace level (bit mask). Values: 0=off, 1=low, 2=medium, 3=high, 4=exceptions. | 1 |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you call the getNextID function using an XPath expression in a DirXML style sheet for the ID Provider driver?",
+      "input": "",
+      "output": "1. Add the ID Provider driver namespace to the style sheet header: `xmlns:id=http://www.novell.com/nxsl/java/com.novell.idm.idprovider.IDClient`.\n2. Use the XPath function syntax `id:getNextID` with the five required arguments: RMI server address, RMI port, ID Policy name, client name, and trace level.\n3. Insert the call inside a `<token-xpath>` element, for example:\n```xml\n<arg-string>\n    <token-xpath expression=\"id:getNextID('172.17.1.3','1199','MYUID','DBUSERS',0)\"/>\n</arg-string>\n```\n4. When the style sheet executes, the ID Provider driver will return the next available ID from the specified policy."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you set the trace level for the ID Provider driver ID client and what are the possible levels?",
+      "input": "",
+      "output": "Include the trace level as the fifth argument of the `id:getNextID` call. The trace level is a bit‑mask integer; possible values are:\n* 0 – off\n* 1 – low\n* 2 – medium\n* 3 – high\n* 4 – exceptions\nYou can combine levels by adding the numbers (e.g., 3 for high + medium). Example:\n```xml\n<token-xpath expression=\"id:getNextID('localhost','1099','uniqueCN','Client-No2',1)\"/>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the ID Provider driver does not return an ID, what parameter misconfigurations should you verify?",
+      "input": "",
+      "output": "Check the following parameters for accuracy:\n1. **$RMIServer** – Ensure the host address points to the correct RMI server (e.g., `localhost` or the actual server IP).\n2. **$RMIPort** – Verify the port matches the RMI service (default is `1099`).\n3. **$UIDRule** – Confirm the ID Policy object name exists in the Identity Vault (e.g., `uniqueCN`).\n4. **$IDClient** – Make sure the client name is registered or recognized by the RMI server (e.g., `Client-No2`).\n5. **$Tracelevel** – Set a non‑zero value to obtain diagnostic messages on the ID Server main screen; this can help reveal communication errors.\nCorrect any mismatched values and re‑execute the XPath expression."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize how the ID client interacts with the ID Provider driver to generate identifiers.",
+      "input": "",
+      "output": "The ID client, accessed via the `com.novell.ncs.idsrv.IDClient` Java class, is invoked from DirXML style sheets using the `id:getNextID` XPath function. It sends five parameters—RMI server address, port, ID Policy name, client identifier, and trace level—to the ID Provider driver’s RMI server. The driver then looks up the specified ID Policy in the Identity Vault and returns the next free identifier. Optional trace level settings allow administrators to view detailed processing information on the ID Server screen."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a DirXML token‑xpath snippet that retrieves the next ID from the ID Policy named \"uniqueCN\" on RMI server \"localhost\" port \"1099\" for client \"Client-No2\" with a low trace level.",
+      "input": "",
+      "output": "<arg-string>\n    <token-xpath expression=\"id:getNextID('localhost','1099','uniqueCN','Client-No2',1)\"/>\n</arg-string>"
+    }
+  ]
+}

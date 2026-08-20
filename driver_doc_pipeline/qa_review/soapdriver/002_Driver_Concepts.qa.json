@@ -1,0 +1,59 @@
+{
+  "driver": "SOAP driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What protocols and data formats does the SOAP driver use to exchange data between Identity Manager and a web service?",
+      "input": "",
+      "output": "The SOAP driver uses several Internet protocols and data formats, including SOAP (the driver supports SOAP 1.1), SPML 1.0/2.0, DSML 2.0, XML, HTTP, and HTTPS. SPML and DSML bind with SOAP 1.1 and are transported over HTTP or HTTPS."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the three core elements of a SOAP message as defined by the SOAP driver?",
+      "input": "",
+      "output": "In the SOAP driver, a SOAP message is composed of three elements: *Envelope* – the root XML node, *Header* – provides contextual information such as transaction ID and security data, and *Body* – contains the method‑specific information."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the SOAP driver support SPML and DSML protocols?",
+      "input": "",
+      "output": "The SOAP driver includes sample configurations for SPML 1.0, SPML 2.0, and DSML 2.0. Both SPML and DSML bind to SOAP 1.1 and use HTTP or HTTPS 1.1 as the transport layer. SPML handles provisioning requests and responses, while DSML represents directory structures, queries, and updates as XML documents."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the <driver-operation-data> element in the SOAP driver?",
+      "input": "",
+      "output": "The <driver-operation-data> element in the SOAP driver serves two purposes: it can be used to match subscriber commands with the responses they generate (helping create associations in transformation policies), and it can override default subscriber channel connection attributes. The element is added by subscriber channel policies, removed by the driver shim before sending the request, and restored to the response."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the SOAP driver to place the <driver-operation-data> element under a specific parent node in the response XML?",
+      "input": "",
+      "output": "To place the <driver-operation-data> element under a specific parent node in the response XML for the SOAP driver, add one or more attributes named parent-node‑n (where n starts at 1 and increments) to the <driver-operation-data> element in the subscriber policy. Each attribute’s value should be the XPath or node name of the desired parent. The driver shim will examine these attributes in order, and if the named node exists, it will use that node as the parent for the restored operation data."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes can be added to the <driver-operation-data> element in the SOAP driver to control where the element is inserted in the response XML?",
+      "input": "",
+      "output": "The SOAP driver recognizes attributes named parent-node‑n (e.g., parent-node-1, parent-node-2, …) on the <driver-operation-data> element. Each attribute specifies a candidate parent node for inserting the operation data in the response XML. The shim checks the attributes sequentially and uses the first existing node it finds."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What problem might arise from using the older <operation-data> element with the SOAP driver, and what is the recommended solution?",
+      "input": "",
+      "output": "Older versions of the SOAP driver shim use the <operation-data> element for the same purpose as <driver-operation-data>. While the shim still supports <operation-data> for backward compatibility, continued use can lead to deprecation issues in future releases. The recommended solution is to replace any <operation-data> elements with <driver-operation-data> elements in your policies."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the overall data flow between Identity Manager and a web service when using the SOAP driver.",
+      "input": "",
+      "output": "When using the SOAP driver, Identity Manager creates an XDS command representing an event and passes it to the driver policy. The policy transforms the XDS to XML (e.g., a SOAP envelope) via an output XSLT style sheet. The driver shim receives the XML, converts it to a byte array, and sends it over HTTP (or HTTPS) using a POST request to the web service. The service processes the request and returns a SOAP response, which the shim receives as bytes, converts back to XML, and passes to the driver policies. An input transformation style sheet then converts the response XML back into XDS, which is reported to the Identity Manager engine."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example of a <driver-operation-data> element for the SOAP driver that specifies two parent nodes, placing the operation data under <Response><Result> in the response XML.",
+      "input": "",
+      "output": "<driver-operation-data parent-node-1=\"Response\" parent-node-2=\"Result\">\n    <!-- custom operation data here -->\n</driver-operation-data>"
+    }
+  ]
+}

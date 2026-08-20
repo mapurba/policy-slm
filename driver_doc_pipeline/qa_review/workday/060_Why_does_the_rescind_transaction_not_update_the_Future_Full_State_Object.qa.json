@@ -1,0 +1,41 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the rescind transaction not update the Future Full State Object in the Workday driver?",
+      "input": "",
+      "output": "In the Workday driver, a rescind transaction updates only the current state object when it is triggered after the full state object has already been created. Because the full state object is a snapshot taken at a specific point in time, any changes made after its creation—such as a rescind event—are not reflected in that snapshot. Therefore, the rescind transaction does not update the Future Full State Object."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What occurs when the rescind event is triggered before the creation of the full state object in the Workday driver?",
+      "input": "",
+      "output": "If the rescind event is triggered before the full state object is created, the Workday driver includes the rescind information in the full state object because the event has already occurred at the time the snapshot is taken. Consequently, no separate future state object is created."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What occurs when the rescind event is triggered after the creation of the full state object in the Workday driver?",
+      "input": "",
+      "output": "When the rescind event is triggered after the full state object has been created, the Workday driver does not add the rescind information to that full state object. Instead, the rescind event updates only the current state object, leaving the full state object unchanged."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Workday driver determine whether to update the full state object with rescind information?",
+      "input": "",
+      "output": "The Workday driver follows these steps:\n1. Detect the timing of the rescind event relative to the creation of the full state object.\n2. If the rescind event occurs **before** the full state object is created, embed the rescind information into the full state object and skip creating a separate future state object.\n3. If the rescind event occurs **after** the full state object is created, update only the current state object and leave the full state object unchanged."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the impact of rescind events on future full state objects in the Workday driver.",
+      "input": "",
+      "output": "In the Workday driver, rescind events affect future full state objects based on when they are triggered. If triggered before the full state object is created, the rescind data is included in the full state object and no future state object is generated. If triggered after the full state object is created, the rescind data updates only the current state object, leaving the full state object unchanged."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Workday driver update changes to the associated object depending on the rescind event timing?",
+      "input": "",
+      "output": "The Workday driver updates changes to the associated object based on rescind event timing to ensure data consistency. When the rescind occurs before the full state snapshot, the snapshot should reflect the rescind, so the driver incorporates it. When the rescind occurs after the snapshot, the snapshot already represents the state at the earlier point in time, so the driver only modifies the current state, preserving the historical accuracy of the full state object."
+    }
+  ]
+}

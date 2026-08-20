@@ -1,0 +1,47 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of adding secondary drivers in the Fan-Out driver environment?",
+      "input": "",
+      "output": "In the Fan-Out driver environment, adding secondary drivers provides failover and load‑balancing capabilities. Deploying the Fan-Out driver on more than one server ensures that if one server becomes unavailable, another can continue to handle client requests, and it also distributes the processing load across multiple eDirectory servers."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you deploy the Fan-Out driver for failover and load balancing across multiple eDirectory servers?",
+      "input": "",
+      "output": "To deploy the Fan-Out driver for failover and load balancing across multiple eDirectory servers:\n1. Identify the eDirectory servers that will host the Fan-Out driver.\n2. On each selected server, install the Fan-Out driver package.\n3. Configure each installed Fan-Out driver instance to connect to the same Core Driver Shim.\n4. Verify that each Fan-Out driver instance is running and able to communicate with the Core Driver Shim.\n5. Test failover by stopping the driver on one server and confirming that the remaining instances continue to process events.\n6. Optionally, configure a load‑balancing mechanism (such as DNS round‑robin or a hardware load balancer) to distribute client connections among the Fan-Out driver instances."
+    },
+    {
+      "category": "config",
+      "instruction": "Which operation modes of the Fan-Out Platform Receiver affect Core Driver Shim performance, and what are their performance effects according to the Fan-Out driver documentation?",
+      "input": "",
+      "output": "The Fan-Out driver documentation identifies three operation modes of the Fan-Out Platform Receiver that impact Core Driver Shim performance:\n\n| Mode       | Function (as described in the Fan-Out driver)                                                                                                                                                      | Effect on Performance (as described in the Fan-Out driver)                                                                                                                                                                                                                                                                                                                                                                                                      |\n|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| Persistent | The Platform Receiver connects and remains connected to the Fan-Out driver to receive events in real‑time, which is desirable when the platform must process events as they occur in the Identity Vault. | Maintaining the open connection and its resources adds overhead in both memory and CPU usage for the Core Driver Shim.                                                                                                                                                                                                                                                                                                                                          |\n| Polling    | The Platform Receiver connects to the Fan-Out driver at configurable intervals to catch up on events since its last poll.                                                                      | Positive: Allows the Core Driver Shim to release its connection and free up resources, delivering a single aggregated event to the polling platform, which improves delivery efficiency. Negative: Can cause delayed event delivery, and if the polling interval is too short or many platforms poll frequently, memory issues may reappear. |\n| Scheduled  | Similar to Polling mode but runs only once, typically triggered by an external scheduler such as cron.                                                                                           | Enables nightly or weekly updates and lets you stagger event deliveries, helping to protect the Fan-Out driver from being overloaded by a large number of simultaneous requests. |"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the performance implications of using Persistent mode in the Fan-Out driver?",
+      "input": "",
+      "output": "When the Fan-Out driver is configured for Persistent mode, the Platform Receiver keeps a continuous, open connection to the driver to receive events in real time. This approach ensures immediate event delivery but incurs additional memory and CPU overhead on the Core Driver Shim because the open connection and its associated resources must be maintained constantly."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the advantages and disadvantages of Polling mode in the Fan-Out driver?",
+      "input": "",
+      "output": "In the Fan-Out driver, Polling mode causes the Platform Receiver to connect to the driver at set intervals and retrieve all events that occurred since the last poll. Advantages include allowing the Core Driver Shim to release the connection between polls, freeing memory and CPU resources, and delivering a single aggregated event to the platform, which can be more efficient. Disadvantages are potential delays in event delivery and the risk of memory issues if the polling interval is too short or if many platforms poll frequently, which can recreate resource‑consumption problems."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does Scheduled mode help avoid overloading the Fan-Out driver?",
+      "input": "",
+      "output": "Scheduled mode in the Fan-Out driver works like Polling mode but runs only once, typically triggered by an external scheduler such as cron. By scheduling the Platform Receiver to run at off‑peak times (e.g., nightly or weekly) and staggering the execution of multiple receivers, the mode reduces the chance of many simultaneous connections, thereby protecting the Fan-Out driver from being overloaded with a burst of requests."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the performance tuning recommendations for the Fan-Out driver documented in the performance tuning page.",
+      "input": "",
+      "output": "The Fan-Out driver performance tuning page recommends installing secondary driver instances on multiple eDirectory servers to provide failover and load balancing. It also advises selecting an appropriate Platform Receiver operation mode—Persistent, Polling, or Scheduled—based on the need for real‑time delivery versus resource usage. Persistent mode offers immediate event delivery but uses more memory and CPU, Polling mode reduces resource consumption at the cost of potential delivery delays, and Scheduled mode allows staggered, off‑peak updates to prevent driver overload."
+    }
+  ]
+}

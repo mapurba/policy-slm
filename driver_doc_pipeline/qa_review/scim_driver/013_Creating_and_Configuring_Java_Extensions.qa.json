@@ -1,0 +1,47 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of Java extensions in the SCIM driver and which messages can they modify?",
+      "input": "",
+      "output": "In the SCIM driver, Java extensions allow you to customize the SCIM request and response documents when the connected application does not follow the RFC standards. You can modify the following messages:\n- Subscriber request document sent to the connected application.\n- Subscriber response document returned to Identity Manager.\n- Publisher request document sent through the Publisher channel to the connected application.\n- Publisher response document received through the Publisher channel and returned to Identity Manager."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you compile and deploy a custom Java extension for the SCIM driver on a Linux system?",
+      "input": "",
+      "output": "To compile and deploy a custom Java extension for the SCIM driver on Linux, follow these steps:\n1. Ensure a current JDK is installed.\n2. Place your source file in a directory structure that matches its package (e.g., com/microfocus/idm/MyDocumentModifiers.java).\n3. Make sure the required JARs are available: SCIMUtils.jar and nxsl.jar (both found in /opt/novell/eDirectory/lib/dirxml/classes).\n4. Put the JAR files in the root directory of your source tree (outside the com directory).\n5. Open a shell prompt with the appropriate path.\n6. Compile the class with:\n   ```\n   javac -classpath SCIMUtils.jar:nxsl.jar com/novell/idm/*.java\n   ```\n7. Package the compiled class into a JAR:\n   ```\n   jar cvf mydriverextensions.jar com/microfocus/idm/*.class\n   ```\n8. Copy the resulting mydriverextensions.jar to the same directory that contains SCIMShim.jar:\n   - Linux path: /opt/novell/eDirectory/lib/dirxml/classes.\n9. Restart the SCIM driver to load the new extension."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure a custom Java extension in the Identity Console for the SCIM driver?",
+      "input": "",
+      "output": "To configure a custom Java extension in the Identity Console for the SCIM driver:\n1. Open Identity Console and edit the SCIM driver settings.\n2. In the driver configuration, select **Custom Java Extension** to show.\n3. Set **Document Handling** to **Implemented**.\n4. In the **Class** field, enter the fully‑qualified class name of your modifier, for example `com.microfocus.idm.MyDocumentModifiers`.\n5. Provide a string for **Init Parameter** – this string is passed to the `init` method of your class and can contain any information required for initialization.\n6. Save the changes and restart the SCIM driver. The custom class will now be used for document handling."
+    },
+    {
+      "category": "config",
+      "instruction": "Which JAR files are required to compile a Java class for the SCIM driver, and where are they located on Linux and Windows?",
+      "input": "",
+      "output": "To compile a Java class for the SCIM driver you need at least the following JAR files:\n- **SCIMUtils.jar**\n  - Linux location: `/opt/novell/eDirectory/lib/dirxml/classes`\n  - Windows location: `C:\\NetIQ\\IDM\\NDS\\lib`\n- **nxsl.jar** (required only if the class processes XML documents)\n  - Linux location: `/opt/novell/eDirectory/lib/dirxml/classes`\n  - Windows location: same directory as SCIMUtils.jar (`C:\\NetIQ\\IDM\\NDS\\lib`)."
+    },
+    {
+      "category": "config",
+      "instruction": "What values must be entered for the Class and Init Parameter settings when configuring a custom Java extension in the SCIM driver?",
+      "input": "",
+      "output": "In the SCIM driver configuration, set the **Class** field to the fully qualified name of your modifier class, for example `com.microfocus.idm.MyDocumentModifiers`. For the **Init Parameter**, enter a string that will be passed to the `init` method of your class; this can contain any initialization data your class requires (the exact content is defined by you)."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the SCIM driver does not recognize a custom Java extension after deployment, what common placement issue should be checked?",
+      "input": "",
+      "output": "A frequent cause is that the custom JAR file was not placed in the same directory as **SCIMShim.jar**. Ensure that the JAR you created (e.g., `mydriverextensions.jar`) is copied to the driver’s library directory:\n- Windows: `C:\\NetIQ\\IDM\\NDS\\lib`\n- Linux: `/opt/novell/eDirectory/lib/dirxml/classes`\nAfter placing the JAR correctly, restart the SCIM driver."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps for creating and configuring Java extensions for the SCIM driver.",
+      "input": "",
+      "output": "To create and configure Java extensions for the SCIM driver:\n1. Write a Java class that implements the `DocumentModifiers` interface and place it in a proper package structure.\n2. Ensure JDK is installed and gather required JARs (SCIMUtils.jar and optionally nxsl.jar) from the driver’s lib directory.\n3. Compile the class using the appropriate classpath (`javac -classpath SCIMUtils.jar:nxsl.jar …` on Linux or `;` on Windows).\n4. Package the compiled class into a JAR (`jar cvf mydriverextensions.jar …`).\n5. Copy the JAR to the same folder that contains SCIMShim.jar (`/opt/novell/eDirectory/lib/dirxml/classes` on Linux or `C:\\NetIQ\\IDM\\NDS\\lib` on Windows).\n6. In Identity Console, enable **Custom Java Extension**, set **Document Handling** to **Implemented**, and specify the fully qualified class name and an init‑parameter string.\n7. Restart the SCIM driver to load the custom extension."
+    }
+  ]
+}

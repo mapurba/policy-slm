@@ -1,0 +1,35 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you confirm that a JWT connection has been successfully established when using the Workday driver?",
+      "input": "",
+      "output": "To confirm a successful JWT connection with the Workday driver, enable log level 3 and look for the following sequence of log entries:\n1. \"Creating new OAuth Connection...\"\n2. \"Extracting private key from the keystore file...\"\n3. \"JWT Bearer Token initialized with\" followed by the OAuth2 Client Id and Integration Username.\n4. A SOAP request envelope containing a <bsvc:Server_Timestamp_Get> operation.\n5. \"Generating signed JWT...\" and \"Requesting new access token...\"\n6. \"Received Response from Workday with response code: 200\"\nIf all these entries appear in the log, the JWT connection is established successfully."
+    },
+    {
+      "category": "config",
+      "instruction": "Which log level must be configured to view the JWT connection confirmation messages for the Workday driver?",
+      "input": "",
+      "output": "Set the logging level to **level 3** for the Workday driver. At this level the log will display the detailed JWT connection steps, including key extraction, token initialization, request sending, and the response code."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What do the log entries \"JWT Bearer Token initialized with\" and \"Generating signed JWT\" indicate in the context of the Workday driver?",
+      "input": "",
+      "output": "In the Workday driver, the log entry \"JWT Bearer Token initialized with\" confirms that the driver has loaded the OAuth2 Client Id, Integration Username, and the private key from the keystore, preparing the JWT payload. The subsequent entry \"Generating signed JWT\" shows that the driver has created a cryptographically signed JWT using the private key, which is required to request an access token from Workday."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the Workday driver logs show \"Received Response from Workday with response code: 200\" but the integration still fails, what should you verify based on the JWT connection log?",
+      "input": "",
+      "output": "When the Workday driver logs a successful response code (200) after requesting a new access token, yet the integration fails, verify the following:\n1. That the OAuth2 Client Id and Integration Username displayed in the log match the credentials configured in Workday.\n2. The keystore file path (\n   e.g., \"/home/JWTkeystore.jks\") is correct and the file contains the expected private key.\n3. The SOAP request payload (<bsvc:Server_Timestamp_Get>) is appropriate for the Workday version you are targeting.\n4. No subsequent error messages appear after the 200 response (e.g., token parsing errors). Correct any mismatches before re‑testing."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key log output that confirms a successful JWT connection for the Workday driver.",
+      "input": "",
+      "output": "The Workday driver confirms a successful JWT connection when the level‑3 log shows:\n- Creation of a new OAuth connection.\n- Extraction of the private key from the specified keystore file.\n- Initialization of the JWT Bearer Token with the OAuth2 Client Id and Integration Username.\n- Sending of a SOAP request (Server_Timestamp_Get).\n- Generation of a signed JWT and request for a new access token.\n- Retrieval of page 1 of the response.\n- A final log line stating \"Received Response from Workday with response code: 200\".\nThese entries together verify that the JWT was generated, signed, sent, and accepted by Workday."
+    }
+  ]
+}

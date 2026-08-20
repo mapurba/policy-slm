@@ -1,0 +1,77 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are Custom IDs in the Workday driver and how are they referenced?",
+      "input": "",
+      "output": "In the Workday driver, Custom IDs refer to the \"Other IDs\" shown on the IDs tab of the Personal section in Workday. The driver and its API treat these as Custom IDs and they can be synchronized with Identity Manager using the Change_Other_IDs_Request API. For each Custom ID, the driver creates an attribute named {WD Custom Attribute}_Custom_ID and also returns a {WD Custom Attribute}_Description attribute when the ID is listed in the wdCustomIdList parameter."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter is used to list Custom IDs for synchronization in the Workday driver, and give an example of its value?",
+      "input": "",
+      "output": "The driver parameter is **wdCustomIdList**. It accepts a multi‑valued list of the Custom ID type IDs that need to be synchronized. Example parameter value: `CUSTOM_ID_TYPE-6-10` (represents one Custom ID type)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Workday driver to synchronize a Custom ID, including schema mapping and auxiliary class attribute creation?",
+      "input": "",
+      "output": "To configure the Workday driver for Custom ID synchronization:\n1. Obtain the Custom_ID_Type_ID from the Workday team (case‑sensitive).\n2. In Designer, navigate to **Workday Driver Properties ► Driver Configurations ► Driver Parameters ► Driver Options ► Transformation Parameters** and set the **wdCustomIdList** parameter with a list of the required IDs.\n3. Add a driver schema mapping that maps the Identity Vault attribute to `{WD Custom Attribute}_Custom_ID` (e.g., `CUSTOM_ID_TYPE-6-10` → `CUSTOM_ID_TYPE-6-10_Custom_ID`).\n4. For each Custom ID that will be updated on the Subscriber channel, create a **wd‑user auxiliary class attribute** (single‑valued, case‑ignore string) to hold the Workday reference ID, e.g., `AUX_ID_WID`.\n5. In the schema‑mapping policy, map `{WD Custom Attribute}_Custom_ID_Shared_Reference` to the auxiliary attribute created in step 4 (e.g., `CUSTOM_ID_TYPE-6-10_Custom_ID_Shared_Reference` → `AUX_ID_WID`).\n6. Add a driver filter entry for the Identity Vault attribute that maps to `{WD Custom Attribute}_Custom_ID` so it flows on Subscriber and/or Publisher channels (e.g., `AUX_ID`).\n7. If the Custom ID is updated from Identity Manager, add filter entries for the new attributes (`AUX_ID`, `AUX_ID_WID`, `AUX_ID_Description`)."
+    },
+    {
+      "category": "config",
+      "instruction": "When creating auxiliary class attributes for Custom ID shared reference in the Workday driver, what type, cardinality, and case settings should be used?",
+      "input": "",
+      "output": "Auxiliary class attributes for Custom ID shared references must be created as **single‑valued**, **case‑ignore string** attributes. For example, an attribute named `AUX_ID_WID`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create an output transformation policy rule that appends the shared reference of a Custom ID to driver-operation-data in the Workday driver?",
+      "input": "",
+      "output": "To append the shared reference of a Custom ID to `driver-operation-data` in the Workday driver:\n1. Create an output transformation policy that runs after the `NETQWDDCFG-otp-user` policy.\n2. Add a rule for each Custom ID attribute you are sending.\n3. In the rule, check that the Custom ID attribute is changing, the operation is `modify`, and the class name is `User`.\n4. Within a `<do-if>` block, ensure the auxiliary attribute holding the Workday reference (e.g., `AUX_ID_WID`) is available.\n5. Use `<do-append-xml-element>` to add an element named `WD-{WD Custom Attribute}_Custom_ID_Shared_Reference` to `driver-operation-data` (e.g., `WD-CUSTOM_ID_TYPE-6-10_Custom_ID_Shared_Reference`).\n6. Use `<do-append-xml-text>` to insert the value of the auxiliary attribute (`AUX_ID_WID`) as the text of that element.\n7. Save the policy.\nThe rule structure follows the XML example provided in the documentation."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the complete XML rule that adds a driver-operation-data element for modify AUX_ID events in the Workday driver.",
+      "input": "",
+      "output": "<rule>\n    <description>Add driver-operation-data element for modify AUX_ID events</description>\n    <conditions>\n        <and>\n            <if-op-attr name=\"AUX_ID_Custom_ID\" op=\"changing\"/>\n\n            <if-operation mode=\"nocase\" op=\"equal\">modify</if-operation>\n\n            <if-class-name mode=\"nocase\" op=\"equal\">User</if-class-name>\n        </and>\n    </conditions>\n    <actions>\n        <do-if>\n            <arg-conditions>\n                <and>\n                    <if-attr name=\"AUX_ID_WID\" op=\"available\"/>\n                </and>\n            </arg-conditions>\n            <arg-actions>\n                <do-append-xml-element expression=\"driver-operation-data\" name=\"WD-CUSTOM_ID_TYPE-6-10_Custom_ID_Shared_Reference\"/>\n                <do-append-xml-text expression=\"driver-operation-data/WD-CUSTOM_ID_TYPE-6-10_Custom_ID_Shared_Reference\">\n                    <arg-string>\n                        <token-attr name=\"AUX_ID_WID\"/>\n                    </arg-string>\n                </do-append-xml-text>\n            </arg-actions>\n            <arg-actions/>\n        </do-if>\n    </actions>\n</rule>"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What derived attributes does the Workday driver automatically generate for worker objects when an organization is added to the wdOrgList parameter?",
+      "input": "",
+      "output": "When an organization is included in the **wdOrgList** transformation parameter, the Workday driver automatically derives the following attributes for each organization type/sub‑type combination on a worker object:\n- `_RefID` (maps to the `Organization_Reference_ID` element)\n- `_Name` (maps to the `Organization_Name` element)\n- `_Code` (maps to the `Organization_Code` element)\n- `RoleID_Employee_ID`\n- `RoleID_Contingent_Worker_ID`\nThese attributes are suffixed with the organization type and sub‑type, e.g., `Supervisory|Department_RefID`."
+    },
+    {
+      "category": "config",
+      "instruction": "Which transformation parameter must be set to enable derived attributes for organizations in the Workday driver, and what are the names of the derived attributes?",
+      "input": "",
+      "output": "Set the **wdOrgList** transformation parameter in the Workday driver. The driver then derives the attributes `_RefID`, `_Name`, `_Code`, `RoleID_Employee_ID`, and `RoleID_Contingent_Worker_ID` for each organization type/sub‑type combination, with the organization type and sub‑type prefixed (e.g., `Supervisory|Department_RefID`)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure custom override fields in the Workday driver, including obtaining the Integration System ID and setting the required parameters?",
+      "input": "",
+      "output": "To configure custom override (calculated) fields in the Workday driver:\n1. Obtain the **Integration System ID** from the Workday team (see the \"Obtaining Integration System ID from Workday\" steps).\n2. In the Publisher driver parameters, add the Integration System ID to the **Field and Parameter Criteria Provider Reference List** of the relevant class.\n3. Get the names of the override fields created in Workday.\n4. Place those override field names in the **wdIntFieldAttrList** transformation parameter.\n5. The driver will expose each override field as an attribute ending with `_CF`. For example, the Workday override field `mailStop` becomes the attribute `mailStop_CF` for use in schema mapping or transformation policies."
+    },
+    {
+      "category": "config",
+      "instruction": "What transformation parameter holds the list of override field names in the Workday driver, and how are the corresponding attributes named?",
+      "input": "",
+      "output": "The transformation parameter is **wdIntFieldAttrList**. The names of the override fields placed in this list become driver attributes by appending `_CF` to the override field name. For example, an override field named `mailStop` will be available as the attribute `mailStop_CF`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If newly added filter attributes are not populating for workers already in the Identity Vault, what actions does the Workday driver documentation recommend?",
+      "input": "",
+      "output": "The documentation suggests two options:\n1. **Re‑migrate** the affected workers through the Workday driver, which clears the cache and forces the new attributes to be populated.\n2. **Allow regular polling** to populate the attributes automatically, provided the worker record is changed in Workday. You can also set the **wd-Merge** attribute to **True** on the workers; if the `wd-Merge-effectiveDate` is in the future, the merge occurs on that date, otherwise the current date is used. All workers with `wd-Merge=True` must already have a correct `wd-WorkerIDType` (Employee_ID or Contingent_Worker_ID). If no change occurs in Workday, the driver will not retrieve the data, and the new attributes will remain unset until a change happens."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main steps for configuring dynamic attributes such as Custom IDs, derived attributes, and custom fields in the Workday driver.",
+      "input": "",
+      "output": "In the Workday driver, dynamic attribute configuration involves:\n- **Custom IDs**: Add required IDs to the `wdCustomIdList` parameter, create schema mappings to `{WD Custom Attribute}_Custom_ID`, define single‑valued, case‑ignore auxiliary attributes for the shared reference, map `{WD Custom Attribute}_Custom_ID_Shared_Reference` to these auxiliaries, add the attributes to driver filters, and create an output transformation rule that appends the shared reference XML element to `driver-operation-data`.\n- **Derived Attributes**: Populate the `wdOrgList` parameter with organization identifiers; the driver then automatically derives `_RefID`, `_Name`, `_Code`, `RoleID_Employee_ID`, and `RoleID_Contingent_Worker_ID` for each organization type/sub‑type, which can be added to schema mappings and filters.\n- **Custom Override Fields**: Obtain the Integration System ID from Workday, place it in the Publisher driver parameters' Field and Parameter Criteria Provider Reference List, list the override field names in the `wdIntFieldAttrList` parameter, and use the resulting `{fieldName}_CF` attributes in mappings or policies."
+    }
+  ]
+}

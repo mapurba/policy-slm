@@ -1,0 +1,47 @@
+{
+  "driver": "PeopleSoft driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of setting the SSL_KEY_STORE_PATH environment variable in the PeopleSoft driver?",
+      "input": "",
+      "output": "The SSL_KEY_STORE_PATH environment variable tells the PeopleSoft driver where to locate the KeyStore file that contains the SSL certificate and private key needed for secure communication. By defining this variable on the IDM or Development system, the driver can load the correct certificate during SSL handshake."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure SSL for the PeopleSoft driver on an Identity Manager system?",
+      "input": "",
+      "output": "To configure SSL for the PeopleSoft driver on an Identity Manager system, follow these steps:\n1. Create a certificate and import it into a KeyStore file in the PeopleSoft system.\n2. Set the SSL_KEY_STORE_PATH environment variable for the operating system:\n   * Linux: `SSL_KEY_STORE_PATH=<path>\\keystore` (e.g., `SSL_KEY_STORE_PATH=/root/drivers/psoft/keystore`).\n   * Windows: `SSL_KEY_STORE_PATH=<path>\\keystore` (e.g., `SSL_KEY_STORE_PATH=E:\\PeopleSoft\\PeopleSoft_8_59\\Certificates\\keystore`).\n3. Copy the created TrustStore/KeyStore file to the Identity Manager machine.\n4. Add the required JVM options in Identity Console:\n   a. Click the IDM Administration tile.\n   b. On the Driver Dashboard, click the upper‑right corner of the driver set and choose **Driver Set Properties**.\n   c. Expand **Java Environment Parameters** to edit **JVM Options**.\n   d. Enter the TrustStore file path and password, for example:\n      - `-Djavax.net.ssl.TrustStore=/home/certificates/keystore`\n      - `-Djavax.net.ssl.TrustStorePassword=password`\n5. Restart eDirectory to apply the changes.\n*If the certificate expires, repeat the steps to generate a new KeyStore and re‑configure the driver.*"
+    },
+    {
+      "category": "config",
+      "instruction": "Which JVM options must be added for the PeopleSoft driver to locate its TrustStore and password, and what are example values?",
+      "input": "",
+      "output": "For the PeopleSoft driver you must add the following JVM options in the Identity Console:\n* **TrustStore file path** – `-Djavax.net.ssl.TrustStore=<path to TrustStore/KeyStore>`\n  *Example:* `-Djavax.net.ssl.TrustStore=/home/certificates/keystore`\n* **TrustStore password** – `-Djavax.net.ssl.TrustStorePassword=<password>`\n  *Example:* `-Djavax.net.ssl.TrustStorePassword=password`"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the SSL_KEY_STORE_PATH environment variable for a Linux operating system when configuring the PeopleSoft driver?",
+      "input": "",
+      "output": "On Linux, define the environment variable as follows:\n```bash\nSSL_KEY_STORE_PATH=<path>\\keystore\n```\nFor example:\n```bash\nSSL_KEY_STORE_PATH=/root/drivers/psoft/keystore\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you set the SSL_KEY_STORE_PATH environment variable for a Windows operating system when configuring the PeopleSoft driver?",
+      "input": "",
+      "output": "On Windows, define the environment variable as follows:\n```cmd\nSSL_KEY_STORE_PATH=<path>\\keystore\n```\nFor example:\n```cmd\nSSL_KEY_STORE_PATH=E:\\PeopleSoft\\PeopleSoft_8_59\\Certificates\\keystore\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken if the SSL certificate used by the PeopleSoft driver expires?",
+      "input": "",
+      "output": "If the SSL certificate expires, you need to generate a new KeyStore and repeat the SSL configuration steps for the PeopleSoft driver:\n1. Create a new certificate and import it into a new KeyStore file in PeopleSoft.\n2. Update the SSL_KEY_STORE_PATH environment variable if the file location has changed.\n3. Copy the new TrustStore/KeyStore to the Identity Manager machine.\n4. Update the JVM options (`-Djavax.net.ssl.TrustStore` and `-Djavax.net.ssl.TrustStorePassword`) with the new file path and password if they changed.\n5. Restart eDirectory to apply the new certificate."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the SSL configuration process for the PeopleSoft driver.",
+      "input": "",
+      "output": "To configure SSL for the PeopleSoft driver, create and import a certificate into a KeyStore, set the SSL_KEY_STORE_PATH environment variable (different syntax for Linux and Windows), copy the TrustStore/KeyStore to the IDM machine, add the JVM options `-Djavax.net.ssl.TrustStore` and `-Djavax.net.ssl.TrustStorePassword` via the Identity Console’s Driver Set Properties, and finally restart eDirectory. Regenerate the KeyStore and repeat the steps if the certificate expires."
+    }
+  ]
+}

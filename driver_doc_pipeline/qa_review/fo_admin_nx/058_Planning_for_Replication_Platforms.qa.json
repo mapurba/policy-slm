@@ -1,0 +1,65 @@
+{
+  "driver": "Fan-Out driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the Core Driver do with passwords before sending them to the Platform Receiver in the Fan-Out driver?",
+      "input": "",
+      "output": "In the Fan-Out driver, the Core Driver converts passwords to lowercase by default before transmitting them to the Platform Receiver."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible values for the Permit Password Replication attribute of a Platform object in the Fan-Out driver and what does each value control?",
+      "input": "",
+      "output": "The Permit Password Replication attribute of a Platform object in the Fan-Out driver can be set to:\n\n- **Yes** – The platform will not receive provisioning events for user accounts until the passwords for those accounts are known to the driver.\n- **If Available** – The platform receives provisioning events when they occur, even if the password is not yet known to the driver.\n- **No** (default if not specified) – The behavior is the same as **If Available**, meaning events are sent regardless of password knowledge."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you ensure that users’ passwords are available for replication to a platform configured with Permit Password Replication set to Yes in the Fan-Out driver?",
+      "input": "",
+      "output": "To make passwords available for replication to a platform whose Permit Password Replication is set to **Yes** in the Fan-Out driver, follow these steps:\n1. Ensure the system intercepts are installed and configured on at least one platform that the users can access.\n2. Have users **change their passwords** on a platform where those intercepts are active, or\n3. Have users **authenticate** on a participating redirection platform that captures the password via intercepts.\nOnce the driver has captured the password through these mechanisms, it can provision the account to the target platform."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If provisioning events are not reaching a platform with Permit Password Replication set to Yes in the Fan-Out driver, what could be the cause and how can it be resolved?",
+      "input": "",
+      "output": "When a platform’s Permit Password Replication is set to **Yes**, the Fan-Out driver will hold back provisioning events until it knows the account password. If events are not reaching the platform, the likely cause is that the driver does not yet have the password for those accounts. Resolve this by:\n- Having the affected users change their passwords on a platform where the system intercepts are installed, or\n- Having the users authenticate on a participating redirection platform so the driver can capture the password.\nAfter the password is captured, the Fan-Out driver will forward the pending provisioning events."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key planning considerations for replication platforms when using the Fan-Out driver.",
+      "input": "",
+      "output": "When planning replication platforms for the Fan-Out driver, consider that:\n- The Core Driver lower‑cases passwords by default before sending them to the Platform Receiver.\n- The Permit Password Replication attribute controls when provisioning events are sent: **Yes** delays events until passwords are known; **If Available** sends events immediately regardless of password knowledge.\n- Passwords are collected via system intercepts; users must change passwords on an intercept‑enabled platform or authenticate on a redirection platform to make passwords available.\n- Deploy the Fan-Out driver in stages, first enabling it on platforms where most users have already authenticated, to ensure a sufficient pool of users with known passwords before rolling out to password‑replication platforms."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Fan-Out driver convert passwords to lowercase before sending them to the Platform Receiver?",
+      "input": "",
+      "output": "The Fan-Out driver converts passwords to lowercase by default to ensure a consistent case format when transmitting passwords to the Platform Receiver, which can help avoid case‑sensitivity mismatches on platforms that treat passwords case‑insensitively."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you plan a staged deployment of the Fan-Out driver to maximize password availability for replication platforms?",
+      "input": "",
+      "output": "To plan a staged deployment of the Fan-Out driver for optimal password availability:\n1. Deploy the driver first on platforms where system intercepts are already installed and where most users regularly authenticate.\n2. Allow users to change passwords or authenticate on these initial platforms so the driver captures their passwords.\n3. Once a substantial number of users have known passwords, roll out the driver to additional platforms that have Permit Password Replication set to **Yes**.\n4. Monitor that passwords are being captured before provisioning events are sent to the new platforms."
+    },
+    {
+      "category": "config",
+      "instruction": "Where is the Permit Password Replication attribute configured for a platform in the Fan-Out driver and what impact does it have on provisioning events?",
+      "input": "",
+      "output": "The Permit Password Replication attribute is configured on the **Platform object** within the Fan-Out driver. Its value determines the timing of provisioning events:\n- **Yes** – Events are withheld until the driver knows the account password.\n- **If Available** – Events are sent immediately, even if the password is not yet known.\n- **No** (or default) – Behaves like **If Available**, sending events regardless of password knowledge."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What happens when Permit Password Replication is set to If Available in the Fan-Out driver and the password for an account is not yet known?",
+      "input": "",
+      "output": "When Permit Password Replication is set to **If Available** in the Fan-Out driver, the platform receives provisioning events as soon as they occur, even if the password for the account has not been captured yet. The driver will later update the platform with the password once it becomes available."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What role do system intercepts play in password replication for the Fan-Out driver?",
+      "input": "",
+      "output": "System intercepts in the Fan-Out driver are mechanisms that capture password information when users change passwords on platforms where the intercepts are installed or when they authenticate on a participating redirection platform. The driver relies on these intercepts to obtain passwords needed for provisioning to platforms that require the password, especially when Permit Password Replication is set to **Yes**."
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "driver": "SAP HANA driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of a trust store when configuring secure communication in the SAP HANA driver?",
+      "input": "",
+      "output": "In the SAP HANA driver, a trust store holds the CA certificates that verify the server’s TLS/SSL certificate. It enables the driver to establish a trusted, encrypted connection between the Identity vault and the SAP HANA instance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you download the SAP HANA tenant root CA certificate from Chrome for testing purposes?",
+      "input": "",
+      "output": "1. Enter the SAP HANA login URL in Chrome and press Enter.\n2. Click the lock icon next to the address bar and select **Certificate (Valid)**.\n3. Click **Certification Path** to view the full certificate hierarchy.\n4. Choose the top‑most (root) certificate and click **View Certificate**.\n5. In the certificate window, go to **Details > Copy to File > Next > Next**.\n6. Provide a filename and save the certificate to your local system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the downloaded SAP HANA root CA certificate into a Java keystore for the SAP HANA driver?",
+      "input": "",
+      "output": "Run the following keytool command, replacing the placeholders with your file names and passwords:\n```\nkeytool -import -file <name_of_cert_file> -trustcacerts -noprompt -keystore <keystore_filename> -storepass <keystore_password>\n```\nFor example:\n```\nkeytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver option must be set to specify the trust store for the SAP HANA driver, and what values does it require?",
+      "input": "",
+      "output": "In the SAP HANA driver options, set the **Keystore File** setting. Provide the path to the trust store file you created and the trust store password."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What verification step should you perform before importing a CA certificate into the trust store for the SAP HANA driver?",
+      "input": "",
+      "output": "Before importing, verify the authenticity of the CA certificates by checking them against the issuing authority’s trusted website (e.g., Digicert’s site). This ensures you are not using untrusted or tampered certificates."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to secure communication for the SAP HANA driver using TLS/SSL.",
+      "input": "",
+      "output": "To secure communication for the SAP HANA driver, obtain a trusted CA root certificate (preferably from the issuer’s URL), import it into a Java keystore with keytool, and then configure the driver’s **Keystore File** option in the Identity Console to reference that keystore and its password. This enables TLS/SSL encrypted connections between the Identity vault and SAP HANA."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact keytool command to import a certificate file named \"tree_ca_root.b64\" into a keystore named \"dirxml.keystore\" with the password \"novell\" for the SAP HANA driver.",
+      "input": "",
+      "output": "```\nkeytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell\n```"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is it recommended to import the chain of CA certificates from the issuer’s trusted URL when configuring the SAP HANA driver?",
+      "input": "",
+      "output": "Importing the full CA chain from the issuer’s trusted URL ensures that the trust store contains all intermediate and root certificates needed to validate the server’s certificate. This reduces the risk of trust failures and guarantees that the SAP HANA driver trusts only certificates issued by a verified authority."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the SAP HANA driver in the Identity Console to use a newly created trust store?",
+      "input": "",
+      "output": "1. Log into Identity Console and navigate to **Identity Manager > Identity Manager Overview**.\n2. Locate the driver set that contains the SAP HANA driver and click the driver’s icon to open the **Identity Manager Driver Overview** page.\n3. Click the driver’s icon again, scroll down to **Driver Options**.\n4. In the **Keystore File** setting, enter the path to the trust store and the trust store password you created.\n5. Click **Apply**, then **OK** to save the configuration."
+    }
+  ]
+}

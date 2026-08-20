@@ -1,0 +1,71 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What delimiters does the SCIM driver use to convert JSON attributes into a linear SCIM format?",
+      "input": "",
+      "output": "The SCIM driver uses two delimiters: the plus sign (+) as the URN (resource) delimiter, and the colon (:) as the attribute‑sub‑attribute delimiter."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the SCIM driver represent core attributes of different types using its delimiter grammar?",
+      "input": "",
+      "output": "In the SCIM driver, core attributes are represented as follows:\n- Singular: <attribute>\n- Complex Singular: <attribute>:<subattribute>\n- Complex Multi‑valued: <attribute>:<cannonicalType>:<subattribute>"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How are extension attributes formatted by the SCIM driver when using delimiters?",
+      "input": "",
+      "output": "Extension attributes are prefixed with the URN and a plus sign (+). The formats are:\n- Singular: <urn>+<attribute>\n- Complex Singular: <urn>+<attribute>:<subattribute>\n- Complex Multi‑valued: <urn>+<attribute>:<cannonicalType>:<subattribute>"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the grammar pattern for a complex multi‑valued core attribute in the SCIM driver?",
+      "input": "",
+      "output": "<attribute>:<cannonicalType>:<subattribute>"
+    },
+    {
+      "category": "config",
+      "instruction": "What is the grammar pattern for a complex multi‑valued extension attribute in the SCIM driver?",
+      "input": "",
+      "output": "<urn>+<attribute>:<cannonicalType>:<subattribute>"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you transform the JSON singular attribute \"userName\":\"johndoe@microfocus.com\" into a SCIM attribute using the SCIM driver?",
+      "input": "",
+      "output": "The SCIM driver converts the JSON singular attribute to the SCIM attribute \"username\", following the <attribute> grammar."
+    },
+    {
+      "category": "howto",
+      "instruction": "Using the SCIM driver, how would you represent the JSON complex attribute \"phoneNumbers\":[{\"type\":\"work\",\"value\":\"09663502443\"}] as SCIM attributes?",
+      "input": "",
+      "output": "The SCIM driver produces the following linear SCIM attributes:\n- phoneNumbers (the attribute itself)\n- phoneNumbers:work (canonical type)\n- phoneNumbers:value (sub‑attribute)\n- phoneNumbers:work:value (canonical type plus sub‑attribute)"
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the SCIM driver convert an extension attribute with the URN \"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\" that contains the simple fields \"organization\" and \"employeeNumber\"?",
+      "input": "",
+      "output": "The SCIM driver creates these SCIM attributes:\n- urn:ietf:params:scim:schemas:extension:enterprise:2.0:User+Organization\n- urn:ietf:params:scim:schemas:extension:enterprise:2.0:User+employeeNumber"
+    },
+    {
+      "category": "howto",
+      "instruction": "Using the SCIM driver, how would you represent the JSON extension attribute that defines a manager with a displayName under the same enterprise URN?",
+      "input": "",
+      "output": "The SCIM driver produces the linear SCIM attribute:\nurn:ietf:params:scim:schemas:extension:enterprise:2.0:User+Manager:displayName"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the rules the SCIM driver follows to convert JSON structures into linear SCIM attributes.",
+      "input": "",
+      "output": "The SCIM driver converts JSON to linear SCIM attributes by applying two delimiters: '+' to separate a URN from an extension attribute, and ':' to separate an attribute from its sub‑attributes or canonical type. Core attributes use <attribute>, <attribute>:<subattribute>, or <attribute>:<cannonicalType>:<subattribute>. Extension attributes prepend the URN and '+' and follow the same colon‑based patterns for singular, complex, or multivalued forms."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write the exact SCIM driver utility grammar string that represents a complex multivalued extension attribute for a manager's displayName, based on the example JSON provided.",
+      "input": "",
+      "output": "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User+Manager:displayName"
+    }
+  ]
+}

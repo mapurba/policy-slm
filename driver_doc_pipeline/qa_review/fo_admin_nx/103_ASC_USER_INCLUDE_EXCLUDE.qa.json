@@ -1,0 +1,41 @@
+{
+  "driver": "FO Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ASC_USER_INCLUDE_EXCLUDE function in the FO Admin Nx driver?",
+      "input": "",
+      "output": "In the FO Admin Nx driver, the ASC_USER_INCLUDE_EXCLUDE function determines whether a specified Enterprise User ID matches an AS.USER.INCLUDE or AS.USER.EXCLUDE statement that is defined in the platform configuration file."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you use the ASC_USER_INCLUDE_EXCLUDE function in the FO Admin Nx driver to check a user against include/exclude rules?",
+      "input": "",
+      "output": "1. Include the required header:\n   ```c\n   #include <ascauth.h>\n   ```\n2. Ensure you have an ASCENV pointer (asce) that was obtained from a successful call to ASC_INIT() or ASC_INIT_EXT().\n3. Call the function with the environment pointer and the Enterprise User ID string:\n   ```c\n   int rc = ASC_USER_INCLUDE_EXCLUDE(asce, userid);\n   ```\n4. Evaluate the returned integer:\n   - AS_NOMATCH   → user does not match any INCLUDE or EXCLUDE statement (user is included by default).\n   - AS_INCLUDED  → user matches an AS.USER.INCLUDE statement.\n   - AS_EXCLUDED  → user matches an AS.USER.EXCLUDE statement or a built‑in standard exclude entry.\n   - AS_NOAUTHENV → no authentication environment has been established.\n5. Take appropriate action based on the return value."
+    },
+    {
+      "category": "config",
+      "instruction": "What parameters does the ASC_USER_INCLUDE_EXCLUDE function accept in the FO Admin Nx driver and what do they represent?",
+      "input": "",
+      "output": "The ASC_USER_INCLUDE_EXCLUDE function in the FO Admin Nx driver takes two parameters:\n\n| Parameter | Description |\n|-----------|-------------|\n| **asce**  | The environment item returned from a call to **ASC_INIT()** or **ASC_INIT_EXT()**. It represents the authentication environment that holds configuration information. |\n| **user**  | The Enterprise User ID (a null‑terminated C string) of the user to be checked against include/exclude rules. |\n\nBoth parameters must be valid; otherwise the function may return **AS_NOAUTHENV**."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does the return value AS_NOAUTHENV indicate when calling ASC_USER_INCLUDE_EXCLUDE in the FO Admin Nx driver, and how can you address it?",
+      "input": "",
+      "output": "When ASC_USER_INCLUDE_EXCLUDE returns **AS_NOAUTHENV** in the FO Admin Nx driver, it means that no authentication environment has been established for the call. To resolve this, ensure that you have successfully called **ASC_INIT()** or **ASC_INIT_EXT()** beforehand, and that the returned ASCENV pointer is correctly passed as the first argument to ASC_USER_INCLUDE_EXCLUDE."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the behavior and possible outcomes of the ASC_USER_INCLUDE_EXCLUDE function in the FO Admin Nx driver.",
+      "input": "",
+      "output": "The ASC_USER_INCLUDE_EXCLUDE function in the FO Admin Nx driver checks an Enterprise User ID against AS.USER.INCLUDE and AS.USER.EXCLUDE statements defined in the platform configuration. It returns one of four integer constants: **AS_NOMATCH** (no match, user is included by default), **AS_INCLUDED** (user matches an INCLUDE statement), **AS_EXCLUDED** (user matches an EXCLUDE statement or a built‑in exclude list), or **AS_NOAUTHENV** (no authentication environment has been set up)."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a C code fragment that calls ASC_USER_INCLUDE_EXCLUDE from the FO Admin Nx driver and prints a specific message for each possible return value.",
+      "input": "",
+      "output": "```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <ascauth.h>\n\n/* Assume 'asce' has been obtained from ASC_INIT() or ASC_INIT_EXT() */\nextern ASCENV *asce;   /* provided elsewhere */\n\nvoid check_user(const char *userid)\n{\n    int rc = ASC_USER_INCLUDE_EXCLUDE(asce, (char *)userid);\n\n    if (rc == AS_NOMATCH) {\n        printf(\"%s does not match an Include or Exclude statement (default include)\\n\", userid);\n    } else if (rc == AS_INCLUDED) {\n        printf(\"%s matches an Include statement\\n\", userid);\n    } else if (rc == AS_EXCLUDED) {\n        printf(\"%s matches an Exclude statement\\n\", userid);\n    } else if (rc == AS_NOAUTHENV) {\n        printf(\"Authentication environment not established for %s (rc=%d)\\n\", userid, rc);\n    } else {\n        printf(\"Unexpected return code %d for user %s: %s\\n\", rc, userid, ASC_STRERROR(rc));\n    }\n}\n```"
+    }
+  ]
+}

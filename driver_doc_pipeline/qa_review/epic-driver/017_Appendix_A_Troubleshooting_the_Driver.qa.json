@@ -1,0 +1,59 @@
+{
+  "driver": "Epic driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why must the configured Epic Interconnect Server URL be validated for the Epic driver?",
+      "input": "",
+      "output": "The Epic driver relies on the Epic Interconnect Server URL to establish a web‑service connection to Epic. If the URL is incorrect, the driver cannot reach the Epic services, resulting in start‑up failures or inability to synchronize data. Validating the URL ensures the driver points to a reachable and correctly formatted endpoint."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you verify that the IDM server’s firewall ports are open to allow access for the Epic driver?",
+      "input": "",
+      "output": "1. Identify the network ports required by Epic Interconnect (typically the HTTP/HTTPS ports used by the Epic web services). 2. On the IDM server, open a command prompt or terminal. 3. Use a network utility such as `telnet <EpicServerHost> <port>` or `nc -zv <EpicServerHost> <port>` to test connectivity to each required port. 4. If the connection is refused or times out, adjust the firewall rules to permit inbound/outbound traffic on those ports. 5. Re‑run the test to confirm the ports are now reachable before attempting to start the Epic driver again."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the required format for the Authentication ID setting in the Epic driver?",
+      "input": "",
+      "output": "The Authentication ID must be supplied in the format `EMP:<ID>`. For example, if the employee’s identifier is BSMITH, the Authentication ID should be entered as `EMP:BSMITH`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken when the Epic driver is not starting or connecting to Epic?",
+      "input": "",
+      "output": "1. Validate that the configured Epic Interconnect Server URL is correct.\n2. Verify that the IDM server’s firewall ports are open to allow access to Epic.\n3. Ensure the Authentication ID follows the `EMP:<ID>` format (e.g., `EMP:BSMITH`).\n4. Confirm that the Epic driver is fully activated; if not, activate it according to the \"Activating the Driver\" documentation."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How can you resolve a user update failure in the Epic driver when the user record is locked in Epic?",
+      "input": "",
+      "output": "If a user record is locked in Epic (e.g., currently open in Epic Hyperspace), the Epic driver cannot update the user and will log an error in the driver trace. To resolve the issue, close the locked record in Epic or wait until it is released, then re‑run the synchronization. Ensure the record is not being edited by another process before retrying."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What are the possible causes and recommended actions for the error \"com.sun.xml.internal.ws.client.ClientTransportException: The server sent HTTP status code 500: System.ServiceModel.ServiceActivationException\" reported in the Epic driver trace?",
+      "input": "",
+      "output": "Possible causes:\n* Scarce resources (memory or CPU) on the Epic Interconnect server.\n* Specific versions of Epic Interconnect that exhibit this behavior.\nRecommended actions:\n1. Turn on driver trace level 5 to capture detailed information.\n2. Duplicate the issue to generate a new trace entry.\n3. Provide the full URL of the web‑service endpoint that was called when the error occurred to your Epic support representative for further analysis."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do when the Epic driver trace shows the error “INVALID-CLIENT-ID details: Provided client ID is invalid”?",
+      "input": "",
+      "output": "Ensure that the Epic driver is fully activated. If activation is incomplete, follow the steps in the \"Activating the Driver\" documentation to activate the driver, then re‑attempt the operation."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "How do you address the exception “java.lang.NoSuchMethodException” that appears in the Epic driver trace?",
+      "input": "",
+      "output": "1. Recognize that this exception occurs when the driver attempts to synchronize an attribute not supported by Epic.\n2. Review the description of the message in the trace to identify the specific attribute causing the exception.\n3. Open the Epic driver’s Filter policy and verify that the identified attribute is not set to “Synchronize”. Adjust the policy to exclude the unsupported attribute, then save and re‑run the synchronization."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main troubleshooting guidance provided for the Epic driver.",
+      "input": "",
+      "output": "The Epic driver troubleshooting guide advises validating the Epic Interconnect Server URL, ensuring firewall ports are open, using the correct `EMP:<ID>` Authentication ID format, and confirming the driver is fully activated. For user update failures, ensure the Epic record is not locked. Specific error handling includes: for HTTP 500/ServiceActivationException, increase trace level and supply endpoint details to Epic support; for INVALID-CLIENT-ID, verify driver activation; and for NoSuchMethodException, remove unsupported attributes from the Filter policy. These steps help resolve connection, activation, and attribute‑related issues."
+    }
+  ]
+}

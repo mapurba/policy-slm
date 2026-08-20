@@ -1,0 +1,47 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the wd-Photo container used for in the Workday driver when synchronizing photos from Azure AD?",
+      "input": "",
+      "output": "In the Workday driver, the wd-Photo container is the designated object class that holds employee photos. Unlike Azure AD, which stores photos in the User container, Workday requires the photo to be placed in a wd-Photo instance, and the synchronization process maps the Azure AD jpegPhoto attribute to this container."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure Identity Manager to synchronize user photos from Azure AD to Workday using the Workday driver?",
+      "input": "",
+      "output": "To configure photo synchronization from Azure AD to Workday in Identity Manager, follow these steps:\n1. Open Identity Console and click the **IDM Administration** tile.\n2. On the Driver Dashboard, select the **Workday driver** icon.\n3. Choose the **Data Transformation and Synchronization** tab.\n4. In the **Subscriber** channel, add the Azure AD attribute **jpegPhoto**:\n   a. Select **User** as the class and click **Add Attribute**.\n   b. Click **Show All Attribute** and select **jpegPhoto**, then save.\n   c. Set **Publisher** to **Ignore** and **Subscriber** to **Notify** for jpegPhoto.\n5. For the Workday attribute **wd-Photo** class, set the **Subscriber** channel to **Synchronize**.\n6. Insert the provided XML policy (see the grounded pair) into the subscriber ETP after the policy named **NETQWDDCFG-sub-etp-SupportedOperations-users**.\nAfter completing these steps, any change to a user's jpegPhoto in Azure AD will be propagated to the corresponding wd-Photo record in Workday."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Publisher and Subscriber settings must be applied to the Azure AD jpegPhoto attribute in the Workday driver configuration?",
+      "input": "",
+      "output": "For the **jpegPhoto** attribute (class **User**) in the Workday driver:\n- **Publisher**: **Ignore**\n- **Subscriber**: **Notify**"
+    },
+    {
+      "category": "config",
+      "instruction": "What Subscriber channel setting is required for the Workday wd-Photo class to enable photo synchronization?",
+      "input": "",
+      "output": "Set the **Subscriber** channel of the **wd-Photo** class to **Synchronize**."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the XML policy that should be placed in the subscriber ETP to synchronize photos from Azure AD to Workday using the Workday driver.",
+      "input": "",
+      "output": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<policy>\n    <rule>\n        <description>subPhotoSync</description>\n        <comment xml:space=\"preserve\">SubPhotoSynz</comment>\n        <conditions>\n            <and>\n                <if-class-name mode=\"nocase\" op=\"equal\">User</if-class-name>\n                <if-op-attr name=\"jpegPhoto\" op=\"changing\"/>\n            </and>\n        </conditions>\n        <actions>\n            <do-set-local-variable name=\"workerID\" scope=\"policy\">\n                <arg-string>\n                    <token-attr name=\"workforceID\"/>\n                </arg-string>\n            </do-set-local-variable>\n            <do-set-local-variable name=\"eType\" scope=\"policy\">\n                <arg-string>\n                    <token-attr name=\"wd-WorkerIDType\"/>\n                </arg-string>\n            </do-set-local-variable>\n            <do-set-local-variable name=\"photoVal\" scope=\"policy\">\n                <arg-string>\n                    <token-op-attr name=\"jpegPhoto\"/>\n                </arg-string>\n            </do-set-local-variable>\n            <do-add-dest-attr-value class-name=\"wd-Photo\" name=\"photo\" when=\"after\">\n                <arg-association>\n                    <token-local-variable name=\"workerID\"/>\n                    <token-text xml:space=\"preserve\">-</token-text>\n                    <token-local-variable name=\"eType\"/>\n                </arg-association>\n                <arg-value type=\"octet\">\n                    <token-local-variable name=\"photoVal\"/>\n                </arg-value>\n            </do-add-dest-attr-value>\n        </actions>\n    </rule>\n</policy>"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might photos not appear in Workday after configuring synchronization, and how can the issue be resolved?",
+      "input": "",
+      "output": "If photos are not showing up in Workday, verify the following:\n1. The **jpegPhoto** attribute in the Azure AD **User** class is set to **Publisher: Ignore** and **Subscriber: Notify**. An incorrect setting will prevent the change event from being captured.\n2. The **wd-Photo** class in the Workday driver has its **Subscriber** channel set to **Synchronize**. Without this, the destination attribute will not be updated.\n3. The XML policy (provided in the grounded pair) must be placed **after** the policy named **NETQWDDCFG-sub-etp-SupportedOperations-users** in the subscriber ETP. If it is placed earlier, the rule may never fire.\n4. Ensure that the tokens **workforceID**, **wd-WorkerIDType**, and **jpegPhoto** contain valid values for the affected user. Missing or malformed tokens will cause the policy actions to fail.\nCorrecting any of these misconfigurations will allow the photo synchronization to execute as expected."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to synchronize user photos from Azure AD to Workday using the Workday driver in Identity Manager.",
+      "input": "",
+      "output": "To sync photos from Azure AD to Workday with the Workday driver, you must:\n1. Add the Azure AD **jpegPhoto** attribute to the **User** class in the Subscriber channel and set Publisher = Ignore, Subscriber = Notify.\n2. Set the Workday **wd-Photo** class Subscriber channel to Synchronize.\n3. Insert the provided XML policy (the subPhotoSync rule) into the subscriber ETP after the **NETQWDDCFG-sub-etp-SupportedOperations-users** policy.\nThese configurations cause any change to a user's jpegPhoto in Azure AD to be captured, transformed, and written to the corresponding wd-Photo record in Workday."
+    }
+  ]
+}

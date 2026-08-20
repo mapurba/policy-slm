@@ -1,0 +1,35 @@
+{
+  "driver": "FO Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the provisioning process for a new user added to eDirectory when the user is covered by a Census Search object in the FO Admin Nx driver?",
+      "input": "",
+      "output": "When an administrator adds a new user to eDirectory and the user is covered by a Census Search object, the FO Admin Nx driver follows these steps:\n1. The Event Subsystem detects the change and alerts Object Services.\n2. Object Services checks the Census Search; if it matches, the primary Core Driver creates an eUser object for the user in the Census container and links the user to the appropriate Platform Set container objects.\n3. If the user’s common name already exists in the Census container, the eUser object is created in the Exceptions container, requiring administrator resolution.\n4. Object Services notifies Event Journal Services.\n5. When a Platform Receiver requests the next event, Event Journal Services reads the user’s detailed information from eDirectory and forwards the provisioning event to the Platform Receiver. If directory synchronization is incomplete, the event is postponed and retried later.\n6. The Platform Receiver checks whether a user with that name already exists (unless excluded by the platform configuration file). If the user does not exist, it runs the Add User Receiver script to add the user to the local security system and reports the outcome.\n7. Finally, Event Journal Services notifies Audit Services, which logs the action in the Audit Log."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you resolve an exception that occurs when the common name of a newly added user already exists in the Census container of the FO Admin Nx driver?",
+      "input": "",
+      "output": "To resolve the exception in the FO Admin Nx driver:\n1. Recognize that the eUser object for the new user has been created in the Exceptions container because its common name duplicates an existing name in the Census container.\n2. Consult the Core Driver Administration guide (Section II) for guidance on avoiding such name collisions.\n3. As an administrator, rename either the existing user or the new user in eDirectory to ensure a unique common name.\n4. After correcting the name, verify that the eUser object moves from the Exceptions container to the appropriate Census container and that provisioning proceeds normally."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration file determines whether a user is excluded from processing by a Platform Receiver in the FO Admin Nx driver?",
+      "input": "",
+      "output": "The platform configuration file associated with each Platform Set defines exclusion rules. The FO Admin Nx driver’s Platform Receiver consults this platform configuration file to decide if a user should be excluded from processing."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should an administrator do if Event Journal Services cannot obtain new user information because directory synchronization is not yet complete in the FO Admin Nx driver?",
+      "input": "",
+      "output": "When Event Journal Services cannot retrieve the new user’s details due to incomplete directory synchronization, the FO Admin Nx driver automatically defers processing of that event. The next event for the platform is processed, and the deferred user‑addition event is retried later. No manual intervention is required; the system will retry once synchronization finishes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the steps the FO Admin Nx driver takes when a new user is added to eDirectory and covered by a Census Search object.",
+      "input": "",
+      "output": "In the FO Admin Nx driver, adding a new eDirectory user covered by a Census Search triggers the Event Subsystem, which notifies Object Services. Object Services creates an eUser object in the Census container (or Exceptions container if a name clash occurs). Event Journal Services then gathers user details and forwards a provisioning event to the appropriate Platform Receiver. The Platform Receiver checks for existing users, runs the Add User Receiver script if needed, and reports the outcome. Finally, Audit Services logs the action."
+    }
+  ]
+}

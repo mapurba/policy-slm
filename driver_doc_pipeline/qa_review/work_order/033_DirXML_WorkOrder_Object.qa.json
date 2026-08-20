@@ -1,0 +1,53 @@
+{
+  "driver": "Work Order driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the DirXML-WorkOrder object and why is it used in the Work Order driver?",
+      "input": "",
+      "output": "The DirXML-WorkOrder object, sometimes called the WorkOrder object, tells the Work Order driver what tasks to perform. It can delay execution until a specific date and time or until another work order completes, and it can repeat work orders at a defined interval."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes are defined for the DirXML-WorkOrder object in the Work Order driver, and what are their descriptions and data types?",
+      "input": "",
+      "output": "The DirXML-WorkOrder object defines the following attributes:\n| Attribute | Description | Type |\n|---|---|---|\n| Description | Description of the work order. Passed through to the WorkToDo object. | Case ignore string |\n| Common Name | The naming attribute for eDirectory. | Case ignore string |\n| DirXML-nwoContact Name | Information about the work order. Passed through to the WorkToDo object. | Case ignore string |\n| DirXML-nwoContent | Passed through to the WorkToDo object; used by policies to process the work order. | Case ignore string |\n| DirXML-DueDate | The date and time the work order is to be processed. | Time |\n| DirXML-nwoDoItNowFlag | If True, the Subscriber channel sends the work order to the Publisher channel to be processed immediately. | Boolean |\n| DirXML-nwoSendToPublisher | If True, the Subscriber channel sends the work order to the Publisher channel to be written to the WorkOrder container. | Boolean |\n| DirXML-woType | Information about the work order. Passed through to the WorkToDo object. | User defined |\n| DirXML-nwoCreationDate | Information about the work order. | Time |\n| DirXML-nwoDependentWorkOrder | DN of the dependent work order; the work order is not processed until this dependent order has a status of Configured. | Distinguished Name |\n| DirXML-nwoRepeatInterval | Amount of time, in minutes, before the work order is repeated; added to the due date after processing. | Case ignore string |\n| DirXML-nwoRepeatCount | Number of times to repeat the work order; used with DirXML-nwoRepeatInterval. | Case ignore string |\n| DirXML-nwoStatus | Status of the work order (Pending, Configured, Error, On Hold). | Case ignore string |\n| DirXML-nwoWorkOrderNumber | Information about the work order. Passed through to the WorkToDo object. | Case ignore string |\n| DirXML-nwoDeleteOnError | If True, the work order is deleted if the status is Error and the DeleteDueDate has expired. | Boolean |\n| DirXML-nwoProcessLog | Contains information relating to the processing of the work order. | Case ignore string |\n| DirXML-nwoDeleteDueDate | Shows the date and time the work order will be deleted when status is Pending or Configured. | Time |\n| DirXML-CreatorName | Information about the work order. Passed through to the WorkToDo object. | Distinguished Name |\n| DirXML-Other1 | Information about the work order. Passed through to the WorkToDo object. | Case ignore string |\n| DriXML-Other2 | Information about the work order. Passed through to the WorkToDo object. | Case ignore string |"
+    },
+    {
+      "category": "config",
+      "instruction": "Which attribute controls immediate processing of a work order in the Work Order driver, and what value must it have?",
+      "input": "",
+      "output": "The attribute DirXML-nwoDoItNowFlag controls immediate processing. It must be set to True (Boolean) for the Subscriber channel to send the work order to the Publisher channel for immediate processing."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the Work Order driver handle dependent work orders, and which attribute specifies the dependency?",
+      "input": "",
+      "output": "The Work Order driver does not process a work order until its dependent work order has a status of Configured. The dependency is specified with the DirXML-nwoDependentWorkOrder attribute, which holds the Distinguished Name of the dependent work order. If this attribute is missing or empty, the dependency is ignored."
+    },
+    {
+      "category": "config",
+      "instruction": "Which attributes are required to configure a repeating work order in the Work Order driver, and what do they represent?",
+      "input": "",
+      "output": "To configure a repeating work order, you need:\n* DirXML-nwoRepeatInterval – the amount of time, in minutes, before the work order is repeated. It is a Case ignore string and its value is added to the due date after each processing.\n* DirXML-nwoRepeatCount – the number of times the work order should repeat. It is a Case ignore string and must be used together with DirXML-nwoRepeatInterval."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a work order that is processed immediately using the Work Order driver?",
+      "input": "",
+      "output": "To create an immediately processed work order in the Work Order driver:\n1. Create a DirXML-WorkOrder object.\n2. Set the DirXML-nwoDoItNowFlag attribute to True (Boolean).\n3. Optionally set DirXML-nwoSendToPublisher to True if you also want the work order written to the WorkOrder container.\n4. Populate any required informational attributes (e.g., Description, DirXML-nwoContent, DirXML-woType).\n5. Save the object; the Subscriber channel will send it to the Publisher channel for immediate processing."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure a work order to be automatically deleted when an error occurs in the Work Order driver?",
+      "input": "",
+      "output": "To have a work order automatically deleted after an error in the Work Order driver:\n1. Create or edit the DirXML-WorkOrder object.\n2. Set the DirXML-nwoDeleteOnError attribute to True (Boolean).\n3. Ensure the DirXML-nwoDeleteDueDate attribute contains the date and time after which the work order may be deleted.\n4. Save the object; if the work order status becomes Error and the DeleteDueDate has passed, the driver will delete the work order."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key features and configurable attributes of the DirXML-WorkOrder object used by the Work Order driver.",
+      "input": "",
+      "output": "The DirXML-WorkOrder object lets the Work Order driver schedule, delay, repeat, and manage work orders. Key features include:\n* Scheduling with DirXML-DueDate.\n* Immediate execution via DirXML-nwoDoItNowFlag.\n* Dependency handling using DirXML-nwoDependentWorkOrder.\n* Repeating work orders using DirXML-nwoRepeatInterval and DirXML-nwoRepeatCount.\n* Status tracking with DirXML-nwoStatus (Pending, Configured, Error, On Hold).\n* Automatic deletion on error with DirXML-nwoDeleteOnError and DirXML-nwoDeleteDueDate.\n* Various informational attributes (Description, DirXML-nwoContent, DirXML-woType, etc.) that are passed through to the WorkToDo object unchanged."
+    }
+  ]
+}

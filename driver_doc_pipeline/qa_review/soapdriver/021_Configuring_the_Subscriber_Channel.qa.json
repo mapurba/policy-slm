@@ -1,0 +1,59 @@
+{
+  "driver": "SOAP driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Subscriber channel in the SOAP driver and what does it do?",
+      "input": "",
+      "output": "In the SOAP driver, the Subscriber channel is responsible for sending information from the Identity Vault to the Web service. It requires a secure connection, which is established by using a trust store that contains a certificate issued by the certificate authority that signed the server’s certificate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a trust store for the SOAP driver subscriber channel using keytool?",
+      "input": "",
+      "output": "To create a trust store for the SOAP driver subscriber channel:\n1. Ensure you have a server certificate that is signed by a certificate authority.\n2. At a command prompt, run the keytool import command:\n   ```\n   keytool -import -file name_of_cert_file -trustcacerts -noprompt -keystore filename -storepass password\n   ```\n   Replace *name_of_cert_file* with the certificate file name, *filename* with the desired keystore file name, and *password* with the keystore password.\n3. Example:\n   ```\n   keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell\n   ```\n   This imports the certificate *tree_ca_root.b64* into a keystore called *dirxml.keystore* with the password *novell*.\n4. For more details on keytool options, refer to the Oracle keytool documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to configure the SOAP driver subscriber channel to use the trust store in Identity Console?",
+      "input": "",
+      "output": "To configure the SOAP driver subscriber channel to use the trust store:\n1. In Identity Console, open the Identity Manager frame and click **IDM Administration**.\n2. Locate the driver set that contains the SOAP driver and click the driver’s icon to open its configuration page.\n3. Navigate to **Configuration > Driver Parameters**, then select **Subscriber Settings**.\n4. In the **Keystore File** field, specify the full path to the trust store you created (e.g., *dirxml.keystore*).\n5. Click **Apply**, then click **OK** to save the changes."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter in the SOAP driver specifies the location of the trust store for the subscriber channel?",
+      "input": "",
+      "output": "The parameter is **Keystore File** under **Subscriber Settings** in the SOAP driver configuration. It should contain the full path to the trust store file (e.g., *dirxml.keystore*)."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you configure the SOAP driver to use TLSv1 instead of SSLv3 via JVM options in Designer?",
+      "input": "",
+      "output": "In Designer:\n1. Right‑click the driver set that contains the SOAP driver.\n2. Choose **Properties > Java**.\n3. In the JVM options field, add the option **Dhttps.protocols=TLSv1**.\n4. Click **Apply** and then **OK**.\nThis forces the SOAP driver to initiate connections using only the TLSv1 protocol."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you set the JVM option to use TLSv1 for the SOAP driver in Identity Console?",
+      "input": "",
+      "output": "In Identity Console:\n1. Click the action‑menu icon (⋮) and select **Driver Set properties**.\n2. Go to **Driver set configuration > Java Environment Parameters** tab.\n3. Add the JVM option **Dhttps.protocols=TLSv1**.\n4. Click **Apply** and then **OK**.\nThis configures the SOAP driver to communicate only over TLSv1."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you set the JVM option for the SOAP driver when using the Remote Loader?",
+      "input": "",
+      "output": "When the SOAP driver is using the Remote Loader, edit the Remote Loader’s configuration file and add the following option:\n```\n-javaparam DHOST_JVM_OPTIONS=-Dhttps.protocols=TLSv1\n```\nThis ensures the Remote Loader starts the SOAP driver with TLSv1 as the only protocol."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the SOAP driver attempts to connect using SSLv3 and fails, what configuration change should you make to force TLSv1?",
+      "input": "",
+      "output": "Modify the JVM settings for the SOAP driver to include the option **Dhttps.protocols=TLSv1**. You can apply this option in Designer, in Identity Console under Java Environment Parameters, or via the Remote Loader’s -javaparam setting. After the change, the SOAP driver will only initiate connections using TLSv1 and will no longer try SSLv3."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to secure the subscriber channel for the SOAP driver.",
+      "input": "",
+      "output": "To secure the subscriber channel for the SOAP driver you must:\n1. Obtain a server certificate signed by a trusted certificate authority.\n2. Import the certificate into a new or existing trust store using the **keytool -import** command (e.g., `keytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell`).\n3. In Identity Console, locate the SOAP driver, go to **Configuration > Driver Parameters > Subscriber Settings**, and set the **Keystore File** to the path of the trust store.\n4. Apply and save the configuration.\n5. Optionally, force the driver to use TLSv1 instead of SSLv3 by setting the JVM option **Dhttps.protocols=TLSv1** via Designer, Identity Console, or the Remote Loader configuration."
+    }
+  ]
+}

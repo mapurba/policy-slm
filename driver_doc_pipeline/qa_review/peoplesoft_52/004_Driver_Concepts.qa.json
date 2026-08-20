@@ -1,0 +1,53 @@
+{
+  "driver": "PeopleSoft driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the Driver Shim in the PeopleSoft driver?",
+      "input": "",
+      "output": "In the PeopleSoft driver, the Driver Shim (psoftshim.jar) enables communication between PeopleSoft and the Identity Vault. It bidirectionally reports object change events and applies object modification commands between these systems."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the Driver Packages used for in the PeopleSoft driver?",
+      "input": "",
+      "output": "The Driver Packages in the PeopleSoft driver contain configuration information and policies that enable Identity Manager to handle synchronization and data object manipulation between PeopleSoft and the Identity Vault. They act as a template with common synchronization tasks that you can customize for your business processes."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is the PeopleSoft Service Agent (PSA) not intended for production use in the PeopleSoft driver?",
+      "input": "",
+      "output": "The PeopleSoft Service Agent (PSA) is provided as a template that contains most common synchronization tasks for typical integration scenarios. It is meant for demonstration and as a starting point; you should configure your own policies and objects based on your business processes. Therefore, the PSA is not intended for production because it may not meet the specific requirements and security considerations of a live environment."
+    },
+    {
+      "category": "howto",
+      "instruction": "What two configuration tasks must be performed in a PeopleSoft environment to use the PeopleSoft driver?",
+      "input": "",
+      "output": "To use the PeopleSoft driver, you must configure your PeopleSoft application to:\n1. Trap events that occur within PeopleSoft and place transactions into a transaction table.\n2. Expose the transactions and any other desired data to the driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the PeopleSoft driver synchronize data from PeopleSoft to Identity Vault using the Publisher channel?",
+      "input": "",
+      "output": "In the PeopleSoft driver, the Publisher channel works as follows:\n1. Events occurring in PeopleSoft create transactions that are written to a transaction table (via PeopleCode or other methods).\n2. The driver connects to PeopleSoft through Component Interface (CI) objects at the Application Server level and periodically requests transactions with an \"available\" status and a transaction date/time less than or equal to the current time.\n3. For each transaction, the driver builds an XML document with the retrieved data and sends it to the Identity Manager engine.\n4. After the Identity Manager engine processes the XML, the driver updates the transaction record with the status and any messages.\n5. If events occur in Identity Vault, the driver can poll the Application Server and update the PeopleSoft staging table accordingly."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the PeopleSoft driver update PeopleSoft from Identity Vault using the Subscriber channel?",
+      "input": "",
+      "output": "In the PeopleSoft driver, the Subscriber channel operates as follows:\n1. When events occur in Identity Vault, the Identity Manager engine sends an XML document to the driver.\n2. The driver receives the XML and, based on the configured filter on the Subscriber channel, determines which data should be updated in PeopleSoft.\n3. Using the Schema Component Interface (CI), the driver updates a staging table within the PeopleSoft environment.\n4. To move the data from the staging table into the PeopleSoft application, you create and apply PeopleCode that processes the staging table transactions."
+    },
+    {
+      "category": "config",
+      "instruction": "List the components that are included in the PeopleSoft driver.",
+      "input": "",
+      "output": "The PeopleSoft driver includes the following components:\n* Driver Shim (psoftshim.jar)\n* Driver Packages\n* PeopleSoft Service Agent (PSA)"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key concepts covered on the PeopleSoft driver concepts page.",
+      "input": "",
+      "output": "The PeopleSoft driver concepts page explains that the driver consists of three main components—the Driver Shim for bidirectional communication, Driver Packages for configuration and policies, and the PeopleSoft Service Agent as a sample set of PeopleSoft objects. It describes how the driver works through a Publisher channel (PeopleSoft ➜ Identity Vault) that reads transactions from a PeopleSoft table, builds XML, and sends it to Identity Manager, and a Subscriber channel (Identity Vault ➜ PeopleSoft) that receives XML, updates a staging table, and requires PeopleCode to move data into PeopleSoft. The page also outlines the two necessary PeopleSoft configuration steps (trapping events into a transaction table and exposing data to the driver) and lists the capabilities the driver provides when configured with Identity Manager."
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "driver": "eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "howto",
+      "instruction": "How do you configure the eDirectory driver to start user synchronization immediately after a failover in a Linux High Availability cluster?",
+      "input": "",
+      "output": "1. In the Publisher options, set the **Receive timeout in minutes** option to a smaller value.\n2. Remove the port number from the **Authentication Context**.\n3. Specify two different ports: one for the **Subscriber** settings and a different one for the **Publisher** settings.\n4. In the Subscriber settings, open **Advanced options**, enable **Socket local bind**, and enter the IP address where eDirectory is listening in the **Local bind address for the subscriber socket** field (required when multiple IP addresses exist).\n5. In the Publisher settings, set the **Local bind address for the subscriber socket** to the same IP address used in step 4."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration properties must be set in the eDirectory driver after a failover to ensure proper synchronization?",
+      "input": "",
+      "output": "- **Receive timeout in minutes** (Publisher option) – set to a smaller value.\n- **Authentication Context** – delete the existing port number.\n- **Subscriber port** – specify a unique port number.\n- **Publisher port** – specify a different unique port number.\n- **Socket local bind** (Subscriber Advanced options) – enable this option.\n- **Local bind address for the subscriber socket** (Subscriber) – enter the eDirectory listening IP address.\n- **Local bind address for the subscriber socket** (Publisher) – enter the same IP address used for the subscriber."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why should the Receive timeout in minutes option be reduced in the eDirectory driver after a cluster failover?",
+      "input": "",
+      "output": "Reducing the **Receive timeout in minutes** makes the Publisher stop waiting for a response more quickly, allowing the eDirectory driver to attempt synchronization sooner after the failover. This speeds up the recovery of user synchronization in a Linux High Availability environment."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "When must you specify a local bind IP address in the eDirectory driver configuration?",
+      "input": "",
+      "output": "You must specify a **Local bind address for the subscriber socket** when the High Availability setup has multiple IP addresses. The specified IP address is where eDirectory is listening and ensures the subscriber binds to the correct network interface."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps to synchronize eDirectory objects after a failover in a Linux High Availability cluster using the eDirectory driver.",
+      "input": "",
+      "output": "After a failover, adjust the eDirectory driver as follows: lower the Publisher’s **Receive timeout in minutes**, remove the Authentication Context port and assign distinct ports to the Subscriber and Publisher, enable **Socket local bind** in the Subscriber’s Advanced options and set the **Local bind address for the subscriber socket** to the eDirectory listening IP (required when multiple IPs exist), and replicate that same IP address in the Publisher’s settings. These changes ensure immediate user synchronization."
+    }
+  ]
+}

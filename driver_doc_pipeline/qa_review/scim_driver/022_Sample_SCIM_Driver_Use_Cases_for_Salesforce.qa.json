@@ -1,0 +1,65 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why must the auxiliary class scim-User be added to the object class attribute when using the SCIM driver with Salesforce?",
+      "input": "",
+      "output": "In the SCIM driver, the auxiliary class scim-User is required because without it the SCIM‑related attributes such as scim-Entitlementsvalue and scim-Address are not exposed. Consequently, a user created in Identity Console would not synchronize to Salesforce. Adding the auxiliary class ensures that these attributes are available for provisioning."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the role of the scim-Entitlementsvalue attribute when provisioning users with the SCIM driver to Salesforce?",
+      "input": "",
+      "output": "The scim-Entitlementsvalue attribute holds entitlement information for a user. When using the SCIM driver to sync a user to Salesforce, this attribute must be provided; otherwise the user will not be synchronized because the SCIM driver requires it to complete the provisioning process."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add a new user in Identity Manager so that it syncs to Salesforce using the SCIM driver?",
+      "input": "",
+      "output": "1. In Identity Manager, create the user and fill in required details (first name, last name, email, etc.).\n2. Add the auxiliary class **scim-User** to the object's class attribute.\n3. Provide a value for the **scim-Entitlementsvalue** attribute (e.g., <00e2x000000K4Yv>).\n4. Save the user. The SCIM driver will issue a **POST** request to the endpoint `https://<tenantname>.salesforce.com/services/scim/<current version>/Users` to provision the user in Salesforce."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you remove a member from a Salesforce group using the SCIM driver?",
+      "input": "",
+      "output": "1. Identify the Salesforce group ID (<salesforce-groupid>) and the member’s user ID.\n2. Issue a **PUT** request to the endpoint `https://<tenantname>.salesforce.com/services/scim/<current version>/Groups/<salesforce-groupid>` with a payload that removes the member entry from the group's members list.\n3. The SCIM driver will process the request and update the group in Salesforce, effectively removing the member."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the sample SCIM endpoint URLs and HTTP methods for adding, deleting, and modifying a user with the SCIM driver?",
+      "input": "",
+      "output": "| Operation | Sample SCIM endpoint | Method |\n|---|---|---|\n| Adding a user | https://<tenantname>.salesforce.com/services/scim/<current version>/Users | POST |\n| Deleting a user | https://<tenantname>.salesforce.com/services/scim/<current version>/Users/<salesforce-userid> | DELETE |\n| Modifying a user | https://<tenantname>.salesforce.com/services/scim/<current version>/Users/<salesforce-userid> | PUT |\n| Polling a user | https://<tenantname>.salesforce.com/services/scim/<current version>/Users/ | GET |\n| Querying a user | https://<tenantname>.salesforce.com/services/scim/<current version>/Users/<salesforce-userid> | GET |\n*Note: Complex JSON attributes cannot be queried via the dxcmd utility.*"
+    },
+    {
+      "category": "config",
+      "instruction": "List the sample SCIM endpoint URLs and HTTP methods for group operations using the SCIM driver.",
+      "input": "",
+      "output": "| Operation | Sample SCIM endpoint | Method |\n|---|---|---|\n| Adding a group | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups | POST |\n| Adding member to a group | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups | PUT |\n| Removing member from a group | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups/<salesforce-groupid> | PUT |\n| Renaming group object | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups/<salesforce-groupid> | PUT |\n| Deleting a group | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups/<salesforce-groupid> | DELETE |\n| Migrating a group | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups | PUT/GET |\n| Polling a group | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups | GET |\n| Querying a group | https://<tenantname>.salesforce.com/services/scim/<current version>/Groups | GET |\n*Note: Complex JSON attributes cannot be queried via the dxcmd utility.*"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does modifying a user's email address in Identity Manager not update the email in Salesforce even though the SCIM driver returns a 200 success code?",
+      "input": "",
+      "output": "Salesforce does not support updating the email attribute via the SCIM interface. When the SCIM driver sends a **PUT** request to modify the email, Salesforce ignores the change but still returns an HTTP 200 status, which appears as a successful operation in the driver logs. This is a known limitation of Salesforce's SCIM implementation."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What limitation does the SCIM driver have when renaming a group in Identity Manager for Salesforce?",
+      "input": "",
+      "output": "When a group is renamed in Identity Manager, the SCIM driver updates only the **label** attribute of the group in Salesforce. The **name** attribute remains unchanged, so the underlying group identifier does not reflect the new name."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the sample use cases and known observations for the SCIM driver with Salesforce.",
+      "input": "",
+      "output": "The SCIM driver enables Identity Manager to add, delete, modify, migrate, poll, and query users and public groups in Salesforce via RESTful SCIM endpoints. Adding users requires the auxiliary class scim-User and the scim-Entitlementsvalue attribute. Salesforce does not support user renaming, email updates, or the canonical phone type. Group renaming only changes the label, not the name. By default, only up to 10 users can be polled in a single GET request."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a sample SCIM endpoint URL for adding a public group to Salesforce using the SCIM driver, assuming the tenant name is \"ap16\" and the current version is \"v2\".",
+      "input": "",
+      "output": "https://ap16.salesforce.com/services/scim/v2/Groups"
+    }
+  ]
+}

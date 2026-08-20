@@ -1,0 +1,59 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Location attribute in the Google Apps driver and what data elements does it contain?",
+      "input": "",
+      "output": "In the Google Apps driver, the Location attribute is a structured attribute that represents a set of location values taken from the Google user object. It is composed of the following data elements: area (textual location, e.g., \"Mountain View, CA\"), buildingId (building identifier), deskCode (most specific textual code of an individual desk), floorName (floor name/number), and floorSection (specific section of a floor, e.g., \"A\", \"B\", \"C\")."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What are the possible values for the type component of the Location attribute in the Google Apps driver?",
+      "input": "",
+      "output": "The type component of the Location attribute in the Google Apps driver can take three acceptable values: desk, default, or custom. If the value custom is chosen, an additional element customType must be supplied."
+    },
+    {
+      "category": "config",
+      "instruction": "List all components of the structured Location attribute in the Google Apps driver and indicate which are mandatory, optional, and any constraints.",
+      "input": "",
+      "output": "Components of the structured Location attribute in the Google Apps driver:\n\n- type: Mandatory. Must be one of desk, default, or custom.\n- customType: Mandatory only when type is custom; ignored otherwise.\n- area: Optional, string.\n- buildingId: Optional, string. The value MUST resolve to an existing building resource in the Google domain.\n- deskCode: Optional, string.\n- floorName: Optional, string.\n- floorSection: Optional, string."
+    },
+    {
+      "category": "config",
+      "instruction": "What constraint does the Google Apps driver impose on the buildingId component of the Location attribute?",
+      "input": "",
+      "output": "The Google Apps driver requires that the buildingId value resolve to a building resource that exists in the Google domain. If the buildingId does not refer to a valid building resource, the API stack will reject the value."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add a default type location value using the modify-attr element in the Google Apps driver?",
+      "input": "",
+      "output": "To add a default type location value in the Google Apps driver, use the following XML fragment:\n\n```xml\n<modify-attr attr-name=\"Location\">\n  <add-value>\n    <value type=\"structured\">\n      <component name=\"type\">default</component>\n      <component name=\"customType\"/>\n      <component name=\"area\">MyArea</component>\n      <component name=\"buildingId\"/>\n      <component name=\"deskCode\">Desk1121</component>\n      <component name=\"floorName\">1st Floor</component>\n      <component name=\"floorSection\"/>\n    </value>\n  </add-value>\n</modify-attr>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you remove a default type location value using the modify-attr element in the Google Apps driver?",
+      "input": "",
+      "output": "To remove a default type location value in the Google Apps driver, use the following XML fragment. Only the type component (and customType if needed) is examined; other components are ignored.\n\n```xml\n<modify-attr attr-name=\"Location\">\n  <remove-value>\n    <value type=\"structured\">\n      <component name=\"type\">default</component>\n    </value>\n  </remove-value>\n</modify-attr>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a buildingId value be rejected when using the Location attribute in the Google Apps driver, and how can you resolve it?",
+      "input": "",
+      "output": "A buildingId value will be rejected by the Google Apps driver if it does not correspond to an existing building resource within the Google domain. To resolve this, ensure that the building resource has been created and is visible in the Google Admin interface, then use the correct buildingId that matches that resource."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about the Location attribute handling in the Google Apps driver.",
+      "input": "",
+      "output": "The Google Apps driver exposes the Location attribute as a structured attribute containing area, buildingId, deskCode, floorName, and floorSection. Each location set is identified by a type (desk, default, or custom); custom types require a customType component. Only one instance of each type/customType combination is allowed, and adding a new set of the same type replaces the existing one. BuildingId values must reference an existing building resource in the domain, otherwise the API rejects them. Adding or removing locations is performed with modify-attr XML, where removal only needs the type (and customType if applicable)."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML fragment to add a custom type location with customType 'office' and area 'Seattle' in the Google Apps driver.",
+      "input": "",
+      "output": "```xml\n<modify-attr attr-name=\"Location\">\n  <add-value>\n    <value type=\"structured\">\n      <component name=\"type\">custom</component>\n      <component name=\"customType\">office</component>\n      <component name=\"area\">Seattle</component>\n      <component name=\"buildingId\"/>\n      <component name=\"deskCode\"/>\n      <component name=\"floorName\"/>\n      <component name=\"floorSection\"/>\n    </value>\n  </add-value>\n</modify-attr>\n```"
+    }
+  ]
+}

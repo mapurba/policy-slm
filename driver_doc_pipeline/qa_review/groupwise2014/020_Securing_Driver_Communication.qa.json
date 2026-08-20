@@ -1,0 +1,65 @@
+{
+  "driver": "GroupWise driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the \"Always accept server certificate\" setting control in the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, the \"Always accept server certificate\" setting determines whether the driver automatically trusts the GroupWise server’s SSL certificate for establishing an SSL connection. When set to True, the driver accepts the server’s certificate without requiring you to import the certificate into a keystore."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter is used to specify the location of the keystore file for the GroupWise driver?",
+      "input": "",
+      "output": "In the GroupWise driver, the keystore file location is entered in the **Subscriber Settings** section under **Configuration > Driver Parameters**. You provide the complete file system path to the keystore file in this field."
+    },
+    {
+      "category": "config",
+      "instruction": "What file format must the GroupWise server certificate be in before it can be added to the keystore for the GroupWise driver?",
+      "input": "",
+      "output": "The GroupWise server certificate must be saved in **DER** format (a file with a .der extension) before it can be imported into the keystore used by the GroupWise driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import a GroupWise server certificate into a Java keystore for use with the GroupWise driver?",
+      "input": "",
+      "output": "To import a GroupWise server certificate into a Java keystore for the GroupWise driver:\n1. Export the server certificate from a web browser in **DER** format and save it locally (e.g., `PublicKeyCert.der`).\n2. Open a command line and run the following keytool command (using Java 1.7 or later):\n   ```\n   keytool -import -file PATH_OF_DERFile\\PublicKeyCert.der -keystore KEYSTOREPATH\\NAME.keystore -storepass keystorepass\n   ```\n3. When prompted to trust the certificate, answer **Yes**.\n4. Copy the resulting `.keystore` file to a directory on the same file system where Identity Manager is running."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to configure the GroupWise driver to use the imported keystore after the certificate has been added?",
+      "input": "",
+      "output": "After importing the certificate into a keystore, configure the GroupWise driver as follows:\n1. Open **Identity Console** and click **IDM Administration**.\n2. Select the driverset that contains the GroupWise driver and click the **GroupWise driver** icon.\n3. Navigate to **Configuration > Driver Parameters**.\n4. In the **Subscriber Settings**, enter the full path to the keystore file you copied earlier.\n5. Specify the keystore password in the provided field.\n6. Click **Save** to apply the configuration."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the keytool command fails when importing the GroupWise server certificate, what should you verify according to the documentation?",
+      "input": "",
+      "output": "If the keytool command fails, verify that you are using **Java 1.7 keytool** (or a later version). The documentation notes that the command may not work with versions earlier than Java 1.7."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the process for securing communication between the GroupWise driver and the GroupWise server.",
+      "input": "",
+      "output": "The GroupWise driver secures communication via SSL. You can either set the **Always accept server certificate** option to True, allowing the driver to trust the server automatically, or import the server’s SSL certificate (saved as a .der file) into a Java keystore using Java 1.7 keytool. After importing, copy the keystore to the Identity Manager host, then configure the driver in Identity Console by providing the keystore path and password under Subscriber Settings, and finally save the configuration."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the GroupWise driver documentation recommend using Java 1.7 keytool for importing the certificate?",
+      "input": "",
+      "output": "The documentation recommends Java 1.7 keytool because earlier Java versions may not support the certificate import command correctly, and the command might fail. Using Java 1.7 ensures compatibility with the import operation."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the name of the field where you enter the keystore password for the GroupWise driver configuration?",
+      "input": "",
+      "output": "In the GroupWise driver configuration, the keystore password is entered in the **keystore password** field within the **Subscriber Settings** section."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you set the \"Always accept server certificate\" option to True during driver configuration for the GroupWise driver?",
+      "input": "",
+      "output": "During driver configuration for the GroupWise driver, locate the setting named **Always accept server certificate** and change its value to **True**. This can be done in the driver configuration wizard (see Step 11 in the driver creation documentation)."
+    }
+  ]
+}

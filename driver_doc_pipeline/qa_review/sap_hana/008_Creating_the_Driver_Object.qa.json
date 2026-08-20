@@ -1,0 +1,83 @@
+{
+  "driver": "SAP HANA driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the SAP HANA driver packages and why are they needed when creating a driver object?",
+      "input": "",
+      "output": "The SAP HANA driver packages contain the items required to create a driver, such as policies, entitlements, filters, and Schema Mapping policies. They are needed because they provide the core components that the driver uses to interact with the SAP HANA data source, and they can be updated after the initial installation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the current SAP HANA driver packages into Designer?",
+      "input": "",
+      "output": "1. Open Designer.\n2. In the Outline view, right‑click the Package Catalog.\n3. Click **Import Package**.\n4. Browse to the location where you downloaded the SAP HANA packages.\n5. Select the required packages for SAP HANA, or click **Select All** to import all displayed packages.\n6. Click **OK** to import the selected packages, then click **OK** in the \"successfully imported packages\" message.\n7. After the packages are imported, continue with installing and configuring the driver object."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the step‑by‑step actions to install and configure a SAP HANA driver object in Designer?",
+      "input": "",
+      "output": "1. In Designer, open your project.\n2. From the Palette, drag‑and‑drop the **SAP HANA driver** (found under the Enterprise category) onto the desired driver set in the Modeler.\n3. Select the required packages you want to install for the SAP HANA driver and click **Next**.\n4. Click **OK** on the Package Dependencies screen.\n5. Fill the **Driver Name** field and click **Next**.\n6. On the Driver Parameters page, enter values for Driver Options, Cache Parameters, and Advanced Parameters as described in the documentation, then click **Next**.\n7. Complete the Subscriber Options (assign user to default user group) and click **OK**.\n8. Fill the Publisher Options (enable channel, migration and polling settings, intervals) and click **Next**.\n9. Configure the Remote Loader information (Host Name, Port, KMO, Remote Loader Password, Driver Password) if you choose to use a Remote Loader, then click **Next**.\n10. Review the summary and click **Finish**.\n11. After installation, you can modify the configuration as needed."
+    },
+    {
+      "category": "config",
+      "instruction": "Which authentication options can be configured in the Driver Options of the SAP HANA driver, and what does each option require?",
+      "input": "",
+      "output": "The SAP HANA driver offers the following authentication options:\n- **Username** – Requires the user name of the SAP HANA database.\n- **Password** – Requires the database password.\n- **SQL Endpoint** – Requires the SAP HANA SQL endpoint details, e.g., `<server>:<port>` (example: `myServer:30015`) or `<endpoint>:<port>` (example: `1234568-abcd-12ab-34cd-1234abcd.hana.hanacloud.ondemand.com:443`).\n- **Use SSL Connection** – Set to **True** to enable SSL. When True, you must provide **Truststore Path** and **Truststore Password**; if omitted, the driver searches the default Java keystore."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you enable SSL connection for the SAP HANA driver and what are the required fields?",
+      "input": "",
+      "output": "In the Driver Options section, set **Use SSL Connection** to **True**. Then provide the following fields:\n- **Truststore Path** – The file system path to the truststore containing the SSL certificate.\n- **Truststore Password** – The password for the truststore.\nIf these fields are not provided, the driver will look for the certificate in the default Java keystore."
+    },
+    {
+      "category": "config",
+      "instruction": "What field defines where temporary files are stored for the SAP HANA driver, and how is it configured?",
+      "input": "",
+      "output": "The **Cache Directory Path** field, found under **Cache Parameters**, defines where temporary files are stored. You can leave it blank to use the default cache path, or enter a custom directory path to store the temporary files."
+    },
+    {
+      "category": "config",
+      "instruction": "How can you configure paging for the SAP HANA driver, and which parameter controls the number of pages processed at a time?",
+      "input": "",
+      "output": "In the **Advanced Parameters** section, set the field to **Show** (by default it is **Hide**). Then, under **Paging Parameters**, specify the **Page Size** value, which determines the number of pages the driver processes at a time."
+    },
+    {
+      "category": "config",
+      "instruction": "What Subscriber Options are available in the SAP HANA driver and how do you assign a user to a default user group?",
+      "input": "",
+      "output": "Subscriber Options include **Assign User to a default UserGroup** (default **Yes**). If set to **Yes**, the **Default usergroup name** field becomes enabled; by default it is **DEFAULT**, but you can edit it to any user group name you require."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Publisher Options control user migration and polling in the SAP HANA driver, and what are their default values?",
+      "input": "",
+      "output": "Publisher Options for users include:\n- **Migrate Users on Driver Startup** – Valid only at startup; when **True**, migration starts on driver startup; when **False**, regular polling starts.\n- **Poll Users** – Default **True**; polls users from SAP HANA during migration.\n- **Exclude Users** – Allows you to list user name prefixes; any user whose name starts with a listed prefix will be excluded from migration and polling.\nThe default for **Enable Publisher Channel** is **Yes**."
+    },
+    {
+      "category": "config",
+      "instruction": "What settings are available for migrating and polling user groups in the SAP HANA driver, and what are their defaults?",
+      "input": "",
+      "output": "User Group settings under Publisher Options:\n- **Migrate User Groups on Driver Startup** – Same startup‑only behavior as user migration.\n- **Poll User Groups** – Default **False**; when enabled, the driver polls user groups during migration.\n- **Exclude User Groups** – You can specify prefixes to exclude system‑generated user groups from migration and polling."
+    },
+    {
+      "category": "config",
+      "instruction": "How do you set the polling interval and heartbeat interval for the SAP HANA driver, and what are their default values?",
+      "input": "",
+      "output": "In the Publisher Options:\n- **Polling Interval** – Specifies the number of minutes between polling cycles (no default value is listed; you must enter a value).\n- **Heartbeat Interval** – Configures how often the driver shim sends a status message when there is no Publisher traffic; the default is **10 minutes**."
+    },
+    {
+      "category": "config",
+      "instruction": "What information must be provided to configure the SAP HANA driver to use a Remote Loader, and what are the default values for the Remote Loader port?",
+      "input": "",
+      "output": "When **Connect To Remote Loader** is set to **Yes**, you must provide:\n- **Host Name** – IP address or DNS name of the server running the Remote Loader.\n- **Port** – The port number for this driver; each driver uses a separate port. The default port is **8090**.\n- **KMO** – The Key Material Object nickname that contains the SSL keys and certificate (e.g., `kmo=remotecert`). If the certificate name contains spaces, enclose the nickname in single quotes.\n- **Remote Loader Password** – Password that controls access to the Remote Loader; must match the password set on the Remote Loader.\n- **Driver Password** – Password for the driver to authenticate to the Identity Manager server; must match the Driver Object Password configured on the Remote Loader."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete process for creating and configuring a SAP HANA driver object in NetIQ Identity Manager.",
+      "input": "",
+      "output": "To create a SAP HANA driver object, first import the latest SAP HANA driver packages into Designer via the Package Catalog. Then drag the SAP HANA driver from the Enterprise palette onto a driver set, select required packages, and name the driver. Configure Driver Options (authentication type, SSL, cache path, paging), Subscriber Options (default user group assignment), and Publisher Options (enable channel, migration and polling settings for users, user groups, and roles, plus polling and heartbeat intervals). Optionally configure Remote Loader connection details (host, port, KMO, passwords). Review the summary and finish the wizard. After deployment to the Identity Vault and driver start, you can modify the configuration as needed."
+    }
+  ]
+}

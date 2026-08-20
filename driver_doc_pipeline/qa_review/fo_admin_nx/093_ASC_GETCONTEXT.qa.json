@@ -1,0 +1,53 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ASC_GETCONTEXT function in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, ASC_GETCONTEXT obtains a user's fully distinguished object name from the Census and copies that name into a caller‑supplied buffer."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you use ASC_GETCONTEXT to retrieve a user’s context in a C program that uses the Fo Admin Nx driver?",
+      "input": "",
+      "output": "To use ASC_GETCONTEXT with the Fo Admin Nx driver:\n1. Include the header `#include <ascauth.h>`.\n2. Create an authentication environment by calling `ASCENV *asce = ASC_INIT(NULL);` and verify the return is not NULL.\n3. Allocate a buffer large enough to hold the context, e.g., `char *context = malloc(MAX_CONTEXT);` where `MAX_CONTEXT` is the buffer size.\n4. Call `int rc = ASC_GETCONTEXT(asce, user, context, MAX_CONTEXT);` passing the environment pointer, the Enterprise User ID, the buffer, and its size.\n5. Check the return value `rc`. If it equals `AS_OK`, the buffer contains the context string; otherwise handle the error (e.g., use `ASC_STRERROR(rc)`).\n6. Free the buffer with `free(context)` when done.\n7. Terminate the authentication environment with `ASC_TERM(asce);`."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the parameters required by ASC_GETCONTEXT in the Fo Admin Nx driver and what does each represent?",
+      "input": "",
+      "output": "The ASC_GETCONTEXT function in the Fo Admin Nx driver takes four parameters:\n\n| Parameter | Description |\n|-----------|-------------|\n| `asce` | The environment item returned from the call to `ASC_INIT()` or `ASC_INIT_EXT()`. |\n| `user` | The Enterprise User ID whose context is being requested. |\n| `buffer` | A caller‑allocated buffer that will receive the context string. If the buffer is too small, the call returns `AS_TOOSMALL`. |\n| `size` | The length in bytes of the allocated buffer. |\n\nThe caller must allocate `buffer` large enough to hold the entire context string."
+    },
+    {
+      "category": "config",
+      "instruction": "List all possible return values of ASC_GETCONTEXT in the Fo Admin Nx driver and explain the meaning of each.",
+      "input": "",
+      "output": "ASC_GETCONTEXT in the Fo Admin Nx driver can return the following integer codes defined in `ascauth.h`:\n\n| Return Code | Meaning |\n|-------------|---------|\n| `AS_OK` | Context was found successfully. |\n| `AS_NOUSER` | User is inactive or not found in the Census. |\n| `AS_BADCLIENT` | Local host is not authorized to query the Core Driver. |\n| `AS_NOAGENT` | No Core Driver could be contacted. |\n| `AS_NOAUTHENV` | No authentication environment has been established. |\n| `AS_INVALIDREQ` | Call rejected by the Core Driver as not valid or not supported. |\n| `AS_INVALIDARGS` | Invalid arguments were supplied to the function. |\n| `AS_TOOSMALL` | Provided buffer size is too small; result was truncated. |\n| `AS_KEYEXPIRED` | The authentication key used is expired. |"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "When ASC_GETCONTEXT returns AS_TOOSMALL in the Fo Admin Nx driver, what steps should you take to resolve the issue?",
+      "input": "",
+      "output": "If ASC_GETCONTEXT returns `AS_TOOSMALL` in the Fo Admin Nx driver, it means the buffer you supplied is not large enough to hold the full context string. To resolve:\n1. Increase the size of the buffer you allocate (e.g., define a larger constant such as `#define MAX_CONTEXT 1024`).\n2. Reallocate the buffer accordingly before calling ASC_GETCONTEXT again.\n3. Optionally, you can call ASC_GETCONTEXT with a small buffer to obtain the required size indirectly (if the API provides such a mechanism), then allocate the exact size.\n4. After resizing, repeat the call and verify that the return value is now `AS_OK`."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does the AS_BADCLIENT return value indicate for ASC_GETCONTEXT in the Fo Admin Nx driver and how can you address it?",
+      "input": "",
+      "output": "`AS_BADCLIENT` returned by ASC_GETCONTEXT in the Fo Admin Nx driver indicates that the local host from which the request is made is not authorized to query the Core Driver. To address this:\n1. Verify that the host machine is listed as an authorized client in the Core Driver’s configuration.\n2. Add the host to the allowed client list if it is missing, using the administrative tools for the Fo Admin Nx driver.\n3. Ensure that any network security policies or firewalls are not blocking the communication between the host and the Core Driver.\n4. After updating the authorization settings, restart the Fo Admin Nx service (if required) and retry the ASC_GETCONTEXT call."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using ASC_GETCONTEXT with the Fo Admin Nx driver.",
+      "input": "",
+      "output": "ASC_GETCONTEXT in the Fo Admin Nx driver retrieves a user's fully distinguished object name from the Census into a caller‑provided buffer. It requires an initialized authentication environment (`ASC_INIT`/`ASC_INIT_EXT`), the user ID, a buffer, and the buffer size. The function returns various status codes (e.g., `AS_OK`, `AS_NOUSER`, `AS_TOOSMALL`). The returned context is formatted in simple dot form (e.g., `.jondoe.j.myorg`) and the buffer is null‑padded if needed. Proper error handling includes checking for `AS_TOOSMALL` and resizing the buffer, and ensuring the local host is authorized to query the Core Driver."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a minimal C code example that initializes the Fo Admin Nx driver, obtains the context for a user named \"jdoe\", checks for errors, prints the context, and then cleans up.",
+      "input": "",
+      "output": "#include <stdio.h>\n#include <stdlib.h>\n#include <ascauth.h>\n\n#define MAX_CONTEXT 512\n\nint main(void)\n{\n    ASCENV *asce;\n    char *context;\n    int rc;\n    const char *user = \"jdoe\";\n\n    /* allocate buffer */\n    context = (char *)malloc(MAX_CONTEXT);\n    if (context == NULL) {\n        fprintf(stderr, \"Failed to allocate buffer\\n\");\n        return EXIT_FAILURE;\n    }\n\n    /* initialize authentication environment */\n    asce = ASC_INIT(NULL);\n    if (asce == NULL) {\n        fprintf(stderr, \"Error: cannot initialize authentication environment\\n\");\n        free(context);\n        return EXIT_FAILURE;\n    }\n\n    /* get the user's context */\n    rc = ASC_GETCONTEXT(asce, (char *)user, context, MAX_CONTEXT);\n    if (rc == AS_OK) {\n        printf(\"Context for %s: %s\\n\", user, context);\n    } else {\n        printf(\"ASC_GETCONTEXT failed: RC=%d, %s\\n\", rc, ASC_STRERROR(rc));\n    }\n\n    /* clean up */\n    free(context);\n    ASC_TERM(asce);\n    return EXIT_SUCCESS;\n}"
+    }
+  ]
+}

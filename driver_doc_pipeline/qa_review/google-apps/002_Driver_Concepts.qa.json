@@ -1,0 +1,47 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What are the Publisher and Subscriber channels in the Google Apps driver and how do they differ?",
+      "input": "",
+      "output": "In the Google Apps driver, the Publisher channel would normally handle data and events flowing from the connected system into the Identity Vault, while the Subscriber channel handles data and events flowing from the Identity Vault into the connected system. However, the Google Apps driver does not support the Publisher channel at all; it only supports the Subscriber channel, which monitors the Identity Vault for new objects or changes and sends the relevant updates to Google Apps."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Google APIs are supported by the Google Apps driver and what is each API used for?",
+      "input": "",
+      "output": "The Google Apps driver supports the following APIs:\n\n- **Directory API** – Used to create user and group objects; this API must be enabled in the G Suite Admin Console.\n- **Contact API** – Creates a Domain Contact inside the Address Book (Contacts).\n- **Groups Settings API** – Provides enhanced control of permissions and other group attributes.\n- **GMAIL API** – Manages Gmail user account settings, labels, forwarding, send‑as, and delegation."
+    },
+    {
+      "category": "config",
+      "instruction": "Which API must be turned on in the G Suite Admin Console to allow the Google Apps driver to create users and groups?",
+      "input": "",
+      "output": "The **Directory API** must be turned on in the G Suite Admin Console for the Google Apps driver to create users and group objects."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might a newly added contact not appear immediately in the G Suite Admin Console or Address Book when using the Google Apps driver?",
+      "input": "",
+      "output": "When the Google Apps driver uses the Contact API to add a contact, the new contact may not appear in the G Suite Admin Console or Address Book for up to 24 hours, even though the object is usable right away. This delay is a known behavior of the Contact API; modify events, however, show immediately."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Google Apps driver use filters and policies to control what changes are sent to Google Apps?",
+      "input": "",
+      "output": "In the Google Apps driver, you configure filters and policies within the driver settings. The filters determine which objects or attribute changes in the Identity Vault are of interest, and the policies (which may include basic policies, DirXML scripts, or XSLT style sheets) process those filtered events. After policy processing, only the relevant changes are sent through the Subscriber channel to the Google Apps system."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Explain the data flow process for the Google Apps driver when updating an object in Google Apps.",
+      "input": "",
+      "output": "When the Google Apps driver updates an object, the Identity Manager engine first creates an XDS (a specialized XML form) that represents the event. This XDS is passed to the driver policy, where it may be transformed by basic policies, DirXML scripts, or XSLT style sheets. The driver shim then securely communicates over HTTPS with the appropriate Google Apps API. The API response is returned to the shim, which converts it back into an XDS format and reports the result to the Identity Manager engine."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the key capabilities and limitations of the Google Apps driver.",
+      "input": "",
+      "output": "The Google Apps driver is a one‑way (Identity Vault to Google Apps) subscriber‑only driver that monitors the Identity Vault for new or changed objects and sends those changes to Google Apps via HTTPS. It supports the Directory, Contact, Groups Settings, and Gmail APIs, requires the Directory API for user/group provisioning, and allows control of data flow through filters and policies. The driver does not support a Publisher channel, and Contact API adds may take up to 24 hours to appear in the admin console."
+    }
+  ]
+}

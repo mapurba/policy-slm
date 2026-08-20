@@ -1,0 +1,65 @@
+{
+  "driver": "JMS driver",
+  "qa_pairs": [
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete upgrade procedure for the JMS driver as described in the documentation.",
+      "input": "",
+      "output": "To upgrade the JMS driver, first download the latest driver packages and optionally configure Designer to auto‑read online updates. In Designer, open the project, right‑click the JMS driver, select Driver > Properties, then Packages. If an upgrade is available, select the package, choose Upgrade from the drop‑down, pick the desired version, and click OK. Apply the changes, fill any required fields, review the summary, finish, and verify the upgraded package. After upgrading the packages, apply the driver patch: back up the configuration, stop the driver and Identity Vault, download the patch, and install the files (using rpm on Linux or copying JMSShim.jar on Windows). Finally, restart the Identity Vault and driver instances as appropriate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure Designer to automatically read JMS driver package updates when a new version is available?",
+      "input": "",
+      "output": "In Designer, open the Windows menu, choose Preferences, navigate to NetIQ > Package Manager > Online Updates, and enable the option to automatically read package updates when a new version becomes available."
+    },
+    {
+      "category": "howto",
+      "instruction": "What steps must be performed in Designer to upgrade an installed package for the JMS driver?",
+      "input": "",
+      "output": "1. Open the project containing the JMS driver.\n2. Right‑click the JMS driver and select Driver > Properties.\n3. Click the Packages tab.\n4. Locate the package with a check mark in the Upgrades column.\n5. Click Select Operation for that package and choose Upgrade from the drop‑down list.\n6. Select the desired version and click OK.\n7. Click Apply.\n8. (If required) Fill in any additional fields and click Next.\n9. Review the summary of packages to be installed and click Finish.\n10. Review the upgraded package and click OK to close the Package Management page."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is there no separate procedure for updating the JMS driver shim?",
+      "input": "",
+      "output": "The JMS driver shim is updated automatically when a new version of the Identity Manager engine is installed, so a separate shim‑update procedure is unnecessary."
+    },
+    {
+      "category": "config",
+      "instruction": "Which file must be present in the <non-root eDirectory location>/rpm directory to verify a non‑root installation before applying the JMS driver patch?",
+      "input": "",
+      "output": "The file _db.000 must exist in the <non-root eDirectory location>/rpm directory."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe the prerequisites that must be completed before applying the JMS driver patch.",
+      "input": "",
+      "output": "1. Back up the current JMS driver configuration.\n2. Stop the JMS driver instance.\n3. Stop the Identity Vault.\n4. In a browser, go to the NetIQ Patch Finder Download Page.\n5. Click Search Patches under Patches.\n6. Enter \"Identity Manager nn Bidirectional eDirectory Driver nn\" in the search box.\n7. Download and unzip the patch file to a temporary location on the server."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the JMS driver patch as a root user on a Linux system?",
+      "input": "",
+      "output": "1. Delete or move any existing files that will be replaced.\n2. Open a command prompt and run the command:\n   rpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLjms.rpm\n3. If the JMS driver is running locally, start the Identity Vault and the driver instance (e.g., run `ndsmanage startall`).\n4. If the driver uses a Remote Loader, start the Remote Loader instance and the driver instance."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the JMS driver patch as a root user on a Windows system?",
+      "input": "",
+      "output": "Navigate to the <Driver Patch File Temporary Location>\\windows folder and copy the JMSShim.jar file to either <IdentityManager installation>\\NDS\\lib or <IdentityManager installation>\\RemoteLoader\\<architecture>\\lib."
+    },
+    {
+      "category": "howto",
+      "instruction": "What commands are used to install the JMS driver patch as a non‑root user, and how do you set the required environment variable?",
+      "input": "",
+      "output": "1. Verify that the file _db.000 exists in <non-root eDirectory location>/rpm.\n2. Set the root directory environment variable by executing:\n   ROOTDIR=<non-root eDirectory location>\n3. Install the driver files with the rpm command, for example:\n   rpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory --relocate=/etc=$ROOTDIR/etc --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml --relocate=/var=$ROOTDIR/var --badreloc --nodeps --replacefiles /home/user/novell-DXMLjms.rpm"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the JMS driver patch installation as a non‑root user fails because the _db.000 file is missing, what is the recommended resolution?",
+      "input": "",
+      "output": "The absence of the _db.000 file indicates that Identity Manager may not be properly installed for non‑root use. The recommended resolution is to reinstall Identity Manager to ensure the _db.000 file is created in the <non-root eDirectory location>/rpm directory."
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the SCIM driver and why is it used to connect to Salesforce in NetIQ Identity Manager?",
+      "input": "",
+      "output": "The SCIM driver is a NetIQ Identity Manager driver that implements the System for Cross-domain Identity Management (SCIM) protocol. It enables Identity Manager to provision, synchronize, and manage user and group objects in external systems. Configuring the SCIM driver with Salesforce allows Identity Manager to communicate with Salesforce via the SCIM 2.0 API, using OAuth 2.0 authentication, so that user accounts and groups can be created, updated, or deleted directly in Salesforce."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a SCIM driver object in Designer for connecting to Salesforce?",
+      "input": "",
+      "output": "To create a SCIM driver object in Designer for Salesforce, follow these steps:\n1. Open Designer.\n2. Click **Help > Check for Package Updates**.\n3. In the package list, select the required versions of the SCIM Base, SCIM Default, SCIM JSON (optional), and SCIM Entitlements packages (see the required package table in the documentation).\n4. Click **OK** to update the packages.\n5. In the Outline view, right‑click **Package Catalog** and choose **Import Package**.\n6. Locate and import the **SCIM Salesforce Configuration** package (NETQSCIMSFCG).\n7. Click **OK** to complete the import.\n8. In Outline view, open your project.\n9. Right‑click the project, choose **New > Identity Vault** (or drag an Identity Vault from the Palette).\n10. In the **Add Server Association** screen, fill **Server DN**, **Identity Manager Version**, and **Identity Manager Edition**, then click **OK**.\n11. In the **Identity Vault Credentials** window, enter the host IP, username, and password of the Identity Vault, optionally select **Save Password**, and click **OK**.\n12. Drag the **SCIM driver** icon from the Tools tab onto the Identity Vault in the Modeler window.\n13. In the Driver Configuration Wizard, select the SCIM Base Package and click **Next**.\n14. On the **Select Mandatory Features** page, select the SCIM Default Package and click **Next**.\n15. (Optional) On the **Select Optional Features** page, select the SCIM JSON Package and click **Next**.\n16. Verify the Important Note items, click **Next**.\n17. On the **Driver Information** page, give the driver a name and click **Next**.\n18. Select **OAuth 2.0** as the Authentication Method and continue with the specific authentication configuration (Bearer, JWT, or Manual) as required.\n19. Complete the remaining wizard pages (Subscriber Options, Publisher Options, Schema Settings, etc.) and click **Finish**. The configured SCIM driver appears in the Designer screen."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the required SCIM Base and SCIM Default package details for the SCIM driver?",
+      "input": "",
+      "output": "The SCIM driver requires the following packages:\n- **SCIM Base Package**\n  - Package Name: **NETQSCIMBASE**\n  - Version: **1.0.0**\n  - Build Date: **20201117**\n  - Build Number: **124957**\n- **SCIM Default Package**\n  - Package Name: **NETQSCIMDCFG**\n  - Version: **1.0.0**\n  - Build Date: **20201113**\n  - Build Number: **132234**"
+    },
+    {
+      "category": "config",
+      "instruction": "Which fields must be filled in the Identity Vault Credentials window when adding the SCIM driver?",
+      "input": "",
+      "output": "In the **Identity Vault Credentials** window, provide the following fields:\n| Field | Description |\n|-------|-------------|\n| **Host** | The IP address of the Identity Vault's host machine. |\n| **Username** | The name of the user that will log in to the Identity Vault. |\n| **Password** | The password of that user. |\nOptionally select **Save Password** to store the password for future logins."
+    },
+    {
+      "category": "config",
+      "instruction": "What authentication method must be selected for the SCIM driver to connect to Salesforce?",
+      "input": "",
+      "output": "For a Salesforce connection, the SCIM driver must be configured to use **OAuth 2.0** as the Authentication Method."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the SCIM driver with a Bearer token for Salesforce?",
+      "input": "",
+      "output": "To configure the SCIM driver with a Bearer token:\n1. In the Driver Configuration Wizard, set **Authentication Method** to **OAuth 2.0**.\n2. In the **OAuth2.0 Authorization Token** field, choose **Bearer**.\n3. The following fields appear; enter the values as shown in the documentation:\n   - **Access Token URL**: `https://login.salesforce.com/services/oauth2/token`\n   - **User Name**: Salesforce user name.\n   - **Password**: Salesforce password.\n   - **Query Options**:\n     * `grant_type`: `password`\n     * `client_id`: `<3MVG97quAmFZJfVwk3ylU...>`\n     * `issuer`: `https://login.Salesforce.com`\n     * `username`: `<username to login to Salesforce>`\n   - **Secret Query Options** (hidden for security):\n     * `refresh_token`: `5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ`\n     * `client_secret`: `E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87`\n     * `password`: `<password to login to Salesforce>`\n   - **Header Fields**: Name=`Content-Type`, Value=`application/x-www-form-urlencoded`\n   - **Application Truststore File**: `</root/scim_configuration/trustSalesforce/Salesforce>` (JKS format, public certificate added to cacerts).\n   - **Mutual Authentication**: Not supported.\n   - **Proxy Authentication**: Provide proxy host, port, username, and password if required.\n   - **HTTPS Connection Timeout**: Specify a timeout value greater than 0 (in minutes).\n   - **SCIM 2.0 URL**: `https://salesforce.com/api/rest/scim/v2/339216517038085`\n4. Continue through the wizard to complete driver installation."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the required fields and sample values for Bearer token configuration in the SCIM driver?",
+      "input": "",
+      "output": "The Bearer token configuration requires the following fields:\n| Field | Sample Field Value |\n|-------|--------------------|\n| **Access Token URL** | `https://login.salesforce.com/services/oauth2/token` |\n| **User Name** | *The user name to login to Salesforce.* |\n| **Password** | *The password to login to Salesforce.* |\n| **Query Options** | `grant_type: password`<br>`client_id: <3MVG97quAmFZJfVwk3ylU.8elhRYBqG9h25m3TWewozjKnFIY0HrhOEJl7LMET9HHocaHnTB1k04kophr1CgW>`<br>`issuer: https://login.Salesforce.com`<br>`username: <username to login to Salesforce>` |\n| **Secret Query Options** (hidden) | `refresh_token: 5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ`<br>`client_secret: E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87`<br>`password: <password to login to Salesforce>` |\n| **Header Fields** | Name: `Content-Type`<br>Value: `application/x-www-form-urlencoded` |\n| **Application Truststore File** | `</root/scim_configuration/trustSalesforce/Salesforce>` |\n| **Mutual Authentication** | Not supported |\n| **Proxy Authentication** | Host/Port, Username, Password as needed |\n| **HTTPS Connection Timeout** | Value > 0 (minutes) |\n| **SCIM 2.0 URL** | `https://salesforce.com/api/rest/scim/v2/339216517038085` |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the SCIM driver using JWT for Salesforce?",
+      "input": "",
+      "output": "To configure the SCIM driver with JWT:\n1. In the Driver Configuration Wizard, set **Authentication Method** to **OAuth 2.0**.\n2. In the **OAuth2.0 Authorization Token** field, select **JWT**.\n3. The following fields appear; fill them with the appropriate values:\n   - **Query Options**:\n     * `client_id`: `<3MVG97quAmFZJfVwk3ylU...>`\n     * `subject`: `<username@microfocus.com>`\n     * `issuer`: `https://login.salesforce.com`\n     * `client_auth_type`: `private_key_jwt`\n     * `recipient_keystore`: `</Soft/Certs/recipient.jks>`\n   - **Secret Query Options** (hidden):\n     * `recipient_storepass`: `<novell>`\n     * `recipient_keypass`: `<novell>`\n     * `refresh_token`: `5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ`\n     * `client_secret`: `E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87`\n4. For the remaining common fields (Application Truststore File, Proxy Authentication, HTTPS Connection Timeout, SCIM 2.0 URL), refer to the common connection parameters section.\n5. Proceed through the rest of the wizard to finish driver installation."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the JWT-specific fields and sample values for the SCIM driver configuration?",
+      "input": "",
+      "output": "The JWT configuration requires the following fields:\n| Field | Sample Field Value |\n|-------|--------------------|\n| **Query Options** | `client_id: <3MVG97quAmFZJfVwk3ylU.8elhRYBqG9h25m3TWewozjKnFIY0HrhOEJl7LMET9HHocaHnTB1k04kophr1CgW>`<br>`subject: <username@microfocus.com>`<br>`issuer: https://login.salesforce.com`<br>`client_auth_type: private_key_jwt`<br>`recipient_keystore: </Soft/Certs/recipient.jks>` |\n| **Secret Query Options** (hidden) | `recipient_storepass: <novell>`<br>`recipient_keypass: <novell>`<br>`refresh_token: 5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ`<br>`client_secret: E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87` |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the SCIM driver manually with an already available access token for Salesforce?",
+      "input": "",
+      "output": "To configure the SCIM driver manually with an existing token:\n1. In the Driver Configuration Wizard, set **Authentication Method** to **OAuth 2.0**.\n2. In the **OAuth2.0 Authorization Token** field, select **Manual**.\n3. The following fields appear; provide the values:\n   - **Token**: `<00D2v000002mBdQ!ARQAQAzAXhpgilDpcvN3RDgCkrfh4pyzCOv2G1Iq5kEMh0TRi>` (the already‑generated Salesforce access token).\n   - **Query Options**:\n     * `client_id`: `<3MVG97quAmFZJfVwk3ylU.8elhRYBqG9h25m3TWewozjKnFIY0HrhOEJl7LMET9HHocaHnTB1k04kophr1CgW>`\n     * `issuer`: `https://login.Salesforce.com`\n   - **Secret Query Options** (hidden):\n     * `refresh_token`: `5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ`\n     * `client_secret`: `E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87`\n4. Complete the remaining wizard pages (common connection parameters, Subscriber/Publisher options, etc.) and click **Finish**."
+    },
+    {
+      "category": "config",
+      "instruction": "What fields are required when configuring the SCIM driver manually with an available token?",
+      "input": "",
+      "output": "Manual token configuration requires these fields:\n| Field | Sample Field Value |\n|-------|--------------------|\n| **Token** | `<00D2v000002mBdQ!ARQAQAzAXhpgilDpcvN3RDgCkrfh4pyzCOv2G1Iq5kEMh0TRi>` |\n| **Query Options** | `client_id: <3MVG97quAmFZJfVwk3ylU.8elhRYBqG9h25m3TWewozjKnFIY0HrhOEJl7LMET9HHocaHnTB1k04kophr1CgW>`<br>`issuer: https://login.Salesforce.com` |\n| **Secret Query Options** (hidden) | `refresh_token: 5Aep861Xq7VoDavIt6UxKW62EAmfy0hKFv1T_X8yhb9PRQWtsOCrr97CYDrVasefykdl_f.DTVaJGKxjmz50XjQ`<br>`client_secret: E734505442694ECD0156D83F965B42C0F07601BB8BFDCA9879420C1FF23C8A87` |"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the common connection parameters shared across OAuth 2.0 authentication methods for the SCIM driver?",
+      "input": "",
+      "output": "The common connection parameters are:\n- **Application Truststore File**: Path to a JKS keystore containing the remote server’s trusted certificates (e.g., `</root/scim_configuration/trustSalesforce/Salesforce>`). For Bearer tokens, the public certificate must be added to the JRE’s `cacerts` directory.\n- **Mutual Authentication**: Not supported for Salesforce.\n- **Proxy Authentication**: Optional; includes proxy host and port (e.g., `192.168.0.0:port`), username, password, and re‑enter password.\n- **HTTPS Connection Timeout**: Must be greater than 0; value is in minutes. The driver will wait the specified time before terminating the connection and applying the configured HTTPS error‑code retry logic.\n- **SCIM 2.0 URL**: The base URL for the SCIM API in Salesforce (e.g., `https://salesforce.com/api/rest/scim/v2/339216517038085`)."
+    },
+    {
+      "category": "config",
+      "instruction": "What Subscriber Options and Publisher Options should be set on the Install SCIM Base page for the SCIM driver?",
+      "input": "",
+      "output": "On the **Install SCIM Base** page:\n- **Subscriber Options**\n  - **HTTPS error codes for retry**: `307 408 503 504` (the driver retries the operation when any of these HTTP status codes are returned).\n- **Publisher Options**\n  - **Enable Publisher Channel**: `Yes` to activate publishing.\n  - **Polling interval in minutes**: `10`\n  - **Heartbeat interval in minutes**: `10`\n  - **Polling Resource Options** (after installation, configure under Driver Configuration > Publisher Options):\n    * **Configured Resources** – poll all resources defined in the schema, or\n    * **Custom Resources** – add specific resources, e.g.,\n      - User Resource ID: `urn:ietf:params:scim:schemas:core:2.0:User`\n      - User Resource URL: `https://ap16.salesforce.com/services/scim/v2/Users?startIndex=1&count=100`\n      - Group Resource ID: `urn:ietf:params:scim:schemas:core:2.0:Group`\n      - Group Resource URL: `https://ap16.salesforce.com/services/scim/v2/Groups?startIndex=1&count=100`"
+    },
+    {
+      "category": "config",
+      "instruction": "How should Schema Settings be specified for the SCIM driver, including Refresh Schema on Driver Startup, Schema Options, and Resource Type?",
+      "input": "",
+      "output": "Schema Settings (Table 5‑1) require:\n- **Refresh Schema on Driver Startup**: Set to `Yes` if you want the driver to reload the SCIM schema each time it starts; default is `No`.\n- **Schema Options**: Choose the desired option (default `SCIM 2.0`). Options are:\n  * `SCIM 2.0`\n  * **Application URL**: `https://ap17.salesforce.com/services/scim/v2/Schemas`\n  * **Import JSON File**: Path to a user‑defined schema JSON file on the local file system.\n- **Resource Type**: Define each resource you will sync.\n  * For Users:\n    - **Resource ID**: `urn:ietf:params:scim:schemas:core:2.0:Users`\n    - **Resource Endpoint**: `Users`\n    - **Modify Method Operation**: `PUT`\n  * For Groups:\n    - **Resource ID**: `urn:ietf:params:scim:schemas:core:2.0:Group`\n    - **Resource Endpoint**: `Groups`\n    - **Modify Method Operation**: `PUT`"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error occurs if an expired access token is used with the SCIM driver, and how does the driver mitigate this problem?",
+      "input": "",
+      "output": "When an expired access token is sent to Salesforce, the SCIM driver receives an **Unauthorized Access** or **Invalid Session** error. The driver mitigates the problem by using a **refresh token** (configured in the Secret Query Options) to automatically obtain a new access token from Salesforce, re‑establishing the session without requiring user intervention."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps to configure the SCIM driver for Salesforce in Designer.",
+      "input": "",
+      "output": "To configure the SCIM driver for Salesforce in Designer: update the required SCIM packages, import the SCIM Salesforce Configuration package, create an Identity Vault and add the SCIM driver to it, select the SCIM Base package and mandatory features, choose **OAuth 2.0** as the authentication method, then configure either Bearer, JWT, or Manual token settings (providing URLs, client IDs, secrets, and truststore details). Set Subscriber and Publisher options, define Schema Settings (refresh schema, schema source, resource IDs, endpoints, and modify method), optionally configure modifiers and a remote loader, review the summary, and finish the wizard. The driver then appears in the Designer ready to sync users and groups with Salesforce."
+    }
+  ]
+}

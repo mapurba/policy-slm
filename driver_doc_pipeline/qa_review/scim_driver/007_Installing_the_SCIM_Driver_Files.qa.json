@@ -1,0 +1,53 @@
+{
+  "driver": "SCIM driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What files are required to install the SCIM driver and where can they be obtained?",
+      "input": "",
+      "output": "To install the SCIM driver you need the driver package files such as a .zip file (e.g., SCIMDriver.zip), an .rpm file (e.g., netiq-DXMLscim.rpm), and a .jar file (e.g., SCIMUtils.jar). These files must be downloaded from the Micro Focus Download site for the appropriate driver build."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the SCIM driver as a root user on a Linux system?",
+      "input": "",
+      "output": "To install the SCIM driver as a root user on Linux:\n1. Log in to the server as the root user.\n2. Download and unzip SCIMDriver.zip to a temporary location.\n3. Navigate to the extracted directory.\n4. Run the rpm command to install the binary, for example:\n   rpm -Ivh (binaries‑path)/netiq-DXMLscim.rpm\nThis places the SCIM driver RPM in the driver installation directory."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the SCIM driver as a root user on a Windows system?",
+      "input": "",
+      "output": "To install the SCIM driver as a root (administrator) user on Windows:\n1. Log in with administrative privileges.\n2. Download and unzip SCIMDriver.zip.\n3. Locate the SCIMShim.jar file in the extracted content.\n4. Copy SCIMShim.jar to the driver’s installation folder, such as \\NetIQ\\IdentityManager\\NDS (local installation) or \\Novell\\RemoteLoader\\64bit (remote installation)."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the steps to install the SCIM driver as a non‑root user?",
+      "input": "",
+      "output": "To install the SCIM driver as a non‑root user:\n1. Verify that the /rpmdirectory exists and contains the _db.000 file.\n2. If the _db.000 file is missing, reinstall Identity Manager so the file is created.\n3. Set the root directory for the non‑root installation by defining the environment variable:\n   ROOTDIR=<non‑root eDirectory location>\n4. Run the rpm command with relocations, for example:\n   rpm --dbpath $ROOTDIR/rpm -Ivh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles /home/user/netiq-DXMLscim.rpm\n5. After installation, start the Identity Manager and driver instance (if running locally) or start the Remote Loader instance and driver instance (if using Remote Loader)."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the exact rpm command for installing the SCIM driver as a non‑root user and what do the --relocate options specify?",
+      "input": "",
+      "output": "The rpm command is:\n```\nrpm --dbpath $ROOTDIR/rpm -Ivh \\\n    --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/etc=$ROOTDIR/etc \\\n    --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n    --relocate=/var=$ROOTDIR/var \\\n    --badreloc --nodeps --replacefiles /home/user/netiq-DXMLscim.rpm\n```\nThe `--relocate` options map the standard installation paths used by the RPM to the corresponding directories under the non‑root eDirectory location defined by `$ROOTDIR`:\n- `/usr` is redirected to `$ROOTDIR/opt/novell/eDirectory`\n- `/etc` is redirected to `$ROOTDIR/etc`\n- `/opt/novell/eDirectory` remains under `$ROOTDIR/opt/novell/eDirectory`\n- `/opt/novell/dirxml` is redirected to `$ROOTDIR/opt/novell/dirxml`\n- `/var` is redirected to `$ROOTDIR/var`\nThese relocations allow the RPM to be installed in a non‑standard (non‑root) directory hierarchy."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the _db.000 file is not found when installing the SCIM driver as a non‑root user?",
+      "input": "",
+      "output": "If the _db.000 file is missing, it indicates that the Identity Manager was not installed correctly for a non‑root setup. The resolution is to reinstall the Identity Manager so that the _db.000 file is created in the /rpmdirectory before proceeding with the SCIM driver installation."
+    },
+    {
+      "category": "config",
+      "instruction": "Which environment variable must be set to indicate the non‑root eDirectory location for the SCIM driver installation, and how is it set?",
+      "input": "",
+      "output": "The environment variable `ROOTDIR` must be set to the non‑root eDirectory location. It is set by executing the command:\n```\nROOTDIR=<non‑root eDirectory location>\n```\nThis command assigns the path where Identity Manager is installed as a non‑root user and is used by the rpm installation command to locate the appropriate directories."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps for installing the SCIM driver for both root and non‑root users.",
+      "input": "",
+      "output": "To install the SCIM driver:\n- **Root user**: Log in as root, unzip SCIMDriver.zip, and either run `rpm -Ivh (binaries-path)/netiq-DXMLscim.rpm` on Linux or copy SCIMShim.jar to the driver’s installation folder on Windows.\n- **Non‑root user**: Ensure `/rpmdirectory` contains the `_db.000` file; set `ROOTDIR` to the non‑root eDirectory location; execute the rpm command with multiple `--relocate` options to map standard paths to `$ROOTDIR`; then start the Identity Manager and driver (or Remote Loader and driver) as appropriate."
+    }
+  ]
+}

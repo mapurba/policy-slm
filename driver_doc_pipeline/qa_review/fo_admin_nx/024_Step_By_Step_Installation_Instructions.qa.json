@@ -1,0 +1,95 @@
+{
+  "driver": "Fan-Out Driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Core Driver Shim in the Fan-Out Driver and why is it needed?",
+      "input": "",
+      "output": "In the Fan-Out Driver, the Core Driver Shim is the software component that runs on a host system and provides the driver objects, remote loader, and networking services required for the Fan-Out Driver to communicate with eDirectory and connected platforms. It is needed to install, configure, and manage the Core Driver, to store synchronization information in a designated ASAM System container, and to enable secure communication via SSL certificates."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install a new Fan-Out Driver Shim on a Linux system?",
+      "input": "",
+      "output": "To install a new Fan-Out Driver Shim on Linux:\n1. Locate and run the self‑extracting installer from the media:\n   ```\n   sh linux_x86_64_coredriver.bin\n   ```\n2. If eDirectory has EBA enabled, first execute `export DISABLE_EBA=true`.\n3. Accept the license, choose the installation directory, and proceed.\n4. When prompted, enter the Remote Loader password (used for encrypting driver network communications).\n5. Enter the Driver Object password (used to access the driver object in eDirectory).\n6. Provide the eDirectory server/port (typically localhost on port 636) so the installer can retrieve an SSL certificate.\n7. Supply the eDirectory admin name/password in LDAP dot format (e.g., `admin.acme`).\n8. Specify the ASAM System Container Context DN (e.g., `idm.acme`).\n9. Provide a descriptive driver name and the network port (default 3451).\n10. Select the Core Driver network address (DNS name or IP address) that other platforms will use.\n11. After installation, edit the built‑in remote loader port in `/usr/local/ASAM/data/fanout.conf` if needed (see the Config question for details).\n12. If a firewall is present, open the driver’s network port (default 3451)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you upgrade an existing Fan-Out Driver Shim on Linux to version 4.8.1.0 or later and convert it to use systemd?",
+      "input": "",
+      "output": "To upgrade a Fan-Out Driver Shim on Linux and switch to systemd:\n1. Stop the Core Driver object in iManager.\n2. Run the same installer you used for the original install:\n   ```\n   sh linux_x86_64_coredriver.bin\n   ```\n3. Accept the license and enter `Y` when asked to upgrade the existing installation.\n4. If the previous version was earlier than 4.8.1.0 and you use systemd, perform the following steps:\n   * Disable the old init startup script:\n     ```\n     chkconfig asamcdrvd off\n     ```\n   * Copy the new systemd service file:\n     ```\n     cp /usr/local/ASAM/data/SystemdStartupScripts/asamcdrv.service /etc/systemd/system/\n     ```\n   * Reload systemd and enable the service:\n     ```\n     systemctl daemon-reload\n     systemctl enable asamcdrv\n     ```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Fan-Out Driver Shim on a Windows system?",
+      "input": "",
+      "output": "To install the Fan-Out Driver Shim on Windows:\n1. From the installation media, run the executable:\n   ```\n   fan-out\\IDMCoreDrivers\\Win\\win_x86_coredriver.exe\n   ```\n   (This 32‑bit executable works on both x86 and x64 Windows.)\n2. Accept the license, choose the installation directory, and continue.\n3. When prompted, enter the Remote Loader password.\n4. Enter the Driver Object password.\n5. Provide the eDirectory server name or IP and the secure LDAP port (default 636); accept the SSL certificate by entering `y`.\n6. Supply the eDirectory admin name/password in LDAP dot format (e.g., `admin.acme`).\n7. Specify the ASAM System Container Context DN (e.g., `acme`).\n8. Enter a descriptive driver name and the network port (default 3451).\n9. Choose the Core Driver network address (DNS name or IP) that other platforms will use.\n10. After installation, edit the built‑in remote loader port in `C:\\Novell\\ASAM\\data\\fanout.conf` if necessary (see the Config question for the exact line).\n11. Open the driver’s network port (default 3451) in any firewall."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade a local Fan-Out Driver Shim on Windows to a remote driver configuration?",
+      "input": "",
+      "output": "To upgrade a local Fan-Out Driver Shim on Windows to remote mode:\n1. Stop the Core Driver object in iManager.\n2. Run the installer from the media:\n   ```\n   fan-out\\IDMCoreDrivers\\Win\\win_x86_coredriver.exe\n   ```\n3. Accept the license and select the same installation directory as the previous install (usually `C:\\Novell\\ASAM`).\n4. Provide the Remote Loader password when prompted.\n5. Provide the Driver Object password.\n6. Enter the eDirectory server name/IP and secure LDAP port (default 636); accept the certificate (`y`).\n7. Supply the eDirectory admin name/password in LDAP dot format.\n8. Specify the ASAM System Container Context DN (e.g., `idm.acme`).\n9. When asked whether to create a new driver or upgrade an existing one, click **No** to upgrade.\n10. Select the driver to upgrade from the displayed list.\n11. After the installer finishes, edit the built‑in remote loader port in `C:\\Novell\\ASAM\\data\\fanout.conf` if needed.\n12. Open the driver’s network port (default 3451) in any firewall."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade a remote Fan-Out Driver Shim on Windows systems?",
+      "input": "",
+      "output": "To upgrade a remote Fan-Out Driver Shim on Windows:\n1. Stop the Core Driver object and its Remote Loader instance in iManager.\n2. In iManager, open the Identity Manager Remote Loader Console, select the Fan-Out Driver instance, click **Edit**, and note the Connection Port, Trace Level, and Trace File.\n3. Remove the standard NetIQ Remote Loader if it is no longer needed:\n   * If other Remote Drivers exist, remove only the Fan-Out Driver instance in the Remote Loader Console.\n   * If no other Remote Drivers exist, uninstall the NetIQ Identity Manager Connected System program via Control Panel → Add or Remove Programs.\n4. Run the installer from the media:\n   ```\n   fan-out\\IDMCoreDrivers\\Win\\win_x86_coredriver.exe\n   ```\n5. Accept the license and select the same installation directory (usually `C:\\Novell\\ASAM`).\n6. Provide the Remote Loader password.\n7. Provide the Driver Object password.\n8. Enter the eDirectory server name/IP and secure LDAP port (default 636); accept the certificate (`y`).\n9. Supply the eDirectory admin name/password in LDAP dot format.\n10. Specify the ASAM System Container Context DN (e.g., `idm.acme`).\n11. When asked whether to create a new driver or upgrade, click **No**.\n12. Choose the driver to upgrade from the list.\n13. After installation, edit the built‑in remote loader port in `C:\\Novell\\ASAM\\data\\fanout.conf` if required.\n14. Open the driver’s network port (default 3451) in any firewall."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the default network ports used by the Fan-Out Driver and its built‑in remote loader, and where can they be changed?",
+      "input": "",
+      "output": "The Fan-Out Driver uses port **3451** by default for driver communication. The built‑in remote loader also defaults to port **8090**. The remote loader port can be changed by editing the `fanout.conf` file:\n* On Linux/UNIX: `/usr/local/ASAM/data/fanout.conf`\n* On Windows: `C:\\Novell\\ASAM\\data\\fanout.conf`\nLocate the line that reads `-connection \"ca=/usr/local/ASAM/keys/ca.pem port=8090\"` and modify the `port=` value to the desired port number."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration file contains the built‑in remote loader port for the Fan-Out Driver and what line should be edited to change the port?",
+      "input": "",
+      "output": "The built‑in remote loader port for the Fan-Out Driver is defined in the `fanout.conf` file. On Linux/UNIX the file is located at `/usr/local/ASAM/data/fanout.conf`; on Windows it is at `C:\\Novell\\ASAM\\data\\fanout.conf`. Edit the line:\n```\n-connection \"ca=/usr/local/ASAM/keys/ca.pem port=8090\"\n```\nReplace `8090` with the desired port number."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the Fan-Out Driver installer cannot connect to eDirectory during installation?",
+      "input": "",
+      "output": "If the Fan-Out Driver installer cannot connect to eDirectory, verify the following:\n1. The eDirectory server name or IP address and LDAP secure port (default 636) entered during installation are correct.\n2. The eDirectory administrator name and password are entered in LDAP dot format (e.g., `admin.acme`).\n3. Network connectivity between the host where the installer runs and the eDirectory server is functioning (no firewall blocks on port 636).\n4. Consult your eDirectory LDAP documentation for additional troubleshooting steps, as suggested by the installer notes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps you must complete after installing the Fan-Out Driver Shim before the driver becomes operational.",
+      "input": "",
+      "output": "After installing the Fan-Out Driver Shim, you must:\n1. Optionally edit `fanout.conf` to change the built‑in remote loader port from its default 8090.\n2. Ensure the driver’s communication port (default 3451) is allowed through any firewalls.\n3. Use iManager to import a configuration (or upgrade an existing one) for the Core Driver, providing driver name, activation group, LDAP host/port, remote host/port, ASAM master user/password, and the Remote Loader/Driver Object passwords set during installation.\n4. Define security equivalences and exclude administrative roles as needed.\n5. Start the Core Driver object in iManager and start the Fan-Out Driver service on the Shim system (via init, systemd, or Windows Services)."
+    },
+    {
+      "category": "config",
+      "instruction": "What environment variable must be set when installing the Fan-Out Driver Shim on Linux if eDirectory has EBA enabled?",
+      "input": "",
+      "output": "If eDirectory has EBA enabled, you must set the environment variable `DISABLE_EBA=true` before running the Linux installer:\n```bash\nexport DISABLE_EBA=true\nsh linux_x86_64_coredriver.bin\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the Fan-Out Driver Shim to auto‑start on a Linux system that uses chkconfig?",
+      "input": "",
+      "output": "To configure the Fan-Out Driver Shim to auto‑start with chkconfig on a Linux system using init, run the following command:\n```bash\nchkconfig asamcdrvd on\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Fan-Out Driver Shim ensure automatic start on Linux systems that use systemd?",
+      "input": "",
+      "output": "On Linux systems that use systemd, the Fan-Out Driver Shim installs the `asamcdrv.service` file automatically in `/etc/systemd/system/`. Systemd is configured to start the service at boot, so no additional command is required beyond the installation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why might you need to modify the built‑in remote loader port after installing the Fan-Out Driver?",
+      "input": "",
+      "output": "You may need to modify the built‑in remote loader port because the Fan-Out Driver’s built‑in remote loader defaults to port 8090, which is also the default port for the standard NetIQ Remote Loader that ships with Identity Manager. If both loaders are running on the same host, they would conflict on port 8090, so changing the port in `fanout.conf` avoids the conflict."
+    },
+    {
+      "category": "config",
+      "instruction": "Where are the Fan-Out Driver Certificate Authority files stored, and why must they be migrated when adding a secondary driver or moving the primary driver?",
+      "input": "",
+      "output": "The Fan-Out Driver Certificate Authority files are stored in:\n```\nASAM/data/CoreDriver/certs/ca_cert.pem\nASAM/data/CoreDriver/certs/ca_key.pem\nASAM/data/CoreDriver/certs/ca.pem\n```\nThese files must be copied to a new host when migrating the primary Core Driver or adding a secondary Core Driver; otherwise the new primary driver would generate a new Certificate Authority on first start, invalidating any platform certificates that were signed by the previous CA."
+    }
+  ]
+}

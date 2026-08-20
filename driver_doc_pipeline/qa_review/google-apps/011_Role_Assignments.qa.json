@@ -1,0 +1,77 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the roleAssignment attribute in the Google Apps driver and how does it affect role assignments?",
+      "input": "",
+      "output": "In the Google Apps driver, the roleAssignment attribute is an optional structured attribute on UserEntry objects. When a value is added to this attribute the connector interprets it as a request to create a role assignment for that user; when a value is removed, the connector interprets it as a request to delete the corresponding role assignment."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What elements make up a role assignment in the Google Apps driver?",
+      "input": "",
+      "output": "A role assignment in the Google Apps driver consists of:\n- The user to whom the role is assigned\n- The role being assigned (identified by roleId, roleName, or roleDescription)\n- The scope of the assignment, which can be the entire domain (CUSTOMER) or a specific organizational unit (ORG_UNIT)\n- When the scope is ORG_UNIT, either orgUnitId or orgUnitPath must be supplied"
+    },
+    {
+      "category": "config",
+      "instruction": "Which scopeType values are supported by the roleAssignment attribute in the Google Apps driver and what do they represent?",
+      "input": "",
+      "output": "The Google Apps driver supports two scopeType values for roleAssignment:\n- **CUSTOMER** – the role assignment applies to the entire G Suite domain.\n- **ORG_UNIT** – the role assignment applies to a specific organizational unit; you must also specify either orgUnitId or orgUnitPath."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the required elements when adding a value for roleAssignment in the Google Apps driver?",
+      "input": "",
+      "output": "When adding a value for roleAssignment in the Google Apps driver you must provide:\n1. A way to identify the role (roleId, roleName, or roleDescription).\n2. A scopeType (CUSTOMER or ORG_UNIT).\n3. If scopeType is ORG_UNIT, you must also supply either orgUnitId or orgUnitPath."
+    },
+    {
+      "category": "config",
+      "instruction": "What default system roles does Google provide, as shown in the Google Apps driver documentation?",
+      "input": "",
+      "output": "The Google Apps driver lists the following default system roles:\n\n| Admin UI Display Name | Role Name | Role Description |\n|-----------------------|-----------|------------------|\n| Super Admin | _SEED_ADMIN_ROLE | G Suite Administrator Seed Role |\n| Groups Admin | _GROUPS_ADMIN_ROLE | Groups Administrator |\n| User Management Admin | _USER_MANAGEMENT_ADMIN_ROLE | User Management Administrator |\n| Help Desk Admin | _HELP_DESK_ADMIN_ROLE | Help Desk Administrator |\n| Services Admin | _SERVICE_ADMIN_ROLE | Services Administrator |\n\nThese names and descriptions are returned by the connector when querying role assignments."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you add a role assignment to a user using the Google Apps driver via a modify-attr XML block?",
+      "input": "",
+      "output": "To add a role assignment with the Google Apps driver you create a modify‑attr element that targets the roleAssignment attribute and includes an <add-value> block containing the required components. Example steps:\n1. Open the provisioning rule editor for the user.\n2. Insert a `<modify-attr attr-name=\"roleAssignment\">` element.\n3. Inside it, add `<add-value>`.\n4. Within `<add-value>`, create a `<value type=\"structured\">` block.\n5. Add `<component>` entries for the role identifier (roleId, roleName, or roleDescription), the scopeType, and, if scopeType is ORG_UNIT, either orgUnitId or orgUnitPath.\n6. Close the tags.\n\nA minimal example from the documentation is:\n```\n<modify-attr attr-name=\"roleAssignment\">\n  <add-value>\n    <value type=\"structured\">\n      <component name=\"roleDescription\">Weaver testing role 1</component>\n      <component name=\"scopeType\">ORG_UNIT</component>\n      <component name=\"orgUnitPath\">/Weaver</component>\n    </value>\n  </add-value>\n</modify-attr>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you remove a role assignment from a user using the Google Apps driver via a modify-attr XML block?",
+      "input": "",
+      "output": "To remove a role assignment with the Google Apps driver you use a `<modify-attr>` element targeting the roleAssignment attribute and include a `<remove-value>` block. Steps:\n1. In the provisioning rule, add `<modify-attr attr-name=\"roleAssignment\">`.\n2. Inside, add `<remove-value>`.\n3. Provide a `<value type=\"structured\">` containing enough information for the connector to locate the assignment (roleAssignmentId, or a combination of roleId/roleName/roleDescription, scopeType, and org unit if applicable).\n4. Close the tags.\n\nThe documentation gives this example:\n```\n<modify-attr attr-name=\"roleAssignment\">\n  <remove-value>\n    <value type=\"structured\">\n      <component name=\"roleDescription\">User Management Administrator</component>\n      <component name=\"scopeType\">CUSTOMER</component>\n      <component name=\"orgUnitPath\"/>\n    </value>\n  </remove-value>\n</modify-attr>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you determine the roleId for a role when using the Google Apps driver?",
+      "input": "",
+      "output": "In the Google Apps driver you can find a roleId by:\n1. Issuing a query for the object class name \"Role\"; the returned instance documents include the internal role ID.\n2. Querying a user for the roleAssignment attribute; the connector returns roleId for each assignment.\nBoth methods are observable in the driver trace logs, where the `<component name=\"roleId\">` element contains the unique internal identifier for the role."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you find the orgUnitId for an organizational unit using the Google Apps driver?",
+      "input": "",
+      "output": "To obtain an orgUnitId with the Google Apps driver, query the OrgUnit object class and read the attribute named OrgUnitId. The trace shows the value inside `<attr attr-name=\"OrgUnitId\"><value>id:03gre1hq4d6ldwa</value></attr>`. The corresponding orgUnitPath is the association value (e.g., \"/AK/NL\")."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error does the Google Apps driver return if it cannot locate a role, organizational unit, or existing role assignment when processing a roleAssignment change?",
+      "input": "",
+      "output": "If the Google Apps driver cannot find a matching role, organizational unit, or existing role assignment for the requested add or remove operation, it performs no operation and returns an error indicating that the target could not be found."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about managing role assignments with the Google Apps driver.",
+      "input": "",
+      "output": "The Google Apps driver lets you create and delete G Suite admin role assignments via the structured roleAssignment attribute on user objects. A role assignment requires a role identifier (roleId, roleName, or roleDescription) and a scope (CUSTOMER for the whole domain or ORG_UNIT for a specific OU). For ORG_UNIT you must supply either orgUnitId or orgUnitPath. Adding or removing assignments is done with modify‑attr XML blocks containing <add-value> or <remove-value>. Role IDs can be discovered by querying the Role object class; org unit IDs are retrieved from OrgUnit objects. If the driver cannot locate the necessary role or unit, it returns an error and performs no change."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML modify-attr snippet that adds a domain‑wide role assignment for a custom role named \"Project Lead\" with description \"Leads projects\" using the Google Apps driver.",
+      "input": "",
+      "output": "<modify-attr attr-name=\"roleAssignment\">\n  <add-value>\n    <value type=\"structured\">\n      <component name=\"roleName\">Project Lead</component>\n      <component name=\"roleDescription\">Leads projects</component>\n      <component name=\"scopeType\">CUSTOMER</component>\n      <component name=\"orgUnitPath\"/>\n    </value>\n  </add-value>\n</modify-attr>"
+    }
+  ]
+}

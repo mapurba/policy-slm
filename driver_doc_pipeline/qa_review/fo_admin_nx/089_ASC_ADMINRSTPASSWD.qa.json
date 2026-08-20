@@ -1,0 +1,65 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the ASC_ADMINRSTPASSWD function do in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, ASC_ADMINRSTPASSWD performs an administrative reset of a user's password. The function changes the password to the value supplied in the newpass argument and marks the new password as expired unless the password is configured to be non‑expiring."
+    },
+    {
+      "category": "config",
+      "instruction": "Which header file must be included to use ASC_ADMINRSTPASSWD in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "The Fo Admin Nx driver requires the inclusion of the header file `ascauth.h` to use ASC_ADMINRSTPASSWD."
+    },
+    {
+      "category": "config",
+      "instruction": "What parameters does ASC_ADMINRSTPASSWD require in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "The ASC_ADMINRSTPASSWD function in the Fo Admin Nx driver takes the following parameters:\n\n- `ASCENV *asce` – The environment item returned from ASC_INIT() or ASC_INIT_EXT().\n- `char *adminUser` – The Enterprise User ID of an administrative user with rights to change the target user's password.\n- `char *adminPassword` – The password of the administrative user ID.\n- `char *user` – The Enterprise User ID whose password is to be changed.\n- `char *newpass` – The new password for the user."
+    },
+    {
+      "category": "config",
+      "instruction": "What return codes can ASC_ADMINRSTPASSWD produce in the Fo Admin Nx driver and what do they indicate?",
+      "input": "",
+      "output": "ASC_ADMINRSTPASSWD in the Fo Admin Nx driver returns one of the following integer values defined in `ascauth.h`:\n\n| Return Code | Meaning |\n|-------------|---------|\n| AS_OK | Password changed |\n| AS_NOUSER | User inactive or not found in the Census |\n| AS_BADCLIENT | Local host not authorized to query the Core Driver |\n| AS_NOAGENT | No Core Driver could be contacted |\n| AS_NOAUTHENV | No environment has been established |\n| AS_INVALIDREQ | Call rejected by the Core Driver as not valid or not supported |\n| AS_INVALIDARGS | Invalid arguments supplied to the function |\n| AS_KEYEXPIRED | Old key rejected by the Core Driver because the expiration date has passed |\n| AS_INSUFFICIENTRIGHTS | Administrative user does not exist, lacks rights to change the password, or administrative password is not valid |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you reset a user's password using ASC_ADMINRSTPASSWD in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "To reset a user's password with the Fo Admin Nx driver, follow these steps:\n\n1. Include the header `ascauth.h` in your source file.\n2. Call `ASC_INIT(NULL)` (or `ASC_INIT_EXT()`) to obtain an `ASCENV *` environment pointer.\n3. Prepare the administrative user ID, administrative password, target user ID, and the new password as C strings.\n4. Invoke `ASC_ADMINRSTPASSWD(asce, adminUser, adminPassword, user, newpass);` passing the environment pointer and the prepared strings.\n5. Check the return value against the codes listed for ASC_ADMINRSTPASSWD to determine success or the type of failure.\n6. When finished, call `ASC_TERM(asce);` to terminate the authentication environment."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does the AS_INSUFFICIENTRIGHTS return value indicate when calling ASC_ADMINRSTPASSWD in the Fo Admin Nx driver, and how can you address it?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, a return value of `AS_INSUFFICIENTRIGHTS` from ASC_ADMINRSTPASSWD means that the administrative user is either not present, does not have the rights required to change the target user's password, or the administrative user's password is invalid. To resolve this, verify that:\n\n- The administrative user ID exists in the Census.\n- The administrative user has the appropriate permission to change other users' passwords.\n- The password supplied for the administrative user is correct.\nCorrect any of these issues and retry the ASC_ADMINRSTPASSWD call."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Fo Admin Nx driver mark the new password as expired unless it is non‑expiring when using ASC_ADMINRSTPASSWD?",
+      "input": "",
+      "output": "The Fo Admin Nx driver marks the new password as expired by default to enforce that the user must change the password at next login, which is a security best practice after an administrative reset. If the password is configured as non‑expiring, the driver respects that setting and does not mark it as expired."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about using ASC_ADMINRSTPASSWD in the Fo Admin Nx driver.",
+      "input": "",
+      "output": "ASC_ADMINRSTPASSWD in the Fo Admin Nx driver is used to administratively reset a user's password. It requires an initialized authentication environment, administrative credentials, the target user ID, and the new password. The function returns specific status codes indicating success or various failure conditions such as user not found, insufficient rights, or invalid arguments. The new password is treated as expired unless it is designated non‑expiring. After the operation, the environment should be terminated with ASC_TERM."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a complete C program that demonstrates initializing the Fo Admin Nx driver, resetting a user's password with ASC_ADMINRSTPASSWD, handling return values, and terminating the environment.",
+      "input": "",
+      "output": "#include <stdio.h>\n#include <stdlib.h>\n#include <ascauth.h>\n\nint main(int argc, char *argv[])\n{\n    ASCENV *asce;\n    char *adminUser, *adminPass, *user, *newpass;\n    int rc;\n\n    if (argc != 5) {\n        fprintf(stderr, \"usage: %s <adminUser> <adminPass> <user> <newpass>\\n\", argv[0]);\n        exit(EXIT_FAILURE);\n    }\n\n    adminUser = argv[1];\n    adminPass = argv[2];\n    user      = argv[3];\n    newpass   = argv[4];\n\n    /* initialize the authentication environment */\n    asce = ASC_INIT(NULL);\n    if (asce == NULL) {\n        fprintf(stderr, \"Error: cannot initialize authentication environment\\n\");\n        exit(EXIT_FAILURE);\n    }\n\n    /* change the user's password */\n    rc = ASC_ADMINRSTPASSWD(asce, adminUser, adminPass, user, newpass);\n    if (rc == AS_OK) {\n        printf(\"password has been changed\\n\");\n    } else {\n        printf(\"RC=%d, %s\\n\", rc, ASC_STRERROR(rc));\n    }\n\n    /* now terminate the authentication environment */\n    ASC_TERM(asce);\n    return 0;\n}"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you compile a program that uses ASC_ADMINRSTPASSWD from the Fo Admin Nx driver?",
+      "input": "",
+      "output": "To compile a C program that calls ASC_ADMINRSTPASSWD from the Fo Admin Nx driver, ensure that the Fo Admin Nx driver libraries and header files are available, then use a command similar to:\n\n```\ngcc -o resetpwd resetpwd.c -lFoAdminNx -lother_required_libraries\n```\n\nReplace `-lFoAdminNx` with the actual library name for the Fo Admin Nx driver and add any additional libraries required by the driver. Make sure the compiler can locate `ascauth.h` by using appropriate `-I` include path options if the headers are not in a standard location."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "driver": "Bidirectional eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does SSL encryption provide in the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "In the Bidirectional eDirectory driver, SSL encryption encrypts all traffic on the TCP/IP socket by using a public/private key pair, ensuring that the data exchanged between Identity Manager and the eDirectory servers is confidential and protected from eavesdropping."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why do existing certificates in the Identity Vault fail when the Bidirectional eDirectory driver is configured for SSL with the keystore method or the Always Accept Server Certificate option in an environment using Engine 4.6 and eDirectory 9.0.2 with Suite B?",
+      "input": "",
+      "output": "Existing certificates fail because Suite B specifies increased encryption strength for SSL certificates. The certificates originally stored in the Identity Vault do not meet the stronger encryption requirements of Suite B, causing SSL handshakes to fail when the Bidirectional eDirectory driver uses the keystore method or the Always Accept Server Certificate option."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you prepare the Identity Manager installation to support Suite B SSL connections for the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "To prepare the Identity Manager installation for Suite B SSL connections in the Bidirectional eDirectory driver:\n1. Download the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy files for your Java version (for example, Java 8 JCE files from Oracle’s download page).\n2. Copy the JCE policy files into the JRE path of your Identity Manager installation, replacing the existing policy files.\n3. Create new Elliptic Curve (EC) certificates that are compatible with Suite B requirements.\n4. Import the new EC certificates into the Identity Vault.\n5. Optionally, if you prefer not to manage new certificates, enable the \"Always Accept Server Certificate\" option for SSL communication in the Bidirectional eDirectory driver configuration.\n6. Restart the Identity Manager engine to apply the changes."
+    },
+    {
+      "category": "config",
+      "instruction": "Which option in the Bidirectional eDirectory driver allows the driver to accept any server certificate without validation?",
+      "input": "",
+      "output": "The Bidirectional eDirectory driver provides the \"Always Accept Server Certificate\" option, which, when enabled, causes the driver to accept any server certificate without performing standard validation."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What mutual authentication capability does the Bidirectional eDirectory driver provide, and how is it established on the Identity Manager side?",
+      "input": "",
+      "output": "The Bidirectional eDirectory driver supports mutual authentication, enabling secure data transfer and data integrity by authenticating both the client and the server. Mutual authentication is established on the Identity Manager side by configuring the driver to use the Identity Vault for authentication, allowing the driver to present its own certificate during the SSL handshake."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take if SSL connections fail because the existing Identity Vault certificates are not accepted when using the Bidirectional eDirectory driver with Suite B?",
+      "input": "",
+      "output": "If SSL connections fail due to incompatible certificates in the Identity Vault when using the Bidirectional eDirectory driver with Suite B, follow these steps:\n1. Download and install the JCE Unlimited Strength Jurisdiction Policy files for your Java version.\n2. Place the policy files in the JRE path of the Identity Manager installation.\n3. Generate new Elliptic Curve (EC) certificates that meet Suite B encryption strength requirements.\n4. Import the newly created EC certificates into the Identity Vault.\n5. Alternatively, enable the \"Always Accept Server Certificate\" option in the driver configuration to bypass certificate validation.\n6. Restart the Identity Manager engine and retest the SSL connection."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points for configuring SSL connections in the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "The Bidirectional eDirectory driver uses LDAP over SSL to encrypt traffic. When connecting Engine 4.6 to eDirectory 9.0.2 with Suite B, existing Identity Vault certificates are insufficient. To comply, install Java Cryptography Extension (JCE) Unlimited Strength policy files, create Suite B‑compatible Elliptic Curve certificates, or enable the \"Always Accept Server Certificate\" option. The driver also supports mutual authentication, which can be configured on the Identity Manager side to authenticate to the Identity Vault."
+    }
+  ]
+}

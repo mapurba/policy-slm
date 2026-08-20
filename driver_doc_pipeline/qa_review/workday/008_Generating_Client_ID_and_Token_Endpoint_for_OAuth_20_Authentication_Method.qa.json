@@ -1,0 +1,59 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of creating an x509 public key certificate for the Workday driver?",
+      "input": "",
+      "output": "For the Workday driver, an x509 public key certificate is required to enable the Jwt Bearer Grant type in OAuth 2.0 authentication. The certificate proves the identity of the client that will request access tokens, allowing Workday to verify the JWT signature and securely issue bearer tokens."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create an x509 public key certificate for the Workday driver using keytool?",
+      "input": "",
+      "output": "To create an x509 public key certificate for the Workday driver, follow these steps:\n1. Open a command prompt or terminal.\n2. Run the keytool command:\n   ```\n   keytool -genkey -keyalg RSA -alias Workday -keystore JWTkeystore.ks -storetype PKCS12 -storepass <Workday123!> -validity 360 -keysize 2048\n   ```\n   *Note*: Use PKCS12 as the storetype.\n3. When prompted, enter the following details:\n   - First Name\n   - Last Name\n   - Organizational Unit\n   - Organization\n   - City\n   - Province\n   - Country Code\n4. Confirm the information by entering **Yes**. A keystore file (e.g., JWTkeystore.pkcs12) is created.\n5. Export the public key and certificate:\n   ```\n   keytool -export -alias Workday -keystore JWTkeystore.ks -rfc -file publickey.cert\n   ```\n6. When asked for the password, provide the same password used in step 2.\n7. Display the certificate (optional): `cat publickey.cert`.\n8. Copy everything from the line `BEGIN CERTIFICATE` to `END CERTIFICATE` and save it for later use in the Workday driver configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the required parameters for the keytool command to generate the keystore for the Workday driver?",
+      "input": "",
+      "output": "The keytool command used for the Workday driver includes the following parameters:\n- `-genkey` – generate a key pair.\n- `-keyalg RSA` – use the RSA algorithm.\n- `-alias Workday` – alias name for the entry.\n- `-keystore JWTkeystore.ks` – name of the keystore file.\n- `-storetype PKCS12` – specify the keystore type as PKCS12.\n- `-storepass <Workday123!>` – password for the keystore (replace with your own password).\n- `-validity 360` – certificate validity period in days.\n- `-keysize 2048` – size of the RSA key.\nAll these parameters must be supplied exactly as shown to create a compatible keystore for the Workday driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you extract the public key certificate file for the Workday driver after generating the keystore?",
+      "input": "",
+      "output": "After generating the keystore for the Workday driver, extract the public key certificate with the following steps:\n1. Run the export command:\n   ```\n   keytool -export -alias Workday -keystore JWTkeystore.ks -rfc -file publickey.cert\n   ```\n2. When prompted, enter the keystore password you set during creation.\n3. The command creates `publickey.cert`, which contains the certificate in PEM (Base64) format.\n4. Optionally, display the content with `cat publickey.cert` and copy everything from `BEGIN CERTIFICATE` to `END CERTIFICATE` for use in the Workday driver configuration."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the password not be visible when entered during certificate creation for the Workday driver, and what should you do?",
+      "input": "",
+      "output": "When creating the certificate for the Workday driver, the password entry does not display characters on the screen. This is normal behavior for security reasons. To avoid issues, make sure you type the password correctly, remember it, or store it in a secure location because you will need it later to export the certificate and to configure the driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which OAuth 2.0 grant type must be selected when registering an API client for the Workday driver?",
+      "input": "",
+      "output": "When registering an API client for the Workday driver, you must select the **Jwt Bearer Grant** as the Client Grant Type."
+    },
+    {
+      "category": "howto",
+      "instruction": "What are the step‑by‑step actions to generate the Client ID and Token Endpoint for the Workday driver in the Workday application?",
+      "input": "",
+      "output": "To generate the Client ID and Token Endpoint for the Workday driver, follow these steps:\n1. Log in to the Workday application.\n2. Search for and click **Register API Client**.\n3. In the registration form:\n   a. Enter a name in the **Client Name** field.\n   b. Set **Client Grant Type** to **Jwt Bearer Grant**.\n   c. For **x509 Certificate**, choose **Create x509 Public Key**.\n   d. In the **Create x509 Public Key** page, enter your name and paste the certificate you created in the earlier steps (the content from `BEGIN CERTIFICATE` to `END CERTIFICATE`).\n   e. Select **Access Token Type** as **Bearer**.\n   f. Provide a **Redirection URL** (e.g., your organization’s home page URL).\n   g. Choose the required **Scope** values from the Workday REST API list (see the Scope values question for details).\n4. Click **OK**.\n5. Workday will generate a **Client ID** and a **Token Endpoint** URL.\n6. Save both values in a secure location; they are needed to configure OAuth 2.0 authentication for the Workday driver."
+    },
+    {
+      "category": "config",
+      "instruction": "Which scope values should be selected for the Workday driver when creating an API client?",
+      "input": "",
+      "output": "When creating an API client for the Workday driver, select the following Scope values from the Workday REST API:\n- Contact Information\n- Integration\n- Jobs & Positions\n- Organizations & Roles\n- Personal Data\n- System\n- Tenant Non-configurable\n- Include Workday Owned Scope"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the entire process of preparing OAuth 2.0 authentication for the Workday driver.",
+      "input": "",
+      "output": "To prepare OAuth 2.0 authentication for the Workday driver, first generate an x509 public key certificate using keytool (specifying RSA, PKCS12, a password, validity, and key size). Export the certificate to a PEM file and copy its contents. Then, in the Workday application, register a new API client: provide a client name, select **Jwt Bearer Grant**, create the x509 public key using the exported certificate, choose **Bearer** as the access token type, set a redirection URL, and select the required scopes (Contact Information, Integration, Jobs & Positions, Organizations & Roles, Personal Data, System, Tenant Non-configurable, Include Workday Owned Scope). After clicking OK, Workday returns a Client ID and a Token Endpoint URL, which must be saved for configuring the Workday driver’s OAuth 2.0 authentication method."
+    }
+  ]
+}

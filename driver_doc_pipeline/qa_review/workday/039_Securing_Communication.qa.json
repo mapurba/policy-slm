@@ -1,0 +1,53 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Workday driver only accept certificates from a Java keystore?",
+      "input": "",
+      "output": "The Workday driver only accepts certificates from a Java keystore because the driver is built on Java technology, which accesses certificates through the Java security infrastructure. Only certificates stored in a Java keystore can be read and used by the driver for establishing SSL/TLS connections."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of a trust store when configuring secure communication for the Workday driver?",
+      "input": "",
+      "output": "A trust store holds the certificate of the certificate authority (CA) that signed the Workday server’s SSL certificate. The Workday driver uses this trust store to verify the authenticity of the server’s certificate, ensuring that the communication between the Identity vault and Workday is encrypted and trusted."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you download the Workday tenant root CA certificate using Chrome for the Workday driver?",
+      "input": "",
+      "output": "1. Open Chrome and navigate to the Workday login URL.\n2. Click the lock icon in the address bar and select **Certificate (Valid)**.\n3. In the certificate dialog, click **Certification Path** to view the hierarchy.\n4. Select the top‑most root certificate and click **View Certificate**.\n5. Click **Details > Copy to File > Next > Next**.\n6. Provide a filename and save the certificate to a location on your system."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import a downloaded Workday root CA certificate into a Java keystore for the Workday driver?",
+      "input": "",
+      "output": "Run the Java keytool command with the downloaded certificate file:\n```\nkeytool -import -file <name_of_cert_file> -trustcacerts -noprompt -keystore <keystore_filename> -storepass <password>\n```\nFor example:\n```\nkeytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Workday driver to use a newly created trust store?",
+      "input": "",
+      "output": "1. In Identity Console, click the **IDM Administration** tile.\n2. On the Driver Dashboard, click the Workday driver’s icon.\n3. Select the **Configuration** tab and expand **Driver Parameters**.\n4. On the **Driver Settings** tab, locate **SSL Parameters > Workday Keystore file**.\n5. Enter the full path to the trust store you created.\n6. Save the configuration."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter specifies the location of the trust store for the Workday driver?",
+      "input": "",
+      "output": "The driver parameter is **SSL Parameters > Workday Keystore file**. This setting should contain the full filesystem path to the Java keystore that holds the trusted CA certificate."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you check if the Workday driver fails to establish an HTTPS connection due to a certificate error?",
+      "input": "",
+      "output": "Verify that:\n1. The certificate you imported is in a Java keystore format (not a Windows or PEM store).\n2. The trust store contains the root CA certificate that signed the Workday server’s certificate.\n3. The **SSL Parameters > Workday Keystore file** path points to the correct keystore file.\n4. The keystore password specified in the driver matches the password used when creating the keystore.\n5. The Workday server’s certificate chain matches the CA certificates you imported."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to secure communication for the Workday driver using HTTPS.",
+      "input": "",
+      "output": "To secure communication for the Workday driver, ensure the Workday tenant’s SSL certificate is in a Java keystore. Import the root CA certificate (preferably from the CA’s trusted URL) into a Java keystore using the `keytool -import` command. Then, in Identity Console, set the **SSL Parameters > Workday Keystore file** driver parameter to the path of this keystore and save the configuration."
+    }
+  ]
+}

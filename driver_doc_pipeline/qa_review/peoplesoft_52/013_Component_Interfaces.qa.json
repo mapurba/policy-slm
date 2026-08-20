@@ -1,0 +1,89 @@
+{
+  "driver": "PeopleSoft driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is a Component Interface (CI) in the PeopleSoft driver and why is it used?",
+      "input": "",
+      "output": "In the PeopleSoft driver a Component Interface (CI) is a PeopleTools object that maps to a specific PeopleSoft component. The Transaction CI gives the driver access to the transaction table, while the Schema CI provides access to the application data (schema). CIs expose the fields and methods needed for data synchronization and allow the PeopleSoft driver to read, update, and submit transaction data to Identity Manager."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter specifies the Transaction CI object name for the PeopleSoft driver?",
+      "input": "",
+      "output": "In the PeopleSoft driver parameters you must specify the Transaction CI object name exactly as defined in PeopleSoft. This parameter tells the driver which Component Interface to use to access the transaction table."
+    },
+    {
+      "category": "config",
+      "instruction": "How does the PeopleSoft driver identify a subset of transactions for processing?",
+      "input": "",
+      "output": "The PeopleSoft driver can limit processing to a particular subset of transactions by using the DIRXML_DRIVER field in the Transaction CI. The value placed in this field identifies the subset that a specific driver instance will handle."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What changes to CI field names were introduced in PeopleTools 8.41 that affect the PeopleSoft driver?",
+      "input": "",
+      "output": "PeopleTools 8.41 introduced two important changes: (1) spaces are no longer allowed in CI field names, and (2) CI field names became case‑sensitive, causing sorting issues (e.g., a field named CN sorts before City). To avoid these problems the PeopleSoft driver uses the standard ALL‑CAPS naming convention for all CI fields."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Transaction Record SQL Date/Time format for the PeopleSoft driver?",
+      "input": "",
+      "output": "To configure the Date/Time format for the PeopleSoft driver:\n1. Open the SQL view that defines the Transaction View record (e.g., DIRXML_TRANS01V).\n2. Ensure the %DateTimeOut() meta‑SQL function formats the strings as a lexicographically increasing value.\n3. Use the format YYYY‑MM‑DD for the date followed by a 24‑hour time HH:MM:SS (milliseconds may be appended). Example: 2004-08-26-14.44.33.000000 or 2004/08/26-14:44:33.\n4. Modify the SQL view to apply the required conversion if the default does not match this pattern.\n5. After editing, run Build > Create Views in PeopleSoft to rebuild the view.\n6. Have a qualified DBMS/PeopleSoft administrator apply the changes."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the field names used by the PeopleSoft driver for date and time in the Transaction View?",
+      "input": "",
+      "output": "The PeopleSoft driver uses the fields DIRXML_DTTM_ST and DIRXML_CURRDTTM_ST in the Transaction View to store the creation date/time of the transaction row and the current processing date/time, respectively."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the CITester reports \"Exception in thread \\\"main\\\" java.lang.NoClassDefFoundError: psft/pt8/util/PSProperties\" for the PeopleSoft driver, how should you resolve it?",
+      "input": "",
+      "output": "Add the correct version of psjoa.jar (the 8.1x or 8.4x version that matches the PeopleTools version of the target server) to the CLASSPATH environment variable or include it with the -classpath option on the Java command line. Also verify that the Java runtime is version 1.3.1 or later; an invalid JVM version can cause this error."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does the error \"ERROR: Transaction Component Interface element validation failed. Required Fields are not all present.\" mean for the PeopleSoft driver and how can you fix it?",
+      "input": "",
+      "output": "The error indicates that the specified Transaction CI does not contain all fields required by the PeopleSoft driver. To fix it, verify that you entered the correct Transaction CI name and ensure that the CI includes every field listed for DIRXML_TRANS01 (e.g., DIRXML_ASSOC_ID, DIRXML_CURRDTTM, DIRXML_DESCR, DIRXML_DRIVER, DIRXML_DTTM, DIRXML_EVENT, DIRXML_FIELDKEY, DIRXML_FIELDNAME, DIRXML_INST, DIRXML_PROCESSED, DIRXML_SCHEMA, DIRXML_STATUS, DIRXML_VALUE)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you run the CITester program to test Component Interfaces for the PeopleSoft driver?",
+      "input": "",
+      "output": "To run the CITester for the PeopleSoft driver:\n1. Ensure the CLASSPATH includes CITester.class, psjoa.jar, dirxmlcomps.jar, and any custom CI API JAR files.\n2. Verify that java.exe (JRE/JDK 1.3.1 or later) is on the PATH.\n3. From a command shell, execute the test with `java CITester` (or run the supplied CITester.bat which contains the correct syntax).\n4. Press Enter to accept default values; during Phase II you must enter the Application Server name (use leading double slashes, e.g., //255.255.255.255) and the Jolt port.\n5. The program writes results to the screen and to CITesterOutput.txt in the same directory as CITester.class.\n6. Review the four phases (session creation, authentication, Transaction CI validation, Schema CI validation) for success messages or error details."
+    },
+    {
+      "category": "config",
+      "instruction": "Which fields must be defined as key fields in the Transaction CI for the PeopleSoft driver?",
+      "input": "",
+      "output": "The PeopleSoft driver requires the fields DIRXML_DRIVER and DIRXML_INST to be defined as key fields in the Transaction Component Interface."
+    },
+    {
+      "category": "config",
+      "instruction": "What properties are required in the Schema CI for the PeopleSoft driver?",
+      "input": "",
+      "output": "The PeopleSoft driver expects the following properties in the Schema CI (all must be present, with the listed key fields marked):\n- ASSOC_ID (key)\n- STATUS\n- FULL_NAME\n- FIRST_NAME\n- MIDDLE_NAME (key)\n- LAST_NAME\n- BIRTH_DATE\n- DEPT_ID\n- DEPT_LONG_DESCR\n- DEPT_DN\n- TITLE_ID\n- TITLE_SHORT_DESCR\n- TITLE_LONG_DESCR\n- MANAGER_ID\n- MAIL_DROP\n- ADDRESS1\n- CITY\n- STATE\n- POSTAL\n- MANAGER\n- COMMON_NAME\n- DISTINGUISHED_NAME\n- DESCRIPTION\n- EMAIL_ID\n- PHONE_BUSN\n- PHONE_CELL\n- PHONE_HOME\n- PHONE_PGR"
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the PeopleSoft driver process a transaction after retrieving it via the Transaction CI?",
+      "input": "",
+      "output": "After the PeopleSoft driver retrieves a transaction via the Transaction CI, it sets the transaction status to \"In Process\", reads the Event Name (DIRXML_EVENT) to determine whether the operation is Add, Modify, or Delete, and gathers the Schema ID (DIRXML_SCHEMA) and Associate ID (DIRXML_ASSOC_ID). It then constructs an XML document representing the change and passes this document to the Identity Manager engine for processing. Once processing completes, the driver updates the transaction status (DIRXML_STATUS) and, if applicable, writes any error or warning messages to the Comment field (DIRXML_DESCR) in the PeopleSoft transaction table."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure PeopleCode to trigger transactions for the PeopleSoft driver?",
+      "input": "",
+      "output": "To configure PeopleCode to trigger transactions for the PeopleSoft driver:\n1. Use the PeopleSoft PSA function DirXML_Trans in the SavePostChange PeopleCode on the relevant record definition so that data is committed before the transaction is generated.\n2. The DirXML_Trans call creates a transaction record in the PeopleSoft transaction table.\n3. Ensure the DIRXML_DRIVER field (if using subsets) and other required fields are correctly populated.\n4. Deploy the PeopleCode changes and verify that transactions appear in the transaction table for the driver to process."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to configure and test Component Interfaces for the PeopleSoft driver.",
+      "input": "",
+      "output": "For the PeopleSoft driver you must (1) define a Transaction CI and a Schema CI in PeopleTools; (2) set the driver parameter to the Transaction CI name and optionally a DIRXML_DRIVER subset identifier; (3) ensure the Transaction CI contains all required fields (DIRXML_* properties) with DIRXML_DRIVER and DIRXML_INST marked as key fields; (4) verify the Schema CI includes the required properties (e.g., ASSOC_ID, STATUS, etc.) with the appropriate key field; (5) configure the Transaction View date/time fields (DIRXML_DTTM_ST, DIRXML_CURRDTTM_ST) to use a lexicographically sortable format (YYYY‑MM‑DD HH:MM:SS); (6) place DirXML_Trans calls in PeopleCode SavePostChange to generate transactions; (7) run the CITester program, setting CLASSPATH to include CITester.class, psjoa.jar, dirxmlcomps.jar, and any custom CI JARs, then execute the four test phases to verify client session, authentication, Transaction CI validation, and Schema CI validation; and (8) resolve any errors reported by CITester before putting the driver into production."
+    }
+  ]
+}

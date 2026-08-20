@@ -1,0 +1,65 @@
+{
+  "driver": "GroupWise driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the NGW: Object ID attribute in the GroupWise driver and what are its constraints?",
+      "input": "",
+      "output": "In the GroupWise driver, the NGW: Object ID attribute corresponds to GroupWise attribute 50073. It represents the mailbox name, which must be unique within a post office. The value can be 1 to 256 characters long and cannot contain any of the following characters: ( ) @ . : \", { } * . The attribute takes its value from the eDirectory CN attribute and is set when an account is created, modified, or renamed. Changing this value may also modify related attributes such as Email Address, Internet Email Address, NGW: GroupWise ID, and the Identity Manager association key."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the GroupWise driver interpret the Login Disabled attribute and what effect does it have on a GroupWise account?",
+      "input": "",
+      "output": "The GroupWise driver maps the eDirectory Login Disabled property to GroupWise attribute 50058. It is a Boolean value indicating whether eDirectory login (authentication) is allowed. During Create and Modify events, the shim converts a true value to 1 and a false value to 0. Setting GroupWise attribute 50058 to 1 disables the corresponding GroupWise account."
+    },
+    {
+      "category": "config",
+      "instruction": "List the GroupWise attributes that are included in the schema mapping policy for the upgraded GroupWise driver and give a brief description of each.",
+      "input": "",
+      "output": "The upgraded GroupWise driver includes the following attributes in its schema mapping policy:\n\n| GroupWise Attribute | Description |\n|---------------------|-------------|\n| 50091 (Given Name) | User’s first name – synchronizes from eDirectory on Create and Modify events. |\n| 50093 (Surname) | User’s last name – synchronizes from eDirectory on Create and Modify events. |\n| 50096 (Title) | User’s title – synchronizes from eDirectory on Create and Modify events. |\n| 50089 (OU) | User’s department – synchronizes from eDirectory on Create and Modify events. |\n| 50095 (Telephone Number) | User’s telephone number – synchronizes from eDirectory on Create and Modify events. |\n| 50145 (Facsimile Telephone Number) | Synchronizes only the telephone number portion from eDirectory on Create and Modify events. |\n| 50073 (NGW: Object ID) | Mailbox name; unique within a post office, 1‑256 characters, cannot contain prohibited characters. |\n| 50116 (NGW Account ID) | Optional accounting field; can be set via Create rule or Create style sheet. |\n| 59001 (NGW: Gateway Access) | Can be set via Create rule or style sheet; not set by the driver by default. |\n| 50138 (NGW: Mailbox Expiration Time) | Used to set NGW: Expiration Time, which in turn sets GroupWise attribute 50058. |\n| 50058 (Login Disabled) | Boolean indicating if eDirectory login is allowed; true converts to 1 (account disabled). |\n| 50038 (NGW: File ID) | Three‑character system file identifier; unique within a post office; set by GroupWise; should not be modified in style sheets. |\n| 50076 (NGW: Visibility) | Controls replication databases and address‑book visibility; can be set via Create rule or style sheet (values: SYSTEM, NONE, POST_OFFICE, DOMAIN). |\n| 50081 (NGW: Owner) | For GroupWise Resource objects, identifies the owning user by Object ID. |\n| 50032 (Description) | Provides additional information; synchronizes from eDirectory on Create and Modify events."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the custom GroupWise attributes that are not part of the default schema mapping policy and what are their key restrictions?",
+      "input": "",
+      "output": "The following custom attributes can be defined in the GroupWise driver but are not part of the default schema mapping policy:\n\n| GroupWise Attribute | Description and Restrictions |\n|---------------------|------------------------------|\n| 50319 | Preferred Internet eMail ID. Must be unique across the entire GroupWise system; 1‑256 characters; cannot contain ( ) @ : , { } * \" characters. |\n| 50045 | Internet domain name. Takes a string value; must be converted to a structured attribute because GroupWise accepts some attributes only in a structured format. Example: MyDomain.com |\n| 50094 | Net ID. Can be a fully distinguished name or the common name. |\n| 58004 | DS_DN. Always the fully distinguished name. |\n| 58056 | LDAP authentication ID in typeful format (e.g., cn=admin, o=novell). |\n| 50013 | Preferred Internet address format (numeric). Values: 0‑Full (Name.PostOffice.Domain@IDomain.com), 1‑Host and User ID, 2‑User ID, 3‑Lastname.firstname, 4‑Firstname.lastname, 5‑No setting (reserved), 6‑First initial and last name. |\n| 50320 | Allowed Addressing formats (bit‑mask). Bits: 0‑None, 1‑Full (must not be set), 2‑Host, 4‑User ID, 8‑Lastname.Firstname, 16‑Firstname.Lastname, 32‑First initial and last name. Combine bits using OR; e.g., to allow only full name use value 62 (0x3E). |\n| 50157 | Exclusive use of Internet domain name. In legacy driver use 50157; in GroupWise driver use 50045. Boolean: True requires setting an Internet domain name (50045); False uses the domain name already set in 50045. |\n| 50032 | Description – provides additional information; synchronizes from eDirectory on Create and Modify events."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the NGW: Visibility attribute to give global visibility for a user in the GroupWise driver?",
+      "input": "",
+      "output": "To give a user global visibility using the GroupWise driver, add code to the Create rule (or Create style sheet) that sets the NGW: Visibility attribute (GroupWise attribute 50076) to the value SYSTEM. Example steps:\n1. Open the Create rule for the relevant eDirectory class.\n2. Insert a line that sets the attribute, e.g., `setAttribute( \"50076\", \"SYSTEM\" );`.\n3. Save the rule and re‑publish the policy.\nThe driver will then apply global visibility to the user object."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you set the NGW: Visibility attribute for a GroupWise post office to be visible only in that post office using the GroupWise driver?",
+      "input": "",
+      "output": "To limit visibility to a specific post office with the GroupWise driver, modify the Create rule (or Create style sheet) to set NGW: Visibility (attribute 50076) to POST_OFFICE. Example procedure:\n1. Edit the Create rule for the GroupWise Post Office class.\n2. Add the line `setAttribute( \"50076\", \"POST_OFFICE\" );`.\n3. Save and publish the policy.\nThe object will then be replicated only to the database of the specified post office."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might setting the NGW: Object ID attribute to a value that includes prohibited characters cause the GroupWise driver to fail, and what characters are not allowed?",
+      "input": "",
+      "output": "The GroupWise driver enforces that the NGW: Object ID (attribute 50073) cannot contain certain characters. If you attempt to set this attribute to a value that includes any of the prohibited characters — ( ) @ . : \", { } * — the driver will reject the value and the provisioning operation will fail. This restriction ensures the mailbox name remains valid within GroupWise."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample Create style sheet snippet for the GroupWise driver that sets the NGW: Visibility attribute to NONE and also sets the NGW: Account ID to \"COST123\".",
+      "input": "",
+      "output": "<styleSheet>\n  <setAttribute name=\"50076\" value=\"NONE\"/><!-- NGW: Visibility -->\n  <setAttribute name=\"50116\" value=\"COST123\"/><!-- NGW Account ID -->\n</styleSheet>"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key attribute mappings and customizations available in the GroupWise driver according to the documentation page.",
+      "input": "",
+      "output": "The GroupWise driver maps standard eDirectory user attributes (e.g., Given Name, Surname, Title, OU, Telephone Number) to specific GroupWise numeric attributes (e.g., 50091, 50093, 50096, 50089, 50095) for creation and modification events. It also includes NGW‑prefixed attributes for the upgraded driver, such as NGW: Object ID (50073), NGW Account ID (50116), NGW: Visibility (50076), and NGW: Mailbox Expiration Time (50138), which can be set via Create rules or style sheets. Custom attributes not in the default schema (e.g., 50319 Preferred Internet eMail ID, 50045 Internet domain name, 50013 Preferred Internet address format, 50320 Allowed Addressing formats, 50157 Exclusive use of Internet domain name) provide additional configuration options, each with specific formatting rules and value constraints. Visibility can be controlled with values like SYSTEM, NONE, POST_OFFICE, or DOMAIN, and certain attributes such as Login Disabled (50058) and Login Expiration Time (50138) control account status."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What does the Allowed Addressing formats attribute (50320) control in the GroupWise driver and how are its values represented?",
+      "input": "",
+      "output": "In the GroupWise driver, the Allowed Addressing formats attribute (50320) controls which address formats are permitted for a user. It is a bit‑mask where each bit represents a format:\n- 0 – None\n- 1 – Full (must never be set; setting this bit is illegal)\n- 2 – Host\n- 4 – User ID\n- 8 – Lastname.Firstname\n- 16 – Firstname.Lastname\n- 32 – First initial and last name\nYou combine allowed formats using a logical OR. For example, to allow only the full name format you would use the value 62 (0x3E), which sets bits 2, 4, 8, 16, and 32."
+    }
+  ]
+}

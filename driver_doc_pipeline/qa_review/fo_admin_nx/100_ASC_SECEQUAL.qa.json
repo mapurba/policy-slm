@@ -1,0 +1,41 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the ASC_SECEQUAL function do in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, the ASC_SECEQUAL function checks whether a specified Enterprise User ID has security equivalence to a given fully distinguished object name. It returns a status code indicating the result of the security equivalence test."
+    },
+    {
+      "category": "config",
+      "instruction": "What parameters must be supplied to ASC_SECEQUAL in the Fo Admin Nx driver and what does each parameter represent?",
+      "input": "",
+      "output": "The ASC_SECEQUAL function in the Fo Admin Nx driver takes three parameters:\n\n| Parameter | Description |\n|-----------|-------------|\n| **asce** | The environment pointer returned from a prior call to ASC_INIT() or ASC_INIT_EXT(). |\n| **user** | The Enterprise User ID (string) whose security equivalence is to be tested. |\n| **object** | The fully distinguished object name (string) against which the user’s security equivalence is evaluated. |\n\nAll three arguments must be valid, non‑null pointers before the call is made."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the possible return values from ASC_SECEQUAL in the Fo Admin Nx driver and what does each value indicate?",
+      "input": "",
+      "output": "ASC_SECEQUAL in the Fo Admin Nx driver returns one of the integer constants defined in **ascauth.h**:\n\n| Return Value | Meaning |\n|--------------|---------|\n| **AS_OK** | User has security equivalence to the specified object. |\n| **AS_NO** | User does **not** have security equivalence to the object. |\n| **AS_NOUSER** | User is inactive or not found in the Census. |\n| **AS_BADCLIENT** | The local host is not authorized to query the Core Driver. |\n| **AS_NOAGENT** | No Core Driver could be contacted. |\n| **AS_NOAUTHENV** | No authentication environment has been established. |\n| **AS_INVALIDREQ** | The call was rejected by the Core Driver as not valid or not supported. |\n| **AS_INVALIDARGS** | Invalid arguments were supplied to the function. |\n| **AS_INVALIDOBJ** | The specified object does not exist. |\n| **AS_KEYEXPIRED** | The key used for the request has expired. |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you call ASC_SECEQUAL in a C program using the Fo Admin Nx driver?",
+      "input": "",
+      "output": "To use ASC_SECEQUAL with the Fo Admin Nx driver, follow these steps in your C program:\n\n1. Include the required headers:\n   ```c\n   #include <stdio.h>\n   #include <stdlib.h>\n   #include <ascauth.h>\n   ```\n2. Parse command‑line arguments to obtain the **user** and **object** strings.\n3. Initialize an authentication environment:\n   ```c\n   ASCENV *asce = ASC_INIT(NULL);\n   if (asce == NULL) {\n       fprintf(stderr, \"Error: cannot initialize authentication environment\\n\");\n       exit(EXIT_FAILURE);\n   }\n   ```\n4. Call ASC_SECEQUAL with the environment, user, and object:\n   ```c\n   int rc = ASC_SECEQUAL(asce, user, object);\n   ```\n5. Evaluate the return code:\n   ```c\n   if (rc == AS_OK)\n       printf(\"User has security equivalence\\n\");\n   else\n       printf(\"RC=%d, %s\", rc, ASC_STRERROR(rc));\n   ```\n6. Terminate the authentication environment before exiting:\n   ```c\n   ASC_TERM(asce);\n   ```\n7. Return from **main**.\n\nThe example in the documentation follows exactly these steps."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If ASC_SECEQUAL returns AS_INVALIDARGS when used with the Fo Admin Nx driver, what might be wrong and how can it be corrected?",
+      "input": "",
+      "output": "When ASC_SECEQUAL returns **AS_INVALIDARGS** in the Fo Admin Nx driver, it means that one or more arguments passed to the function are invalid. Common causes include:\n\n- Passing a **NULL** pointer for *asce*, *user*, or *object*.\n- Supplying an empty string for the user ID or object name.\n- Providing strings that are not properly null‑terminated.\n\nTo fix the issue, ensure that:\n1. **asce** is a valid pointer returned from a successful call to **ASC_INIT** or **ASC_INIT_EXT**.\n2. **user** contains a non‑empty, null‑terminated Enterprise User ID.\n3. **object** contains a non‑empty, null‑terminated fully distinguished object name.\n4. All three arguments are correctly ordered in the function call.\n\nAfter correcting the arguments, re‑run the program; the function should return a different status code reflecting the actual security equivalence result."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key information about ASC_SECEQUAL provided in the Fo Admin Nx driver documentation.",
+      "input": "",
+      "output": "The Fo Admin Nx driver documentation for **ASC_SECEQUAL** describes a function that tests whether a given Enterprise User ID has security equivalence to a specified fully distinguished object. The function prototype is `int ASC_SECEQUAL(ASCENV *asce, char *user, char *object);`. It requires an authentication environment pointer (from **ASC_INIT**/**ASC_INIT_EXT**), a user ID, and an object name. The function returns a set of integer codes defined in **ascauth.h**, indicating success (**AS_OK**), lack of equivalence (**AS_NO**), or various error conditions such as invalid arguments (**AS_INVALIDARGS**) or missing objects (**AS_INVALIDOBJ**). An example program shows how to initialize the environment, call the function, interpret the return code (using **ASC_STRERROR** for messages), and clean up with **ASC_TERM**."
+    }
+  ]
+}

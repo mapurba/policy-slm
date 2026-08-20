@@ -1,0 +1,47 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the ASC_GRPMEM function do in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "The ASC_GRPMEM function in the Fo Admin Nx driver obtains a list of all members of a specified group and places that list into a caller‑supplied buffer. Each member name is separated by a newline character."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the parameters of the ASC_GRPMEM function in the Fo Admin Nx driver and what does each represent?",
+      "input": "",
+      "output": "The ASC_GRPMEM function in the Fo Admin Nx driver has the following parameters:\n\n| Parameter | Description |\n|-----------|-------------|\n| **asce** | The environment item returned from ASC_INIT() or ASC_INIT_EXT(). |\n| **object** | The fully distinguished group name whose membership list is to be returned. |\n| **buf** | The buffer that will receive the membership list. Member names are separated by a new line (‘\\n’) character. If the buffer is too small the list is truncated and the function returns AS_TOOSMALL. |\n| **size** | The size of the buffer supplied in **buf** (in bytes). |"
+    },
+    {
+      "category": "config",
+      "instruction": "What return values can ASC_GRPMEM produce in the Fo Admin Nx driver and what does each indicate?",
+      "input": "",
+      "output": "ASC_GRPMEM in the Fo Admin Nx driver returns one of the integer constants defined in ascauth.h:\n\n| Return value | Meaning |\n|--------------|---------|\n| **AS_OK** | Member list successfully returned |\n| **AS_BADCLIENT** | Local host not authorized to query the Core Driver |\n| **AS_NOAGENT** | No Core Driver could be contacted |\n| **AS_NOAUTHENV** | No environment has been established |\n| **AS_INVALIDREQ** | Call rejected by the Core Driver as not valid or not supported |\n| **AS_INVALIDARGS** | Invalid arguments supplied to the function |\n| **AS_TOOSMALL** | Size of the pre‑allocated buffer is too small – list truncated |\n| **AS_INVALIDOBJ** | Specified object does not exist |\n| **AS_KEYEXPIRED** | Old key rejected because its expiration date has passed |"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve the full member list of a group using ASC_GRPMEM in the Fo Admin Nx driver, handling possible buffer truncation?",
+      "input": "",
+      "output": "To retrieve the full membership list of a group with ASC_GRPMEM in the Fo Admin Nx driver and handle possible truncation:\n\n1. Call **ASC_INIT** (or **ASC_INIT_EXT**) to obtain an **ASCENV** pointer.\n2. Allocate a buffer large enough for an initial attempt (e.g., `char buffer[2000];`).\n3. Call **ASC_GRPMEM(asce, groupName, buffer, sizeof(buffer))**.\n4. Check the return code:\n   - If **AS_OK**, the buffer contains the complete list.\n   - If **AS_TOOSMALL**, the buffer contains a truncated list; allocate a larger buffer (increase size) and call **ASC_GRPMEM** again.\n5. Process the newline‑separated member names in the buffer as needed.\n6. When finished, terminate the environment with **ASC_TERM(asce)**.\n\nThe example program in the documentation follows these steps."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if ASC_GRPMEM returns AS_TOOSMALL when using the Fo Admin Nx driver?",
+      "input": "",
+      "output": "If ASC_GRPMEM returns **AS_TOOSMALL** in the Fo Admin Nx driver, it means the buffer provided was insufficient to hold the entire group member list. To resolve this:\n\n1. Note that the buffer already contains a truncated list; you may display it if partial data is useful.\n2. Allocate a larger buffer (for example, double the previous size or choose a size you estimate will be sufficient).\n3. Call **ASC_GRPMEM** again with the new, larger buffer.\n4. Repeat the process until the function returns **AS_OK**, indicating the full list has been retrieved."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key points about the ASC_GRPMEM function in the Fo Admin Nx driver.",
+      "input": "",
+      "output": "The ASC_GRPMEM function in the Fo Admin Nx driver returns the membership list of a specified group, placing newline‑separated member names into a caller‑provided buffer. It requires an initialized authentication environment, the fully distinguished group name, a buffer, and the buffer size. Return codes indicate success, buffer too small, invalid arguments, and other error conditions. If the buffer is too small (**AS_TOOSMALL**), retry with a larger buffer. The function can be used alongside ASC_SECEQUAL (to test individual membership) and ASC_LISTSEQV (to list groups for a user)."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write a C function named get_all_group_members that uses ASC_GRPMEM from the Fo Admin Nx driver to return a dynamically allocated string containing the full member list of a given group. The function should handle the AS_TOOSMALL case by resizing the buffer as needed and return NULL on error.",
+      "input": "",
+      "output": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ascauth.h>\n\n/*\n * Retrieves the full membership list for *group* using ASC_GRPMEM.\n * On success returns a newly allocated string that the caller must free.\n * Returns NULL if an unrecoverable error occurs.\n */\nchar *get_all_group_members(ASCENV *asce, const char *group)\n{\n    size_t bufsize = 2048;               /* start with 2 KB */\n    char *buf = NULL;\n    int rc;\n\n    while (1) {\n        buf = (char *)realloc(buf, bufsize);\n        if (!buf) {\n            perror(\"realloc\");\n            return NULL;\n        }\n\n        rc = ASC_GRPMEM(asce, (char *)group, buf, (u_int)bufsize);\n        if (rc == AS_OK) {\n            /* Successful full retrieval */\n            return buf;\n        } else if (rc == AS_TOOSMALL) {\n            /* Buffer too small – increase and retry */\n            bufsize *= 2;   /* double the size */\n            continue;\n        } else {\n            /* Some other error – report and clean up */\n            fprintf(stderr, \"ASC_GRPMEM failed: %s\\n\", ASC_STRERROR(rc));\n            free(buf);\n            return NULL;\n        }\n    }\n}"
+    }
+  ]
+}

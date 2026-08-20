@@ -1,0 +1,47 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of customizing the stylesheet in the Workday driver?",
+      "input": "",
+      "output": "In the Workday driver, customizing the stylesheet allows you to modify or add attribute mappings between Workday objects and Identity Vault attributes. By editing the XSLT stylesheet, you can change which Workday data element is used for a given attribute (e.g., switching from an international phone number to a national formatted phone) and introduce new attributes that are not supplied by default."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you modify an existing phone attribute in the Workday driver’s custom stylesheet?",
+      "input": "",
+      "output": "To modify an existing phone attribute in the Workday driver’s custom stylesheet, follow these steps:\n1. Open the custom stylesheet used for the Publisher channel.\n2. Locate the `<attr>` block for the phone attribute. The original block looks like:\n```xml\n<attr>\n  <xsl:attribute name=\"attr-name\">\n    <xsl:value-of select='\"wd-WorkPrimaryPhone\"'/>\n  </xsl:attribute>\n  <value>\n    <xsl:value-of select=\"$primary_work_phone_node/@wd:International_Formatted_Phone\"/>\n  </value>\n</attr>\n```\n3. Change the XPath in the `<value>` element to reference the national formatted phone attribute, resulting in:\n```xml\n<attr>\n  <xsl:attribute name=\"attr-name\">\n    <xsl:value-of select='\"wd-WorkPrimaryPhone\"'/>\n  </xsl:attribute>\n  <value>\n    <xsl:value-of select=\"$primary_work_phone_node/@wd:National_Formatted_Phone\"/>\n  </value>\n</attr>\n```\n4. Save the stylesheet and restart the Workday driver for the change to take effect."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter field is used to specify the XSLT stylesheet path for the Workday driver’s Publisher channel?",
+      "input": "",
+      "output": "In the Workday driver, the XSLT stylesheet path for the Publisher channel is specified in the **Import Worker Stylesheet** field, which is located under:\n- Driver Configuration > Driver Parameters > Publisher Options > Worker > Worker Poll Settings > **Import Worker Stylesheet**.\nEnter the full file system path or URL to the custom XSLT file in this field, then save and restart the driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the schema definition syntax for adding a new attribute, such as wd-MaritalStatusID, in the Workday driver?",
+      "input": "",
+      "output": "The schema extension for a new attribute in the Workday driver uses the following syntax:\n```text\n\"wd-MaritalStatusID\" ATTRIBUTE ::=\n{\n  Operation ADD,\n  SyntaxID SYN_CI_STRING,\n  Flags {DS_STRING_ATTR},\n  ASN1ObjID {2 16 840 1 113719 1 14 4 1 2746}\n}\n```\nAdd this block to the `.sch` (schema extension) file so that Identity Manager recognizes the new attribute."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you add a new attribute, such as Marital Status, to the Workday driver’s Publisher channel?",
+      "input": "",
+      "output": "To add a new attribute (e.g., Marital Status) to the Workday driver’s Publisher channel, perform the following steps:\n1. Fetch the SOAP response from Workday.\n2. Identify the XPath of the required attribute in the SOAP response.\n3. Build the XPath in the format required by the XSLT stylesheet.\n4. Add the XPath to the XSLT stylesheet. Example snippet:\n```xml\n<!--  **** Worker : Marital Status************* -->\n<attr>\n  <xsl:attribute name=\"attr-name\">\n    <xsl:value-of select='\"wd-MaritalStatusID\"'/>\n  </xsl:attribute>\n  <value>\n    <xsl:value-of select=\"wd:Worker_Data/wd:Personal_Data/wd:Marital_Status_Reference/wd:ID[@wd:type='Marital_Status_ID']\"/>\n  </value>\n</attr>\n```\n5. Extend the schema file (.sch) with the attribute definition (see the config QA for the exact syntax).\n6. In Identity Console, open the IDM Administration tile.\n7. On the Driver Dashboard, click the **Workday Driver** icon.\n8. Select the **Data Transformation and Synchronization** tab.\n9. Click **Filter** in the Publisher Channel.\n10. Add the attribute name (e.g., wd-MaritalStatusID):\n   a. Choose **User** as the class and click **Add Attribute**.\n   b. Click **Show All Attribute** and select **wd-MaritalStatusID**, then save.\n   c. Set the Publisher option to **Synchronize** to match the attribute name with the schema extension.\n11. Add the XSLT stylesheet path:\n   a. Click the **Configuration** tab.\n   b. Expand **Driver Parameters** and select the **Subscriber Settings** tab.\n   c. Enter the path in the **Import Worker Stylesheet** field.\n12. Save all changes.\n13. Restart the Workday driver for the new attribute to become active."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to customize attributes using the Workday driver.",
+      "input": "",
+      "output": "The Workday driver customization process involves:\n- Editing the custom XSLT stylesheet to modify existing attribute mappings or add new `<attr>` blocks.\n- For new attributes, identify the Workday SOAP XPath, build the XSLT entry, and extend the schema (.sch) file with the attribute definition.\n- In Identity Console, add the new attribute to the appropriate object class, set the Publisher option to Synchronize, and provide the stylesheet path via the **Import Worker Stylesheet** driver parameter.\n- Save the configuration and restart the Workday driver so the changes take effect."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XSLT snippet for a new Workday driver attribute named wd-EmployeeHireDate that extracts the hire date from the path wd:Worker_Data/wd:Employment_Data/wd:Hire_Date.",
+      "input": "",
+      "output": "```xml\n<!--  **** Worker : Employee Hire Date ************* -->\n<attr>\n  <xsl:attribute name=\"attr-name\">\n    <xsl:value-of select='\"wd-EmployeeHireDate\"'/>\n  </xsl:attribute>\n  <value>\n    <xsl:value-of select=\"wd:Worker_Data/wd:Employment_Data/wd:Hire_Date\"/>\n  </value>\n</attr>\n```"
+    }
+  ]
+}

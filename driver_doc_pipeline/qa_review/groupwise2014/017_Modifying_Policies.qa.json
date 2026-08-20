@@ -1,0 +1,83 @@
+{
+  "driver": "GroupWise 2014 driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of specifying the post office in the GroupWise 2014 driver policies?",
+      "input": "",
+      "output": "In the GroupWise 2014 driver, the post office determines where new GroupWise user accounts are created. By default all new users go to a single post office, but the Subscriber Placement policy can be customized to select a post office based on an Identity Vault attribute value or the container where the user resides. This allows organizations to automatically place users into the appropriate GroupWise post office, such as Sales or Engineering, during account creation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you place users into different post offices based on their Identity Vault container using the GroupWise 2014 driver?",
+      "input": "",
+      "output": "Create two placement rules in the GroupWise 2014 driver policies. Each rule checks the source DN container and sets the destination DN to the desired post office:\n\n```xml\n<rule>\n  <description>Users in Sales container are placed in Post Office PO1</description>\n  <conditions>\n   <and>\n    <if-class-name op=\"equal\">User</if-class-name>\n    <if-src-dn op=\"in-container\">data\\users\\Sales</if-src-dn>\n   </and>\n  </conditions>\n  <actions>\n   <do-set-op-dest-dn>\n    <arg-dn>\n     <token-text xml:space=\"preserve\">GWDomain.PO1</token-text>\n    </arg-dn>\n   </do-set-op-dest-dn>\n   <do-break/>\n  </actions>\n</rule>\n<rule>\n  <description>Users in Engineering container are placed in Post Office PO2</description>\n  <conditions>\n   <and>\n    <if-class-name op=\"equal\">User</if-class-name>\n    <if-src-dn op=\"in-container\">data\\users\\Engr</if-src-dn>\n   </and>\n  </conditions>\n  <actions>\n   <do-set-op-dest-dn>\n    <arg-dn>\n     <token-text xml:space=\"preserve\">GWDomain.PO2</token-text>\n    </arg-dn>\n   </do-set-op-dest-dn>\n   <do-break/>\n  </actions>\n</rule>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What are the length and character restrictions for the UserID attribute in the GroupWise 2014 driver?",
+      "input": "",
+      "output": "The UserID used for a GroupWise account must be between 1 and 256 characters. It cannot contain any of the following characters: ( ) @ . : , { } \\ * \" . Additionally, the UserID must be unique within its post office and shares the same namespace as nicknames; the reserved ID “mapi” must not be used."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the Create policy to use the Identity Vault \"Given Name\" attribute as the GroupWise account name in the GroupWise 2014 driver?",
+      "input": "",
+      "output": "Add a rule to the Create (or Subscriber Create) policy that vetoes the operation if the required attributes are missing and then reformats the CN attribute with the value of \"Given Name\":\n\n```xml\n<rule>\n  <description> Use Given Name for GroupWise Account Name</description>\n  <conditions>\n    <and>\n      <if-class-name op=\"equal\">User</if-class-name>\n    </and>\n  </conditions>\n  <actions>\n    <!-- 'CN' and 'Given Name' must be present -->\n    <do-veto-if-op-attr-not-available name=\"CN\"/>\n    <do-veto-if-op-attr-not-available name=\"Given Name\"/>\n    <!-- replace current CN value with the 'Given Name' value -->\n    <do-reformat-op-attr name=\"CN\">\n      <arg-value type=\"string\">\n        <token-op-attr name=\"Given Name\"/>\n      </arg-value>\n    </do-reformat-op-attr>\n  </actions>\n</rule>\n```"
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a Schema Mapping XML snippet that maps the Identity Vault attribute \"Location\" to the GroupWise generic attribute 55003 for the GroupWise 2014 driver.",
+      "input": "",
+      "output": "```xml\n<attr-name class-name=\"User\">\n     <nds-name>Location</nds-name>\n     <app-name>55003</app-name>\n</attr-name>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you query the GroupWise 2014 driver to obtain the record count of users in domain \"dom1\" and post office \"po1\"?",
+      "input": "",
+      "output": "Send a DirXML query that searches for the User class, filters on the domain (attribute 50035) and post office (attribute 50062), and reads the special attribute \"Record Count\":\n\n```xml\n<nds dtdversion=\"2.0\" ndsversion=\"8.x\">\n   <input>\n     <query event-id=\"query-groupwise\" scope=\"subtree\">\n       <search-class class-name=\"User\"/>\n       <search-attr attr-name=\"50035\">\n         <value>dom1</value>\n       </search-attr>\n       <search-attr attr-name=\"50062\">\n         <value>po1</value>\n       </search-attr>\n       <!-- return Record Count -->\n       <read-attr attr-name=\"Record Count\"/>\n     </query>\n   </input>\n</nds>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you modify the query to obtain the total number of users in the domain \"dom1\" regardless of post office using the GroupWise 2014 driver?",
+      "input": "",
+      "output": "Remove the post office filter (attribute 50062) from the query shown in the previous example. The query will then return the record count for all users in the specified domain:\n\n```xml\n<nds dtdversion=\"2.0\" ndsversion=\"8.x\">\n   <input>\n     <query event-id=\"query-groupwise\" scope=\"subtree\">\n       <search-class class-name=\"User\"/>\n       <search-attr attr-name=\"50035\">\n         <value>dom1</value>\n       </search-attr>\n       <!-- No post office filter -->\n       <read-attr attr-name=\"Record Count\"/>\n     </query>\n   </input>\n</nds>\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "How do you enable automatic creation of GroupWise nicknames on rename or move in the GroupWise 2014 driver?",
+      "input": "",
+      "output": "In the Global Configuration Values page of the GroupWise 2014 driver, set the option \"Create GroupWise Nicknames on Rename/Move\" (or the similarly named GCV) to **True**. When the value is True, the driver automatically creates a nickname record whenever an Identity Vault rename event or a GroupWise account move occurs. Setting the value to False disables automatic nickname creation."
+    },
+    {
+      "category": "howto",
+      "instruction": "Show an example of an Add operation that creates a GroupWise nickname record using the <add> element with a destination DN for the GroupWise 2014 driver.",
+      "input": "",
+      "output": "```xml\n<add class-name=\"GroupWise Nickname\" dest-dn=\"domain.po\" event-id=\"0\" >\n  <!-- Domain of user this nickname refers to -->\n  <add-attr attr-name=\"50068\" >\n    <value type=\"string\">xmlDom</value>\n  </add-attr>\n  <!-- Post Office of user this nickname refers to -->\n  <add-attr attr-name=\"50069\" >\n    <value type=\"string\">xmlPO</value>\n  </add-attr>\n  <!-- User this nickname refers to -->\n  <add-attr attr-name=\"50070\" >\n    <value type=\"string\">Usern1</value>\n  </add-attr>\n  <!-- Name of nickname record -->\n  <add-attr attr-name=\"50073\" >\n    <value type=\"string\">nn1</value>\n  </add-attr>\n</add>\n```"
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you control whether a GroupWise account is created using the extended attribute \"createGroupWiseAccount\" in the GroupWise 2014 driver?",
+      "input": "",
+      "output": "1. Extend the Identity Vault schema to include the Boolean attribute **createGroupWiseAccount**.\n2. Add the attribute as a required attribute in the Create policy:\n   ```xml\n   <rule>\n     <description>Require createGroupWiseAccount attribute</description>\n     <conditions>\n       <and>\n         <if-class-name op=\"equal\">User</if-class-name>\n       </and>\n     </conditions>\n     <actions>\n       <do-veto-if-op-attr-not-available name=\"createGroupWiseAccount\"/>\n     </actions>\n   </rule>\n   ```\n3. Add a veto rule that blocks account creation when the attribute is not true:\n   ```xml\n   <rule>\n     <description>Check createGroupWiseAccount attribute</description>\n     <conditions>\n       <and>\n         <if-class-name op=\"equal\">User</if-class-name>\n         <if-op-attr name=\"createGroupWiseAccount\" op=\"not-equal\">true</if-op-attr>\n       </and>\n     </conditions>\n     <actions>\n       <do-veto/>\n     </actions>\n   </rule>\n   ```\nWhen **createGroupWiseAccount** is set to **True**, the driver creates the corresponding GroupWise account; when **False**, no account is created."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe how to move a user to a different post office based on a container change using an Output Transformation policy in the GroupWise 2014 driver.",
+      "input": "",
+      "output": "Add a rule that detects a move operation on a User and sets the **dest-dn** attribute to the new post office DN using the appropriate XPath check. Example:\n\n```xml\n<rule>\n  <description>Move User to GW Post Office</description>\n  <conditions>\n    <and>\n      <if-operation op=\"equal\">move</if-operation>\n      <if-class-name op=\"equal\">User</if-class-name>\n    </and>\n  </conditions>\n  <actions>\n    <do-if>\n      <arg-conditions>\n        <and>\n          <if-xpath op=\"true\">parent/@src-dn=\"\\GWDRIVERTREE\\Novell\\Users\\Sales\"</if-xpath>\n        </and>\n      </arg-conditions>\n      <arg-actions>\n        <do-set-xml-attr expression=\"parent\" name=\"dest-dn\">\n          <arg-string>\n            <token-text xml:space=\"preserve\">GWDomain.salesPO</token-text>\n          </arg-string>\n        </do-set-xml-attr>\n      </arg-actions>\n    </do-if>\n    <do-if>\n      <arg-conditions>\n        <and>\n          <if-xpath op=\"true\">parent/@src-dn=\"\\GWDRIVERTREE\\Novell\\Users\\Engineering\"</if-xpath>\n        </and>\n      </arg-conditions>\n      <arg-actions>\n        <do-set-xml-attr expression=\"parent\" name=\"dest-dn\">\n          <arg-string>\n            <token-text xml:space=\"preserve\">GWDomain.engineeringPO</token-text>\n          </arg-string>\n        </do-set-xml-attr>\n      </arg-actions>\n    </do-if>\n  </actions>\n</rule>\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if a wildcard query in the GroupWise 2014 driver returns an error about '?' or '=' characters?",
+      "input": "",
+      "output": "The GroupWise REST API does not allow question‑mark (?) or equals (=) literals inside a wildcard search‑attribute value. Remove those characters from the <value> element of the <search-attr> or replace them with a supported pattern (e.g., use only ‘*’ as the wildcard). After eliminating the illegal characters, re‑execute the query."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the main policy customization capabilities described in the Modifying Policies section for the GroupWise 2014 driver.",
+      "input": "",
+      "output": "The Modifying Policies chapter for the GroupWise 2014 driver outlines how to tailor driver behavior through DirXML policies. It covers placement of users into specific post offices, constructing and validating the GroupWise UserID, mapping up to twenty generic GroupWise attributes, obtaining record counts via queries, automatic nickname creation, detailed nickname record creation, controlling account creation with entitlements or extended attributes, moving users between post offices, adding extra synchronized attributes, rename handling, creating gateway aliases, wildcard queries, querying nicknames, email addresses, and gateway aliases, verifying uniqueness of email or alias values, and converting string attributes to the structured format required by GroupWise."
+    }
+  ]
+}

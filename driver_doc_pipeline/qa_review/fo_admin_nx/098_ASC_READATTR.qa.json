@@ -1,0 +1,53 @@
+{
+  "driver": "Fo Admin Nx driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of the ASC_READATTR function in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "In the Fo Admin Nx driver, the ASC_READATTR function returns the value of a specified single‑valued attribute for a given object."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which attribute can be read using ASC_READATTR in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "Only the Home Directory attribute of a User object is supported by ASC_READATTR in the Fo Admin Nx driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the parameters required by ASC_READATTR in the Fo Admin Nx driver and what do they represent?",
+      "input": "",
+      "output": "The ASC_READATTR function in the Fo Admin Nx driver takes the following parameters:\n\n| Parameter | Description |\n|-----------|-------------|\n| asce | The environment item returned from ASC_INIT() or ASC_INIT_EXT(). |\n| object | The Enterprise User ID or fully distinguished object name of the object whose attribute value is to be returned. |\n| attribute | The single‑valued attribute to be returned (currently only \"HOME DIRECTORY\" is supported). |\n| buffer | The buffer that will receive the attribute value. |\n| bufsize | The size of the buffer supplied."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you retrieve a user's Home Directory using ASC_READATTR in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "To retrieve a user's Home Directory with ASC_READATTR in the Fo Admin Nx driver, follow these steps:\n1. Initialize the authentication environment with `ASCENV *asce = ASC_INIT(NULL);`.\n2. Prepare a buffer large enough to hold the directory path, e.g., `char buffer[2000];`.\n3. Call the function:\n   `int rc = ASC_READATTR(asce, userObjectFDN, \"HOME DIRECTORY\", buffer, sizeof(buffer));`\n4. Check the return code. If `rc == AS_OK`, the buffer contains the Home Directory. Otherwise, use `ASC_STRERROR(rc)` to obtain an error description.\n5. Terminate the authentication environment with `ASC_TERM(asce);`."
+    },
+    {
+      "category": "howto",
+      "instruction": "How should you handle an AS_TOOSMALL return code when using ASC_READATTR in the Fo Admin Nx driver?",
+      "input": "",
+      "output": "If ASC_READATTR in the Fo Admin Nx driver returns `AS_TOOSMALL`, the provided buffer was too small to hold the entire attribute value. To handle this, allocate a larger buffer and retry the call with the increased `bufsize` value."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What does the AS_BADCLIENT error indicate when calling ASC_READATTR in the Fo Admin Nx driver, and how can it be resolved?",
+      "input": "",
+      "output": "`AS_BADCLIENT` indicates that the local host is not authorized to query the Core Driver. Resolve this by ensuring the host is listed in the Core Driver's authorized client list or by configuring appropriate network permissions."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If ASC_READATTR in the Fo Admin Nx driver returns AS_ATTRNOTFOUND, what does that mean?",
+      "input": "",
+      "output": "`AS_ATTRNOTFOUND` means the specified attribute does not exist for the given object. Verify that the attribute name is correct (currently only \"HOME DIRECTORY\" is supported) and that the object is a User object."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key usage points of ASC_READATTR in the Fo Admin Nx driver.",
+      "input": "",
+      "output": "ASC_READATTR in the Fo Admin Nx driver retrieves a single‑valued attribute (currently only the Home Directory of a User) for a specified object. It requires an initialized authentication environment, object identifier, attribute name, a buffer, and its size. Return codes indicate success (`AS_OK`) or various error conditions such as unauthorized host (`AS_BADCLIENT`), attribute not found (`AS_ATTRNOTFOUND`), or insufficient buffer size (`AS_TOOSMALL`). If the buffer is too small, increase its size and retry."
+    }
+  ]
+}

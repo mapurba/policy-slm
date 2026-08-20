@@ -1,0 +1,59 @@
+{
+  "driver": "Salesforce driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of upgrading the Salesforce driver according to the documentation?",
+      "input": "",
+      "output": "Upgrading the Salesforce driver ensures that the driver has the latest updates by refreshing both the installed driver packages and the driver files, which helps maintain compatibility, security, and functionality."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you upgrade the installed packages for the Salesforce driver using NetIQ Designer?",
+      "input": "",
+      "output": "To upgrade the installed packages for the Salesforce driver in Designer:\n1. Open the project that contains the Salesforce driver.\n2. Right‑click the Salesforce driver and choose **Driver > Properties**.\n3. Click the **Packages** tab.\n4. If an upgrade is available, a check mark appears in the **Upgrades** column.\n5. Click **Select Operation** for the package with an upgrade available.\n6. From the drop‑down list choose **Upgrade**.\n7. Select the desired version and click **OK** (Designer lists all versions available for upgrade).\n8. Click **Apply**.\n9. If additional information is required for that package, fill in the fields and click **Next**.\n10. Review the summary of packages to be installed and click **Finish**.\n11. After the upgrade completes, click **OK** to close the Package Management page."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Salesforce driver patch as a root user on a Linux system?",
+      "input": "",
+      "output": "To apply the Salesforce driver patch as a root user on Linux:\n1. Ensure you have a backup of the current driver configuration.\n2. (If the driver is running with the Identity Manager engine, stop the Identity Vault and the driver instance; if using a Remote Loader, stop those instances as well.)\n3. Download the patch from the NetIQ Patch Finder and unzip it to a temporary location on the server.\n4. Log in to the server as **root**.\n5. Run the following command, replacing the placeholder with the actual temporary location of the RPM file:\n   ```\n   rpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLSForce.rpm\n   ```\n   For example:\n   ```\n   rpm -Uvh <IDM45_SF_410.zip>/linux/novell-DXMLSForce.rpm\n   ```\n6. (If the driver runs locally) start the Identity Vault and driver instance, e.g., `ndsmanage startall`.\n7. (If the driver runs with Remote Loader) start the Remote Loader and driver instances."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you apply the Salesforce driver patch as a non‑root user on a Linux system?",
+      "input": "",
+      "output": "To apply the Salesforce driver patch as a non‑root user on Linux:\n1. Verify that the directory `<non-root eDirectory location>/rpm` exists and contains the file **_db.000**.\n2. Set the root directory environment variable to the non‑root eDirectory location:\n   ```\n   ROOTDIR=<non-root eDirectory location>\n   ```\n3. Download the patch and unzip it to a temporary location.\n4. Install the driver RPM using the following command, replacing `<rpm-location>` with the path to the unpacked RPM file:\n   ```\n   rpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles <rpm-location>\n   ```\n   Example for the Salesforce driver:\n   ```\n   rpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles /home/user/novell-DXMLSForce.rpm\n   ```\n5. If the driver is running locally, restart the Identity Vault and driver instance (e.g., `ndsmanage startall`).\n6. If the driver runs with Remote Loader, restart the Remote Loader and driver instances."
+    },
+    {
+      "category": "config",
+      "instruction": "Which command is used to install the Salesforce driver RPM on Linux as a root user?",
+      "input": "",
+      "output": "The command is:\n```\nrpm -Uvh <Driver Patch File Temporary Location>/linux/novell-DXMLSForce.rpm\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "What file must exist in the non‑root eDirectory rpm directory before installing the Salesforce driver patch as a non‑root user?",
+      "input": "",
+      "output": "The file **_db.000** must be present in the `<non-root eDirectory location>/rpm` directory."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What should you do if the _db.000 file is missing when trying to apply the Salesforce driver patch as a non‑root user?",
+      "input": "",
+      "output": "If the _db.000 file is missing, it indicates that Identity Manager may not be properly installed. The documentation advises reinstalling Identity Manager so that the file is correctly placed in the directory."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to upgrade the Salesforce driver, including both package upgrades and applying the driver patch.",
+      "input": "",
+      "output": "To upgrade the Salesforce driver:\n1. **Backup** the current driver configuration.\n2. **Upgrade installed packages** using Designer: open the project, access Driver > Properties, select Packages, choose Upgrade for any package with a newer version, select the desired version, apply and finish.\n3. **Apply the driver patch**:\n   - For a root installation on Linux, download the patch, unzip it, and run `rpm -Uvh <temp>/linux/novell-DXMLSForce.rpm`.\n   - For a non‑root installation, verify the `_db.000` file, set `ROOTDIR` to the non‑root eDirectory location, and run the complex `rpm --dbpath $ROOTDIR/rpm -Uvh ...` command with appropriate relocate options.\n4. **Restart** any stopped Identity Vault, Remote Loader, or driver instances as needed.\n5. Ensure the upgrade steps are completed within a short time to keep the driver up to date."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact rpm command required to install the Salesforce driver RPM as a non‑root user, using placeholders as shown in the documentation.",
+      "input": "",
+      "output": "```\nrpm --dbpath $ROOTDIR/rpm -Uvh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/etc=$ROOTDIR/etc \\\n    --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n    --relocate=/var=$ROOTDIR/var \\\n    --badreloc --nodeps --replacefiles <rpm-location>\n```"
+    }
+  ]
+}

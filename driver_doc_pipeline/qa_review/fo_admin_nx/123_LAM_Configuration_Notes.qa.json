@@ -1,0 +1,65 @@
+{
+  "driver": "Fan-Out Driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the DCE LAM module used by the Fan-Out Driver and where is it located on an AIX system?",
+      "input": "",
+      "output": "The Fan-Out Driver uses a proprietary Loadable Authentication Module (LAM) named **DCE**. The DCE LAM module is located at **/usr/lib/security/DCE** on the AIX system."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration file must be edited to enable the DCE LAM module for the Fan-Out Driver, and what does the file contain?",
+      "input": "",
+      "output": "To enable the DCE LAM module as an available authentication mechanism for the Fan-Out Driver, edit the **/usr/lib/security/methods.cfg** file. This file lists the authentication methods that the system can use; adding an entry for the DCE module makes it selectable by the Fan-Out Driver. A sample methods.cfg file is provided in **/usr/local/ASAM/bin/PlatformServices**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you associate a specific user with the DCE LAM module by modifying the Fan-Out Driver's adduser.sh script?",
+      "input": "",
+      "output": "Edit the **adduser.sh** script used by the Fan-Out Driver and add the **SYSTEM** and **registry** attributes to the **mkuser** command as follows:\n```\nCOMMAND=\"/usr/bin/mkuser -R files SYSTEM=\\\"DCE\\\" registry=DCE \"\n```\nThis explicitly ties the newly created user to the DCE LAM module for authentication via the Fan-Out Driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you configure the Fan-Out Driver to make the DCE LAM module the default authentication method for all users?",
+      "input": "",
+      "output": "Modify the user configuration file **/etc/security/user** used by the Fan-Out Driver. Use the sample file **user.sample** located in **/usr/local/ASAM/bin/PlatformServices**, which shows the required entry to set DCE as the default authentication mechanism for all users."
+    },
+    {
+      "category": "config",
+      "instruction": "What setting must be present in /etc/security/login.cfg for the Fan-Out Driver's LAM on AIX 5.3 and later?",
+      "input": "",
+      "output": "In **/etc/security/login.cfg**, ensure that the parameter **auth_type** is set to **STD_AUTH**. This setting enables LAM support for the Fan-Out Driver on AIX 5.3 and later."
+    },
+    {
+      "category": "config",
+      "instruction": "What value should PasswordAuthentication have in /etc/ssh/sshd_config to allow SSH authentication via the DCE LAM module for the Fan-Out Driver?",
+      "input": "",
+      "output": "In the **/etc/ssh/sshd_config** file, the directive **PasswordAuthentication** must be set to **yes** (the default). This permits SSH logins to be processed by the DCE LAM module used by the Fan-Out Driver."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Provide a concise summary of the key configuration steps required to use the DCE LAM module with the Fan-Out Driver on AIX.",
+      "input": "",
+      "output": "To use the DCE LAM module with the Fan-Out Driver on AIX:\n1. Ensure the DCE module exists at **/usr/lib/security/DCE**.\n2. Add the DCE entry to **/usr/lib/security/methods.cfg** (sample file in /usr/local/ASAM/bin/PlatformServices).\n3. Configure authentication defaults or per‑user mapping in **/etc/security/user** (use user.sample or user.sample2 for fail‑over). Optionally add `SYSTEM=\"DCE\" registry=DCE` to the mkuser command in the Fan-Out Driver’s adduser.sh script.\n4. For AIX 5.3+, set `auth_type = STD_AUTH` in **/etc/security/login.cfg**.\n5. Verify **/etc/ssh/sshd_config** has `PasswordAuthentication yes` to allow SSH logins via DCE.\nThese steps fully integrate the DCE LAM module with the Fan-Out Driver."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If DCE LAM authentication becomes unavailable, how can the Fan-Out Driver be configured to fall back to local authentication?",
+      "input": "",
+      "output": "Use the sample file **user.sample2** (found in **/usr/local/ASAM/bin/PlatformServices**) as a template. It configures the DCE LAM module as the default authentication mechanism **with fail‑over to local authentication** when DCE is unavailable. Apply the same settings to the **/etc/security/user** file for the affected users."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why is IBM's deprecated DCE LAM module unrelated to the Fan-Out Driver's DCE LAM module?",
+      "input": "",
+      "output": "IBM previously provided a deprecated LAM module also named **DCE**, which implements the Distributed Computing Environment. The Fan-Out Driver's DCE LAM module is a separate, proprietary implementation; the two modules are unrelated despite sharing the same name."
+    },
+    {
+      "category": "config",
+      "instruction": "Where can an administrator find sample configuration files for methods.cfg and user mappings to set up the DCE LAM module with the Fan-Out Driver?",
+      "input": "",
+      "output": "Sample configuration files are located in **/usr/local/ASAM/bin/PlatformServices**:\n- A sample **methods.cfg** file showing how to include the DCE LAM module.\n- **user.sample** demonstrating how to make DCE the default authentication mechanism for all users.\n- **user.sample2** illustrating DCE as default with fail‑over to local authentication."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "driver": "GroupWise driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What compatibility issue occurs when the GroupWise driver and the Google Apps driver run on the same server?",
+      "input": "",
+      "output": "When the GroupWise driver and the Google Apps driver are running on the same server, the default configuration of the Google Apps driver modifies the Java API, which creates a compatibility issue that causes the GroupWise driver to fail while processing events on the Subscriber channel."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error message does the GroupWise driver log when the compatibility issue with the Google Apps driver is triggered?",
+      "input": "",
+      "output": "The GroupWise driver logs the following error:\n\n```\n13:22:28 E9C03700 Drvrs: gw2014 ST:\nDirXML Log Event -------------------\nDriver: \\WGSDVAULT\\SD\\driverset\\GroupWise2014\nChannel: Subscriber\nObject: \\WGSDVAULT\\SD\\Teachers\\aegerter\nStatus: Error\nMessage: Code(-9010) An exception occurred: javax.xml.transform.TransformerFactoryConfigurationError: Provider javax.xml.transform.sax.SAXTransformerFactory could not be instantiated: java.lang.IllegalAccessException: Class javax.xml.transform.FactoryFinder can not access a member of class javax.xml.transform.sax.SAXTransformerFactory with modifiers \"protected\"\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration property on the Google Apps driver should be changed to avoid the exception in the GroupWise driver?",
+      "input": "",
+      "output": "Set the **Override JAXP Factory** property to **false** on the Google Apps driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Google Apps driver to prevent the GroupWise driver exception when both drivers run on the same server?",
+      "input": "",
+      "output": "1. Open the configuration for the Google Apps driver.\n2. Locate the **Override JAXP Factory** setting.\n3. Change its value to **false**.\n4. Save the configuration and restart the Google Apps driver (or the IDM server) for the change to take effect.\nAfter this change, the GroupWise driver will no longer encounter the TransformerFactoryConfigurationError."
+    },
+    {
+      "category": "howto",
+      "instruction": "If you prefer not to modify the Google Apps driver, what alternative deployment option can you use to avoid the GroupWise driver exception?",
+      "input": "",
+      "output": "Run the GroupWise driver and the Google Apps driver on **different servers**. By separating the drivers onto distinct servers, the Java API conflict is avoided, and the GroupWise driver processes events without the error."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the exception that occurs when the GroupWise driver and Google Apps driver run on the same server and the recommended workarounds.",
+      "input": "",
+      "output": "When the GroupWise driver and Google Apps driver share a server, the Google Apps driver’s default configuration alters the Java API, causing the GroupWise driver to throw a TransformerFactoryConfigurationError on the Subscriber channel. The recommended workarounds are to set **Override JAXP Factory** to **false** on the Google Apps driver or to run each driver on separate servers."
+    }
+  ]
+}

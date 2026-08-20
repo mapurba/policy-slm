@@ -1,0 +1,65 @@
+{
+  "driver": "SCIM SAP Cloud driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What files are required to install the SCIM SAP Cloud driver and where can they be obtained?",
+      "input": "",
+      "output": "The SCIM SAP Cloud driver requires three files: the .zip file named NIdm_Driver_SCIM.zip, the .rpm file named netiq-DXMLscim.rpm, and the .jar file named SCIMUtils.jar. These files can be downloaded from the NetIQ Download Website (https://dl.netiq.com/index.jsp)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the SCIM SAP Cloud driver as a root user on a Linux server?",
+      "input": "",
+      "output": "To install the SCIM SAP Cloud driver as a root user on Linux:\n1. Log in to the target server as the root user.\n2. Download and unzip NIdm_Driver_SCIM.zip to a temporary location.\n3. Navigate to the extracted directory.\n4. Run the following command, replacing (binaries-path) with the path to the extracted RPM file:\n   rpm -Ivh (binaries-path)/netiq-DXMLscim.rpm\nThis installs the netiq-DXMLscim.rpm package into the driver installation directory."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the SCIM SAP Cloud driver as a non‑root user on Linux?",
+      "input": "",
+      "output": "To install the SCIM SAP Cloud driver as a non‑root user on Linux:\n1. Verify that the directory /rpmdirectory exists and contains a file named _db.*. If the file is missing, reinstall the Identity Manager.\n2. Set the root directory of the non‑root Identity Vault by executing:\n   ROOTDIR=<non-root eDirectory location>\n   (replace <non‑root eDirectory location> with the actual path).\n3. Run the rpm command with relocate options, for example:\n   rpm --dbpath $ROOTDIR/rpm -Ivh \\\n       --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles /home/user/netiq-DXMLscim.rpm\n   (Replace /home/user/ with the home directory of the non‑root user.)\n4. If the driver runs locally, start the Identity Vault and the driver instance; if it runs with Remote Loader, start the Remote Loader instance and the driver instance."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver packages are mandatory for the SCIM SAP Cloud driver in Designer and what are their version details?",
+      "input": "",
+      "output": "The mandatory packages for the SCIM SAP Cloud driver in Designer are:\n- **SCIM Base Package**\n  - Package Name: NETQSCIMBASE\n  - Version: 1.0.0\n  - Build Date: 20201222\n  - Build Number: 142319\n- **SCIM Default Package**\n  - Package Name: NETQSCIMDCFG\n  - Version: 1.0.0\n  - Build Date: 20201113\n  - Build Number: 132234\n- **SCIM SAPCloud Configuration Package**\n  - Package Name: NETQSCIMSCCG\n  - Version: 1.0.0\n  - Build Date: 20201020\n  - Build Number: 175433"
+    },
+    {
+      "category": "config",
+      "instruction": "What optional packages can be installed for the SCIM SAP Cloud driver and what are their details?",
+      "input": "",
+      "output": "Optional packages for the SCIM SAP Cloud driver are:\n- **SCIM JSON Package**\n  - Package Name: NETQSCIMJSON\n  - Version: 1.0.0\n  - Build Date: 20200721\n  - Build Number: 184051\n- **SCIM Entitlements Package**\n  - Package Name: NETQSCIMENT\n  - Version: 1.0.0\n  - Build Date: 20201221\n  - Build Number: 171309"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take if the _db.* file is not present when attempting a non‑root installation of the SCIM SAP Cloud driver?",
+      "input": "",
+      "output": "If the _db.* file is missing, it indicates that the Identity Manager was not installed correctly for non‑root operation. The recommended action is to reinstall the Identity Manager so that the _db.* file is created in the /rpmdirectory location."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you extend the eDirectory (Identity Vault) schema for the SCIM SAP Cloud driver?",
+      "input": "",
+      "output": "To extend the eDirectory schema for the SCIM SAP Cloud driver:\n1. Copy the schema file (e.g., /root/schema/scim-schema.sch) to the system where Identity Manager is installed.\n2. Execute the ndssch command with appropriate parameters. Example:\n   ndssch -h 10.71.131.123:524 -t SLES12SP3_Quality_131123_TREE -d admin.sa.system /root/schema/scim-schema.sch scim-Group\n3. Check the log file created at the default location (/root/schema.log) for any issues.\n4. Reload the iManager session to make the schema changes take effect."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why must you reload the iManager session after uploading a new SCIM schema file for the SCIM SAP Cloud driver?",
+      "input": "",
+      "output": "Reloading the iManager session forces the management console to re‑read the schema definitions from eDirectory. Without reloading, iManager continues to use the cached schema information, and the newly uploaded SCIM attributes would not be recognized."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to install and configure the SCIM SAP Cloud driver.",
+      "input": "",
+      "output": "To install and configure the SCIM SAP Cloud driver:\n1. Download NIdm_Driver_SCIM.zip, netiq-DXMLscim.rpm, and SCIMUtils.jar from the NetIQ download site.\n2. Unzip the archive.\n3. For root installations, run `rpm -Ivh <binaries-path>/netiq-DXMLscim.rpm` on Linux or copy SCIMShim.jar on Windows.\n4. For non‑root installations, verify the presence of the _db.* file, set ROOTDIR, and install the RPM with the complex `rpm --dbpath $ROOTDIR/rpm -Ivh ...` command.\n5. Start the Identity Vault (local) or Remote Loader (remote) as needed.\n6. Extend the eDirectory schema by copying the SCIM schema file and running the ndssch command; then reload iManager.\n7. In Designer, install the mandatory packages NETQSCIMBASE, NETQSCIMDCFG, and NETQSCIMSCCG (all version 1.0.0) and optionally install NETQSCIMJSON and NETQSCIMENT."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the exact rpm command used to install the SCIM SAP Cloud driver RPM as a non‑root user, including all relocate options?",
+      "input": "",
+      "output": "The full rpm command for a non‑root installation is:\n\nrpm --dbpath $ROOTDIR/rpm -Ivh \\\n    --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/etc=$ROOTDIR/etc \\\n    --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n    --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n    --relocate=/var=$ROOTDIR/var \\\n    --badreloc --nodeps --replacefiles /home/user/netiq-DXMLscim.rpm\n\nReplace $ROOTDIR with the non‑root eDirectory location and /home/user/ with the non‑root user’s home directory."
+    }
+  ]
+}

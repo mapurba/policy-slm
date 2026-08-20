@@ -1,0 +1,77 @@
+{
+  "driver": "JMS driver",
+  "qa_pairs": [
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to install IBM MQ for the JMS driver as described in the documentation.",
+      "input": "",
+      "output": "To install IBM MQ for the JMS driver you must (1) place prerequisite JAR files in the appropriate Identity Manager lib directories, (2) copy installation scripts to the MQ server, (3) create a server‑connection channel and queues using the provided MQSC script, (4) start the publish/subscribe broker, (5) install the required system queues, (6) create a local Windows user and add it to the mqm group, (7) configure JMS settings (JMSAdmin.config, JAVA paths, netiqsamplejms.prop), (8) run vinstall.bat to create MQ/JMS objects, and (9) ensure the generated .bindings file is located where the JMS driver’s PROVIDER_URL points."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the JMS driver documentation advise deleting certain JAR files when using IBM WebSphere version older than 8.x?",
+      "input": "",
+      "output": "The JMS driver documentation advises deleting the older IBM MQ JAR files because IBM WebSphere versions prior to 8.x include incompatible or duplicate libraries; removing them prevents class‑loading conflicts when the newer IBM MQ JARs are placed for the JMS driver."
+    },
+    {
+      "category": "config",
+      "instruction": "List the JAR files that must be copied from the IBM MQ installation for the JMS driver and indicate the directory paths for Windows and Linux/UNIX Identity Manager servers.",
+      "input": "",
+      "output": "The following JAR files must be copied from the IBM MQ install (e.g., <MQ_install_path>\\java\\lib):\n\n- com.ibm.mq.commonservices.jar\n- com.ibm.mq.headers.jar\n- com.ibm.mq.jar\n- com.ibm.mq.jmqi.jar\n- com.ibm.mqjms.jar\n- fscontext.jar\n- providerutil.jar\n- javax-jms-api-2.0.jar (downloaded separately)\n\nPlacement on Identity Manager servers:\n\n| Platform | Directory Path |\n|----------|----------------|\n| Windows  | Local: C:\\Novell\\IdentityManager\\NDS\\lib  Remote: C:\\Novell\\IdentityManager\\RemoteLoader\\lib |\n| Linux/UNIX | Local: /usr/lib/dirxml/classes (pre‑eDirectory 8.8) or /opt/novell/eDirectory/lib/dirxml/classes (eDirectory 8.8)  Remote: same as local |"
+    },
+    {
+      "category": "howto",
+      "instruction": "Provide the step‑by‑step procedure to create a server‑connection channel and queues for the JMS driver using the provided MQSC script.",
+      "input": "",
+      "output": "Steps to create a server‑connection channel and queues for the JMS driver:\n1. Open a command prompt and change to the MQ Java binaries directory: `<MQ_HOME>\\java\\bin`.\n2. Execute the MQSC script with the command: `runmqsc QM < idm_mq_install.mqsc`.\n3. Review the output to confirm successful creation; customize the script if your environment requires different definitions.\n4. Proceed to start the publish/subscribe broker (see the JMS driver installation guide)."
+    },
+    {
+      "category": "howto",
+      "instruction": "Describe how to start the publish/subscriber broker for the JMS driver on a Windows system.",
+      "input": "",
+      "output": "To start the publish/subscriber broker for the JMS driver:\n1. Open a command prompt.\n2. Run the command: `strmqbrk -m QM`.\n3. Verify that a message appears indicating the broker is running.\n4. Continue with the next installation step, such as installing system queues."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What error might appear if you skip installing the system queues for the JMS driver, and how can you resolve it?",
+      "input": "",
+      "output": "If the system queues are not installed, the JMS driver may log the error: “MQJMS1111: JMS 1.1 The required Queues/Publish Subscribe services are not set up {0}”. Resolve it by executing the command `runmqsc QM < MQJMS_PSQ.mqsc` from the MQ `java\\bin` directory to create the necessary system queues."
+    },
+    {
+      "category": "howto",
+      "instruction": "Outline the steps to create a local Windows user account named 'idm' and add it to the 'mqm' group for the JMS driver.",
+      "input": "",
+      "output": "Steps to create the local user and add to mqm group for the JMS driver:\n1. Open **Start > Programs > Administrative Tools > Computer Management**.\n2. Expand **Local Users and Groups**.\n3. Right‑click **Users**, select **New User**.\n4. Enter **User name**: `idm`.\n5. Enter **Password**: `novell`.\n6. Clear the **User must change password at next logon** box.\n7. Click **Create**, then **Close**.\n8. Right‑click the newly created `idm` user, choose **Properties**.\n9. Go to the **Member Of** tab, click **Add**, select the **mqm** group, click **OK** twice.\n10. Continue with the JMS driver configuration steps."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the property keys defined in the netiqsamplejms.prop file for the JMS driver and what does each key represent?",
+      "input": "",
+      "output": "The netiqsamplejms.prop file defines the following property keys for the JMS driver:\n\n| Property Key | Purpose |\n|--------------|---------|\n| IDM_LOCAL_USER_ACCOUNT_NAME | Name of the local Windows user account that the NetIQ JMS connector will use to connect to MQ (e.g., `IDM`). |\n| IDM_LOCAL_USER_ACCOUNT_PWD | Password for the local Windows account (e.g., `NetIQ123`). |\n| IDM_QUEUE_MANAGER_NAME | Name of the IBM MQ queue manager under which IDM queues are created (e.g., `IDM.QM`). |\n| IDM_LISTENER_NAME | Name of the MQ listener that the IDM queue manager will use (e.g., `LISTENER.TCP`). |\n| IDM_WEBMQ_HOST | Hostname or IP address of the server running MQ (e.g., `webmq.lab.com`). |\n| IDM_LISTENER_PORT | Port on which the MQ listener accepts connections; default is 1414. |\n| IDM_CHANNEL_NAME | Name of the MQI channel that IDM will use (e.g., `CHANNEL.IDM.QM`). |\n| IDM_DRV_QUEUE_NAME | Name of the IDM queue for sending/receiving events (e.g., `IDM.EVENTSQ`). |\n| IDM_DRV_TOPIC_NAME | Name of the JMS topic used for publish/subscribe (e.g., `IDM.EVENTSTOPIC`). |\n| IDM_DRV_TOPIC_STRING | Topic string pattern for subscriptions (e.g., `IDM.TOPICSTR`). |\n| IDM_JNDI_PROVIDER_URL | Filesystem location for the JNDI .bindings file used by the JMSAdmin tool (e.g., `C:\\JNDI-Directory`). |"
+    },
+    {
+      "category": "howto",
+      "instruction": "Explain how to configure the PROVIDER_URL for the JMS driver on a Windows system.",
+      "input": "",
+      "output": "To configure the PROVIDER_URL for the JMS driver on Windows:\n1. Open the file `<MQ_install_path>\\java\\bin\\JMSAdmin.config`.\n2. Set the line:\n   `INITIAL_CONTEXT_FACTORY=com.sun.jndi.fscontext.RefFSContextFactoryPROVIDER_URL=file:/C:/JNDI-Directory`\n3. Adjust the path after `file:/` to point to a valid directory on the MQ server where the .bindings file will be created (e.g., `C:/JNDI-Directory`).\n4. Save the file; the JMS driver will use this URL to locate the JNDI registry."
+    },
+    {
+      "category": "howto",
+      "instruction": "Detail the process of running vinstall.bat to create the MQ/JMS objects needed by the JMS driver.",
+      "input": "",
+      "output": "Procedure to run vinstall.bat for the JMS driver:\n1. Open a command prompt.\n2. Change directory to `<MQ_install_path>\\java\\bin`.\n3. Execute `vinstall.bat`.\n4. The script invokes the JMSAdmin tool to process `idm_jms_install.scp` and creates the required MQ queues, topics, and the .bindings file.\n5. After the script completes, verify that the .bindings file exists at the location specified by the JMS driver’s `PROVIDER_URL` configuration.\n6. If the Identity Manager server is separate from the MQ server, copy the .bindings file to the Identity Manager server and ensure the `PROVIDER_URL` points to that location."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact content line that must be added to JMSAdmin.config for the JMS driver, using the example path C:\\JNDI-Directory.",
+      "input": "",
+      "output": "INITIAL_CONTEXT_FACTORY=com.sun.jndi.fscontext.RefFSContextFactoryPROVIDER_URL=file:/C:/JNDI-Directory"
+    },
+    {
+      "category": "config",
+      "instruction": "Where are the JMS driver installation scripts located by default on Windows and Linux/UNIX systems?",
+      "input": "",
+      "output": "Default locations for JMS driver installation scripts:\n\n| Platform | Directory Path |\n|----------|----------------|\n| Windows | `C:\\Novell\\IdentityManager\\NDS\\DirXMLUtilities\\jms\\webmq` |\n| Linux/UNIX | `<install-dir>/lib/dirxml/rules/jms/webmq` |"
+    }
+  ]
+}

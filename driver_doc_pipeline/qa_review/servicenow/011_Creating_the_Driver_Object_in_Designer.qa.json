@@ -1,0 +1,59 @@
+{
+  "driver": "ServiceNow driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Which optional feature packages can be selected when installing the ServiceNow driver and what does each provide?",
+      "input": "",
+      "output": "When installing the ServiceNow driver, the following optional feature packages are available:\n\n* **ServiceNow Default Configuration** – Contains the default policies required to enable the driver to create user and group accounts. This option should remain selected.\n* **ServiceNow Password Synchronization** – Contains the policies that enable password synchronization for the ServiceNow driver. To synchronize passwords, this option must be selected.\n* **ServiceNow Driver Entitlements** – Contains configuration information and policies for synchronizing user accounts, group membership, roles, and departments. Select this option if you want account creation and auditing enabled through entitlements."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why does the ServiceNow driver sometimes not display its name or symbol when imported from Identity Vault in Designer?",
+      "input": "",
+      "output": "Designer does not display the name of the driver or the driver symbol when you import the ServiceNow driver from Identity Vault. This issue is observed only in Modeler."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the ServiceNow driver packages in Designer?",
+      "input": "",
+      "output": "To import the ServiceNow driver packages in Designer:\n1. Open Designer.\n2. In the toolbar, choose **Help > Check for Package Updates** and click **OK** to update the packages.\n3. In the Outline view, right‑click **Package Catalog** and select **Import Package**.\n4. In the dialog, select any ServiceNow driver packages (or click **Select All** to import all displayed packages). By default only base packages are shown; deselect **Show Base Packages Only** to see every package.\n5. Click **OK** to import the selected packages, then click **OK** again in the success message.\nAfter completing these steps, proceed to the driver installation phase."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the ServiceNow driver packages in Designer, including choosing optional features?",
+      "input": "",
+      "output": "To install the ServiceNow driver packages in Designer:\n1. Open your project in Designer.\n2. In the Modeler, right‑click the driver set where the driver will reside and choose **New > Driver**.\n3. Select **ServiceNow Base** and click **Next**.\n4. On the optional features screen, select the desired packages:\n   - **ServiceNow Default Configuration** (default policies for user/group creation)\n   - **ServiceNow Password Synchronization** (policies for password sync)\n   - **ServiceNow Driver Entitlements** (policies for synchronizing accounts, groups, roles, departments)\n   Click **Next**.\n5. If any selected packages have dependencies, a dialog will list them; click **OK** to install those dependencies.\n6. If the **Common Settings** package is installed as a dependency, the Common Settings page appears. Provide a **User Container** and **Group Container** (the Identity Vault containers where ServiceNow users and groups will be added) and click **Next**.\n7. On the **Install ServiceNow Base** page, give the driver a unique name within the driver set and click **Next**.\n8. Fill in the ServiceNow connection and optional settings as described in the installation wizard, then click **Next**.\n9. If you choose to use a Remote Loader, provide the host, port (default 8090), Remote Password, and Driver Password; otherwise select **No**.\n10. Review the summary on the **Confirm Installation Tasks** page and click **Finish**.\nThe ServiceNow driver is now created and ready for further configuration."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the ServiceNow driver base settings such as URL, login credentials, and truststore options?",
+      "input": "",
+      "output": "During the installation of the ServiceNow driver, the **Install ServiceNow Base** page requests the following base settings:\n\n* **ServiceNow Base URL** – Enter the URL used to connect to ServiceNow.\n* **ServiceNow Login ID** – Provide a ServiceNow account that has administrative privileges.\n* **ServiceNow Login Password** – Enter the password for the administrative ServiceNow account.\n* **Always Accept Server Certificate** – Choose **Yes** to bypass truststore management, or **No** to require a configured truststore.\n* **Truststore File Path** – If **Always Accept Server Certificate** is set to **No**, specify the full path to the truststore file containing the trusted certificates (e.g., `c:\\security\\truststore`).\n* **Proxy host and port** – Optionally enter the proxy host address and port (e.g., `192.10.1.3:18180`). Leave blank if a proxy is not required.\n* **Set Proxy Authentication Parameters** – Click **Show** to reveal the proxy authentication fields, then provide:\n  * **Proxy User ID** – Username for proxy authentication.\n  * **Proxy User Password** – Password for the proxy user.\n* **Use Custom Application Schema** – Select **Yes** to use a custom schema; if **Yes**, specify the **Custom Schema File Path** where the complete schema file resides. Selecting **No** loads the default ServiceNow schema bundled with the driver package.\nAfter entering these values, click **Next** to continue the installation wizard."
+    },
+    {
+      "category": "config",
+      "instruction": "What does the “Always Accept Server Certificate” option control in the ServiceNow driver configuration and what are the effects of selecting Yes versus No?",
+      "input": "",
+      "output": "The **Always Accept Server Certificate** option determines whether the ServiceNow driver automatically trusts the SSL certificate presented by the ServiceNow instance.\n\n* Selecting **Yes** eliminates the need to maintain a truststore; the driver will accept any server certificate presented.\n* Selecting **No** requires a truststore to be configured with the appropriate certificates. When **No** is chosen, you must also provide the **Truststore File Path** that points to a file containing the trusted certificates."
+    },
+    {
+      "category": "config",
+      "instruction": "Which fields must be completed on the Install ServiceNow Base page when creating a ServiceNow driver?",
+      "input": "",
+      "output": "On the **Install ServiceNow Base** page for the ServiceNow driver, you must complete the following fields:\n1. **Driver Name** – A unique name for the driver within the driver set.\n2. **ServiceNow Base URL** – The URL used to connect to ServiceNow.\n3. **ServiceNow Login ID** – An administrative ServiceNow account name.\n4. **ServiceNow Login Password** – The password for the administrative ServiceNow account.\nThe remaining fields (Always Accept Server Certificate, Truststore File Path, Proxy settings, Use Custom Application Schema, etc.) are optional depending on your environment, but the four items above are required to proceed."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you follow if the ServiceNow driver cannot connect because of missing or untrusted server certificates?",
+      "input": "",
+      "output": "If the ServiceNow driver fails to connect due to missing or untrusted server certificates, take these actions:\n1. Open the ServiceNow driver configuration in Designer.\n2. Locate the **Always Accept Server Certificate** setting on the Install ServiceNow Base page.\n3. If you prefer not to bypass certificate validation, set **Always Accept Server Certificate** to **No**.\n4. Provide a valid **Truststore File Path** that points to a truststore containing the ServiceNow server’s certificate (for example, `c:\\security\\truststore`).\n5. Ensure the truststore file includes the appropriate trusted certificates and is accessible to the Identity Manager engine.\n6. Save the configuration and restart the ServiceNow driver.\nAlternatively, if you want to avoid managing a truststore, set **Always Accept Server Certificate** to **Yes**, which will cause the driver to accept any server certificate presented."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps required to create, install, and configure a ServiceNow driver in Designer.",
+      "input": "",
+      "output": "To create, install, and configure a ServiceNow driver in Designer:\n1. **Import Packages** – In Designer, check for package updates, then import the ServiceNow driver packages from the Package Catalog (select individual packages or **Select All**, optionally showing non‑base packages).\n2. **Install Packages** – In the Modeler, right‑click the desired driver set, choose **New > Driver**, select **ServiceNow Base**, and click **Next**.\n3. **Select Optional Features** – Choose the required optional packages (Default Configuration, Password Synchronization, Driver Entitlements) and confirm any package dependencies.\n4. **Common Settings (if applicable)** – Provide default **User Container** and **Group Container** values for Identity Vault.\n5. **Base Installation** – Supply a unique driver name, the ServiceNow Base URL, administrative login ID and password, and configure SSL trust settings (Always Accept Server Certificate and Truststore Path). Optionally set proxy details and decide whether to use a custom schema.\n6. **Remote Loader (optional)** – If using a Remote Loader, enter its host, port (default 8090), Remote Password, and Driver Password.\n7. **Finish Installation** – Review the summary on the Confirm Installation Tasks page and click **Finish**.\n8. **Post‑Installation Configuration** – Review the Driver Properties on the Driver Configuration page and adjust any additional driver parameters or Global Configuration Values needed for operation.\nAfter these steps, the ServiceNow driver is ready to be deployed, started, and activated."
+    }
+  ]
+}

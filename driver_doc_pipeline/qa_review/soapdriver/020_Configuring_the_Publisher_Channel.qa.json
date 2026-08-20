@@ -1,0 +1,47 @@
+{
+  "driver": "SOAP driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of creating a server certificate for the SOAP driver when configuring the Publisher channel?",
+      "input": "",
+      "output": "Creating a server certificate for the SOAP driver provides a trusted identity for the HTTPS listener of the Publisher channel, enabling encrypted communication between the SOAP driver and client applications and allowing clients to validate the server’s identity during TLS handshakes."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a server certificate in Identity Console for the SOAP driver?",
+      "input": "",
+      "output": "To create a server certificate for the SOAP driver in Identity Console:\n1. Under eDirectory, select **Certificate Management > Server Certificate Management**.\n2. Click the **Create Server Certificate** icon.\n3. Browse to and select the server object where the SOAP driver is installed.\n4. Enter a certificate nickname.\n5. Choose **Standard** as the creation method and click **Next**.\n6. Click **OK** to finish the wizard."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you export a self‑signed certificate from the certificate authority for the SOAP driver?",
+      "input": "",
+      "output": "To export a self‑signed certificate for the SOAP driver:\n1. In Identity Console, go to **Certificate Management > Server Certificate Management**.\n2. Select the tree’s certificate authority object (usually in the **Security** container and named something like *TREENAME CA.Security*).\n3. Click the **Export Server Certificate** icon.\n4. Uncheck **Export private key**.\n5. Choose the file format based on the client:\n   - **File in binary DER format** or\n   - **File in Base64 format**\n   (Both are suitable for Java‑based keystores or trust stores.)\n6. Click **OK**, save the exported certificate to a file, and then click **Close**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the self‑signed certificate into a Java keystore for a client that will connect to the SOAP driver Publisher channel?",
+      "input": "",
+      "output": "To import the self‑signed certificate into a Java keystore for the SOAP driver client:\n1. Use the **keytool** executable that comes with any Java JDK.\n2. Run the following command at a command prompt, substituting your file names and passwords as needed:\n```\nkeytool -import -file <certificate_file> -trustcacerts -noprompt -keystore <keystore_file> -storepass <keystore_password>\n```\nFor example:\n```\nkeytool -import -file tree_ca_root.b64 -trustcacerts -noprompt -keystore dirxml.keystore -storepass novell\n```"
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver parameter must be set to the certificate nickname when configuring the Publisher channel for the SOAP driver?",
+      "input": "",
+      "output": "In the SOAP driver configuration, under **Configuration > Driver Parameters > Publisher Settings**, set the **KMO name** parameter to the certificate nickname that was created in the server certificate step."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to configure the Publisher channel for the SOAP driver.",
+      "input": "",
+      "output": "To configure the Publisher channel for the SOAP driver you must: (1) create a server certificate in Identity Console and note its nickname; (2) export the self‑signed certificate from the tree’s certificate authority in DER or Base64 format; (3) import that certificate into the client’s trust store (typically a Java keystore using the keytool command); and (4) configure the SOAP driver’s Publisher Settings by setting the KMO name to the certificate nickname, then apply and save the changes."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Write the keytool command to import a certificate file named mycert.b64 into a keystore called soap.keystore with password secret for the SOAP driver client.",
+      "input": "",
+      "output": "```\nkeytool -import -file mycert.b64 -trustcacerts -noprompt -keystore soap.keystore -storepass secret\n```"
+    }
+  ]
+}

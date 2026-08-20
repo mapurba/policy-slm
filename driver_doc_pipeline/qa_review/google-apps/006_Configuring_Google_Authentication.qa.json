@@ -1,0 +1,77 @@
+{
+  "driver": "Google Apps driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the purpose of creating a dedicated G Suite administrative account for the Google Apps driver?",
+      "input": "",
+      "output": "In the Google Apps driver, a dedicated G Suite administrative account with Super Admin access is recommended so that the driver has its own identity for performing provisioning actions. This provides tighter security controls, isolates driver activity from regular admin accounts, and improves auditing of domain events."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a super admin account in G Suite for use with the Google Apps driver?",
+      "input": "",
+      "output": "To create a super admin account for the Google Apps driver:\n1. Log in to the Google Admin Dashboard at https://admin.google.com.\n2. Click the **Users** icon.\n3. Choose **Add a user**.\n4. Enter a memorable name that reflects the account’s role and generate or set a password.\n5. After the user is created, open the user’s profile and select **Admin roles**.\n6. Choose the **Super Admin** role and confirm the assignment.\n7. Log in to the G Suite Admin Console with the new user to verify the account.\n8. Accept the terms and conditions.\n9. (Optional) Add a recovery phone number or email address for the account.\nNote: The account must be logged into the admin console at least once to fully activate it; otherwise the Google Apps driver will not function."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable API Access in the G Suite Admin Console for the Google Apps driver?",
+      "input": "",
+      "output": "To enable API Access for the Google Apps driver:\n1. Using a web browser, log in to the G Suite Admin Console.\n2. From the Dashboard, select **Security**.\n3. In the Security management page, choose **API Reference**.\n4. Check the box labeled **Enable API Access**.\n5. Save the setting.\nEnabling API Access allows the Google Apps driver to call the required G Suite APIs."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a developer project and enable the Admin SDK API for the Google Apps driver?",
+      "input": "",
+      "output": "Steps to create a developer project and enable the Admin SDK API for the Google Apps driver:\n1. Open the Google Developers Console at https://console.developers.google.com, logged in with the G Suite admin account created earlier.\n2. Click **Create Project** and fill in the **Project Name** field (the Project ID is generated automatically).\n3. Click **Create** and wait for the project to be provisioned.\n4. In the project’s dashboard, select **Enable APIs and Services**.\n5. In the API Library, scroll to the G Suite APIs, click **View All**, then locate and select **Admin SDK**.\n6. Click **Enable**. The console will prompt you to create credentials, which you will later use for the Google Apps driver."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you create a service account and download the P12 private key for the Google Apps driver?",
+      "input": "",
+      "output": "To create a service account and obtain the P12 key for the Google Apps driver:\n1. In the Admin SDK credential prompt, click **Create Credentials**.\n2. Choose the **service account** credential type and skip the wizard.\n3. Click **Create Service Account**.\n4. Provide a relevant name and description for the service account.\n5. Do **not** assign any role or permissions; simply continue.\n6. On the next screen, click **Create Key**.\n7. Select the **P12** format and download the key file.\n8. Save the P12 file on your workstation; this is the only copy.\n9. Copy the P12 file to the Identity Manager server where the Google Apps driver runs (recommended location: the same directory as gmailshim.jar, e.g., /opt/novell/eDirectory/lib/dirxml/classes).\n10. Record the service account’s **Email** and **Unique ID** values for later use.\nThe P12 file acts as the service account’s password and must be kept secure."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you enable the Group Settings, Contacts, and Gmail APIs for the Google Apps driver?",
+      "input": "",
+      "output": "To enable the additional APIs required by the Google Apps driver:\n1. From the developer console dashboard, click the **GoogleAPIs** banner.\n2. Click **Enable APIs**.\n3. In the API Library, search for **Group Settings**, select it, and click **Enable**.\n4. Return to the Enable APIs screen, search for **Contacts**, and enable the Contacts API.\n5. Finally, search for **Gmail**, and enable the Gmail API.\nAll three APIs must be enabled for the Google Apps driver to function correctly."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you authorize the service account in the G Suite Admin Console for the Google Apps driver?",
+      "input": "",
+      "output": "To authorize the service account for the Google Apps driver:\n1. In the G Suite Admin Console, select the **Security** icon.\n2. Scroll down and click **Advanced Settings**.\n3. Choose **Manage API client access**.\n4. In the **Client Name** field, paste the **Unique ID** of the service account.\n5. In the **One or More API Scopes** field, paste the contents of the driver‑provided **DirectoryScopes.txt** file (a comma‑separated list of scope URLs).\n6. Click **Authorize**.\nIf successful, the entry will appear in the authorized list. If the entry fails, delete it and recreate it with the correct values."
+    },
+    {
+      "category": "config",
+      "instruction": "What driver properties must be set on the Authentication tab for the Google Apps driver?",
+      "input": "",
+      "output": "On the **Authentication** tab of the Google Apps driver, set the following properties:\n- **Authentication ID** – the email address of the dedicated G Suite admin account.\n- **Connection Information** – the domain name of your Google (G Suite) domain.\n- **Set Password** – the password of the dedicated admin account.\nThese values allow the driver to authenticate via the service account and act as the admin proxy."
+    },
+    {
+      "category": "config",
+      "instruction": "What driver parameters must be configured on the Driver Parameters tab for the Google Apps driver, and what format should the P12 key path use?",
+      "input": "",
+      "output": "On the **Driver Parameters** tab of the Google Apps driver, configure:\n- **Service Account Email Address** – the email address of the service account you recorded during credential creation.\n- **P12 Private Key File** – the full path and filename of the downloaded P12 key on the Identity Manager server.\n  Use the appropriate syntax for your operating system, e.g.:\n  * Linux: `/opt/novell/eDirectory/lib/dirxml/classes/KEYFILENAME.p12`\n  * Windows: `C:\\path\\filename.p12`\nThe path must point directly to the P12 file; otherwise the driver cannot authenticate."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why does the Google Apps driver fail to function if the newly created admin account has not been logged into the admin console?",
+      "input": "",
+      "output": "The Google Apps driver requires the dedicated admin account to be fully activated. Google does not activate a new admin account until it has been logged into the G Suite Admin Console at least once. If this initial login has not occurred, the driver will be unable to authenticate and will not function."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should be taken if the service account authorization entry fails or needs to be changed for the Google Apps driver?",
+      "input": "",
+      "output": "If the authorization entry for the service account in the G Suite Admin Console fails or needs modification for the Google Apps driver:\n1. Return to **Security → Advanced Settings → Manage API client access**.\n2. Locate the problematic entry and click **Delete** to remove it.\n3. Re‑enter the **Unique ID** of the service account in the **Client Name** field.\n4. Paste the updated list of scopes from **DirectoryScopes.txt** into the **One or More API Scopes** field.\n5. Click **Authorize**.\nThe new entry should appear in the authorized list, allowing the driver to operate with the corrected scopes."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the complete process of configuring authentication for the Google Apps driver.",
+      "input": "",
+      "output": "Configuring authentication for the Google Apps driver involves: (1) creating a dedicated G Suite super‑admin account and logging into the admin console at least once; (2) enabling **API Access** in the G Suite security settings; (3) creating a developer project in the Google Developers Console, naming it, and enabling the **Admin SDK** API; (4) creating a **service account**, generating a **P12** private key, and recording the service account’s email and unique ID; (5) enabling the additional **Group Settings**, **Contacts**, and **Gmail** APIs; (6) authorizing the service account in the G Suite Admin Console by supplying its unique ID and the driver‑provided scope list; (7) copying the P12 file to the Identity Manager server; and (8) configuring the driver properties in Identity Manager – setting the admin email, domain, password on the Authentication tab, and setting the service account email and full P12 file path on the Driver Parameters tab."
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "driver": "Workday driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Workday driver and on which servers can it run?",
+      "input": "",
+      "output": "The Workday driver is a Java‑based driver for NetIQ Identity Manager. It can be executed on the Identity Manager engine itself or on a Remote Loader server, and it works only with native and Java Remote Loader configurations."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Workday driver files as a root user on a Linux Identity Manager server?",
+      "input": "",
+      "output": "To install the Workday driver files as a root user on Linux:\n1. Ensure the RPM file (novell-DXMLWday.rpm) is available.\n2. Run the command:\n   ```\n   rpm -Ivh <binaries-path>/novell-DXMLWday.rpm\n   ```\n3. Verify that **WorkdayShim.jar** is present in **/opt/novell/eDirectory/lib/dirxml/classes**; if not, copy it there from the Identity Vault server.\n4. Copy **WorkdayUtils.jar** from the driver package directory `<IDM_WorkDayDriver_1300>/common` to **/opt/novell/eDirectory/lib/dirxml/classes/**.\n5. Also copy **imgscalr-lib-4.2.jar**, **jcce-1.3.0.jar**, and **jcce-oauth-1.3.0.jar** from the same **common** folder to the driver installation folder (e.g., **/opt/novell/eDirectory/lib/dirxml/classes/** for a local or remote installation)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Workday driver files as a non‑root user on a Linux Identity Manager installation?",
+      "input": "",
+      "output": "To install the Workday driver as a non‑root user on Linux:\n1. Confirm that the directory **/rpmdirectory** exists and contains the **_db.*** file (created during a non‑root engine install).\n2. Set the root directory environment variable to point to the non‑root eDirectory location:\n   ```\n   ROOTDIR=<non-root eDirectory location>\n   ```\n3. Run the RPM install command with relocated paths, for example:\n   ```\n   rpm --dbpath $ROOTDIR/rpm -Ivh --relocate=/usr=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/etc=$ROOTDIR/etc \\\n       --relocate=/opt/novell/eDirectory=$ROOTDIR/opt/novell/eDirectory \\\n       --relocate=/opt/novell/dirxml=$ROOTDIR/opt/novell/dirxml \\\n       --relocate=/var=$ROOTDIR/var \\\n       --badreloc --nodeps --replacefiles /home/user/novell-DXMLWday.rpm\n   ```\n   *(Replace **/home/user/** with the actual path to the RPM file.)*\n4. Copy **WorkdayUtils.jar** from `<IDM_WorkDayDriver_1300>/common` to **/opt/novell/eDirectory/lib/dirxml/classes/**.\n5. Copy **imgscalr-lib-4.2.jar**, **jcce-1.3.0.jar**, and **jcce-oauth-1.3.0.jar** from the same **common** folder to the driver installation folder (e.g., **/opt/novell/eDirectory/lib/dirxml/classes/**)."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you copy the required JAR files for the Workday driver on a Windows Identity Manager system?",
+      "input": "",
+      "output": "On Windows, perform the following steps to copy the required JAR files for the Workday driver:\n1. Locate the **<IDM_WorkDayDriver_1300>\\common** folder that came with the driver package.\n2. Copy **WorkdayUtils.jar** to the Identity Manager engine library path, typically **\\NetIQ\\IdentityManager\\NDS\\lib**.\n3. Copy **imgscalr-lib-4.2.jar**, **jcce-1.3.0.jar**, and **jcce-oauth-1.3.0.jar** to the driver installation folder. The folder can be:\n   - **\\NetIQ\\IdentityManager\\NDS** for a local installation, or\n   - **\\Novell\\RemoteLoader\\64bit** for a remote installation.\n4. Ensure that **WorkdayShim.jar** is present in the Remote Loader library directory **\\novell\\remoteloader\\lib** if you intend to run the driver with Remote Loader."
+    },
+    {
+      "category": "config",
+      "instruction": "Which configuration parameters are shown in the example Remote Loader configuration file for the Workday driver, and what are their sample values?",
+      "input": "",
+      "output": "The example Remote Loader configuration file for the Workday driver includes the following parameters:\n- **-description** \"Workday Driver\"\n- **-commandport** 8000\n- **-connection** \"port=8090\"\n- **-trace** 3\n- **-tracefile** \"/opt/netiq/workdaydriver.log\" (or \"C:\\novell\\remoteloader\\64bit\\WorkdayDriver-Trace.log\" on Windows)\n- **-tracefilemax** 100M\n- **-class** \"com.netiq.dirxml.driver.workday.WDDriverShim\"\nThese values define the driver description, the command port, the data connection port, trace level and location, maximum trace file size, and the Java class that implements the shim."
+    },
+    {
+      "category": "config",
+      "instruction": "What RPM command is used to install the Workday driver RPM as a root user on Linux?",
+      "input": "",
+      "output": "As a root user on Linux, the Workday driver RPM is installed with the command:\n```\nrpm -Ivh <binaries-path>/novell-DXMLWday.rpm\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "What steps should you take if the WorkdayShim.jar file is not found in the Remote Loader directory for the Workday driver?",
+      "input": "",
+      "output": "If **WorkdayShim.jar** is missing from the Remote Loader directory for the Workday driver:\n1. Verify the operating system type (Linux or Windows).\n2. For Linux, check **/opt/novell/eDirectory/lib/dirxml/classes**. For Windows, check **C:\\novell\\remoteloader\\lib**.\n3. If the file is absent, locate **WorkdayShim.jar** on the Identity Vault server where the driver was originally installed.\n4. Copy the file to the appropriate directory for your platform:\n   - Linux: `cp WorkdayShim.jar /opt/novell/eDirectory/lib/dirxml/classes/`\n   - Windows: copy it to `C:\\novell\\remoteloader\\lib`.\n5. After copying, restart the Remote Loader service (or the Identity Manager engine) to ensure the driver picks up the shim."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the installation and configuration steps required for the Workday driver when using Remote Loader.",
+      "input": "",
+      "output": "To install and configure the Workday driver for Remote Loader:\n1. **Install driver files** – either as a root user (using `rpm -Ivh` on Linux or copying the shim JAR on Windows) or as a non‑root user (setting `ROOTDIR`, then running the RPM with relocation options).\n2. **Verify/shim placement** – ensure **WorkdayShim.jar** is in the Remote Loader library directory (`/opt/novell/eDirectory/lib/dirxml/classes` on Linux, `C:\\novell\\remoteloader\\lib` on Windows).\n3. **Copy dependent JARs** – copy **WorkdayUtils.jar**, **imgscalr‑lib‑4.2.jar**, **jcce‑1.3.0.jar**, and **jcce‑oauth‑1.3.0.jar** from the driver package’s **common** folder to the engine’s lib path and to the driver installation folder.\n4. **Create a Remote Loader configuration file** – include parameters such as `-description`, `-commandport`, `-connection`, `-trace`, `-tracefile`, `-tracefilemax`, and the driver shim class.\n5. **Start the driver instance** – launch Remote Loader and use the command line (Linux) or Remote Loader Console (Windows) to control the driver (e.g., turn tracing on/off, stop the driver).\n6. **Secure the connection** – configure SSL between Remote Loader and the Identity Manager server as described in the Driver Administration Guide."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide a sample Remote Loader configuration file for the Workday driver that enables tracing at level 3, writes trace logs to the default Linux path, and sets the command and connection ports as shown in the documentation.",
+      "input": "",
+      "output": "```\n-description \"Workday Driver\"\n-commandport 8000\n-connection \"port=8090\"\n-trace 3\n-tracefile \"/opt/netiq/workdaydriver.log\"\n-tracefilemax 100M\n-class \"com.netiq.dirxml.driver.workday.WDDriverShim\"\n```"
+    }
+  ]
+}

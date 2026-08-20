@@ -1,0 +1,41 @@
+{
+  "driver": "Salesforce driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the Salesforce driver require to establish a secure HTTPS connection?",
+      "input": "",
+      "output": "The Salesforce driver requires that the remote Web service supports HTTPS and that a Java keystore containing the trusted CA certificate is used. You must create a trust store that includes the certificate issued by the certificate authority that signed the server’s certificate, and the trust store must be a Java keystore."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import a server certificate into a trust store for the Salesforce driver using keytool?",
+      "input": "",
+      "output": "1. Open a command prompt.\n2. Run the keytool import command, specifying the certificate file, the `-trustcacerts` flag, and the target keystore. For example:\n   ```\n   keytool -import -file name_of_cert_file -trustcacerts -noprompt -keystore filename -storepass password\n   ```\n   Replace `name_of_cert_file` with the path to the certificate, `filename` with the desired trust store name, and `password` with the keystore password.\n3. Verify that the certificate was added successfully by listing the keystore contents with `keytool -list -keystore filename`."
+    },
+    {
+      "category": "config",
+      "instruction": "In the Salesforce driver, which configuration field specifies the trust store location and how should it be set?",
+      "input": "",
+      "output": "In the Salesforce driver, the **Truststore file** field on the **Configuration > Driver Settings** page specifies the location of the trust store. Set this field to the full path of the Java keystore file that you created or updated in the certificate import step."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might the Salesforce driver reject a certificate, and how can you resolve it?",
+      "input": "",
+      "output": "The Salesforce driver will reject a certificate if it is not stored in a Java keystore, because only certificates from a Java keystore are accepted. To resolve the issue, ensure that the certificate is imported into a Java keystore using the `keytool` command and that the **Truststore file** field points to that keystore."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps to secure communication for the Salesforce driver.",
+      "input": "",
+      "output": "1. Verify that the remote Salesforce service supports HTTPS.\n2. Use Java’s `keytool` to import the server’s CA certificate into a Java keystore (trust store).\n3. In Identity Console, open the Salesforce driver’s Configuration > Driver Settings page.\n4. Enter the path to the created trust store in the **Truststore file** field.\n5. Save the configuration. This enables the Subscriber channel to communicate securely with Salesforce."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the exact keytool command to import a certificate file named 'cert.cer' into a trust store named 'sf.keystore' with store password 'pass123' for the Salesforce driver.",
+      "input": "",
+      "output": "```bash\nkeytool -import -file cert.cer -trustcacerts -noprompt -keystore sf.keystore -storepass pass123\n```"
+    }
+  ]
+}

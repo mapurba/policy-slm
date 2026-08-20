@@ -1,0 +1,65 @@
+{
+  "driver": "ID Provider driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the ID Provider driver and on which platforms can it run?",
+      "input": "",
+      "output": "The ID Provider driver is an Identity Manager driver that can also be executed as a native Java module. It can run on any platform that is supported by NetIQ Identity Manager, allowing you to create, manage, and issue IDs for objects within the Identity Vault."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you import the current driver packages for the ID Provider driver in Designer?",
+      "input": "",
+      "output": "To import the current driver packages for the ID Provider driver in Designer:\n1. Open Designer.\n2. In the toolbar, choose **Help > Check for Package Updates**.\n3. Click **OK** to update the packages, or click **OK** if they are already up‑to‑date.\n4. In the Outline view, right‑click **Package Catalog** and select **Import Package**.\n5. In the import dialog, select the ID Provider driver packages you need, or click **Select All** to import every displayed package.\n   - By default only base packages are shown; deselect **Show Base Packages Only** to see all packages.\n6. Click **OK** to import the selected packages, then click **OK** again in the success message.\n7. After the packages are imported, proceed to the driver installation step."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the ID Provider driver packages to create a new driver object?",
+      "input": "",
+      "output": "To install the ID Provider driver packages and create a new driver object:\n1. In Designer, open your project.\n2. In the Modeler, right‑click the driver set where the driver will reside and choose **New > Driver**.\n3. Select **ID Provider Base** and click **Next**.\n4. On the ID Provider page, enter a name for the driver and click **Next**.\n5. Fill in the following fields and click **Next**:\n   - **LDAP server** – IP address or DNS name of the LDAP server that holds the ID policies.\n   - **Policy Container DN** – LDAP DN of the policy container.\n6. On the next page, provide these fields and click **Next**:\n   - **Authentication ID** – LDAP DN of a user with read/write rights to the ID Policy container.\n   - **Authentication Password** – Password for the Authentication ID user.\n7. Configure Remote Loader information (see the Remote Loader how‑to for details) and click **Next**.\n8. Review the summary of tasks and click **Finish**.\n9. After installation, either continue to **Configuring the Driver Settings** or proceed directly to **Deploying the Driver Object**, depending on whether further configuration is required."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure Remote Loader settings when installing the ID Provider driver?",
+      "input": "",
+      "output": "During the installation of the ID Provider driver, you can enable Remote Loader use:\n1. On the Remote Loader configuration page, set **Connect To Remote Loader** to **Yes** (or **No** to skip Remote Loader configuration).\n2. If **Yes**, provide the following fields:\n   - **Host Name** – IP address or DNS name of the server where the Remote Loader is installed and running.\n   - **Port** – Port number for this driver (default is **8090**). Each driver uses a separate port.\n   - **Remote Loader Password** – Password that controls access to the Remote Loader; must match the password set on the Remote Loader.\n   - **Driver Password** – Password the driver uses to authenticate to the Identity Manager server; must match the Driver Object Password configured on the Remote Loader.\n3. Click **Next** to continue with the driver creation wizard."
+    },
+    {
+      "category": "config",
+      "instruction": "What are the ID Policy Repository parameters for the ID Provider driver and their default values?",
+      "input": "",
+      "output": "The ID Policy Repository parameters define how the ID Provider driver accesses ID policies:\n| Parameter | Default Value | Description |\n|-----------|---------------|-------------|\n| LDAP Server | 127.0.0.1 | IP address or DNS name of the LDAP server holding the ID policies |\n| LDAP Port | 636 | TCP port the LDAP server listens on (389 for non‑SSL, 636 for SSL) |\n| Use SSL | True | Determines whether SSL is used for LDAP connections |\n| Always trust | True | If True, the driver trusts all LDAP servers even if their certificates are untrusted |\n| Policy Container DN | *None (requires user entry)* | DN of the policy container under the driver object, e.g., `cn=id-policies,cn=id-provider,cn=driverset1,dc=idm,dc=services,dc=system` |\nThese defaults can be changed in the driver’s **Properties** dialog under the **ID Policy Repository** section."
+    },
+    {
+      "category": "config",
+      "instruction": "What client option parameters can be set for the ID Provider driver and what do they control?",
+      "input": "",
+      "output": "Client option parameters affect how the ID Provider driver behaves as an ID client:\n| Parameter | Default Value | Description |\n|-----------|---------------|-------------|\n| Client name | ID-Provider Driver | Name the driver uses when it acts as an ID client; useful for tracing and for access‑control lists on ID policies |\n| ID Generation Map | workforceID=wfid | Comma‑separated list of `attribute=policy` pairs (e.g., `workforceID=wfid,uniqueID=uid`). Configures which policy supplies IDs for which attribute. The driver issues IDs only when the attribute and its object class are present in Subscriber, Publisher, Filter, and set to synchronize. Attribute names must be in the Identity Namespace and case‑exact. |\nThese settings are edited via the driver **Properties** dialog under **Client Options**."
+    },
+    {
+      "category": "config",
+      "instruction": "What server option parameters are available for the ID Provider driver and what are their defaults?",
+      "input": "",
+      "output": "Server option parameters configure RMI services and trace behavior for the ID Provider driver:\n| Parameter | Default Value | Description |\n|-----------|---------------|-------------|\n| Start RMI | True | Determines whether the driver starts an RMI service. Required only if external clients (e.g., DirXMLScript policies) need IDs. |\n| RMI server | 172.17.2.117 | IP address the RMI server binds to. Leave blank to bind to all IP addresses. |\n| RMI port | 1199 | TCP port the RMI service listens on. The standard RMI port is 1099; use a different port >1023 if 1099 is in use. |\n| Use legacy ID‑server schema? | False | When True, enables backward‑compatible mode for legacy ID‑Server policies that do not use the new schema. |\n| Trace level | ALL | ID Provider trace level (not driver trace). Options: OFF, FATAL, ERROR, WARN, INFO, DEBUG, ALL. |\nThese values are set in the driver **Properties** dialog under **Server Options**."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you deploy the ID Provider driver object to the Identity Vault?",
+      "input": "",
+      "output": "To deploy the ID Provider driver object to the Identity Vault:\n1. In Designer, open the project containing the driver.\n2. In the Modeler, right‑click the driver icon or driver line and choose **Live > Deploy**.\n3. If not already authenticated, enter the following and click **OK**:\n   - **Host** – IP address or DNS name of the server hosting the Identity Vault.\n   - **Username** – DN of the user object used for authentication.\n   - **Password** – Password for the user.\n4. Review the deployment summary and click **Deploy**.\n5. After a successful deployment message appears, click **OK**.\n6. Click **Define Security Equivalence** to assign the necessary rights to the driver:\n   a. Click **Add**, browse to the user (e.g., Admin or a custom DriversUser) that has the required rights, and select it.\n   b. Click **OK** twice.\n7. Click **Exclude Administrative Roles** to prevent administrative user objects from being synchronized:\n   a. Click **Add**, select each administrative user object to exclude (e.g., Admin, DriversUser), and click **OK**.\n   b. Repeat for each object to exclude, then click **OK**.\n8. Click **OK** to finish the deployment process."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you start the ID Provider driver after it has been deployed?",
+      "input": "",
+      "output": "To start the ID Provider driver:\n1. In Designer, open your project.\n2. In the Modeler, right‑click the driver icon or driver line.\n3. Choose **Live > Start Driver**.\nThe driver will transition from the stopped state to running. It will remain idle until an event triggers it, as Identity Manager operates on an event‑driven model."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the process of creating, configuring, deploying, and starting an ID Provider driver in Designer.",
+      "input": "",
+      "output": "The ID Provider driver is created by first importing the latest driver packages into Designer, then installing the packages to define the driver name, LDAP server, policy container DN, authentication credentials, and optional Remote Loader settings. After installation, you can adjust driver properties such as ID Policy Repository, Client Options, and Server Options. Once configured, the driver object is deployed to the Identity Vault by providing Vault host and authentication details, defining security equivalence, and excluding administrative roles. Finally, the driver is started via the Live > Start Driver command, after which it will process events as they occur."
+    }
+  ]
+}

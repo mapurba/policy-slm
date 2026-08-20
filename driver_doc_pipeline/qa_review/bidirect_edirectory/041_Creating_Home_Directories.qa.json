@@ -1,0 +1,41 @@
+{
+  "driver": "Bidirectional eDirectory driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the Set Operation Template DN (do-set-op-template-dn) in the Bidirectional eDirectory driver and why is it used?",
+      "input": "",
+      "output": "In the Bidirectional eDirectory driver, the Set Operation Template DN (identified by the GCV name **do-set-op-template-dn**) is the distinguished name (DN) of a user template that the driver will apply when it creates a home directory for a new user. The driver uses this template to provision the initial directory structure and attributes for the home directory, ensuring that each new account receives a consistent set of settings defined in the template."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver filter setting must be enabled on the User class to allow the Bidirectional eDirectory driver to create home directories?",
+      "input": "",
+      "output": "In the Bidirectional eDirectory driver, you must set **Create Home Directory** to **Yes** on the User class within the driver filter. This flag tells the driver that a home directory should be created for each user processed by that class."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure the Bidirectional eDirectory driver to create home directories using a user template?",
+      "input": "",
+      "output": "To configure the Bidirectional eDirectory driver to create home directories using a user template, follow these steps:\n1. Open the driver configuration and locate the **User** class in the driver filter.\n2. Set **Create Home Directory** to **Yes** for that class.\n3. In the policy definition, add an **actions** element.\n4. Within **actions**, include the **do-set-op-template-dn** element.\n5. Inside **do-set-op-template-dn**, add an **arg-dn** element that contains a **token-text** element with the attribute `xml:space=\"preserve\"`.\n6. Set the text of **token-text** to the distinguished name of the template you want to use, for example `Data\\Users\\UserCreationTemplate`.\n7. Save the policy and deploy the changes.\nAfter these steps, the Bidirectional eDirectory driver will use the specified template whenever it creates a home directory for a new user."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an XML fragment for the actions element that sets the Set Operation Template DN to Data\\Users\\UserCreationTemplate for the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "<actions>\n    <do-set-op-template-dn>\n        <arg-dn>\n            <token-text xml:space=\"preserve\">Data\\Users\\UserCreationTemplate</token-text>\n        </arg-dn>\n    </do-set-op-template-dn>\n</actions>"
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the requirements for creating home directories in the destination eDirectory using the Bidirectional eDirectory driver.",
+      "input": "",
+      "output": "To create home directories with the Bidirectional eDirectory driver, you must (1) enable **Create Home Directory = Yes** on the User class in the driver filter, and (2) configure the policy’s **actions** section with a **do-set-op-template-dn** element that references the DN of the user template (using a **token-text** element with `xml:space=\"preserve\"`). This combination tells the driver to apply the specified template when provisioning each user's home directory."
+    },
+    {
+      "category": "config",
+      "instruction": "What XML attribute is used on the token-text element to ensure spaces are preserved in the template DN for the Bidirectional eDirectory driver?",
+      "input": "",
+      "output": "The XML attribute `xml:space=\"preserve\"` is applied to the **token-text** element to ensure that spaces (and backslashes) in the template DN are retained when the Bidirectional eDirectory driver processes the policy."
+    }
+  ]
+}

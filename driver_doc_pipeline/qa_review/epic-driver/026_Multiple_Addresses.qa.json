@@ -1,0 +1,53 @@
+{
+  "driver": "Epic driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What does the \"Multiple\" address option do in the Epic driver?",
+      "input": "",
+      "output": "In the Epic driver, selecting \"Multiple\" for the address type exposes a single Global Configuration Variable (GCV) named \"Provider Address Attribute\" (pdsepicsdcfg.address.multiple.attr). This GCV must point to a multi-valued string attribute that holds each provider address as a separate JSON-formatted string."
+    },
+    {
+      "category": "config",
+      "instruction": "Which Global Configuration Variable (GCV) must be set to define the provider address attribute for multiple addresses in the Epic driver?",
+      "input": "",
+      "output": "The GCV to set is \"Provider Address Attribute\" with the property name pdsepicsdcfg.address.multiple.attr. It should contain the name of the multi-valued string attribute that stores the provider addresses in JSON format."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the required format of each JSON string value for an address in the Epic driver?",
+      "input": "",
+      "output": "Each JSON string must contain the following name/value pairs:\n```\n{\n\"addressID\":\"IDM-1\",\n\"isPrimary\":\"1\",\n\"active\":\"1\",\n\"addr1\":\"123 Main St\",\n\"addr2\":\"Suite 1\",\n\"addr3\":\"Main Hospital\",\n\"city\":\"Atlanta\",\n\"state\":\"GA\",\n\"zip\":\"12345\",\n\"country\":\"USA\",\n\"phone\":\"555.123.1234\",\n\"fax\":\"555.321.4321\",\n\"email\":\"name@hospital.com\"\n}\n```\nAll fields are strings; the attribute must be multi-valued, with each value being one such JSON object."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How is the \"addressID\" element used in the Epic driver address JSON?",
+      "input": "",
+      "output": "In the Epic driver, the \"addressID\" element is mapped to the \"Address External ID\" (field 21200) in Epic. This value must be unique for each address belonging to a single user, although the same External ID can be reused for addresses of different users."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you configure a single-address organization to use the \"Multiple\" address type in the Epic driver?",
+      "input": "",
+      "output": "1. In the Epic driver configuration, select \"Multiple\" as the address type.\n2. Identify the single eDirectory attribute that currently holds the address.\n3. Ensure that attribute is defined as a multi-valued string attribute.\n4. Populate the attribute with a JSON string that follows the required format (see JSON example in the documentation).\n5. Set the GCV \"Provider Address Attribute\" (pdsepicsdcfg.address.multiple.attr) to the name of this attribute.\n6. Save the configuration and verify that the address appears correctly in Epic."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "Why might an address not be imported correctly when using the \"Multiple\" address option in the Epic driver, and how can it be resolved?",
+      "input": "",
+      "output": "If an address is not imported, the most common cause is an invalid JSON format in the attribute. Ensure that each value in the multi-valued attribute is a well‑formed JSON string matching the required field names and that all string values are enclosed in double quotes. Also verify that the attribute referenced by pdsepicsdcfg.address.multiple.attr is indeed multi‑valued and contains the JSON strings. Correcting any formatting errors and re‑populating the attribute resolves the import problem."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the key steps and requirements for configuring multiple addresses in the Epic driver.",
+      "input": "",
+      "output": "To configure multiple addresses in the Epic driver, choose the \"Multiple\" address type, set the GCV \"Provider Address Attribute\" (pdsepicsdcfg.address.multiple.attr) to point to a multi‑valued string attribute, and ensure each attribute value is a JSON string containing fields such as addressID, isPrimary, active, addr1‑addr3, city, state, zip, country, phone, fax, and email. The addressID maps to Epic's Address External ID and must be unique per user. For organizations with a single address stored in one attribute, still select \"Multiple\" and format the attribute as required."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide an example of a JSON string for a secondary address that could be stored in the multi-valued attribute for the Epic driver.",
+      "input": "",
+      "output": "{\n  \"addressID\":\"IDM-2\",\n  \"isPrimary\":\"0\",\n  \"active\":\"1\",\n  \"addr1\":\"456 Secondary Rd\",\n  \"addr2\":\"Suite 200\",\n  \"addr3\":\"Branch Clinic\",\n  \"city\":\"Savannah\",\n  \"state\":\"GA\",\n  \"zip\":\"54321\",\n  \"country\":\"USA\",\n  \"phone\":\"555.987.6543\",\n  \"fax\":\"555.654.3219\",\n  \"email\":\"branch@hospital.com\"\n}"
+    }
+  ]
+}

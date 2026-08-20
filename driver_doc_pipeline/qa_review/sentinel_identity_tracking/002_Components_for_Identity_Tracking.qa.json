@@ -1,0 +1,59 @@
+{
+  "driver": "Sentinel driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "What is the DirXML-Accounts attribute and how does the Sentinel driver use it?",
+      "input": "",
+      "output": "The DirXML-Accounts attribute is an attribute on an Identity Vault User object that stores the different account identifiers a user has in various applications. Identity Manager drivers populate this attribute with identifier values for each managed account. The Sentinel driver reads the DirXML-Accounts values and uses them to create and manage corresponding account records in Sentinel, allowing Sentinel to track each account and its status."
+    },
+    {
+      "category": "config",
+      "instruction": "Which account identifier types and sample data are shown in the DirXML-Accounts attribute for John’s account?",
+      "input": "",
+      "output": "The example in the documentation shows the following identifier types and sample data stored in the DirXML-Accounts attribute:\n\n| Driver/Application | Account Identifier Type | Account Identifier Sample Data |\n|--------------------|------------------------|--------------------------------|\n| Active Directory   | sAMAccountName         | jsmith |\n| Active Directory   | userPrincipalName      | jsmith@company.com |\n| Active Directory   | LDAPDN                 | cn=John Smith,cn=users,dc=company,dc=com |\n| Active Directory   | association            | 5d377f84f3ab534babbf12edd6540d77 |\n| LDAP               | LDAPDN                 | cn=jsmith,cn=users,dc=company,dc=com |\n\nThese values are read by the Sentinel driver to correlate and track the user’s accounts."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Why might the Sentinel driver create multiple account records in Sentinel for a single application account?",
+      "input": "",
+      "output": "The Sentinel driver can create multiple account records for a single application account when the application provides more than one way to identify that account. Each distinct identifier stored in the DirXML-Accounts attribute can result in a separate account record in Sentinel. For example, Active Directory supplies four different identifiers and the Sentinel driver synthesizes a fifth, leading to five records for one AD account."
+    },
+    {
+      "category": "howto",
+      "instruction": "How does the Sentinel driver use DirXML-Accounts values to create and manage account records in Sentinel?",
+      "input": "",
+      "output": "The Sentinel driver follows these steps:\n1. Retrieve the DirXML-Accounts attribute from the Identity Vault user object.\n2. Extract each account identifier value (e.g., sAMAccountName, userPrincipalName, LDAPDN, association, etc.).\n3. For each identifier, construct a corresponding account record payload.\n4. Send the payload, including the account identifier and its current status, to the Sentinel REST API interface.\n5. Receive the response from Sentinel and update the account status in the Identity Vault as needed.\n6. Repeat the process whenever the DirXML-Accounts attribute is changed or when a scheduled sync occurs.\nThese actions enable the Sentinel driver to keep Sentinel in sync with the identities managed by Identity Manager."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "What functions does the Sentinel REST API interface perform for the Sentinel driver?",
+      "input": "",
+      "output": "The Sentinel REST API interface is the integration point between the Sentinel driver and Sentinel. It performs functions such as establishing remote protocol connections, mapping the data sent by the Sentinel driver into the format expected by Sentinel, and handling the communication needed to transmit account identifiers, status information, and access data."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you control the actions performed by the Sentinel driver using Identity Console?",
+      "input": "",
+      "output": "In Identity Console you can control the Sentinel driver by defining filters and policies. Create a filter that selects the specific users or accounts you want the driver to process, then attach a data sharing policy that specifies which actions (e.g., create, update, delete) the Sentinel driver is allowed to perform on those filtered records. The Sentinel driver enforces these policies when it sends data to the Sentinel REST API."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the components required to integrate Sentinel with Identity Manager.",
+      "input": "",
+      "output": "To integrate Sentinel with Identity Manager you need three components: (1) the DirXML-Accounts attribute on Identity Vault user objects, which stores all account identifiers for a user; (2) the Sentinel driver, which reads the DirXML-Accounts values and sends account identifiers and status to Sentinel; and (3) the Sentinel REST API interface, which receives the driver’s data, performs remote protocol connections and data mapping, and forwards the information to Sentinel."
+    },
+    {
+      "category": "config",
+      "instruction": "Which driver synthesizes the fifth account identifier for Active Directory when the Sentinel driver processes DirXML-Accounts values?",
+      "input": "",
+      "output": "The Active Directory driver provides four identifiers in the DirXML-Accounts attribute and the Sentinel driver synthesizes the fifth identifier from one of the values supplied by the Active Directory driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "How does the DirXML-Accounts attribute enable correlation between account identities across systems for the Sentinel driver?",
+      "input": "",
+      "output": "The DirXML-Accounts attribute aggregates all identifiers a user has in each managed application (e.g., sAMAccountName, userPrincipalName, LDAPDN, association). By storing these identifiers in a single attribute, the Sentinel driver can read them and map each identifier to a corresponding account record in Sentinel, thereby correlating multiple identities that belong to the same user across different systems."
+    }
+  ]
+}

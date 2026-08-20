@@ -1,0 +1,47 @@
+{
+  "driver": "PeopleSoft driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the PeopleSoft driver generate a ‘FOR UPDATE cannot be specified on a READ ONLY cursor’ SQL error when saving Sample Person records?",
+      "input": "",
+      "output": "The PeopleSoft driver includes an SQLExec command that uses the ‘FOR UPDATE’ locking clause. This clause is not supported by all database flavors, such as Microsoft SQL Server. When the driver runs the command against SQL Server, the database returns the error “FOR UPDATE cannot be specified on a READ ONLY cursor,” causing the save operation to fail."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you fix the SQL error that occurs when the PeopleSoft driver saves Sample Person records?",
+      "input": "",
+      "output": "1. Open the PeopleCode object DirXML_DERIVED.DIRXML_DRIVER.FieldFormula in the PeopleSoft application.\n2. Locate the SQLExec command line that contains the ‘FOR UPDATE’ clause.\n3. Remove the ‘FOR UPDATE’ clause from the SELECT statement so it reads:\n   SQLExec(\"Select DIRXML_INST from DIRXML_TRANSXT Where DIRXML_DRIVER =:1\", &Driver, &InstanceID);\n4. Save and compile the PeopleCode.\n5. Test the Sample Person record save to confirm the error no longer occurs."
+    },
+    {
+      "category": "config",
+      "instruction": "Which PeopleCode field formula in the PeopleSoft driver contains the SQLExec command that triggers the SQL error?",
+      "input": "",
+      "output": "The problematic SQLExec command resides in the PeopleCode object **DirXML_DERIVED.DIRXML_DRIVER.FieldFormula** of the PeopleSoft driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the exact SQLExec command line used in the PeopleSoft driver that causes the SQL error?",
+      "input": "",
+      "output": "The original command line is:\n```\nSQLExec(\"Select DIRXML_INST from DIRXML_TRANSXT Where DIRXML_DRIVER =:1\nFOR UPDATE\", &Driver, &InstanceID);\n```"
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If there is a risk of simultaneous administrative access to the transaction row creation in the PeopleSoft driver, what should a qualified DBA do after removing the FOR UPDATE clause?",
+      "input": "",
+      "output": "A qualified DBMS/PeopleSoft database administrator should modify the code to appropriately serialize the SELECT and INSERT or UPDATE operations on the DIRXML_TRANSNXT table. This ensures that concurrent administrators do not cause race conditions when creating transaction rows."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the steps required to resolve the SQL error encountered by the PeopleSoft driver when saving Sample Person records.",
+      "input": "",
+      "output": "The PeopleSoft driver throws a SQL error because its SQLExec statement includes a ‘FOR UPDATE’ clause, which SQL Server does not support. To resolve the issue, edit the DirXML_DERIVED.DIRXML_DRIVER.FieldFormula PeopleCode, remove the ‘FOR UPDATE’ clause from the SELECT statement, and recompile. If concurrent administrative access is possible, a DBA should further adjust the code to serialize the SELECT and INSERT/UPDATE actions on the DIRXML_TRANSNXT table."
+    },
+    {
+      "category": "grounded",
+      "instruction": "Provide the corrected SQLExec command for the PeopleSoft driver that removes the unsupported FOR UPDATE clause.",
+      "input": "",
+      "output": "```sql\nSQLExec(\"Select DIRXML_INST from DIRXML_TRANSXT Where DIRXML_DRIVER =:1\", &Driver, &InstanceID);\n```"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "driver": "Sentinel Identity Tracking driver",
+  "qa_pairs": [
+    {
+      "category": "explanatory",
+      "instruction": "Why does the Sentinel Identity Tracking driver require you to import a TLS/SSL certificate after installation?",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver uses TLS/SSL to communicate securely with the Sentinel server, so importing the appropriate certificate (either a self‑signed public key certificate or a trusted root certificate) is required to establish a trusted, encrypted connection between the driver shim and the server."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you install the Sentinel Identity Tracking driver on a Windows system?",
+      "input": "",
+      "output": "To install the Sentinel Identity Tracking driver on Windows:\n1. Download the Integration Module for Sentinel (driver shim) named **sentinel_driver_install.exe** from the NetIQ download site.\n2. Run **sentinel_driver_install.exe** on the target Windows machine, which can be the Identity Manager server or a Remote Loader, depending on where the driver shim is needed.\n3. Follow the prompts presented by the installer until the installation completes.\n4. After installation, import the required TLS/SSL certificate for the Sentinel Identity Tracking driver (self‑signed or trusted root) as described in the certificate sections of the documentation."
+    },
+    {
+      "category": "howto",
+      "instruction": "How can you obtain a self‑signed certificate for the Sentinel Identity Tracking driver using the getcert utility?",
+      "input": "",
+      "output": "To obtain a self‑signed certificate for the Sentinel Identity Tracking driver with the getcert utility:\n1. On the workstation where you run Identity Manager Designer, locate **getcert.jar**. If it is not present, copy it from the system where the Integration Module installer was run or reinstall the Integration Module to place the file.\n2. Run the utility:\n   - **Windows**: double‑click **getcert.jar** in Windows Explorer.\n   - **Linux**: execute `java -jar getcert.jar` from `/opt/novell/eDirectory/lib/dirxml/util/sentinel_rest/`.\n3. In the utility, enter the Sentinel server’s address and port, then click **Get Certificate**.\n4. Review the displayed certificate data; if correct, click **Yes** to confirm.\n5. When creating the Sentinel Identity Tracking driver, provide this certificate data when prompted for the TLS/SSL certificate."
+    },
+    {
+      "category": "howto",
+      "instruction": "How do you extract the Sentinel server's web server certificate from the keystore file for the Sentinel Identity Tracking driver?",
+      "input": "",
+      "output": "To extract the web server certificate for the Sentinel Identity Tracking driver from the keystore file:\n1. Log in as the root user on the Sentinel server.\n2. Locate the Java keystore file at **/etc/opt/novell/sentinel/config/.webserverkeystore.jks**.\n3. Use a Java keytool command (or any compatible keystore utility) with the keystore password **password** to list or export the certificate. For example:\n   ```\n   keytool -list -keystore /etc/opt/novell/sentinel/config/.webserverkeystore.jks -storepass password\n   ```\n4. Export the desired certificate entry to a file (e.g., `keytool -export -alias <alias> -keystore ... -rfc -file server.crt`).\n5. Use the exported certificate data when prompted for the TLS/SSL certificate while creating the Sentinel Identity Tracking driver."
+    },
+    {
+      "category": "config",
+      "instruction": "What is the default location and password of the Java keystore file that stores the web server certificate for the Sentinel Identity Tracking driver?",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver stores the web server certificate in the Java keystore file located at **/etc/opt/novell/sentinel/config/.webserverkeystore.jks**. The keystore password is **password**."
+    },
+    {
+      "category": "troubleshooting",
+      "instruction": "If the getcert.jar file is missing on the machine where you run Identity Manager Designer, what steps should you take to obtain it for use with the Sentinel Identity Tracking driver?",
+      "input": "",
+      "output": "When getcert.jar is not found on the machine used for Identity Manager Designer, follow these steps for the Sentinel Identity Tracking driver:\n1. Copy **getcert.jar** from another system where the Integration Module installer was executed (the installer places the file there).\n2. Alternatively, run the Integration Module installer again on the current system; the installer will copy **getcert.jar** to the appropriate location.\n3. After the file is present, you can launch it (double‑click on Windows or `java -jar getcert.jar` on Linux) to retrieve the self‑signed certificate."
+    },
+    {
+      "category": "summarization",
+      "instruction": "Summarize the essential steps to install the Sentinel Identity Tracking driver on Windows and provision the required TLS/SSL certificate.",
+      "input": "",
+      "output": "To install the Sentinel Identity Tracking driver on Windows and provision its TLS/SSL certificate:\n1. Download **sentinel_driver_install.exe** from the NetIQ download site.\n2. Execute the installer on the Identity Manager server or Remote Loader and follow the prompts.\n3. After installation, import a TLS/SSL certificate:\n   - If using the default self‑signed certificate, obtain it via the **getcert** utility or by extracting it from **/etc/opt/novell/sentinel/config/.webserverkeystore.jks** (password: password).\n   - If a public certificate signed by a Certificate Authority is in use, obtain the corresponding trusted root certificate from your organization or the CA.\n4. Provide the obtained certificate data when creating the Sentinel Identity Tracking driver."
+    },
+    {
+      "category": "explanatory",
+      "instruction": "Which types of certificates can be imported for the Sentinel Identity Tracking driver, and in what scenarios should each type be used?",
+      "input": "",
+      "output": "The Sentinel Identity Tracking driver supports two certificate types:\n* **Self‑signed public key certificate** – Use this when the Sentinel server is still using its default web server certificate created during server installation and has not been replaced with a CA‑signed certificate.\n* **Trusted root certificate of a Certificate Authority** – Use this when the Sentinel server’s default certificate has been replaced with a public key certificate signed by a CA (e.g., Verisign or Entrust). Obtain the CA’s root certificate from your organization or the issuing authority."
+    }
+  ]
+}
